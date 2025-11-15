@@ -205,3 +205,64 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ==================== Trading Coach Project Specific ====================
+
+# Configuration files containing API keys
+config.py
+config_local.py
+.env
+.env.local
+.env.production
+
+# API Keys files
+api_keys.txt
+*.key
+secrets.json
+
+# Database files
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache directories
+cache/
+*.pkl
+*.pickle
+
+# Log files
+logs/
+*.log
+
+# CSV data files (optional - uncomment if you don't want to commit trading data)
+# original_data/*.csv
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.vscode/
+.idea/
+*.code-workspace
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Performance profiling
+*.prof
+*.lprof
+
+# Data analysis outputs
+outputs/
+reports/

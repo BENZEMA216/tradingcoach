@@ -1,0 +1,49 @@
+# 核心依赖
+pandas>=2.0.0
+numpy>=1.24.0
+sqlalchemy>=2.0.0
+
+# 数据获取
+yfinance>=0.2.30
+alpha-vantage>=2.3.1  # 备用数据源
+# polygon-api-client>=1.12.0  # 可选，期权数据
+
+# 技术指标
+pandas-ta>=0.3.14b
+# TA-Lib>=0.4.28  # 可选，性能更好但安装复杂
+
+# 时区和日期处理
+python-dateutil>=2.8.2
+pytz>=2023.3
+
+# HTTP请求
+requests>=2.31.0
+
+# 重试机制
+tenacity>=8.2.3
+
+# 限流控制
+ratelimit>=2.2.1
+
+# 定时任务
+apscheduler>=3.10.4
+
+# Web UI (未来)
+streamlit>=1.28.0
+
+# 配置管理
+python-dotenv>=1.0.0
+
+# 日志
+colorlog>=6.7.0  # 彩色日志输出
+
+# 开发工具
+pytest>=7.4.0
+pytest-cov>=4.1.0  # 测试覆盖率
+black>=23.0.0  # 代码格式化
+flake8>=6.1.0  # 代码检查
+mypy>=1.5.0  # 类型检查
+
+# 性能分析（可选）
+# line-profiler>=4.0.0
+# memory-profiler>=0.61.0
