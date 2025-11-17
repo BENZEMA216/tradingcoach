@@ -22,7 +22,7 @@
 
 **配置示例**:
 ```python
-ALPHA_VANTAGE_API_KEY = "YOUR_KEY_HERE"
+ALPHA_VANTAGE_API_KEY = "AASBPCXAMYZWZAIL"
 ```
 
 **优先级**: ⭐⭐⭐⭐⭐ 必需申请

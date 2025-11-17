@@ -76,9 +76,9 @@ python scripts/import_trades.py --file original_data/历史-保证金综合账�
 ## 当前状态
 
 **版本**: v0.1.0-dev
-**最后更新**: 2025-11-16
+**最后更新**: 2025-11-17
 **当前分支**: `dev/foundation`
-**进度**: Phase 2/7 完成 ✅
+**进度**: Phase 3/7 完成 ✅ (88/88 测试通过，100% 通过率)
 
 ### 快速恢复工作
 
@@ -90,7 +90,7 @@ git checkout dev/foundation
 git status
 git log --oneline -5
 
-# 3. 下一步：开始Phase 3 - CSV导入模块
+# 3. 下一步：开始Phase 4 - FIFO交易配对算法
 # 详见下方"下一步待办事项"
 ```
 
@@ -154,32 +154,45 @@ git log --oneline -5
 - 索引数量: 30+
 - 枚举类型: 4个
 
-### 🚧 Phase 3: CSV导入模块 (待开始)
-**预计耗时**: 4-5小时
+### ✅ Phase 3: CSV导入模块 (已完成)
+**实际耗时**: ~5小时
+**提交**: 4f423f2
+**测试通过率**: 100% (88/88 tests)
 
-- [ ] CSV解析器
+- [x] CSV解析器
   - UTF-8 BOM编码处理
-  - 中文字段名映射
-  - 数据验证
-- [ ] 时区转换器
-  - 美东时间 → UTC
-  - 香港时间 → UTC
+  - 中文字段名映射（40+ 字段）
+  - 数据验证和统计
+- [x] 时区转换器
+  - 美东时间 → UTC（支持EST/EDT）
+  - 香港时间 → UTC (HKT)
+  - 中国时间 → UTC (CST)
   - 处理夏令时/冬令时
-- [ ] Symbol分类器
-  - 识别美股/港股/期权/窝轮
+- [x] Symbol分类器
+  - 识别美股/港股/A股/期权/窝轮
   - 期权symbol解析（underlying, expiry, type, strike）
-  - 窝轮代码解析
-- [ ] 部分成交处理
+  - 窝轮代码解析（从名称提取信息）
+- [x] 部分成交处理
   - 检测order_quantity vs filled_quantity
-  - 拆分部分成交记录
-- [ ] 数据清洗器
-  - 过滤撤单记录
-  - 数字格式处理（逗号分隔）
-  - 交易方向标准化
-- [ ] 导入脚本
+  - 标记部分成交记录
+  - 实际数据检测到35个部分成交
+- [x] 数据清洗器
+  - 过滤撤单/失败订单
+  - 数字格式处理（逗号、货币符号）
+  - 交易方向标准化（中文→英文）
+  - NaN值处理和类型转换
+- [x] 导入脚本
   - `scripts/import_trades.py`
-  - 批量导入、进度显示
+  - 批量导入（批次提交优化）
+  - 进度显示和统计
   - 错误处理和日志
+  - Dry-run模式支持
+
+**实际成果**:
+- 成功导入真实数据：816 CSV行 → 606 有效交易
+- 88个单元测试（100% 通过率）
+- 处理时间：0.18秒
+- 代码量：~1,500行（含测试）
 
 ### 📋 Phase 4: FIFO交易配对算法 (待开始)
 **预计耗时**: 5-6小时
@@ -270,6 +283,15 @@ git log --oneline -5
 - ✅ 完整的业务逻辑（property方法、计算方法）
 - ✅ 序列化支持（to_dict方法）
 
+### CSV导入和数据处理 (Phase 3)
+- ✅ CSV解析器（支持中文字段、UTF-8 BOM、40+字段映射）
+- ✅ 时区转换工具（美东/香港/中国 → UTC，夏令时处理）
+- ✅ Symbol解析器（美股期权、港股股票/窝轮、A股识别）
+- ✅ 数据清洗器（过滤、标准化、NaN处理、方向映射）
+- ✅ 批量导入脚本（进度显示、错误处理、dry-run模式）
+- ✅ 88个单元测试（100%通过率）
+- ✅ 真实数据验证（816行→606交易，0.18秒）
+
 ### 项目结构
 ```
 tradingcoach/
@@ -278,12 +300,12 @@ tradingcoach/
 │   ├── data_sources/        # 待实现
 │   ├── indicators/          # 待实现
 │   ├── cache/               # 待实现
-│   ├── importers/           # 待实现
+│   ├── importers/           # ✅ csv_parser.py, data_cleaner.py完成
 │   ├── matchers/            # 待实现
 │   ├── analyzers/           # 待实现
-│   └── utils/               # 待实现
-├── scripts/                 # ✅ init_db.py完成
-├── tests/                   # 待实现
+│   └── utils/               # ✅ timezone.py, symbol_parser.py完成
+├── scripts/                 # ✅ init_db.py, import_trades.py完成
+├── tests/                   # ✅ 88个单元测试完成
 ├── project_docs/            # ✅ 5个文档完成
 ├── data/, cache/, logs/     # ✅ 目录已创建
 └── 配置文件                  # ✅ 已创建
@@ -295,41 +317,39 @@ tradingcoach/
 
 ### 立即行动 🔥
 
-1. **申请API Keys** (10分钟)
-   - [ ] Alpha Vantage (必需) - https://www.alphavantage.co/support/#api-key
-   - [ ] Polygon.io (推荐) - https://polygon.io/dashboard/signup
-   - [ ] 配置到 config.py
-
-2. **安装依赖** (5分钟)
+1. **验证导入功能** (5分钟) ✅
    ```bash
-   # 创建虚拟环境
-   python3 -m venv venv
-   source venv/bin/activate
-
-   # 安装依赖
-   pip install -r requirements.txt
+   # 测试导入真实数据
+   python3 scripts/import_trades.py --file original_data/历史-*.csv --dry-run
    ```
 
-3. **测试数据库初始化** (5分钟)
+2. **运行测试套件** (2分钟) ✅
    ```bash
-   python3 scripts/init_db.py
-   # 验证数据库文件创建成功
-   ls -lh data/tradingcoach.db
+   # 验证所有测试通过
+   python3 -m pytest tests/unit/ -v
+   # 结果：88/88 tests passed (100%)
    ```
 
-### Phase 3 开发计划 📝
+3. **准备Phase 4开发** (15分钟)
+   - [ ] Review FIFO matching requirements in PRD
+   - [ ] Design test cases for matching scenarios
+   - [ ] Create Phase 4 development branch (optional)
 
-**目标**: 实现CSV数据导入功能
+### Phase 4 开发计划 📝
+
+**目标**: 实现FIFO交易配对算法
 
 **任务清单**:
-1. 创建 `src/utils/timezone.py` - 时区转换工具
-2. 创建 `src/utils/symbol_parser.py` - Symbol分类和解析
-3. 创建 `src/importers/csv_parser.py` - CSV解析器
-4. 创建 `src/importers/data_cleaner.py` - 数据清洗器
-5. 创建 `scripts/import_trades.py` - 导入脚本
-6. 测试：导入真实CSV文件（815条记录）
+1. 创建 `src/matchers/fifo_matcher.py` - FIFO配对引擎
+2. 实现标准做多配对（buy → sell）
+3. 实现做空配对（sell_short → buy_to_cover）
+4. 处理部分成交配对
+5. 期权特殊处理（到期、行权）
+6. 盈亏计算（含费用）
+7. MAE/MFE计算（需分钟级数据）
+8. 编写10+配对场景测试
 
-**预计完成时间**: 4-5小时
+**预计完成时间**: 5-6小时
 
 ---
 
@@ -366,10 +386,16 @@ refactor(module): 描述 # 代码重构
 
 ## 总体进度
 
-**已完成**: Phase 1-2 (2/7)
-**进度**: 28.6%
-**累计工作时间**: 约7小时
-**剩余预计时间**: 约18-22小时
+**已完成**: Phase 1-3 (3/7)
+**进度**: 42.9%
+**累计工作时间**: 约12小时
+**剩余预计时间**: 约16-20小时
+
+**里程碑**:
+- ✅ 数据库架构完成（5个表，30+索引）
+- ✅ CSV导入系统完成（88个测试，100%通过）
+- ✅ 真实数据验证（606条交易成功导入）
+- 🚧 下一步：FIFO配对算法
 
 ## 许可证
 

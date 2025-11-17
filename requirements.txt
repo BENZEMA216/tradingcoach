@@ -9,7 +9,7 @@ alpha-vantage>=2.3.1  # 备用数据源
 # polygon-api-client>=1.12.0  # 可选，期权数据
 
 # 技术指标
-pandas-ta>=0.3.14b
+# pandas-ta>=0.3.14  # 暂时注释，安装有问题
 # TA-Lib>=0.4.28  # 可选，性能更好但安装复杂
 
 # 时区和日期处理
