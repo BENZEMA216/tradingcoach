@@ -8,6 +8,7 @@ import re
 from datetime import datetime
 from typing import Dict, Tuple, Optional
 import logging
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +44,13 @@ def parse_symbol(symbol: str, symbol_name: str = None, market: str = None) -> Di
             'is_option': 是否为期权/窝轮
         }
     """
-    if not symbol:
+    # Handle NaN and None values
+    if pd.isna(symbol) or not symbol:
         return _create_symbol_info(SymbolType.UNKNOWN, symbol)
+
+    # Convert to string if needed (e.g., if it's a float or other type)
+    if not isinstance(symbol, str):
+        symbol = str(symbol)
 
     symbol = symbol.strip()
 
@@ -52,8 +58,8 @@ def parse_symbol(symbol: str, symbol_name: str = None, market: str = None) -> Di
     if _is_us_option(symbol):
         return _parse_us_option(symbol)
 
-    # 2. 尝试解析港股窝轮
-    if market == '港股' or _is_hk_warrant(symbol, symbol_name):
+    # 2. 尝试解析港股窝轮（只有明确检测到窝轮特征时才归类为窝轮）
+    if _is_hk_warrant(symbol, symbol_name):
         return _parse_hk_warrant(symbol, symbol_name)
 
     # 3. 判断股票类型

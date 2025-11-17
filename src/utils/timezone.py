@@ -8,6 +8,7 @@ from datetime import datetime
 import pytz
 import re
 import logging
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,15 @@ def parse_datetime_with_timezone(datetime_str: str, timezone_hint: str = None) -
         >>> parse_datetime_with_timezone("2025/10/22 11:38:00 (香港)")
         datetime(2025, 10, 22, 3, 38, 0, tzinfo=UTC)  # 香港11:38 = UTC 3:38
     """
-    if not datetime_str or datetime_str.strip() == '':
+    # Handle NaN and None values
+    if pd.isna(datetime_str) or not datetime_str:
+        return None
+
+    # Convert to string if needed (e.g., if it's a float or other type)
+    if not isinstance(datetime_str, str):
+        datetime_str = str(datetime_str)
+
+    if datetime_str.strip() == '':
         return None
 
     try:

@@ -118,8 +118,8 @@ class TestDataCleaner:
             utc_times = cleaner.df['filled_time_utc'].dropna()
             if len(utc_times) > 0:
                 # 应该是datetime对象且带时区信息
-                assert all(pd.api.types.is_datetime64_any_dtype(utc_times.dtype)
-                          or hasattr(utc_times.iloc[0], 'tzinfo'))
+                assert (pd.api.types.is_datetime64_any_dtype(utc_times.dtype) or
+                        all(hasattr(t, 'tzinfo') for t in utc_times))
 
     def test_parse_symbols(self, sample_df):
         """测试解析Symbol"""
