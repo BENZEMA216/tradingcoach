@@ -1,0 +1,397 @@
+2025-11-19 00:25:22,022 - __main__ - INFO - Setting up components...
+2025-11-19 00:25:22,026 - src.data_sources.yfinance_client - INFO - YFinanceClient initialized with rate_limit=2000/3600s
+2025-11-19 00:25:25,074 - __main__ - INFO - Data client ready: YFinanceClient(rate_limit=2000/3600s, requests=0)
+2025-11-19 00:25:25,074 - src.data_sources.cache_manager - INFO - CacheManager initialized: cache_dir=cache/market_data, expiry_days=1, l1_max_size=100
+2025-11-19 00:25:25,109 - __main__ - INFO - Cache manager ready: CacheManager(L1=0/100, L2=0 records, L3=0 files)
+2025-11-19 00:25:25,109 - src.data_sources.batch_fetcher - INFO - BatchFetcher initialized: client=yfinance, batch_size=50
+2025-11-19 00:25:25,109 - __main__ - INFO - Batch fetcher ready: BatchFetcher(client=yfinance, batch_size=50, delay=0.2s)
+2025-11-19 00:25:25,109 - src.data_sources.batch_fetcher - INFO - Cache warmup: preloading top 3 symbols...
+2025-11-19 00:25:25,112 - src.data_sources.batch_fetcher - INFO - Warmup symbols: TSLL, AAPL, FIG...
+2025-11-19 00:25:25,924 - src.data_sources.yfinance_client - INFO - Fetched 330 records for TSLL (2024-07-29 to 2025-11-19)
+2025-11-19 00:25:25,996 - src.data_sources.cache_manager - INFO - Cached 330 records for TSLL (2024-07-29 to 2025-11-18) in all 3 levels
+2025-11-19 00:25:28,605 - src.data_sources.yfinance_client - INFO - Fetched 337 records for AAPL (2024-07-18 to 2025-11-19)
+2025-11-19 00:25:28,677 - src.data_sources.cache_manager - INFO - Cached 337 records for AAPL (2024-07-18 to 2025-11-18) in all 3 levels
+2025-11-19 00:25:30,012 - src.data_sources.yfinance_client - INFO - Fetched 78 records for FIG (2025-01-12 to 2025-11-19)
+2025-11-19 00:25:30,040 - src.data_sources.cache_manager - INFO - Cached 78 records for FIG (2025-07-31 to 2025-11-18) in all 3 levels
+2025-11-19 00:25:30,241 - src.data_sources.batch_fetcher - INFO - Warmup completed: 3/3 symbols, 745 records
+2025-11-20 21:40:02,938 - __main__ - INFO - Setting up components...
+2025-11-20 21:40:02,943 - src.data_sources.yfinance_client - INFO - YFinanceClient initialized with rate_limit=2000/3600s
+2025-11-20 21:40:05,090 - __main__ - INFO - Data client ready: YFinanceClient(rate_limit=2000/3600s, requests=0)
+2025-11-20 21:40:05,090 - src.data_sources.cache_manager - INFO - CacheManager initialized: cache_dir=cache/market_data, expiry_days=1, l1_max_size=100
+2025-11-20 21:40:05,123 - __main__ - INFO - Cache manager ready: CacheManager(L1=0/100, L2=745 records, L3=3 files)
+2025-11-20 21:40:05,123 - src.data_sources.batch_fetcher - INFO - BatchFetcher initialized: client=yfinance, batch_size=50
+2025-11-20 21:40:05,123 - __main__ - INFO - Batch fetcher ready: BatchFetcher(client=yfinance, batch_size=50, delay=0.2s)
+2025-11-20 21:40:05,124 - src.data_sources.batch_fetcher - INFO - ============================================================
+2025-11-20 21:40:05,124 - src.data_sources.batch_fetcher - INFO - Starting batch data fetch
+2025-11-20 21:40:05,124 - src.data_sources.batch_fetcher - INFO - ============================================================
+2025-11-20 21:40:05,124 - src.data_sources.batch_fetcher - INFO - Step 1: Analyzing database requirements...
+2025-11-20 21:40:05,128 - src.data_sources.batch_fetcher - INFO - Found 99 symbols to process
+2025-11-20 21:40:05,128 - src.data_sources.batch_fetcher - INFO - Step 2: Checking cache...
+2025-11-20 21:40:05,162 - src.data_sources.batch_fetcher - INFO - Need to fetch 97 symbols (cache hit: 2)
+2025-11-20 21:40:05,162 - src.data_sources.batch_fetcher - INFO - Step 3: Batch fetching data...
+2025-11-20 21:40:05,416 - src.data_sources.yfinance_client - INFO - Fetched 79 records for FIG (2025-01-12 to 2025-11-20)
+2025-11-20 21:40:05,454 - src.data_sources.cache_manager - INFO - Cached 79 records for FIG (2025-07-31 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:06,155 - src.data_sources.yfinance_client - INFO - Fetched 310 records for 9988.HK (2024-08-19 to 2025-11-20)
+2025-11-20 21:40:06,224 - src.data_sources.cache_manager - INFO - Cached 310 records for 09988 (2024-08-19 to 2025-11-20) in all 3 levels
+2025-11-20 21:40:06,866 - src.data_sources.yfinance_client - INFO - Fetched 303 records for HIMS (2024-09-06 to 2025-11-20)
+2025-11-20 21:40:06,940 - src.data_sources.cache_manager - INFO - Cached 303 records for HIMS (2024-09-06 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:07,595 - src.data_sources.yfinance_client - INFO - Fetched 405 records for 1810.HK (2024-03-28 to 2025-11-20)
+2025-11-20 21:40:07,695 - src.data_sources.cache_manager - INFO - Cached 405 records for 01810 (2024-03-28 to 2025-11-20) in all 3 levels
+2025-11-20 21:40:08,462 - src.data_sources.yfinance_client - INFO - Fetched 257 records for INOD (2024-11-10 to 2025-11-20)
+2025-11-20 21:40:08,527 - src.data_sources.cache_manager - INFO - Cached 257 records for INOD (2024-11-11 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:09,474 - src.data_sources.yfinance_client - INFO - Fetched 117 records for BMNR (2025-03-06 to 2025-11-20)
+2025-11-20 21:40:09,507 - src.data_sources.cache_manager - INFO - Cached 117 records for BMNR (2025-06-05 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:10,123 - src.data_sources.yfinance_client - INFO - Fetched 297 records for SVXY (2024-09-16 to 2025-11-20)
+2025-11-20 21:40:10,214 - src.data_sources.cache_manager - INFO - Cached 297 records for SVXY (2024-09-16 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:10,909 - src.data_sources.yfinance_client - INFO - Fetched 413 records for TQQQ (2024-03-29 to 2025-11-20)
+2025-11-20 21:40:10,997 - src.data_sources.cache_manager - INFO - Cached 413 records for TQQQ (2024-04-01 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:11,681 - src.data_sources.yfinance_client - INFO - Fetched 341 records for NVDA (2024-07-15 to 2025-11-20)
+2025-11-20 21:40:11,753 - src.data_sources.cache_manager - INFO - Cached 341 records for NVDA (2024-07-15 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:12,379 - src.data_sources.yfinance_client - INFO - Fetched 277 records for AMZN (2024-10-13 to 2025-11-20)
+2025-11-20 21:40:12,456 - src.data_sources.cache_manager - INFO - Cached 277 records for AMZN (2024-10-14 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:13,097 - src.data_sources.yfinance_client - INFO - Fetched 229 records for OSCR (2024-12-20 to 2025-11-20)
+2025-11-20 21:40:13,159 - src.data_sources.cache_manager - INFO - Cached 229 records for OSCR (2024-12-20 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:13,781 - src.data_sources.yfinance_client - INFO - Fetched 316 records for PLTR (2024-08-17 to 2025-11-20)
+2025-11-20 21:40:13,846 - src.data_sources.cache_manager - INFO - Cached 316 records for PLTR (2024-08-19 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:14,497 - src.data_sources.yfinance_client - INFO - Fetched 336 records for TSLA (2024-07-22 to 2025-11-20)
+2025-11-20 21:40:14,583 - src.data_sources.cache_manager - INFO - Cached 336 records for TSLA (2024-07-22 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:15,203 - src.data_sources.yfinance_client - INFO - Fetched 343 records for NVDL (2024-07-11 to 2025-11-20)
+2025-11-20 21:40:15,287 - src.data_sources.cache_manager - INFO - Cached 343 records for NVDL (2024-07-11 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:15,910 - src.data_sources.yfinance_client - INFO - Fetched 414 records for CONL (2024-03-28 to 2025-11-20)
+2025-11-20 21:40:15,998 - src.data_sources.cache_manager - INFO - Cached 414 records for CONL (2024-03-28 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:16,659 - src.data_sources.yfinance_client - INFO - Fetched 295 records for MSTU (2024-08-17 to 2025-11-20)
+2025-11-20 21:40:16,754 - src.data_sources.cache_manager - INFO - Cached 295 records for MSTU (2024-09-18 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:17,406 - src.data_sources.yfinance_client - INFO - Fetched 306 records for GOOGL (2024-09-01 to 2025-11-20)
+2025-11-20 21:40:17,492 - src.data_sources.cache_manager - INFO - Cached 306 records for GOOGL (2024-09-03 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:19,114 - yfinance - ERROR - $BRK.B: possibly delisted; no timezone found
+2025-11-20 21:40:19,115 - src.data_sources.batch_fetcher - WARNING - Skipped BRK.B: No data found for BRK.B from 2024-12-29 to 2025-11-20
+2025-11-20 21:40:19,586 - src.data_sources.yfinance_client - INFO - Fetched 414 records for YINN (2024-03-28 to 2025-11-20)
+2025-11-20 21:40:19,689 - src.data_sources.cache_manager - INFO - Cached 414 records for YINN (2024-03-28 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:21,679 - yfinance - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: AAPL260116C235000"}}}
+2025-11-20 21:40:22,119 - yfinance - ERROR - $AAPL260116C235000: possibly delisted; no timezone found
+2025-11-20 21:40:22,120 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL260116C235000: No data found for AAPL260116C235000 from 2024-10-25 to 2025-11-20
+2025-11-20 21:40:22,537 - src.data_sources.yfinance_client - INFO - Fetched 202 records for MSTR (2025-02-03 to 2025-11-20)
+2025-11-20 21:40:22,605 - src.data_sources.cache_manager - INFO - Cached 202 records for MSTR (2025-02-03 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:23,611 - yfinance - ERROR - $OSCR260320C15000: possibly delisted; no timezone found
+2025-11-20 21:40:23,611 - src.data_sources.batch_fetcher - WARNING - Skipped OSCR260320C15000: No data found for OSCR260320C15000 from 2025-01-19 to 2025-11-20
+2025-11-20 21:40:24,396 - yfinance - ERROR - $AAPL250404C227500: possibly delisted; no timezone found
+2025-11-20 21:40:24,397 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL250404C227500: No data found for AAPL250404C227500 from 2024-09-01 to 2025-11-20
+2025-11-20 21:40:25,193 - yfinance - ERROR - $AAPL250718C205000: possibly delisted; no timezone found
+2025-11-20 21:40:25,194 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL250718C205000: No data found for AAPL250718C205000 from 2024-09-20 to 2025-11-20
+2025-11-20 21:40:26,193 - yfinance - ERROR - $AMZN250815C215000: possibly delisted; no timezone found
+2025-11-20 21:40:26,193 - src.data_sources.batch_fetcher - WARNING - Skipped AMZN250815C215000: No data found for AMZN250815C215000 from 2024-10-07 to 2025-11-20
+2025-11-20 21:40:27,007 - yfinance - ERROR - $AMZN260618P195000: possibly delisted; no timezone found
+2025-11-20 21:40:27,007 - src.data_sources.batch_fetcher - WARNING - Skipped AMZN260618P195000: No data found for AMZN260618P195000 from 2025-03-28 to 2025-11-20
+2025-11-20 21:40:27,798 - yfinance - ERROR - $BRKB251219C500000: possibly delisted; no timezone found
+2025-11-20 21:40:27,798 - src.data_sources.batch_fetcher - WARNING - Skipped BRKB251219C500000: No data found for BRKB251219C500000 from 2025-01-17 to 2025-11-20
+2025-11-20 21:40:28,589 - yfinance - ERROR - $GLD250516P270000: possibly delisted; no timezone found
+2025-11-20 21:40:28,589 - src.data_sources.batch_fetcher - WARNING - Skipped GLD250516P270000: No data found for GLD250516P270000 from 2024-09-05 to 2025-11-20
+2025-11-20 21:40:29,091 - src.data_sources.yfinance_client - INFO - Fetched 202 records for UNH (2025-02-02 to 2025-11-20)
+2025-11-20 21:40:29,142 - src.data_sources.cache_manager - INFO - Cached 202 records for UNH (2025-02-03 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:29,858 - src.data_sources.yfinance_client - INFO - Fetched 321 records for TSM (2024-08-12 to 2025-11-20)
+2025-11-20 21:40:29,944 - src.data_sources.cache_manager - INFO - Cached 321 records for TSM (2024-08-12 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:30,958 - yfinance - ERROR - $TSM250417C220000: possibly delisted; no timezone found
+2025-11-20 21:40:30,958 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250417C220000: No data found for TSM250417C220000 from 2024-08-03 to 2025-11-20
+2025-11-20 21:40:31,890 - yfinance - ERROR - $BIDU251219C150000: possibly delisted; no timezone found
+2025-11-20 21:40:31,890 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU251219C150000: No data found for BIDU251219C150000 from 2025-03-24 to 2025-11-20
+2025-11-20 21:40:32,666 - yfinance - ERROR - $BIDU260320P105000: possibly delisted; no timezone found
+2025-11-20 21:40:32,667 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU260320P105000: No data found for BIDU260320P105000 from 2025-02-24 to 2025-11-20
+2025-11-20 21:40:33,919 - yfinance - ERROR - $MIU250429P45000: possibly delisted; no timezone found
+2025-11-20 21:40:33,920 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429P45000: No data found for MIU250429P45000 from 2024-09-12 to 2025-11-20
+2025-11-20 21:40:34,733 - yfinance - ERROR - $MIU251030C55000: possibly delisted; no timezone found
+2025-11-20 21:40:34,733 - src.data_sources.batch_fetcher - WARNING - Skipped MIU251030C55000: No data found for MIU251030C55000 from 2025-01-24 to 2025-11-20
+2025-11-20 21:40:35,287 - src.data_sources.yfinance_client - INFO - Fetched 293 records for SVIX (2024-09-20 to 2025-11-20)
+2025-11-20 21:40:35,361 - src.data_sources.cache_manager - INFO - Cached 293 records for SVIX (2024-09-20 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:36,371 - yfinance - ERROR - $TSLA250411P250000: possibly delisted; no timezone found
+2025-11-20 21:40:36,371 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250411P250000: No data found for TSLA250411P250000 from 2024-09-09 to 2025-11-20
+2025-11-20 21:40:37,169 - yfinance - ERROR - $TSLA250417C265000: possibly delisted; no timezone found
+2025-11-20 21:40:37,169 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250417C265000: No data found for TSLA250417C265000 from 2024-09-15 to 2025-11-20
+2025-11-20 21:40:38,035 - yfinance - ERROR - $VIX250521P22000: possibly delisted; no timezone found
+2025-11-20 21:40:38,036 - src.data_sources.batch_fetcher - WARNING - Skipped VIX250521P22000: No data found for VIX250521P22000 from 2024-08-24 to 2025-11-20
+2025-11-20 21:40:38,459 - src.data_sources.yfinance_client - INFO - Fetched 404 records for BIDU (2024-04-12 to 2025-11-20)
+2025-11-20 21:40:38,556 - src.data_sources.cache_manager - INFO - Cached 404 records for BIDU (2024-04-12 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:39,172 - src.data_sources.yfinance_client - INFO - Fetched 305 records for 3690.HK (2024-08-26 to 2025-11-20)
+2025-11-20 21:40:39,240 - src.data_sources.cache_manager - INFO - Cached 305 records for 03690 (2024-08-26 to 2025-11-20) in all 3 levels
+2025-11-20 21:40:39,860 - src.data_sources.yfinance_client - INFO - Fetched 1 records for 18099.HK (2025-03-16 to 2025-11-20)
+2025-11-20 21:40:39,868 - src.data_sources.cache_manager - INFO - Cached 1 records for 18099 (2025-11-12 to 2025-11-12) in all 3 levels
+2025-11-20 21:40:40,985 - yfinance - ERROR - $AAPL260116C215000: possibly delisted; no timezone found
+2025-11-20 21:40:40,985 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL260116C215000: No data found for AAPL260116C215000 from 2024-11-30 to 2025-11-20
+2025-11-20 21:40:41,824 - yfinance - ERROR - $ALB250403P125000: possibly delisted; no timezone found
+2025-11-20 21:40:41,824 - src.data_sources.batch_fetcher - WARNING - Skipped ALB250403P125000: No data found for ALB250403P125000 from 2024-09-05 to 2025-11-20
+2025-11-20 21:40:42,747 - yfinance - ERROR - $AMZN250815C205000: possibly delisted; no timezone found
+2025-11-20 21:40:42,748 - src.data_sources.batch_fetcher - WARNING - Skipped AMZN250815C205000: No data found for AMZN250815C205000 from 2024-09-09 to 2025-11-20
+2025-11-20 21:40:43,592 - yfinance - ERROR - $AMZN260618C250000: possibly delisted; no timezone found
+2025-11-20 21:40:43,593 - src.data_sources.batch_fetcher - WARNING - Skipped AMZN260618C250000: No data found for AMZN260618C250000 from 2025-03-21 to 2025-11-20
+2025-11-20 21:40:44,405 - yfinance - ERROR - $BIDU260116C140000: possibly delisted; no timezone found
+2025-11-20 21:40:44,406 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU260116C140000: No data found for BIDU260116C140000 from 2025-02-27 to 2025-11-20
+2025-11-20 21:40:45,398 - yfinance - ERROR - $BIDU260116C175000: possibly delisted; no timezone found
+2025-11-20 21:40:45,399 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU260116C175000: No data found for BIDU260116C175000 from 2025-03-03 to 2025-11-20
+2025-11-20 21:40:45,964 - src.data_sources.yfinance_client - INFO - Fetched 207 records for BIIB (2025-01-27 to 2025-11-20)
+2025-11-20 21:40:46,012 - src.data_sources.cache_manager - INFO - Cached 207 records for BIIB (2025-01-27 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:47,051 - yfinance - ERROR - $BRKB251219P440000: possibly delisted; no timezone found
+2025-11-20 21:40:47,052 - src.data_sources.batch_fetcher - WARNING - Skipped BRKB251219P440000: No data found for BRKB251219P440000 from 2025-01-19 to 2025-11-20
+2025-11-20 21:40:47,587 - src.data_sources.yfinance_client - INFO - Fetched 303 records for FBL (2024-09-06 to 2025-11-20)
+2025-11-20 21:40:47,672 - src.data_sources.cache_manager - INFO - Cached 303 records for FBL (2024-09-06 to 2025-11-19) in all 3 levels
+2025-11-20 21:40:48,833 - yfinance - ERROR - $GOOGL250718C185000: possibly delisted; no timezone found
+2025-11-20 21:40:48,833 - src.data_sources.batch_fetcher - WARNING - Skipped GOOGL250718C185000: No data found for GOOGL250718C185000 from 2024-09-05 to 2025-11-20
+2025-11-20 21:40:49,747 - yfinance - ERROR - $GOOGL260116C180000: possibly delisted; no timezone found
+2025-11-20 21:40:49,748 - src.data_sources.batch_fetcher - WARNING - Skipped GOOGL260116C180000: No data found for GOOGL260116C180000 from 2024-10-20 to 2025-11-20
+2025-11-20 21:40:50,546 - yfinance - ERROR - $HIMS260618C60000: possibly delisted; no timezone found
+2025-11-20 21:40:50,546 - src.data_sources.batch_fetcher - WARNING - Skipped HIMS260618C60000: No data found for HIMS260618C60000 from 2025-02-23 to 2025-11-20
+2025-11-20 21:40:51,542 - yfinance - ERROR - $MIU250328P50000: possibly delisted; no timezone found
+2025-11-20 21:40:51,542 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250328P50000: No data found for MIU250328P50000 from 2024-08-11 to 2025-11-20
+2025-11-20 21:40:52,442 - yfinance - ERROR - $MIU250429C50000: possibly delisted; no timezone found
+2025-11-20 21:40:52,442 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429C50000: No data found for MIU250429C50000 from 2024-09-12 to 2025-11-20
+2025-11-20 21:40:53,302 - yfinance - ERROR - $MIU250429C52500: possibly delisted; no timezone found
+2025-11-20 21:40:53,302 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429C52500: No data found for MIU250429C52500 from 2024-09-13 to 2025-11-20
+2025-11-20 21:40:54,100 - yfinance - ERROR - $MIU250429P43000: possibly delisted; no timezone found
+2025-11-20 21:40:54,100 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429P43000: No data found for MIU250429P43000 from 2024-09-13 to 2025-11-20
+2025-11-20 21:40:55,027 - yfinance - ERROR - $MSTR260116P300000: possibly delisted; no timezone found
+2025-11-20 21:40:55,027 - src.data_sources.batch_fetcher - WARNING - Skipped MSTR260116P300000: No data found for MSTR260116P300000 from 2025-02-20 to 2025-11-20
+2025-11-20 21:40:55,825 - yfinance - ERROR - $OPEN260220C12000: possibly delisted; no timezone found
+2025-11-20 21:40:55,826 - src.data_sources.batch_fetcher - WARNING - Skipped OPEN260220C12000: No data found for OPEN260220C12000 from 2025-02-20 to 2025-11-20
+2025-11-20 21:40:56,624 - yfinance - ERROR - $SBUX260116C100000: possibly delisted; no timezone found
+2025-11-20 21:40:56,625 - src.data_sources.batch_fetcher - WARNING - Skipped SBUX260116C100000: No data found for SBUX260116C100000 from 2024-10-26 to 2025-11-20
+2025-11-20 21:40:57,423 - yfinance - ERROR - $TCH250227P400000: possibly delisted; no timezone found
+2025-11-20 21:40:57,423 - src.data_sources.batch_fetcher - WARNING - Skipped TCH250227P400000: No data found for TCH250227P400000 from 2024-07-28 to 2025-11-20
+2025-11-20 21:40:58,256 - yfinance - ERROR - $TSLA250328C250000: possibly delisted; no timezone found
+2025-11-20 21:40:58,257 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250328C250000: No data found for TSLA250328C250000 from 2024-09-09 to 2025-11-20
+2025-11-20 21:40:59,047 - yfinance - ERROR - $TSLA250328P235000: possibly delisted; no timezone found
+2025-11-20 21:40:59,048 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250328P235000: No data found for TSLA250328P235000 from 2024-08-24 to 2025-11-20
+2025-11-20 21:40:59,837 - yfinance - ERROR - $TSLA250328P250000: possibly delisted; no timezone found
+2025-11-20 21:40:59,837 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250328P250000: No data found for TSLA250328P250000 from 2024-09-09 to 2025-11-20
+2025-11-20 21:41:00,638 - yfinance - ERROR - $TSLA250417C240000: possibly delisted; no timezone found
+2025-11-20 21:41:00,639 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250417C240000: No data found for TSLA250417C240000 from 2024-08-23 to 2025-11-20
+2025-11-20 21:41:01,412 - yfinance - ERROR - $TSLA250516P220000: possibly delisted; no timezone found
+2025-11-20 21:41:01,413 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250516P220000: No data found for TSLA250516P220000 from 2024-09-09 to 2025-11-20
+2025-11-20 21:41:02,213 - yfinance - ERROR - $TSM250620C170000: possibly delisted; no timezone found
+2025-11-20 21:41:02,213 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250620C170000: No data found for TSM250620C170000 from 2024-09-26 to 2025-11-20
+2025-11-20 21:41:02,993 - yfinance - ERROR - $TSM250620P170000: possibly delisted; no timezone found
+2025-11-20 21:41:02,993 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250620P170000: No data found for TSM250620P170000 from 2024-09-26 to 2025-11-20
+2025-11-20 21:41:03,787 - yfinance - ERROR - $TSM250815C170000: possibly delisted; no timezone found
+2025-11-20 21:41:03,787 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250815C170000: No data found for TSM250815C170000 from 2024-09-29 to 2025-11-20
+2025-11-20 21:41:04,597 - yfinance - ERROR - $AAPL250502C230000: possibly delisted; no timezone found
+2025-11-20 21:41:04,598 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL250502C230000: No data found for AAPL250502C230000 from 2024-08-30 to 2025-11-20
+2025-11-20 21:41:05,486 - yfinance - ERROR - $BIDU250404P87000: possibly delisted; no timezone found
+2025-11-20 21:41:05,486 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU250404P87000: No data found for BIDU250404P87000 from 2024-07-28 to 2025-11-20
+2025-11-20 21:41:06,654 - yfinance - ERROR - $MIU250328P52500: possibly delisted; no timezone found
+2025-11-20 21:41:06,655 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250328P52500: No data found for MIU250328P52500 from 2024-08-19 to 2025-11-20
+2025-11-20 21:41:07,565 - yfinance - ERROR - $MIU250429P55000: possibly delisted; no timezone found
+2025-11-20 21:41:07,565 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429P55000: No data found for MIU250429P55000 from 2024-09-01 to 2025-11-20
+2025-11-20 21:41:08,344 - yfinance - ERROR - $NVDA250207C120000: possibly delisted; no timezone found
+2025-11-20 21:41:08,345 - src.data_sources.batch_fetcher - WARNING - Skipped NVDA250207C120000: No data found for NVDA250207C120000 from 2024-07-18 to 2025-11-20
+2025-11-20 21:41:09,356 - yfinance - ERROR - $PLTR250228P100000: possibly delisted; no timezone found
+2025-11-20 21:41:09,357 - src.data_sources.batch_fetcher - WARNING - Skipped PLTR250228P100000: No data found for PLTR250228P100000 from 2024-07-26 to 2025-11-20
+2025-11-20 21:41:10,210 - yfinance - ERROR - $SPY250321C565000: possibly delisted; no timezone found
+2025-11-20 21:41:10,210 - src.data_sources.batch_fetcher - WARNING - Skipped SPY250321C565000: No data found for SPY250321C565000 from 2024-08-24 to 2025-11-20
+2025-11-20 21:41:11,213 - yfinance - ERROR - $TSLA250314C380000: possibly delisted; no timezone found
+2025-11-20 21:41:11,214 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250314C380000: No data found for TSLA250314C380000 from 2024-07-25 to 2025-11-20
+2025-11-20 21:41:12,039 - yfinance - ERROR - $TSLA250502P200000: possibly delisted; no timezone found
+2025-11-20 21:41:12,039 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250502P200000: No data found for TSLA250502P200000 from 2024-08-30 to 2025-11-20
+2025-11-20 21:41:12,837 - yfinance - ERROR - $BIDU250919P70000: possibly delisted; no timezone found
+2025-11-20 21:41:12,837 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU250919P70000: No data found for BIDU250919P70000 from 2024-07-21 to 2025-11-20
+2025-11-20 21:41:13,863 - yfinance - ERROR - $BIDU260618P105000: possibly delisted; no timezone found
+2025-11-20 21:41:13,863 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU260618P105000: No data found for BIDU260618P105000 from 2025-02-28 to 2025-11-20
+2025-11-20 21:41:14,931 - yfinance - ERROR - $NVDA250214C120000: possibly delisted; no timezone found
+2025-11-20 21:41:14,931 - src.data_sources.batch_fetcher - WARNING - Skipped NVDA250214C120000: No data found for NVDA250214C120000 from 2024-07-19 to 2025-11-20
+2025-11-20 21:41:15,385 - src.data_sources.yfinance_client - INFO - Fetched 313 records for SGOV (2024-08-22 to 2025-11-20)
+2025-11-20 21:41:15,464 - src.data_sources.cache_manager - INFO - Cached 313 records for SGOV (2024-08-22 to 2025-11-19) in all 3 levels
+2025-11-20 21:41:16,435 - yfinance - ERROR - $SVIX250620C21000: possibly delisted; no timezone found
+2025-11-20 21:41:16,435 - src.data_sources.batch_fetcher - WARNING - Skipped SVIX250620C21000: No data found for SVIX250620C21000 from 2024-09-20 to 2025-11-20
+2025-11-20 21:41:17,226 - yfinance - ERROR - $TCH250214P410000: possibly delisted; no timezone found
+2025-11-20 21:41:17,227 - src.data_sources.batch_fetcher - WARNING - Skipped TCH250214P410000: No data found for TCH250214P410000 from 2024-07-26 to 2025-11-20
+2025-11-20 21:41:17,999 - yfinance - ERROR - $TSLA250307C395000: possibly delisted; no timezone found
+2025-11-20 21:41:18,000 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250307C395000: No data found for TSLA250307C395000 from 2024-07-22 to 2025-11-20
+2025-11-20 21:41:18,826 - yfinance - ERROR - $TSLA250307P395000: possibly delisted; no timezone found
+2025-11-20 21:41:18,826 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250307P395000: No data found for TSLA250307P395000 from 2024-07-22 to 2025-11-20
+2025-11-20 21:41:19,749 - yfinance - ERROR - $TSLA250321P215000: possibly delisted; no timezone found
+2025-11-20 21:41:19,750 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250321P215000: No data found for TSLA250321P215000 from 2024-08-23 to 2025-11-20
+2025-11-20 21:41:20,547 - yfinance - ERROR - $TSLA250417C320000: possibly delisted; no timezone found
+2025-11-20 21:41:20,547 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250417C320000: No data found for TSLA250417C320000 from 2024-08-15 to 2025-11-20
+2025-11-20 21:41:21,525 - yfinance - ERROR - $TSLA250417C370000: possibly delisted; no timezone found
+2025-11-20 21:41:21,525 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250417C370000: No data found for TSLA250417C370000 from 2024-07-26 to 2025-11-20
+2025-11-20 21:41:22,529 - yfinance - ERROR - $TSM250417P220000: possibly delisted; no timezone found
+2025-11-20 21:41:22,530 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250417P220000: No data found for TSM250417P220000 from 2024-08-02 to 2025-11-20
+2025-11-20 21:41:23,332 - yfinance - ERROR - $VIX250219C19000: possibly delisted; no timezone found
+2025-11-20 21:41:23,333 - src.data_sources.batch_fetcher - WARNING - Skipped VIX250219C19000: No data found for VIX250219C19000 from 2024-07-28 to 2025-11-20
+2025-11-20 21:41:24,143 - yfinance - ERROR - $TLT241021C95000: possibly delisted; no timezone found
+2025-11-20 21:41:24,143 - src.data_sources.batch_fetcher - WARNING - Skipped TLT241021C95000: No data found for TLT241021C95000 from 2024-03-28 to 2025-11-20
+2025-11-20 21:41:24,970 - yfinance - ERROR - $700.HK: possibly delisted; no timezone found
+2025-11-20 21:41:24,970 - src.data_sources.batch_fetcher - WARNING - Skipped 00700: No data found for 700.HK from 2024-07-26 to 2025-11-20
+2025-11-20 21:41:25,544 - src.data_sources.yfinance_client - INFO - Fetched 180 records for 2097.HK (2024-08-12 to 2025-11-20)
+2025-11-20 21:41:25,625 - src.data_sources.cache_manager - INFO - Cached 180 records for 02097 (2025-03-03 to 2025-11-20) in all 3 levels
+2025-11-20 21:41:26,250 - src.data_sources.yfinance_client - INFO - Fetched 413 records for DJT (2024-03-29 to 2025-11-20)
+2025-11-20 21:41:26,342 - src.data_sources.cache_manager - INFO - Cached 413 records for DJT (2024-04-01 to 2025-11-19) in all 3 levels
+2025-11-20 21:41:27,065 - src.data_sources.yfinance_client - INFO - Fetched 336 records for SOXL (2024-07-22 to 2025-11-20)
+2025-11-20 21:41:27,143 - src.data_sources.cache_manager - INFO - Cached 336 records for SOXL (2024-07-22 to 2025-11-19) in all 3 levels
+2025-11-20 21:41:27,348 - src.data_sources.batch_fetcher - INFO - ============================================================
+2025-11-20 21:41:27,348 - src.data_sources.batch_fetcher - INFO - Batch fetch completed
+2025-11-20 21:41:27,349 - src.data_sources.batch_fetcher - INFO - Success: 31/99
+2025-11-20 21:41:27,349 - src.data_sources.batch_fetcher - INFO - Records: 8932
+2025-11-20 21:41:27,349 - src.data_sources.batch_fetcher - INFO - Duration: 82.2s
+2025-11-20 21:41:27,349 - src.data_sources.batch_fetcher - INFO - ============================================================
+2025-11-22 00:08:15,995 - __main__ - INFO - Setting up components...
+2025-11-22 00:08:15,999 - src.data_sources.yfinance_client - INFO - YFinanceClient initialized with rate_limit=2000/3600s
+2025-11-22 00:08:18,834 - __main__ - INFO - Data client ready: YFinanceClient(rate_limit=2000/3600s, requests=0)
+2025-11-22 00:08:18,834 - src.data_sources.cache_manager - INFO - CacheManager initialized: cache_dir=cache/market_data, expiry_days=1, l1_max_size=100
+2025-11-22 00:08:18,862 - __main__ - INFO - Cache manager ready: CacheManager(L1=0/100, L2=9599 records, L3=34 files)
+2025-11-22 00:08:18,862 - src.data_sources.batch_fetcher - INFO - BatchFetcher initialized: client=yfinance, batch_size=50
+2025-11-22 00:08:18,862 - __main__ - INFO - Batch fetcher ready: BatchFetcher(client=yfinance, batch_size=50, delay=0.2s)
+2025-11-22 00:08:18,863 - src.data_sources.batch_fetcher - INFO - ============================================================
+2025-11-22 00:08:18,863 - src.data_sources.batch_fetcher - INFO - Starting batch data fetch
+2025-11-22 00:08:18,863 - src.data_sources.batch_fetcher - INFO - ============================================================
+2025-11-22 00:08:18,863 - src.data_sources.batch_fetcher - INFO - Step 1: Analyzing database requirements...
+2025-11-22 00:08:18,866 - src.data_sources.batch_fetcher - INFO - Found 99 symbols to process
+2025-11-22 00:08:18,866 - src.data_sources.batch_fetcher - INFO - Step 2: Checking cache...
+2025-11-22 00:08:19,012 - src.data_sources.batch_fetcher - INFO - Need to fetch 71 symbols (cache hit: 28)
+2025-11-22 00:08:19,012 - src.data_sources.batch_fetcher - INFO - Step 3: Batch fetching data...
+2025-11-22 00:08:19,706 - src.data_sources.yfinance_client - INFO - Fetched 81 records for FIG (2025-01-12 to 2025-11-22)
+2025-11-22 00:08:19,738 - src.data_sources.cache_manager - INFO - Cached 81 records for FIG (2025-07-31 to 2025-11-21) in all 3 levels
+2025-11-22 00:08:20,318 - src.data_sources.yfinance_client - INFO - Fetched 119 records for BMNR (2025-03-06 to 2025-11-22)
+2025-11-22 00:08:20,360 - src.data_sources.cache_manager - INFO - Cached 119 records for BMNR (2025-06-05 to 2025-11-21) in all 3 levels
+2025-11-22 00:08:21,013 - src.data_sources.yfinance_client - INFO - Fetched 297 records for MSTU (2024-08-17 to 2025-11-22)
+2025-11-22 00:08:21,132 - src.data_sources.cache_manager - INFO - Cached 297 records for MSTU (2024-09-18 to 2025-11-21) in all 3 levels
+2025-11-22 00:08:22,089 - src.data_sources.yfinance_client - INFO - Fetched 226 records for BRK-B (2024-12-29 to 2025-11-22)
+2025-11-22 00:08:22,161 - src.data_sources.cache_manager - INFO - Cached 226 records for BRK.B (2024-12-30 to 2025-11-21) in all 3 levels
+2025-11-22 00:08:25,256 - yfinance - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: AAPL260116C235000"}}}
+2025-11-22 00:08:25,707 - yfinance - ERROR - $AAPL260116C235000: possibly delisted; no timezone found
+2025-11-22 00:08:25,707 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL260116C235000: No data found for AAPL260116C235000 from 2024-10-25 to 2025-11-22
+2025-11-22 00:08:27,823 - yfinance - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: OSCR260320C15000"}}}
+2025-11-22 00:08:28,812 - yfinance - ERROR - $OSCR260320C15000: possibly delisted; no timezone found
+2025-11-22 00:08:28,812 - src.data_sources.batch_fetcher - WARNING - Skipped OSCR260320C15000: No data found for OSCR260320C15000 from 2025-01-19 to 2025-11-22
+2025-11-22 00:08:29,670 - yfinance - ERROR - $AAPL250404C227500: possibly delisted; no timezone found
+2025-11-22 00:08:29,671 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL250404C227500: No data found for AAPL250404C227500 from 2024-09-01 to 2025-11-22
+2025-11-22 00:08:30,852 - yfinance - ERROR - $AAPL250718C205000: possibly delisted; no timezone found
+2025-11-22 00:08:30,852 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL250718C205000: No data found for AAPL250718C205000 from 2024-09-20 to 2025-11-22
+2025-11-22 00:08:33,755 - yfinance - ERROR - $AMZN250815C215000: possibly delisted; no timezone found
+2025-11-22 00:08:33,756 - src.data_sources.batch_fetcher - WARNING - Skipped AMZN250815C215000: No data found for AMZN250815C215000 from 2024-10-07 to 2025-11-22
+2025-11-22 00:08:35,009 - yfinance - ERROR - $AMZN260618P195000: possibly delisted; no timezone found
+2025-11-22 00:08:35,009 - src.data_sources.batch_fetcher - WARNING - Skipped AMZN260618P195000: No data found for AMZN260618P195000 from 2025-03-28 to 2025-11-22
+2025-11-22 00:08:37,011 - yfinance - ERROR - $BRKB251219C500000: possibly delisted; no timezone found
+2025-11-22 00:08:37,012 - src.data_sources.batch_fetcher - WARNING - Skipped BRKB251219C500000: No data found for BRKB251219C500000 from 2025-01-17 to 2025-11-22
+2025-11-22 00:08:38,364 - yfinance - ERROR - $GLD250516P270000: possibly delisted; no timezone found
+2025-11-22 00:08:38,365 - src.data_sources.batch_fetcher - WARNING - Skipped GLD250516P270000: No data found for GLD250516P270000 from 2024-09-05 to 2025-11-22
+2025-11-22 00:08:39,836 - yfinance - ERROR - $TSM250417C220000: possibly delisted; no timezone found
+2025-11-22 00:08:39,836 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250417C220000: No data found for TSM250417C220000 from 2024-08-03 to 2025-11-22
+2025-11-22 00:08:41,192 - yfinance - ERROR - $BIDU251219C150000: possibly delisted; no timezone found
+2025-11-22 00:08:41,192 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU251219C150000: No data found for BIDU251219C150000 from 2025-03-24 to 2025-11-22
+2025-11-22 00:08:42,187 - yfinance - ERROR - $BIDU260320P105000: possibly delisted; no timezone found
+2025-11-22 00:08:42,187 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU260320P105000: No data found for BIDU260320P105000 from 2025-02-24 to 2025-11-22
+2025-11-22 00:08:43,415 - yfinance - ERROR - $MIU250429P45000: possibly delisted; no timezone found
+2025-11-22 00:08:43,416 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429P45000: No data found for MIU250429P45000 from 2024-09-12 to 2025-11-22
+2025-11-22 00:08:44,388 - yfinance - ERROR - $MIU251030C55000: possibly delisted; no timezone found
+2025-11-22 00:08:44,389 - src.data_sources.batch_fetcher - WARNING - Skipped MIU251030C55000: No data found for MIU251030C55000 from 2025-01-24 to 2025-11-22
+2025-11-22 00:08:45,540 - yfinance - ERROR - $TSLA250411P250000: possibly delisted; no timezone found
+2025-11-22 00:08:45,540 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250411P250000: No data found for TSLA250411P250000 from 2024-09-09 to 2025-11-22
+2025-11-22 00:08:46,549 - yfinance - ERROR - $TSLA250417C265000: possibly delisted; no timezone found
+2025-11-22 00:08:46,550 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250417C265000: No data found for TSLA250417C265000 from 2024-09-15 to 2025-11-22
+2025-11-22 00:08:47,674 - yfinance - ERROR - $VIX250521P22000: possibly delisted; no timezone found
+2025-11-22 00:08:47,675 - src.data_sources.batch_fetcher - WARNING - Skipped VIX250521P22000: No data found for VIX250521P22000 from 2024-08-24 to 2025-11-22
+2025-11-22 00:08:48,048 - src.data_sources.yfinance_client - INFO - Fetched 1 records for 18099.HK (2025-03-16 to 2025-11-22)
+2025-11-22 00:08:48,053 - src.data_sources.cache_manager - INFO - Cached 1 records for 18099 (2025-11-12 to 2025-11-12) in all 3 levels
+2025-11-22 00:08:49,314 - yfinance - ERROR - $AAPL260116C215000: possibly delisted; no timezone found
+2025-11-22 00:08:49,314 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL260116C215000: No data found for AAPL260116C215000 from 2024-11-30 to 2025-11-22
+2025-11-22 00:08:50,359 - yfinance - ERROR - $ALB250403P125000: possibly delisted; no timezone found
+2025-11-22 00:08:50,359 - src.data_sources.batch_fetcher - WARNING - Skipped ALB250403P125000: No data found for ALB250403P125000 from 2024-09-05 to 2025-11-22
+2025-11-22 00:08:51,707 - yfinance - ERROR - $AMZN250815C205000: possibly delisted; no timezone found
+2025-11-22 00:08:51,707 - src.data_sources.batch_fetcher - WARNING - Skipped AMZN250815C205000: No data found for AMZN250815C205000 from 2024-09-09 to 2025-11-22
+2025-11-22 00:08:53,019 - yfinance - ERROR - $AMZN260618C250000: possibly delisted; no timezone found
+2025-11-22 00:08:53,020 - src.data_sources.batch_fetcher - WARNING - Skipped AMZN260618C250000: No data found for AMZN260618C250000 from 2025-03-21 to 2025-11-22
+2025-11-22 00:08:54,209 - yfinance - ERROR - $BIDU260116C140000: possibly delisted; no timezone found
+2025-11-22 00:08:54,209 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU260116C140000: No data found for BIDU260116C140000 from 2025-02-27 to 2025-11-22
+2025-11-22 00:08:55,670 - yfinance - ERROR - $BIDU260116C175000: possibly delisted; no timezone found
+2025-11-22 00:08:55,670 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU260116C175000: No data found for BIDU260116C175000 from 2025-03-03 to 2025-11-22
+2025-11-22 00:08:56,642 - yfinance - ERROR - $BRKB251219P440000: possibly delisted; no timezone found
+2025-11-22 00:08:56,642 - src.data_sources.batch_fetcher - WARNING - Skipped BRKB251219P440000: No data found for BRKB251219P440000 from 2025-01-19 to 2025-11-22
+2025-11-22 00:08:57,478 - yfinance - ERROR - $GOOGL250718C185000: possibly delisted; no timezone found
+2025-11-22 00:08:57,478 - src.data_sources.batch_fetcher - WARNING - Skipped GOOGL250718C185000: No data found for GOOGL250718C185000 from 2024-09-05 to 2025-11-22
+2025-11-22 00:08:59,101 - yfinance - ERROR - $GOOGL260116C180000: possibly delisted; no timezone found
+2025-11-22 00:08:59,101 - src.data_sources.batch_fetcher - WARNING - Skipped GOOGL260116C180000: No data found for GOOGL260116C180000 from 2024-10-20 to 2025-11-22
+2025-11-22 00:08:59,922 - yfinance - ERROR - $HIMS260618C60000: possibly delisted; no timezone found
+2025-11-22 00:08:59,923 - src.data_sources.batch_fetcher - WARNING - Skipped HIMS260618C60000: No data found for HIMS260618C60000 from 2025-02-23 to 2025-11-22
+2025-11-22 00:09:00,939 - yfinance - ERROR - $MIU250328P50000: possibly delisted; no timezone found
+2025-11-22 00:09:00,939 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250328P50000: No data found for MIU250328P50000 from 2024-08-11 to 2025-11-22
+2025-11-22 00:09:01,807 - yfinance - ERROR - $MIU250429C50000: possibly delisted; no timezone found
+2025-11-22 00:09:01,808 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429C50000: No data found for MIU250429C50000 from 2024-09-12 to 2025-11-22
+2025-11-22 00:09:02,737 - yfinance - ERROR - $MIU250429C52500: possibly delisted; no timezone found
+2025-11-22 00:09:02,737 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429C52500: No data found for MIU250429C52500 from 2024-09-13 to 2025-11-22
+2025-11-22 00:09:03,576 - yfinance - ERROR - $MIU250429P43000: possibly delisted; no timezone found
+2025-11-22 00:09:03,576 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429P43000: No data found for MIU250429P43000 from 2024-09-13 to 2025-11-22
+2025-11-22 00:09:04,458 - yfinance - ERROR - $MSTR260116P300000: possibly delisted; no timezone found
+2025-11-22 00:09:04,458 - src.data_sources.batch_fetcher - WARNING - Skipped MSTR260116P300000: No data found for MSTR260116P300000 from 2025-02-20 to 2025-11-22
+2025-11-22 00:09:05,841 - yfinance - ERROR - $OPEN260220C12000: possibly delisted; no timezone found
+2025-11-22 00:09:05,841 - src.data_sources.batch_fetcher - WARNING - Skipped OPEN260220C12000: No data found for OPEN260220C12000 from 2025-02-20 to 2025-11-22
+2025-11-22 00:09:07,115 - yfinance - ERROR - $SBUX260116C100000: possibly delisted; no timezone found
+2025-11-22 00:09:07,115 - src.data_sources.batch_fetcher - WARNING - Skipped SBUX260116C100000: No data found for SBUX260116C100000 from 2024-10-26 to 2025-11-22
+2025-11-22 00:09:08,165 - yfinance - ERROR - $TCH250227P400000: possibly delisted; no timezone found
+2025-11-22 00:09:08,165 - src.data_sources.batch_fetcher - WARNING - Skipped TCH250227P400000: No data found for TCH250227P400000 from 2024-07-28 to 2025-11-22
+2025-11-22 00:09:09,001 - yfinance - ERROR - $TSLA250328C250000: possibly delisted; no timezone found
+2025-11-22 00:09:09,002 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250328C250000: No data found for TSLA250328C250000 from 2024-09-09 to 2025-11-22
+2025-11-22 00:09:09,911 - yfinance - ERROR - $TSLA250328P235000: possibly delisted; no timezone found
+2025-11-22 00:09:09,911 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250328P235000: No data found for TSLA250328P235000 from 2024-08-24 to 2025-11-22
+2025-11-22 00:09:11,098 - yfinance - ERROR - $TSLA250328P250000: possibly delisted; no timezone found
+2025-11-22 00:09:11,098 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250328P250000: No data found for TSLA250328P250000 from 2024-09-09 to 2025-11-22
+2025-11-22 00:09:12,161 - yfinance - ERROR - $TSLA250417C240000: possibly delisted; no timezone found
+2025-11-22 00:09:12,161 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250417C240000: No data found for TSLA250417C240000 from 2024-08-23 to 2025-11-22
+2025-11-22 00:09:13,600 - yfinance - ERROR - $TSLA250516P220000: possibly delisted; no timezone found
+2025-11-22 00:09:13,601 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250516P220000: No data found for TSLA250516P220000 from 2024-09-09 to 2025-11-22
+2025-11-22 00:09:14,796 - yfinance - ERROR - $TSM250620C170000: possibly delisted; no timezone found
+2025-11-22 00:09:14,796 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250620C170000: No data found for TSM250620C170000 from 2024-09-26 to 2025-11-22
+2025-11-22 00:09:16,114 - yfinance - ERROR - $TSM250620P170000: possibly delisted; no timezone found
+2025-11-22 00:09:16,115 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250620P170000: No data found for TSM250620P170000 from 2024-09-26 to 2025-11-22
+2025-11-22 00:09:17,703 - yfinance - ERROR - $TSM250815C170000: possibly delisted; no timezone found
+2025-11-22 00:09:17,703 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250815C170000: No data found for TSM250815C170000 from 2024-09-29 to 2025-11-22
+2025-11-22 00:09:18,971 - yfinance - ERROR - $AAPL250502C230000: possibly delisted; no timezone found
+2025-11-22 00:09:18,971 - src.data_sources.batch_fetcher - WARNING - Skipped AAPL250502C230000: No data found for AAPL250502C230000 from 2024-08-30 to 2025-11-22
+2025-11-22 00:09:19,822 - yfinance - ERROR - $BIDU250404P87000: possibly delisted; no timezone found
+2025-11-22 00:09:19,823 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU250404P87000: No data found for BIDU250404P87000 from 2024-07-28 to 2025-11-22
+2025-11-22 00:09:20,695 - yfinance - ERROR - $MIU250328P52500: possibly delisted; no timezone found
+2025-11-22 00:09:20,695 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250328P52500: No data found for MIU250328P52500 from 2024-08-19 to 2025-11-22
+2025-11-22 00:09:21,613 - yfinance - ERROR - $MIU250429P55000: possibly delisted; no timezone found
+2025-11-22 00:09:21,613 - src.data_sources.batch_fetcher - WARNING - Skipped MIU250429P55000: No data found for MIU250429P55000 from 2024-09-01 to 2025-11-22
+2025-11-22 00:09:22,597 - yfinance - ERROR - $NVDA250207C120000: possibly delisted; no timezone found
+2025-11-22 00:09:22,597 - src.data_sources.batch_fetcher - WARNING - Skipped NVDA250207C120000: No data found for NVDA250207C120000 from 2024-07-18 to 2025-11-22
+2025-11-22 00:09:23,503 - yfinance - ERROR - $PLTR250228P100000: possibly delisted; no timezone found
+2025-11-22 00:09:23,504 - src.data_sources.batch_fetcher - WARNING - Skipped PLTR250228P100000: No data found for PLTR250228P100000 from 2024-07-26 to 2025-11-22
+2025-11-22 00:09:24,417 - yfinance - ERROR - $SPY250321C565000: possibly delisted; no timezone found
+2025-11-22 00:09:24,418 - src.data_sources.batch_fetcher - WARNING - Skipped SPY250321C565000: No data found for SPY250321C565000 from 2024-08-24 to 2025-11-22
+2025-11-22 00:09:25,413 - yfinance - ERROR - $TSLA250314C380000: possibly delisted; no timezone found
+2025-11-22 00:09:25,414 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250314C380000: No data found for TSLA250314C380000 from 2024-07-25 to 2025-11-22
+2025-11-22 00:09:26,623 - yfinance - ERROR - $TSLA250502P200000: possibly delisted; no timezone found
+2025-11-22 00:09:26,624 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250502P200000: No data found for TSLA250502P200000 from 2024-08-30 to 2025-11-22
+2025-11-22 00:09:27,983 - yfinance - ERROR - $BIDU250919P70000: possibly delisted; no timezone found
+2025-11-22 00:09:27,983 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU250919P70000: No data found for BIDU250919P70000 from 2024-07-21 to 2025-11-22
+2025-11-22 00:09:28,968 - yfinance - ERROR - $BIDU260618P105000: possibly delisted; no timezone found
+2025-11-22 00:09:28,968 - src.data_sources.batch_fetcher - WARNING - Skipped BIDU260618P105000: No data found for BIDU260618P105000 from 2025-02-28 to 2025-11-22
+2025-11-22 00:09:29,914 - yfinance - ERROR - $NVDA250214C120000: possibly delisted; no timezone found
+2025-11-22 00:09:29,914 - src.data_sources.batch_fetcher - WARNING - Skipped NVDA250214C120000: No data found for NVDA250214C120000 from 2024-07-19 to 2025-11-22
+2025-11-22 00:09:30,955 - yfinance - ERROR - $SVIX250620C21000: possibly delisted; no timezone found
+2025-11-22 00:09:30,955 - src.data_sources.batch_fetcher - WARNING - Skipped SVIX250620C21000: No data found for SVIX250620C21000 from 2024-09-20 to 2025-11-22
+2025-11-22 00:09:31,808 - yfinance - ERROR - $TCH250214P410000: possibly delisted; no timezone found
+2025-11-22 00:09:31,809 - src.data_sources.batch_fetcher - WARNING - Skipped TCH250214P410000: No data found for TCH250214P410000 from 2024-07-26 to 2025-11-22
+2025-11-22 00:09:32,623 - yfinance - ERROR - $TSLA250307C395000: possibly delisted; no timezone found
+2025-11-22 00:09:32,623 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250307C395000: No data found for TSLA250307C395000 from 2024-07-22 to 2025-11-22
+2025-11-22 00:09:33,754 - yfinance - ERROR - $TSLA250307P395000: possibly delisted; no timezone found
+2025-11-22 00:09:33,754 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250307P395000: No data found for TSLA250307P395000 from 2024-07-22 to 2025-11-22
+2025-11-22 00:09:34,742 - yfinance - ERROR - $TSLA250321P215000: possibly delisted; no timezone found
+2025-11-22 00:09:34,743 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250321P215000: No data found for TSLA250321P215000 from 2024-08-23 to 2025-11-22
+2025-11-22 00:09:35,997 - yfinance - ERROR - $TSLA250417C320000: possibly delisted; no timezone found
+2025-11-22 00:09:35,997 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250417C320000: No data found for TSLA250417C320000 from 2024-08-15 to 2025-11-22
+2025-11-22 00:09:37,124 - yfinance - ERROR - $TSLA250417C370000: possibly delisted; no timezone found
+2025-11-22 00:09:37,124 - src.data_sources.batch_fetcher - WARNING - Skipped TSLA250417C370000: No data found for TSLA250417C370000 from 2024-07-26 to 2025-11-22
+2025-11-22 00:09:38,116 - yfinance - ERROR - $TSM250417P220000: possibly delisted; no timezone found
+2025-11-22 00:09:38,116 - src.data_sources.batch_fetcher - WARNING - Skipped TSM250417P220000: No data found for TSM250417P220000 from 2024-08-02 to 2025-11-22
+2025-11-22 00:09:38,950 - yfinance - ERROR - $VIX250219C19000: possibly delisted; no timezone found
+2025-11-22 00:09:38,951 - src.data_sources.batch_fetcher - WARNING - Skipped VIX250219C19000: No data found for VIX250219C19000 from 2024-07-28 to 2025-11-22
+2025-11-22 00:09:40,166 - yfinance - ERROR - $TLT241021C95000: possibly delisted; no timezone found
+2025-11-22 00:09:40,166 - src.data_sources.batch_fetcher - WARNING - Skipped TLT241021C95000: No data found for TLT241021C95000 from 2024-03-28 to 2025-11-22
+2025-11-22 00:09:40,529 - src.data_sources.yfinance_client - INFO - Fetched 327 records for 0700.HK (2024-07-26 to 2025-11-22)
+2025-11-22 00:09:40,604 - src.data_sources.cache_manager - INFO - Cached 327 records for 00700 (2024-07-26 to 2025-11-21) in all 3 levels
+2025-11-22 00:09:41,446 - src.data_sources.yfinance_client - INFO - Fetched 181 records for 2097.HK (2024-08-12 to 2025-11-22)
+2025-11-22 00:09:41,519 - src.data_sources.cache_manager - INFO - Cached 181 records for 02097 (2025-03-03 to 2025-11-21) in all 3 levels
+2025-11-22 00:09:41,721 - src.data_sources.batch_fetcher - INFO - ============================================================
+2025-11-22 00:09:41,721 - src.data_sources.batch_fetcher - INFO - Batch fetch completed
+2025-11-22 00:09:41,721 - src.data_sources.batch_fetcher - INFO - Success: 7/99
+2025-11-22 00:09:41,721 - src.data_sources.batch_fetcher - INFO - Records: 1232
+2025-11-22 00:09:41,721 - src.data_sources.batch_fetcher - INFO - Duration: 82.7s
+2025-11-22 00:09:41,721 - src.data_sources.batch_fetcher - INFO - ============================================================
