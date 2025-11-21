@@ -72,25 +72,46 @@ python scripts/import_trades.py --file original_data/历史-保证金综合账�
 | 技术指标 | pandas-ta, TA-Lib (可选) |
 | 市场数据 | yfinance, Alpha Vantage |
 | Web框架 | Streamlit |
+| 可视化 | Plotly, Streamlit |
+
+## 可视化工具
+
+### 启动 Dashboard
+
+```bash
+streamlit run visualization/dashboard.py
+```
+
+浏览器自动打开 `http://localhost:8501`
+
+### 功能特性
+
+- **📊 数据概览**: 查看交易统计、数据覆盖率、识别数据缺失
+- **⭐ 质量评分**: 四维度评分分析、评分分布、盈亏关系
+- **🔄 FIFO验证**: 可视化匹配过程、验证系统逻辑
+- **📈 技术指标**: K线图、RSI/MACD/BB、交易点位标注
+
+详细文档: [`visualization/README.md`](visualization/README.md)
 
 ## 当前状态
 
-**版本**: v0.1.0-dev
-**最后更新**: 2025-11-17
-**当前分支**: `dev/foundation`
-**进度**: Phase 3/7 完成 ✅ (88/88 测试通过，100% 通过率)
+**版本**: v0.3.0-dev
+**最后更新**: 2025-11-20
+**当前分支**: `main`
+**进度**: Phase 6/7 完成 ✅ (27/27 Phase 6 测试通过，548条市场数据指标已计算)
 
 ### 快速恢复工作
 
 ```bash
-# 1. 切换到开发分支
-git checkout dev/foundation
-
-# 2. 查看当前状态
+# 1. 查看当前状态
 git status
 git log --oneline -5
 
-# 3. 下一步：开始Phase 4 - FIFO交易配对算法
+# 2. 预加载市场数据并计算指标（可选）
+python3 scripts/preload_market_data.py --warmup-only --top-n 10
+python3 scripts/calculate_indicators.py --all
+
+# 3. 下一步：开始Phase 7 - 交易质量评分系统
 # 详见下方"下一步待办事项"
 ```
 
@@ -194,59 +215,121 @@ git log --oneline -5
 - 处理时间：0.18秒
 - 代码量：~1,500行（含测试）
 
-### 📋 Phase 4: FIFO交易配对算法 (待开始)
-**预计耗时**: 5-6小时
+### ✅ Phase 4: FIFO交易配对算法 (已完成)
+**实际耗时**: 约6小时
+**提交**: [待记录]
 
-- [ ] FIFO配对器
+- [x] FIFO配对器
   - 标准做多配对（buy → sell）
   - 做空配对（sell_short → buy_to_cover）
   - 部分成交配对处理
   - 多次建仓FIFO排序
-- [ ] 期权配对特殊处理
+- [x] 期权配对特殊处理
   - 期权到期自动平仓
   - 期权行权处理
-- [ ] 持仓计算
+- [x] 持仓计算
   - 盈亏计算（含费用）
   - 持仓时长计算
-  - MAE/MFE计算（需分钟级数据）
-- [ ] 单元测试
-  - 10+配对场景测试
-  - 真实数据验证
+  - MAE/MFE计算
+- [x] 单元测试
+  - 完整配对场景测试
+  - 真实数据验证（606交易 → 287持仓）
 
-### 📋 Phase 5: 市场数据获取和缓存 (待开始)
-**预计耗时**: 4-5小时
+**实际成果**:
+- 成功配对真实数据：606条交易 → 287个持仓
+- 所有单元测试通过
+- 处理时长计算、盈亏分析
 
-- [ ] yfinance客户端
+### ✅ Phase 5: 市场数据获取和缓存 (已完成)
+**实际耗时**: 约6小时
+**提交**: [待记录]
+**测试通过率**: 100% (98/98 tests)
+**代码覆盖率**: 93%
+
+- [x] BaseDataClient 抽象基类
+  - 统一数据源接口
+  - 自定义异常体系
+  - 数据验证和标准化
+- [x] YFinanceClient 实现
   - OHLCV数据获取
+  - 滑动窗口限流（2000 req/hour）
+  - 指数退避重试机制（3次）
+  - 多市场symbol转换（US/HK/CN）
   - 批量获取优化
-  - 股票基本信息
-  - 期权Greeks数据
-- [ ] 期权标的关联
-  - 同时获取期权和标的股票数据
-- [ ] 三级缓存实现
-  - L1: 内存缓存（dict）
-  - L2: 数据库缓存（market_data表）
-  - L3: 磁盘缓存（pickle文件）
-- [ ] 批量预加载
-  - 分析所有交易symbol
-  - 批量获取日期范围数据
-  - 限流和重试机制
-- [ ] Alpha Vantage备用客户端
+- [x] 三级缓存系统
+  - **L1**: 内存缓存 (LRU淘汰，100条目)
+  - **L2**: 数据库缓存 (market_data表，持久化)
+  - **L3**: 磁盘缓存 (pickle文件，快速恢复)
+  - 级联查找：L1 → L2 → L3 → API
+  - 写穿策略：同时写入所有层级
+- [x] BatchFetcher 批量获取器
+  - 分析数据库交易记录
+  - 智能日期范围计算（+200天用于指标）
+  - 期权symbol解析（regex: `^([A-Z]+)(\d{6})([CP])(\d{8})$`）
+  - 自动获取期权标的股票数据
+  - 进度追踪（tqdm）
+  - Cache预热功能
+- [x] 预加载脚本
+  - `scripts/preload_market_data.py`
+  - 全量模式：分析所有交易
+  - 预热模式：仅加载Top N symbol
+  - 缓存统计展示
 
-### 📋 Phase 6: 技术指标计算 (待开始)
-**预计耗时**: 3-4小时
+**代码统计**:
+- 核心代码：458行
+- 测试代码：98个测试
+- 测试文件：4个
+  - test_base_client.py (24 tests)
+  - test_yfinance_client.py (29 tests)
+  - test_cache_manager.py (25 tests)
+  - test_batch_fetcher.py (20 tests)
+- 覆盖率明细：
+  - base_client.py: 90%
+  - yfinance_client.py: 92%
+  - cache_manager.py: 92%
+  - batch_fetcher.py: 97%
 
-- [ ] pandas-ta计算器
-  - RSI, MACD, Bollinger Bands
-  - ATR, MA系列, ADX
-  - 批量计算优化
-- [ ] 指标缓存
-  - 保存到market_data表
-  - 避免重复计算
-- [ ] 期权分析增强
-  - Greeks计算/获取
-  - 隐含波动率
-- [ ] TA-Lib集成（可选）
+**实际验证**:
+- 成功预热Top 3 symbols（TSLL, AAPL, FIG）
+- 获取745条市场数据记录
+- 三级缓存全部工作正常
+- 平均获取速度：~1.7秒/symbol
+
+### ✅ Phase 6: 技术指标计算 (已完成)
+**实际耗时**: 约3小时
+**提交**: [待记录]
+**测试通过率**: 100% (27/27 tests)
+
+- [x] 纯pandas技术指标计算器
+  - RSI (14天) - 使用EWM算法
+  - MACD (12,26,9) - DIF, DEA, Histogram
+  - Bollinger Bands (20天, 2σ) - 上中下轨
+  - ATR (14天) - 真实波动幅度
+  - MA系列 (5, 10, 20, 50, 200天) - 简单移动平均
+- [x] 数据库集成
+  - 更新market_data表13个指标字段
+  - 批量更新优化（548条记录）
+  - NaN值处理
+- [x] 指标计算脚本
+  - `scripts/calculate_indicators.py`
+  - 支持指定symbols或全库计算（--all）
+  - 进度显示和统计报告
+  - 集成三级缓存系统
+- [x] 单元测试
+  - 27个测试用例（全部通过）
+  - 涵盖所有5类指标
+  - 数据库更新和批处理测试
+
+**代码统计**:
+- 核心代码：406行（calculator.py）
+- 测试代码：27个测试（test_indicator_calculator.py）
+- 脚本代码：254行（calculate_indicators.py）
+
+**实际验证**:
+- 成功计算AAPL和TSLL共548条记录的指标
+- 处理时间：0.2秒（全库99个symbols）
+- 所有13个指标字段成功写入数据库
+- 无依赖TA-Lib或pandas-ta（纯pandas实现）
 
 ### 📋 Phase 7: 交易质量评分系统 (待开始)
 **预计耗时**: 4-5小时
@@ -292,20 +375,66 @@ git log --oneline -5
 - ✅ 88个单元测试（100%通过率）
 - ✅ 真实数据验证（816行→606交易，0.18秒）
 
+### FIFO交易配对 (Phase 4)
+- ✅ FIFO配对引擎（标准做多、做空配对）
+- ✅ 部分成交处理
+- ✅ 期权特殊处理（到期、行权）
+- ✅ 盈亏计算（含完整费用）
+- ✅ 持仓时长和风险指标
+- ✅ 真实数据验证（606交易→287持仓）
+
+### 市场数据获取和缓存 (Phase 5)
+- ✅ BaseDataClient抽象接口（4个自定义异常）
+- ✅ YFinanceClient实现（限流、重试、多市场）
+- ✅ 三级缓存系统（L1内存+L2数据库+L3磁盘）
+- ✅ BatchFetcher批量获取（智能分析、进度追踪）
+- ✅ 期权symbol解析和标的关联
+- ✅ 预加载脚本（全量/预热两种模式）
+- ✅ 98个单元测试（93%代码覆盖率）
+- ✅ 真实数据验证（Top 3 symbols, 745条记录）
+
+### 技术指标计算 (Phase 6)
+- ✅ 纯pandas指标计算器（无TA-Lib依赖）
+- ✅ 5类核心指标（RSI, MACD, BB, ATR, MA）
+- ✅ 13个指标字段（rsi_14, macd, macd_signal, macd_histogram, bb_upper, bb_middle, bb_lower, atr_14, ma_5, ma_10, ma_20, ma_50, ma_200）
+- ✅ 数据库批量更新（548条记录）
+- ✅ 指标计算脚本（CLI工具）
+- ✅ 27个单元测试（100%通过率）
+- ✅ 真实数据验证（AAPL + TSLL）
+
 ### 项目结构
 ```
 tradingcoach/
 ├── src/                      # ✅ 已创建
 │   ├── models/              # ✅ 5个模型完成
-│   ├── data_sources/        # 待实现
-│   ├── indicators/          # 待实现
-│   ├── cache/               # 待实现
+│   ├── data_sources/        # ✅ Phase 5完成（4个模块）
+│   │   ├── base_client.py
+│   │   ├── yfinance_client.py
+│   │   ├── cache_manager.py
+│   │   └── batch_fetcher.py
+│   ├── indicators/          # ✅ Phase 6完成（calculator.py）
 │   ├── importers/           # ✅ csv_parser.py, data_cleaner.py完成
-│   ├── matchers/            # 待实现
-│   ├── analyzers/           # 待实现
+│   ├── matchers/            # ✅ fifo_matcher.py完成
+│   ├── analyzers/           # 待实现（Phase 7）
 │   └── utils/               # ✅ timezone.py, symbol_parser.py完成
-├── scripts/                 # ✅ init_db.py, import_trades.py完成
-├── tests/                   # ✅ 88个单元测试完成
+├── scripts/                 # ✅ 4个脚本完成
+│   ├── init_db.py
+│   ├── import_trades.py
+│   ├── preload_market_data.py
+│   ├── calculate_indicators.py  # ✅ 新增（Phase 6）
+│   ├── supplement_data_from_csv.py  # ✅ 数据补充工具
+│   ├── check_data_coverage.py      # ✅ 覆盖率检查
+│   └── verify_indicators.py        # ✅ 指标验证
+├── visualization/           # ✅ 新增：可视化模块
+│   ├── dashboard.py        # 主入口
+│   ├── pages/              # 4个页面
+│   ├── components/         # 可复用组件
+│   └── utils/              # 数据加载器
+├── verification/            # ✅ 新增：FIFO验证工具
+│   ├── verify_fifo.py
+│   ├── verify_positions.py
+│   └── compare_calculations.py
+├── tests/unit/              # ✅ 125个单元测试（Phase 5-6）
 ├── project_docs/            # ✅ 5个文档完成
 ├── data/, cache/, logs/     # ✅ 目录已创建
 └── 配置文件                  # ✅ 已创建
@@ -317,39 +446,44 @@ tradingcoach/
 
 ### 立即行动 🔥
 
-1. **验证导入功能** (5分钟) ✅
+1. **验证Phase 6功能** (5分钟) ✅
    ```bash
-   # 测试导入真实数据
-   python3 scripts/import_trades.py --file original_data/历史-*.csv --dry-run
+   # 运行Phase 6测试套件
+   python3 -m pytest tests/unit/test_indicator_calculator.py -v
+   # 结果：27/27 tests passed (100%)
    ```
 
-2. **运行测试套件** (2分钟) ✅
+2. **计算所有市场数据的技术指标** (2-5分钟)
    ```bash
-   # 验证所有测试通过
-   python3 -m pytest tests/unit/ -v
-   # 结果：88/88 tests passed (100%)
+   # 计算所有已缓存市场数据的技术指标
+   python3 scripts/calculate_indicators.py --all
+
+   # 或指定特定symbols
+   python3 scripts/calculate_indicators.py --symbols AAPL,TSLL,TSLA
    ```
 
-3. **准备Phase 4开发** (15分钟)
-   - [ ] Review FIFO matching requirements in PRD
-   - [ ] Design test cases for matching scenarios
-   - [ ] Create Phase 4 development branch (optional)
+3. **准备Phase 7开发** (15分钟)
+   - [ ] Review 交易质量评分需求 in PRD
+   - [ ] 研究四维度评分算法
+   - [ ] 设计评分器架构
 
-### Phase 4 开发计划 📝
+### Phase 7 开发计划 📝
 
-**目标**: 实现FIFO交易配对算法
+**目标**: 实现交易质量评分系统
 
 **任务清单**:
-1. 创建 `src/matchers/fifo_matcher.py` - FIFO配对引擎
-2. 实现标准做多配对（buy → sell）
-3. 实现做空配对（sell_short → buy_to_cover）
-4. 处理部分成交配对
-5. 期权特殊处理（到期、行权）
-6. 盈亏计算（含费用）
-7. MAE/MFE计算（需分钟级数据）
-8. 编写10+配对场景测试
+1. 创建 `src/analyzers/quality_scorer.py` - 质量评分引擎
+2. 实现四维度评分算法
+   - 入场质量评分（30%权重）- 基于RSI, BB, 趋势
+   - 出场质量评分（25%权重）- 止盈止损合理性
+   - 趋势质量评分（25%权重）- MA趋势, MACD信号
+   - 风险管理评分（20%权重）- ATR止损, 仓位管理
+3. 综合评分和等级分配（A/B/C/D/F）
+4. 更新positions表（质量评分字段）
+5. 生成评分报告
+6. 编写单元测试
 
-**预计完成时间**: 5-6小时
+**预计完成时间**: 4-5小时
 
 ---
 
@@ -386,16 +520,19 @@ refactor(module): 描述 # 代码重构
 
 ## 总体进度
 
-**已完成**: Phase 1-3 (3/7)
-**进度**: 42.9%
-**累计工作时间**: 约12小时
-**剩余预计时间**: 约16-20小时
+**已完成**: Phase 1-6 (6/7)
+**进度**: 85.7%
+**累计工作时间**: 约27小时
+**剩余预计时间**: 约4-5小时
 
 **里程碑**:
 - ✅ 数据库架构完成（5个表，30+索引）
 - ✅ CSV导入系统完成（88个测试，100%通过）
 - ✅ 真实数据验证（606条交易成功导入）
-- 🚧 下一步：FIFO配对算法
+- ✅ FIFO配对算法完成（606交易→287持仓）
+- ✅ 市场数据获取和缓存完成（98个测试，93%覆盖率）
+- ✅ 技术指标计算完成（27个测试，548条记录已计算）
+- 🚧 下一步：交易质量评分系统（Phase 7）
 
 ## 许可证
 
@@ -408,4 +545,4 @@ MIT License
 
 ---
 
-**版本**: v0.1.0 | **最后更新**: 2025-11-16
+**版本**: v0.3.0-dev | **最后更新**: 2025-11-20 | **Phase 6/7 完成** ✅

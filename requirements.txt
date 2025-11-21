@@ -28,8 +28,9 @@ ratelimit>=2.2.1
 # 定时任务
 apscheduler>=3.10.4
 
-# Web UI (未来)
+# Web UI & 可视化
 streamlit>=1.28.0
+plotly>=5.17.0  # 交互式图表
 
 # 配置管理
 python-dotenv>=1.0.0
