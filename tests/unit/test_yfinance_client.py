@@ -366,13 +366,13 @@ class TestYFinanceClientSymbolConversion:
     def test_convert_us_stock(self, client):
         """Test US stock symbols (no conversion needed)"""
         assert client.convert_symbol_for_yfinance('AAPL') == 'AAPL'
-        assert client.convert_symbol_for_yfinance('BRK.B') == 'BRK.B'  # Already has dot
+        assert client.convert_symbol_for_yfinance('BRK.B') == 'BRK-B'  # yfinance uses dash for class suffix
 
     def test_convert_hk_stock(self, client):
         """Test Hong Kong stock conversion"""
         assert client.convert_symbol_for_yfinance('09988') == '9988.HK'
         assert client.convert_symbol_for_yfinance('01810') == '1810.HK'
-        assert client.convert_symbol_for_yfinance('00700') == '700.HK'
+        assert client.convert_symbol_for_yfinance('00700') == '0700.HK'  # Keep at least 4 digits
 
     def test_convert_cn_stock_shanghai(self, client):
         """Test Chinese stock (Shanghai) conversion"""
