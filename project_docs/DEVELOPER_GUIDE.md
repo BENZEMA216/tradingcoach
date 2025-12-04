@@ -81,7 +81,10 @@ tradingcoach/
 │   ├── indicators/          # 技术指标
 │   │   └── calculator.py    # 指标计算器
 │   ├── analyzers/           # 分析器
-│   │   └── quality_scorer.py # 质量评分器
+│   │   ├── quality_scorer.py # 质量评分器
+│   │   └── option_analyzer.py # 期权分析器
+│   ├── reports/             # 报告生成
+│   │   └── option_report.py  # 期权交易报告
 │   └── utils/               # 工具函数
 │       ├── timezone.py      # 时区转换
 │       └── symbol_parser.py # 代码解析
@@ -98,6 +101,9 @@ tradingcoach/
 │   └── components/         # 可复用组件
 ├── tests/                   # 测试
 │   └── unit/               # 单元测试
+│       ├── test_quality_scorer.py
+│       ├── test_option_analyzer.py  # 期权分析测试
+│       └── ...
 ├── project_docs/            # 项目文档
 ├── original_data/           # 原始数据
 ├── data/                    # 处理后数据
@@ -223,6 +229,20 @@ class Position:
     risk_mgmt_score: float        # 风险管理分
     overall_score: float          # 综合评分
     score_grade: str              # 等级 (A+/A/A-/B+/B/B-/C+/C/C-/D/F)
+
+    # 期权相关字段 (is_option=1 时有效)
+    underlying_symbol: str        # 标的股票代码
+    is_option: int                # 是否为期权 (0/1)
+    option_type: str              # 期权类型 (call/put)
+    strike_price: Decimal         # 行权价
+    expiry_date: date             # 到期日
+    entry_moneyness: float        # 入场时Moneyness百分比
+    entry_dte: int                # 入场时剩余天数(DTE)
+    exit_dte: int                 # 出场时剩余天数(DTE)
+    option_entry_score: float     # 期权入场评分
+    option_exit_score: float      # 期权出场评分
+    option_strategy_score: float  # 期权策略评分
+    option_analysis: JSON         # 期权分析详情
 ```
 
 #### MarketData 模型 (`market_data.py`)
@@ -379,6 +399,186 @@ result = scorer.calculate_overall_score(session, position)
 - D: 50-54分 (较差)
 - F: 0-49分 (很差)
 
+### 3.7 期权分析 (`src/analyzers/option_analyzer.py`)
+
+#### 期权交易分析器 (`OptionTradeAnalyzer`)
+基于正股数据的期权交易分析，无需期权本身的OHLCV数据：
+
+```python
+from src.analyzers.option_analyzer import OptionTradeAnalyzer
+
+analyzer = OptionTradeAnalyzer(session)
+analysis = analyzer.analyze_position(position)
+```
+
+**核心功能**:
+
+1. **期权合约解析** (`parse_option_symbol`):
+   - 从期权代码解析：标的、到期日、Call/Put、行权价
+   - 示例: `AAPL250404C227500` → AAPL, 2025-04-04, Call, $227.50
+
+2. **入场环境分析** (`analyze_entry_context`):
+   - Moneyness计算 (ITM/ATM/OTM百分比)
+   - DTE分类 (short<7天, medium 7-30天, long 30-90天, LEAPS>90天)
+   - 技术指标配合度
+   - 趋势一致性检查 (Call配合上涨趋势, Put配合下跌趋势)
+
+3. **正股走势分析** (`analyze_underlying_movement`):
+   - 持有期间价格变动
+   - 是否触及/越过行权价
+   - 波动率分析
+
+4. **Greeks影响估算** (`estimate_greeks_impact`):
+   - Delta估算 (基于Moneyness)
+   - Theta估算 (基于DTE和时间流逝)
+   - 无需实际Greeks数据
+
+5. **策略评估** (`evaluate_option_strategy`):
+   - 到期日选择是否合理
+   - 行权价选择是否合理
+   - 时机评估
+
+**Moneyness计算公式**:
+```python
+# Call期权
+moneyness = (stock_price - strike) / strike * 100
+
+# Put期权
+moneyness = (strike - stock_price) / strike * 100
+```
+
+**DTE分类**:
+| DTE范围 | 分类 | 说明 |
+|---------|------|------|
+| < 7天 | short | 高Theta衰减风险 |
+| 7-30天 | medium | 常规交易周期 |
+| 30-90天 | long | 适合趋势交易 |
+| > 90天 | leaps | 长期投资/对冲 |
+
+### 3.8 期权评分 (QualityScorer扩展)
+
+QualityScorer已扩展支持期权特有的评分维度：
+
+```python
+from src.analyzers.quality_scorer import QualityScorer
+
+scorer = QualityScorer()
+# 期权入场评分
+entry_score = scorer.score_option_entry(position, entry_md, option_info)
+# 期权出场评分
+exit_score = scorer.score_option_exit(position, entry_md, exit_md, option_info)
+# 期权策略评分
+strategy_score = scorer.score_option_strategy(position, entry_md, option_info)
+# 综合评分 (股票60% + 期权40%)
+overall = scorer.calculate_option_overall_score(position, entry_md, exit_md, option_info)
+```
+
+**期权入场评分维度** (各25%):
+| 维度 | 说明 | 最优条件 |
+|------|------|----------|
+| Moneyness | 虚值/平值/实值 | ATM附近最佳 |
+| 趋势一致性 | 方向与技术面匹配 | Call配多头, Put配空头 |
+| 波动率 | IV/HV环境 | 中等波动率 |
+| 时间价值 | DTE合理性 | 30-60天 |
+
+**期权出场评分维度**:
+| 维度 | 权重 | 说明 |
+|------|------|------|
+| 方向正确 | 30% | 正股走向是否符合预期 |
+| 时间剩余 | 25% | 避免最后几天的Theta加速 |
+| 盈利捕获 | 25% | 止盈执行度 |
+| 止损纪律 | 20% | 止损是否及时 |
+
+**期权策略评分维度**:
+| 维度 | 权重 | 说明 |
+|------|------|------|
+| 到期日选择 | 30% | DTE是否适合策略 |
+| 行权价选择 | 30% | Moneyness是否合理 |
+| 方向选择 | 20% | Call/Put是否正确 |
+| 资金效率 | 20% | 杠杆使用是否恰当 |
+
+**综合评分计算**:
+```python
+# 股票基础评分 (60%)
+stock_score = (entry_score + exit_score + trend_score + risk_score) / 4
+
+# 期权专属评分 (40%)
+option_score = (option_entry + option_exit + option_strategy) / 3
+
+# 最终综合评分
+overall_score = stock_score * 0.6 + option_score * 0.4
+```
+
+### 3.9 期权报告 (`src/reports/option_report.py`)
+
+生成期权交易复盘报告：
+
+```python
+from src.reports.option_report import OptionTradeReport
+
+report = OptionTradeReport(session)
+
+# 汇总统计
+summary = report.generate_summary(option_positions)
+
+# 单个持仓详情
+detail = report.generate_position_detail(position)
+
+# 策略洞察
+insights = report.generate_strategy_insights(option_positions)
+```
+
+**汇总统计** (`generate_summary`):
+```python
+{
+    'total_count': 64,           # 期权交易总数
+    'total_pnl': -1234.56,       # 总盈亏
+    'win_rate': 0.35,            # 胜率
+    'by_type': {                 # 按类型分组
+        'call': {'count': 40, 'pnl': -800, 'win_rate': 0.30},
+        'put': {'count': 24, 'pnl': -434, 'win_rate': 0.42}
+    },
+    'by_moneyness': {            # 按Moneyness分组
+        'itm': {...},
+        'atm': {...},
+        'otm': {...}
+    },
+    'by_dte': {                  # 按DTE分组
+        'short': {...},
+        'medium': {...},
+        'long': {...}
+    }
+}
+```
+
+**持仓详情** (`generate_position_detail`):
+```python
+{
+    'basic_info': {...},         # 基本信息
+    'entry_analysis': {...},     # 入场分析
+    'exit_analysis': {...},      # 出场分析
+    'greeks_impact': {...},      # Greeks影响
+    'scores': {...},             # 评分详情
+    'suggestions': [             # 改进建议
+        "考虑选择更长的到期日以减少Theta损耗",
+        "入场时Moneyness较高，可考虑更接近ATM的行权价"
+    ]
+}
+```
+
+**策略洞察** (`generate_strategy_insights`):
+```python
+{
+    'best_strategies': [...],    # 最佳策略组合
+    'loss_patterns': [...],      # 亏损模式识别
+    'optimal_params': {          # 最优参数
+        'best_dte_range': '30-60天',
+        'best_moneyness': 'ATM ± 5%',
+        'best_holding_period': '5-15天'
+    }
+}
+```
+
 ---
 
 ## 4. 常用脚本使用
@@ -479,6 +679,7 @@ tests/
     ├── test_cache_manager.py     # 缓存管理测试
     ├── test_indicator_calculator.py  # 指标计算测试
     ├── test_quality_scorer.py    # 质量评分测试
+    ├── test_option_analyzer.py   # 期权分析测试 (24个用例)
     └── ...
 ```
 
@@ -629,6 +830,7 @@ SCORE_WEIGHT_RISK = 0.20
 
 ## 更新日志
 
+- **2025-12-04**: 添加期权分析框架文档 (3.7-3.9节)
 - **2025-11-27**: 创建开发者指南文档
 - **2025-11-20**: Phase 6 完成，技术指标计算
 - **2025-11-18**: Phase 5 完成，市场数据缓存系统
