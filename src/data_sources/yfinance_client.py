@@ -301,6 +301,15 @@ class YFinanceClient(BaseDataClient):
         """记录请求时间"""
         self.request_times.append(time.time())
 
+    # 特殊代码映射（指数、ETF等）
+    SPECIAL_SYMBOL_MAPPINGS = {
+        'VIX': '^VIX',      # CBOE波动率指数
+        'DJI': '^DJI',      # 道琼斯指数
+        'SPX': '^GSPC',     # 标普500指数
+        'NDX': '^NDX',      # 纳斯达克100指数
+        'IXIC': '^IXIC',    # 纳斯达克综合指数
+    }
+
     def convert_symbol_for_yfinance(self, symbol: str, market: str = None) -> str:
         """
         转换股票代码为 yfinance 格式
@@ -319,8 +328,13 @@ class YFinanceClient(BaseDataClient):
             '600000' (A股) → '600000.SS' (上交所)
             'AAPL' (美股) → 'AAPL'
             'BRK.B' (美股) → 'BRK-B'
+            'VIX' (指数) → '^VIX'
         """
         symbol = symbol.strip()
+
+        # 特殊代码映射（指数等）
+        if symbol.upper() in self.SPECIAL_SYMBOL_MAPPINGS:
+            return self.SPECIAL_SYMBOL_MAPPINGS[symbol.upper()]
 
         # 美股特殊格式：BRK.B → BRK-B (yfinance uses dash not dot)
         if '.' in symbol and not symbol.endswith(('.HK', '.SS', '.SZ', '.TW')):

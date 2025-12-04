@@ -7,10 +7,21 @@ Indicators - 技术指标计算模块
 - Bollinger Bands（布林带）
 - ATR（真实波动幅度）
 - MA（移动平均线）系列
+- 多周期数据转换（日线/周线/月线）
 """
 
 from src.indicators.calculator import IndicatorCalculator
+from src.indicators.timeframe_converter import (
+    TimeframeConverter,
+    resample_ohlcv,
+    to_weekly,
+    to_monthly,
+)
 
 __all__ = [
     'IndicatorCalculator',
+    'TimeframeConverter',
+    'resample_ohlcv',
+    'to_weekly',
+    'to_monthly',
 ]

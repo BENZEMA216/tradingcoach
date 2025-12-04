@@ -4,6 +4,7 @@
 Check Market Data Coverage
 
 检查哪些股票有市场数据，哪些缺失。
+支持期权代码检测：期权如果其标的股票有数据，则视为"覆盖"。
 
 Usage:
     python check_data_coverage.py
@@ -22,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.models.base import init_database, get_session
 from src.models.trade import Trade
 from src.models.market_data import MarketData
+from src.utils.option_parser import OptionParser
 from sqlalchemy import func
 
 # 数据库路径
@@ -29,7 +31,7 @@ DB_PATH = Path(__file__).parent.parent / 'data' / 'tradingcoach.db'
 
 
 def check_coverage(verbose=False, missing_only=False):
-    """检查市场数据覆盖率"""
+    """检查市场数据覆盖率（支持期权标的检测）"""
 
     # 连接数据库
     if not DB_PATH.exists():
@@ -60,100 +62,126 @@ def check_coverage(verbose=False, missing_only=False):
         for symbol, count in market_data_counts:
             symbols_with_data[symbol] = count
 
+        # 分类统计
+        stocks = []  # 股票
+        options_covered = []  # 期权（标的有数据）
+        options_missing = []  # 期权（标的无数据）
+        stocks_covered = []  # 有数据的股票
+        stocks_missing = []  # 无数据的股票
+
+        for symbol, trade_count in trade_counts:
+            if OptionParser.is_option_symbol(symbol):
+                underlying = OptionParser.extract_underlying(symbol)
+                if underlying in symbols_with_data:
+                    options_covered.append((symbol, trade_count, underlying))
+                else:
+                    options_missing.append((symbol, trade_count, underlying))
+            else:
+                if symbol in symbols_with_data:
+                    stocks_covered.append((symbol, trade_count))
+                else:
+                    stocks_missing.append((symbol, trade_count))
+
+        # 计算覆盖率
+        total_symbols = len(trade_counts)
+        total_stocks = len(stocks_covered) + len(stocks_missing)
+        total_options = len(options_covered) + len(options_missing)
+
+        covered_count = len(stocks_covered) + len(options_covered)
+        coverage_pct = (covered_count / total_symbols * 100) if total_symbols > 0 else 0
+
         # 打印报告
         print("=" * 100)
-        print("市场数据覆盖率报告")
+        print("市场数据覆盖率报告 (支持期权标的检测)")
         print("=" * 100)
         print()
 
-        # 统计
-        total_symbols = len(trade_counts)
-        symbols_with_data_count = sum(1 for s, _ in trade_counts if s in symbols_with_data)
-        coverage_pct = (symbols_with_data_count / total_symbols * 100) if total_symbols > 0 else 0
+        # 总体统计
+        print(f"{'类型':<15} {'总数':>8} {'有数据':>10} {'缺失':>8} {'覆盖率':>10}")
+        print("-" * 60)
 
-        print(f"总股票数: {total_symbols}")
-        print(f"有数据: {symbols_with_data_count}")
-        print(f"缺失: {total_symbols - symbols_with_data_count}")
-        print(f"覆盖率: {coverage_pct:.1f}%")
+        stock_coverage = len(stocks_covered) / max(total_stocks, 1) * 100
+        option_coverage = len(options_covered) / max(total_options, 1) * 100
+
+        print(f"{'股票':<15} {total_stocks:>8} {len(stocks_covered):>10} {len(stocks_missing):>8} {stock_coverage:>9.1f}%")
+        print(f"{'期权(标的)':<15} {total_options:>8} {len(options_covered):>10} {len(options_missing):>8} {option_coverage:>9.1f}%")
+        print("-" * 60)
+        print(f"{'合计':<15} {total_symbols:>8} {covered_count:>10} {total_symbols - covered_count:>8} {coverage_pct:>9.1f}%")
         print()
 
         # 详细列表
         if not missing_only:
-            print(f"{'股票代码':<12} {'交易次数':>10} {'市场数据记录':>15} {'覆盖率':>10} {'状态':>8}")
+            print("=" * 100)
+            print("股票详情")
+            print("=" * 100)
+            print(f"{'代码':<15} {'类型':<8} {'交易次数':>10} {'市场数据':>12} {'状态':>10}")
             print("-" * 100)
 
-        missing_symbols = []
+            # 显示有数据的股票
+            for symbol, trade_count in stocks_covered:
+                data_count = symbols_with_data.get(symbol, 0)
+                print(f"{symbol:<15} {'股票':<8} {trade_count:>10} {data_count:>12} {'✓':>10}")
 
-        for symbol, trade_count in trade_counts:
-            data_count = symbols_with_data.get(symbol, 0)
+            # 显示有数据的期权
+            for symbol, trade_count, underlying in options_covered:
+                data_count = symbols_with_data.get(underlying, 0)
+                print(f"{symbol:<15} {'期权':<8} {trade_count:>10} {data_count:>12} {'✓ →' + underlying:>10}")
 
-            if data_count > 0:
-                # 计算覆盖率
-                # 假设每个交易日应该有一条市场数据
-                first_trade = session.query(Trade.filled_time).filter(
-                    Trade.symbol == symbol
-                ).order_by(Trade.filled_time).first()
+        # 缺失数据的代码
+        all_missing = stocks_missing + [(s, c, u) for s, c, u in options_missing]
 
-                last_trade = session.query(Trade.filled_time).filter(
-                    Trade.symbol == symbol
-                ).order_by(Trade.filled_time.desc()).first()
-
-                if first_trade and last_trade:
-                    days = (last_trade[0] - first_trade[0]).days + 1
-                    expected_data = max(days // 7 * 5, 1)  # 粗略估算工作日
-                    coverage = min(data_count / expected_data * 100, 100)
-                else:
-                    coverage = 100
-
-                status = "✓"
-
-                if not missing_only:
-                    print(f"{symbol:<12} {trade_count:>10} {data_count:>15} {coverage:>9.0f}% {status:>8}")
-
-            else:
-                missing_symbols.append((symbol, trade_count))
-                status = "✗ 缺失"
-
-                if not missing_only:
-                    print(f"{symbol:<12} {trade_count:>10} {0:>15} {0:>9.0f}% {status:>8}")
-
-        # 缺失数据的股票
-        if missing_symbols:
+        if all_missing or stocks_missing or options_missing:
             print()
             print("=" * 100)
-            print(f"缺失市场数据的股票 ({len(missing_symbols)})")
+            print(f"缺失市场数据 ({len(stocks_missing)} 股票 + {len(options_missing)} 期权)")
             print("=" * 100)
             print()
 
-            print(f"{'股票代码':<12} {'交易次数':>10} {'首次交易':>20} {'最后交易':>20}")
-            print("-" * 100)
+            if stocks_missing:
+                print("【缺失股票】")
+                print(f"{'代码':<15} {'交易次数':>10} {'首次交易':>15} {'最后交易':>15}")
+                print("-" * 60)
 
-            for symbol, trade_count in sorted(missing_symbols, key=lambda x: x[1], reverse=True):
-                first_trade = session.query(Trade.filled_time).filter(
-                    Trade.symbol == symbol
-                ).order_by(Trade.filled_time).first()
+                for symbol, trade_count in sorted(stocks_missing, key=lambda x: x[1], reverse=True):
+                    first_trade = session.query(Trade.filled_time).filter(
+                        Trade.symbol == symbol
+                    ).order_by(Trade.filled_time).first()
 
-                last_trade = session.query(Trade.filled_time).filter(
-                    Trade.symbol == symbol
-                ).order_by(Trade.filled_time.desc()).first()
+                    last_trade = session.query(Trade.filled_time).filter(
+                        Trade.symbol == symbol
+                    ).order_by(Trade.filled_time.desc()).first()
 
-                first_time = first_trade[0].strftime('%Y-%m-%d') if first_trade else 'N/A'
-                last_time = last_trade[0].strftime('%Y-%m-%d') if last_trade else 'N/A'
+                    first_time = first_trade[0].strftime('%Y-%m-%d') if first_trade else 'N/A'
+                    last_time = last_trade[0].strftime('%Y-%m-%d') if last_trade else 'N/A'
 
-                print(f"{symbol:<12} {trade_count:>10} {first_time:>20} {last_time:>20}")
+                    print(f"{symbol:<15} {trade_count:>10} {first_time:>15} {last_time:>15}")
+                print()
 
-            print()
-            print("建议:")
-            print(f"  python3 scripts/supplement_data_from_csv.py --from-db")
-            print()
+            if options_missing:
+                print("【缺失期权（标的无数据）】")
+
+                # 按标的分组
+                underlyings = {}
+                for symbol, trade_count, underlying in options_missing:
+                    if underlying not in underlyings:
+                        underlyings[underlying] = []
+                    underlyings[underlying].append((symbol, trade_count))
+
+                print(f"{'标的':<10} {'期权数':>8} {'期权代码示例':<30}")
+                print("-" * 60)
+
+                for underlying, opts in sorted(underlyings.items()):
+                    example = opts[0][0] if opts else ''
+                    print(f"{underlying:<10} {len(opts):>8} {example:<30}")
+                print()
 
         else:
             print()
-            print("✓ 所有股票都有市场数据!")
+            print("✓ 所有代码都有市场数据!")
             print()
 
         # 详细信息
-        if verbose and not missing_only:
+        if verbose:
             print()
             print("=" * 100)
             print("详细统计")
@@ -169,7 +197,7 @@ def check_coverage(verbose=False, missing_only=False):
             latest = session.query(func.max(MarketData.date)).scalar()
 
             if earliest and latest:
-                print(f"数据时间范围: {earliest.date()} 至 {latest.date()}")
+                print(f"数据时间范围: {earliest} 至 {latest}")
 
             # 技术指标完整性
             with_rsi = session.query(MarketData).filter(
@@ -197,7 +225,7 @@ def check_coverage(verbose=False, missing_only=False):
 def main():
     """主函数"""
     parser = argparse.ArgumentParser(
-        description='市场数据覆盖率检查工具',
+        description='市场数据覆盖率检查工具（支持期权标的检测）',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:

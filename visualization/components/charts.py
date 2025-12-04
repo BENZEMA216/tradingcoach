@@ -9,7 +9,58 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
+import numpy as np
 from typing import List, Optional
+
+
+def resample_to_weekly(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    将日线数据聚合为周线数据
+
+    Args:
+        df: 日线数据DataFrame，必须包含 date, open, high, low, close, volume 列
+
+    Returns:
+        周线聚合后的DataFrame
+    """
+    if df.empty:
+        return df
+
+    # 确保date是索引
+    df_copy = df.copy()
+    if 'date' in df_copy.columns:
+        df_copy['date'] = pd.to_datetime(df_copy['date'])
+        df_copy.set_index('date', inplace=True)
+
+    # 周线聚合规则
+    agg_dict = {
+        'open': 'first',
+        'high': 'max',
+        'low': 'min',
+        'close': 'last',
+        'volume': 'sum'
+    }
+
+    # 添加技术指标的聚合（如果存在）
+    indicator_cols = ['rsi', 'macd', 'macd_signal', 'macd_hist',
+                      'ma_5', 'ma_20', 'ma_50', 'ma_200',
+                      'bb_upper', 'bb_middle', 'bb_lower', 'atr']
+
+    for col in indicator_cols:
+        if col in df_copy.columns:
+            agg_dict[col] = 'last'  # 周线使用周五的指标值
+
+    # 执行周线聚合（W-FRI表示周五为周结束日）
+    weekly_df = df_copy.resample('W-FRI').agg(agg_dict)
+
+    # 去除NaN行
+    weekly_df = weekly_df.dropna(subset=['close'])
+
+    # 重置索引
+    weekly_df = weekly_df.reset_index()
+    weekly_df.rename(columns={'index': 'date'}, inplace=True)
+
+    return weekly_df
 
 
 def create_score_distribution_chart(df: pd.DataFrame) -> go.Figure:

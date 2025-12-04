@@ -88,23 +88,16 @@ def calculate_indicators_for_symbols(
         try:
             logger.info(f"[{i}/{len(symbols)}] Processing {symbol}...")
 
-            # 从缓存获取OHLCV数据
-            # 获取足够的历史数据（至少200天用于MA200）
-            end_date = date.today()
-            start_date = end_date - timedelta(days=400)
-
-            df = cache_manager.get(
-                symbol,
-                start_date,
-                end_date
-            )
+            # 从缓存获取所有OHLCV数据（不限制日期范围）
+            # 这样可以为所有历史数据计算技术指标
+            df = cache_manager.get_all_data(symbol)
 
             if df is None or df.empty:
                 logger.warning(f"  No data found for {symbol}, skipping")
                 stats['skipped_symbols'].append(symbol)
                 continue
 
-            logger.info(f"  Found {len(df)} records for {symbol}")
+            logger.info(f"  Found {len(df)} records for {symbol} (full history)")
 
             # 计算指标
             df_with_indicators = calculator.calculate_all_indicators(df)

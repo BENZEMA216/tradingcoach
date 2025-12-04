@@ -1,5 +1,5 @@
 """
-FIFO Verification Page
+FIFO Verification Page - Terminal Finance 主题
 FIFO验证页面
 """
 
@@ -13,8 +13,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from visualization.utils.data_loader import get_data_loader
 from visualization.components.charts import create_fifo_timeline_chart
+from visualization.styles import inject_global_css
 
 st.set_page_config(page_title="FIFO验证", page_icon="🔄", layout="wide")
+
+# 注入全局样式
+inject_global_css()
 
 st.title("🔄 FIFO 匹配验证")
 st.markdown("可视化先进先出(FIFO)匹配过程，验证系统逻辑")

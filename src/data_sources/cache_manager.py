@@ -62,6 +62,57 @@ class CacheManager:
             f"cache_dir={cache_dir}, expiry_days={expiry_days}, l1_max_size={l1_max_size}"
         )
 
+    def get_all_data(
+        self,
+        symbol: str,
+        interval: str = '1d'
+    ) -> Optional[pd.DataFrame]:
+        """
+        从L2数据库缓存获取指定symbol的所有数据（不限制日期范围）
+
+        用于计算技术指标时需要完整历史数据的场景
+
+        Args:
+            symbol: 股票代码
+            interval: 时间粒度
+
+        Returns:
+            DataFrame if found, None if not found
+        """
+        try:
+            query = self.session.query(MarketData).filter(
+                MarketData.symbol == symbol,
+                MarketData.interval == interval
+            ).order_by(MarketData.timestamp)
+
+            records = query.all()
+
+            if not records:
+                logger.debug(f"No data found for {symbol} in L2 cache")
+                return None
+
+            # 转换为DataFrame
+            data = []
+            for r in records:
+                data.append({
+                    'Date': r.timestamp,
+                    'Open': float(r.open) if r.open else None,
+                    'High': float(r.high) if r.high else None,
+                    'Low': float(r.low) if r.low else None,
+                    'Close': float(r.close),
+                    'Volume': r.volume if r.volume else 0
+                })
+
+            df = pd.DataFrame(data)
+            df.set_index('Date', inplace=True)
+
+            logger.debug(f"Retrieved all {len(df)} records for {symbol} from L2 cache")
+            return df
+
+        except Exception as e:
+            logger.error(f"Failed to get all data for {symbol}: {e}")
+            return None
+
     def get(
         self,
         symbol: str,

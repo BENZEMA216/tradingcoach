@@ -1,5 +1,5 @@
 """
-Data Overview Page
+Data Overview Page - Terminal Finance 主题
 数据概览页面
 """
 
@@ -12,8 +12,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from visualization.utils.data_loader import get_data_loader
 from visualization.components.metrics import status_badge
+from visualization.styles import inject_global_css, COLORS, FONTS
 
 st.set_page_config(page_title="数据概览", page_icon="📊", layout="wide")
+
+# 注入全局样式
+inject_global_css()
 
 st.title("📊 数据概览")
 st.markdown("查看系统整体数据状态，检查市场数据覆盖率")

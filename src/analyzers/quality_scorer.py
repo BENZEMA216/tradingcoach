@@ -24,7 +24,12 @@ from config import (
     SCORE_WEIGHT_TREND,
     SCORE_WEIGHT_RISK,
     RSI_OVERSOLD,
-    RSI_OVERBOUGHT
+    RSI_OVERBOUGHT,
+    STOCH_OVERSOLD,
+    STOCH_OVERBOUGHT,
+    ADX_WEAK_TREND,
+    ADX_MODERATE_TREND,
+    ADX_STRONG_TREND
 )
 
 logger = logging.getLogger(__name__)
@@ -118,109 +123,302 @@ class QualityScorer:
         md: MarketData
     ) -> float:
         """
-        评估进场时的技术指标配合度
+        评估进场时的技术指标配合度（加权平均）
 
-        考虑因素：
-        - RSI超买超卖区域
-        - MACD金叉死叉
-        - 布林带位置
+        权重分配：
+        - RSI评分 (25%)
+        - MACD评分 (20%)
+        - 布林带评分 (15%)
+        - ADX趋势强度评分 (15%)
+        - Stochastic评分 (15%)
+        - 成交量确认评分 (10%)
         """
-        scores = []
+        weighted_scores = []
         is_long = position.direction in ['buy', 'buy_to_open', 'long']
 
-        # RSI评分
-        if md.rsi_14 is not None:
-            if is_long:
-                # 做多：RSI越低越好（超卖区买入）
-                if md.rsi_14 < RSI_OVERSOLD:
-                    rsi_score = 95
-                elif md.rsi_14 < 40:
-                    rsi_score = 80
-                elif md.rsi_14 < 50:
-                    rsi_score = 65
-                elif md.rsi_14 < 60:
-                    rsi_score = 50
-                elif md.rsi_14 < RSI_OVERBOUGHT:
-                    rsi_score = 35
-                else:
-                    rsi_score = 20  # 超买区买入，风险大
+        # 1. RSI评分 (权重25%)
+        rsi_score = self._score_rsi(md, is_long)
+        if rsi_score is not None:
+            weighted_scores.append((rsi_score, 0.25))
+
+        # 2. MACD评分 (权重20%)
+        macd_score = self._score_macd(md, is_long)
+        if macd_score is not None:
+            weighted_scores.append((macd_score, 0.20))
+
+        # 3. 布林带评分 (权重15%)
+        bb_score = self._score_bollinger(md, is_long)
+        if bb_score is not None:
+            weighted_scores.append((bb_score, 0.15))
+
+        # 4. ADX趋势强度评分 (权重15%)
+        adx_score = self._score_adx(md, is_long)
+        if adx_score is not None:
+            weighted_scores.append((adx_score, 0.15))
+
+        # 5. Stochastic评分 (权重15%)
+        stoch_score = self._score_stochastic(md, is_long)
+        if stoch_score is not None:
+            weighted_scores.append((stoch_score, 0.15))
+
+        # 6. 成交量确认评分 (权重10%)
+        volume_score = self._score_volume_confirmation(md)
+        if volume_score is not None:
+            weighted_scores.append((volume_score, 0.10))
+
+        # 计算加权平均分
+        if not weighted_scores:
+            return 50.0
+
+        total_weight = sum(w for _, w in weighted_scores)
+        weighted_sum = sum(s * w for s, w in weighted_scores)
+
+        return weighted_sum / total_weight if total_weight > 0 else 50.0
+
+    def _score_rsi(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """RSI评分：超买超卖区域判断"""
+        if md.rsi_14 is None:
+            return None
+
+        if is_long:
+            # 做多：RSI越低越好（超卖区买入）
+            if md.rsi_14 < RSI_OVERSOLD:
+                return 95
+            elif md.rsi_14 < 40:
+                return 80
+            elif md.rsi_14 < 50:
+                return 65
+            elif md.rsi_14 < 60:
+                return 50
+            elif md.rsi_14 < RSI_OVERBOUGHT:
+                return 35
             else:
-                # 做空：RSI越高越好（超买区卖出）
-                if md.rsi_14 > RSI_OVERBOUGHT:
-                    rsi_score = 95
-                elif md.rsi_14 > 60:
-                    rsi_score = 80
-                elif md.rsi_14 > 50:
-                    rsi_score = 65
-                elif md.rsi_14 > 40:
-                    rsi_score = 50
-                elif md.rsi_14 > RSI_OVERSOLD:
-                    rsi_score = 35
-                else:
-                    rsi_score = 20
-
-            scores.append(rsi_score)
-
-        # MACD评分
-        if md.macd is not None and md.macd_signal is not None:
-            macd_diff = float(md.macd) - float(md.macd_signal)
-
-            if is_long:
-                # 做多：MACD在信号线上方（金叉）
-                if macd_diff > 0 and float(md.macd) > 0:
-                    macd_score = 90  # 强势金叉
-                elif macd_diff > 0:
-                    macd_score = 75  # 金叉但在0轴下方
-                elif macd_diff > -0.5:
-                    macd_score = 55  # 接近金叉
-                else:
-                    macd_score = 35  # 死叉状态
+                return 20  # 超买区买入，风险大
+        else:
+            # 做空：RSI越高越好（超买区卖出）
+            if md.rsi_14 > RSI_OVERBOUGHT:
+                return 95
+            elif md.rsi_14 > 60:
+                return 80
+            elif md.rsi_14 > 50:
+                return 65
+            elif md.rsi_14 > 40:
+                return 50
+            elif md.rsi_14 > RSI_OVERSOLD:
+                return 35
             else:
-                # 做空：MACD在信号线下方（死叉）
-                if macd_diff < 0 and float(md.macd) < 0:
-                    macd_score = 90  # 强势死叉
-                elif macd_diff < 0:
-                    macd_score = 75  # 死叉但在0轴上方
-                elif macd_diff < 0.5:
-                    macd_score = 55  # 接近死叉
-                else:
-                    macd_score = 35  # 金叉状态
+                return 20
 
-            scores.append(macd_score)
+    def _score_macd(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """MACD评分：金叉死叉判断"""
+        if md.macd is None or md.macd_signal is None:
+            return None
 
-        # 布林带评分
-        if all([md.bb_upper, md.bb_middle, md.bb_lower, md.close]):
-            bb_position = (float(md.close) - float(md.bb_lower)) / (float(md.bb_upper) - float(md.bb_lower))
+        macd_diff = float(md.macd) - float(md.macd_signal)
 
-            if is_long:
-                # 做多：在下轨附近买入
-                if bb_position < 0.2:
-                    bb_score = 92
-                elif bb_position < 0.35:
-                    bb_score = 80
-                elif bb_position < 0.5:
-                    bb_score = 65
-                elif bb_position < 0.7:
-                    bb_score = 50
-                else:
-                    bb_score = 30  # 上轨附近买入风险大
+        if is_long:
+            # 做多：MACD在信号线上方（金叉）
+            if macd_diff > 0 and float(md.macd) > 0:
+                return 90  # 强势金叉
+            elif macd_diff > 0:
+                return 75  # 金叉但在0轴下方
+            elif macd_diff > -0.5:
+                return 55  # 接近金叉
             else:
-                # 做空：在上轨附近卖出
-                if bb_position > 0.8:
-                    bb_score = 92
-                elif bb_position > 0.65:
-                    bb_score = 80
-                elif bb_position > 0.5:
-                    bb_score = 65
-                elif bb_position > 0.3:
-                    bb_score = 50
+                return 35  # 死叉状态
+        else:
+            # 做空：MACD在信号线下方（死叉）
+            if macd_diff < 0 and float(md.macd) < 0:
+                return 90  # 强势死叉
+            elif macd_diff < 0:
+                return 75  # 死叉但在0轴上方
+            elif macd_diff < 0.5:
+                return 55  # 接近死叉
+            else:
+                return 35  # 金叉状态
+
+    def _score_bollinger(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """布林带评分：价格在通道中的位置"""
+        if not all([md.bb_upper, md.bb_middle, md.bb_lower, md.close]):
+            return None
+
+        bb_width = float(md.bb_upper) - float(md.bb_lower)
+        if bb_width <= 0:
+            return None
+
+        bb_position = (float(md.close) - float(md.bb_lower)) / bb_width
+
+        if is_long:
+            # 做多：在下轨附近买入
+            if bb_position < 0.2:
+                return 92
+            elif bb_position < 0.35:
+                return 80
+            elif bb_position < 0.5:
+                return 65
+            elif bb_position < 0.7:
+                return 50
+            else:
+                return 30  # 上轨附近买入风险大
+        else:
+            # 做空：在上轨附近卖出
+            if bb_position > 0.8:
+                return 92
+            elif bb_position > 0.65:
+                return 80
+            elif bb_position > 0.5:
+                return 65
+            elif bb_position > 0.3:
+                return 50
+            else:
+                return 30
+
+    def _score_adx(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """
+        ADX趋势强度评分
+
+        评分逻辑：
+        - ADX衡量趋势强度（不区分方向）
+        - +DI和-DI判断趋势方向
+        - 做多时：+DI > -DI且ADX强，得分高
+        - 做空时：-DI > +DI且ADX强，得分高
+        """
+        if md.adx is None:
+            return None
+
+        adx = float(md.adx)
+        plus_di = float(md.plus_di) if md.plus_di is not None else None
+        minus_di = float(md.minus_di) if md.minus_di is not None else None
+
+        # 仅有ADX时，仅评估趋势强度
+        if plus_di is None or minus_di is None:
+            if adx >= ADX_STRONG_TREND:
+                return 75  # 强趋势但方向未知
+            elif adx >= ADX_MODERATE_TREND:
+                return 65
+            elif adx >= ADX_WEAK_TREND:
+                return 55
+            else:
+                return 45  # 震荡市，趋势策略风险大
+
+        # 有完整DI数据时，综合评分
+        direction_correct = (is_long and plus_di > minus_di) or (not is_long and minus_di > plus_di)
+        di_diff = abs(plus_di - minus_di)
+
+        if direction_correct:
+            # 方向正确
+            if adx >= ADX_STRONG_TREND and di_diff >= 10:
+                return 95  # 强趋势+方向明确
+            elif adx >= ADX_MODERATE_TREND and di_diff >= 5:
+                return 85  # 中等趋势+方向正确
+            elif adx >= ADX_WEAK_TREND:
+                return 70  # 弱趋势+方向正确
+            else:
+                return 55  # 震荡但方向正确
+        else:
+            # 方向错误（逆势交易）
+            if adx >= ADX_STRONG_TREND:
+                return 25  # 强逆势，风险很大
+            elif adx >= ADX_MODERATE_TREND:
+                return 35  # 中等逆势
+            elif adx >= ADX_WEAK_TREND:
+                return 45  # 弱趋势逆势
+            else:
+                return 50  # 震荡市，方向不重要
+
+    def _score_stochastic(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """
+        Stochastic随机指标评分
+
+        评分逻辑：
+        - 做多：%K在超卖区且%K上穿%D（金叉），得分高
+        - 做空：%K在超买区且%K下穿%D（死叉），得分高
+        """
+        if md.stoch_k is None:
+            return None
+
+        stoch_k = float(md.stoch_k)
+        stoch_d = float(md.stoch_d) if md.stoch_d is not None else stoch_k
+
+        # 计算K-D差值（正值表示金叉趋势，负值表示死叉趋势）
+        kd_diff = stoch_k - stoch_d
+
+        if is_long:
+            # 做多：超卖区 + 金叉
+            if stoch_k < STOCH_OVERSOLD:
+                if kd_diff > 0:
+                    return 95  # 超卖区金叉，最佳买入
                 else:
-                    bb_score = 30
+                    return 80  # 超卖区，等待金叉
+            elif stoch_k < 35:
+                if kd_diff > 0:
+                    return 80  # 低位金叉
+                else:
+                    return 65
+            elif stoch_k < 50:
+                return 60 if kd_diff > 0 else 50
+            elif stoch_k < 65:
+                return 45
+            elif stoch_k < STOCH_OVERBOUGHT:
+                return 35
+            else:
+                return 20  # 超买区做多，风险大
+        else:
+            # 做空：超买区 + 死叉
+            if stoch_k > STOCH_OVERBOUGHT:
+                if kd_diff < 0:
+                    return 95  # 超买区死叉，最佳卖出
+                else:
+                    return 80  # 超买区，等待死叉
+            elif stoch_k > 65:
+                if kd_diff < 0:
+                    return 80  # 高位死叉
+                else:
+                    return 65
+            elif stoch_k > 50:
+                return 60 if kd_diff < 0 else 50
+            elif stoch_k > 35:
+                return 45
+            elif stoch_k > STOCH_OVERSOLD:
+                return 35
+            else:
+                return 20  # 超卖区做空，风险大
 
-            scores.append(bb_score)
+    def _score_volume_confirmation(self, md: MarketData) -> Optional[float]:
+        """
+        成交量确认评分
 
-        # 返回平均分
-        return np.mean(scores) if scores else 50.0
+        评分逻辑：
+        - 成交量 > 20日均量：放量，确认信号有效
+        - 成交量 < 20日均量：缩量，信号可靠性降低
+        """
+        if md.volume is None or md.volume <= 0:
+            return None
+
+        volume = float(md.volume)
+
+        # 优先使用volume_sma_20
+        if md.volume_sma_20 is not None and md.volume_sma_20 > 0:
+            volume_sma = float(md.volume_sma_20)
+            volume_ratio = volume / volume_sma
+
+            if volume_ratio >= 2.0:
+                return 95  # 大幅放量，强确认
+            elif volume_ratio >= 1.5:
+                return 85  # 明显放量
+            elif volume_ratio >= 1.2:
+                return 75  # 温和放量
+            elif volume_ratio >= 1.0:
+                return 65  # 正常成交量
+            elif volume_ratio >= 0.7:
+                return 55  # 轻度缩量
+            elif volume_ratio >= 0.5:
+                return 45  # 明显缩量
+            else:
+                return 35  # 极度缩量，信号不可靠
+        else:
+            # 无均量数据，给基本分
+            return 60
 
     def _score_entry_position(
         self,
@@ -292,13 +490,11 @@ class QualityScorer:
         """
         评估进场时的成交量确认
 
-        注意：当前版本简化处理，未来可增加成交量均值对比
+        使用成交量与20日均量的比值评估
         """
-        # 简化版本：如果有成交量数据给予基本分
-        if md.volume is not None and md.volume > 0:
-            return 70.0  # 有成交量数据
-        else:
-            return 60.0  # 无成交量数据
+        # 复用 _score_volume_confirmation 方法
+        score = self._score_volume_confirmation(md)
+        return score if score is not None else 60.0
 
     # ==================== 出场质量评分（25%权重）====================
 
@@ -597,14 +793,30 @@ class QualityScorer:
         """
         评估趋势强度
 
-        使用均线分离度和MACD强度
+        使用ADX作为主要趋势强度指标（权重50%）
+        辅以均线分离度（权重30%）和MACD柱状图强度（权重20%）
         """
         if not md:
             return 50.0
 
-        scores = []
+        weighted_scores = []
 
-        # 均线分离度
+        # 1. ADX趋势强度（权重50%）- 主要指标
+        if md.adx is not None:
+            adx = float(md.adx)
+
+            if adx >= ADX_STRONG_TREND:
+                adx_score = 95  # 强趋势
+            elif adx >= ADX_MODERATE_TREND:
+                adx_score = 80  # 中等趋势
+            elif adx >= ADX_WEAK_TREND:
+                adx_score = 60  # 弱趋势
+            else:
+                adx_score = 40  # 震荡市
+
+            weighted_scores.append((adx_score, 0.50))
+
+        # 2. 均线分离度（权重30%）
         if md.ma_5 and md.ma_20 and md.ma_50:
             # 计算MA5与MA50的分离度
             separation = abs((float(md.ma_5) - float(md.ma_50)) / float(md.ma_50) * 100)
@@ -618,9 +830,9 @@ class QualityScorer:
             else:
                 ma_score = 45  # 震荡
 
-            scores.append(ma_score)
+            weighted_scores.append((ma_score, 0.30))
 
-        # MACD柱状图强度
+        # 3. MACD柱状图强度（权重20%）
         if md.macd_hist is not None:
             hist_abs = abs(md.macd_hist)
 
@@ -633,9 +845,16 @@ class QualityScorer:
             else:
                 macd_score = 50
 
-            scores.append(macd_score)
+            weighted_scores.append((macd_score, 0.20))
 
-        return np.mean(scores) if scores else 50.0
+        # 计算加权平均
+        if not weighted_scores:
+            return 50.0
+
+        total_weight = sum(w for _, w in weighted_scores)
+        weighted_sum = sum(s * w for s, w in weighted_scores)
+
+        return weighted_sum / total_weight if total_weight > 0 else 50.0
 
     def _score_trend_consistency(
         self,

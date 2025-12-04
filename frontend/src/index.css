@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* Custom design system variables */
+:root {
+  /* Colors - Trading theme */
+  --color-profit: #22c55e;
+  --color-loss: #ef4444;
+  --color-neutral: #6b7280;
+
+  /* Grade colors */
+  --color-grade-a: #22c55e;
+  --color-grade-b: #84cc16;
+  --color-grade-c: #eab308;
+  --color-grade-d: #f97316;
+  --color-grade-f: #ef4444;
+}
+
+/* Base styles */
+body {
+  @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Utility classes */
+.text-profit {
+  color: var(--color-profit);
+}
+
+.text-loss {
+  color: var(--color-loss);
+}
+
+.bg-profit {
+  background-color: var(--color-profit);
+}
+
+.bg-loss {
+  background-color: var(--color-loss);
+}
+
+/* Grade badge colors */
+.grade-a { @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200; }
+.grade-b { @apply bg-lime-100 text-lime-800 dark:bg-lime-900 dark:text-lime-200; }
+.grade-c { @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200; }
+.grade-d { @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200; }
+.grade-f { @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200; }

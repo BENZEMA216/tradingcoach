@@ -1,211 +1,325 @@
 #!/usr/bin/env python3
 """
 Trading Coach Dashboard
-交易教练可视化仪表板
+交易教练性能仪表盘 - 一眼看懂盈亏
 
-主入口文件。
+核心功能:
+- KPI 指标展示 (总盈亏/胜率/平均评分/交易数)
+- 权益曲线图表
+- 最近交易列表
+- 待复盘交易列表
+- 策略分布饼图
+- 本月日历热力图预览
 """
 
 import streamlit as st
 import sys
 from pathlib import Path
+from datetime import datetime
+import plotly.graph_objects as go
+import plotly.express as px
 
 # 添加主工程路径
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # 页面配置
 st.set_page_config(
-    page_title="Trading Coach Dashboard",
+    page_title="Trading Coach",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 自定义 CSS
-st.markdown("""
-<style>
-    .main-header {
-        font-size: 3rem;
-        font-weight: bold;
-        text-align: center;
-        color: #1f77b4;
-        margin-bottom: 2rem;
+# 导入样式
+from visualization.styles import inject_global_css, COLORS, FONTS
+inject_global_css()
+
+# 导入组件
+from visualization.components.core.metric_card import render_kpi_cards, METRIC_CARD_CSS
+from visualization.components.charts.equity_curve import create_equity_curve
+from visualization.components.charts.calendar_heatmap import create_month_calendar
+from visualization.utils.data_loader import get_data_loader
+
+# 注入额外CSS
+st.markdown(METRIC_CARD_CSS, unsafe_allow_html=True)
+
+
+def render_trade_list(df, title: str, icon: str, show_reason: bool = False):
+    """渲染交易列表"""
+    if df is None or df.empty:
+        st.info(f"暂无{title}数据")
+        return
+
+    title_style = f"color: {COLORS['text_primary']}; font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;"
+    st.markdown(f'<div style="{title_style}"><span>{icon}</span><span>{title}</span></div>', unsafe_allow_html=True)
+
+    for _, row in df.iterrows():
+        pnl = row['net_pnl']
+        is_profit = pnl >= 0
+        pnl_color = COLORS['profit'] if is_profit else COLORS['loss']
+        pnl_icon = "▲" if is_profit else "▼"
+        pnl_sign = "+" if is_profit else ""
+
+        grade = row.get('grade', '-') or '-'
+        grade_color = {
+            'A': COLORS['grade_a'], 'B': COLORS['grade_b'],
+            'C': COLORS['grade_c'], 'D': COLORS['grade_d'], 'F': COLORS['grade_f']
+        }.get(grade[0] if grade else 'C', COLORS['text_muted'])
+
+        date_str = row['close_date'].strftime('%m/%d') if row.get('close_date') else '-'
+
+        reason_html = ""
+        if show_reason and 'reason' in row:
+            reason_style = f"font-size: 0.7rem; padding: 0.125rem 0.375rem; background: {COLORS['loss']}20; color: {COLORS['loss']}; border-radius: 4px;"
+            reason_html = f'<span style="{reason_style}">{row["reason"]}</span>'
+
+        # 定义所有样式 (单行格式)
+        row_style = f"display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: {COLORS['bg_tertiary']}; border-radius: 8px; margin-bottom: 0.5rem;"
+        left_container_style = "display: flex; align-items: center; gap: 0.75rem;"
+        symbol_style = f"font-family: {FONTS['mono']}; font-weight: 600; color: {COLORS['text_primary']}; min-width: 60px;"
+        date_style = f"color: {COLORS['text_muted']}; font-size: 0.8rem;"
+        right_container_style = "display: flex; align-items: center; gap: 0.75rem;"
+        pnl_style = f"font-family: {FONTS['mono']}; font-weight: 600; color: {pnl_color}; font-size: 0.9rem;"
+        grade_style = f"display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: {grade_color}20; color: {grade_color}; border-radius: 4px; font-size: 0.75rem; font-weight: 700;"
+
+        st.markdown(f'''<div style="{row_style}"><div style="{left_container_style}"><span style="{symbol_style}">{row['symbol']}</span><span style="{date_style}">{date_str}</span>{reason_html}</div><div style="{right_container_style}"><span style="{pnl_style}">{pnl_icon} {pnl_sign}${abs(pnl):,.0f}</span><span style="{grade_style}">{grade}</span></div></div>''', unsafe_allow_html=True)
+
+
+def render_strategy_donut(df):
+    """渲染策略分布饼图"""
+    if df is None or df.empty:
+        st.info("暂无策略数据")
+        return
+
+    # 颜色映射
+    colors = {
+        'trend': COLORS['strategy_trend'],
+        'mean_reversion': COLORS['strategy_reversion'],
+        'breakout': COLORS['strategy_breakout'],
+        'range': COLORS['strategy_range'],
+        'momentum': COLORS['strategy_momentum'],
+        'unknown': COLORS['neutral'],
     }
-    .sub-header {
-        font-size: 1.5rem;
-        color: #666;
-        text-align: center;
-        margin-bottom: 3rem;
-    }
-    .feature-box {
-        padding: 2rem;
-        border-radius: 10px;
-        background-color: #f8f9fa;
-        margin-bottom: 1rem;
-        border-left: 5px solid #1f77b4;
-    }
-    .feature-title {
-        font-size: 1.3rem;
-        font-weight: bold;
-        color: #1f77b4;
-        margin-bottom: 0.5rem;
-    }
-    .feature-desc {
-        color: #666;
-        line-height: 1.6;
-    }
-</style>
-""", unsafe_allow_html=True)
 
-# 主页面
-st.markdown('<div class="main-header">📊 Trading Coach Dashboard</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">交易质量分析与验证工具</div>', unsafe_allow_html=True)
+    fig = go.Figure(data=[
+        go.Pie(
+            labels=df['strategy_name'],
+            values=df['count'],
+            hole=0.6,
+            marker=dict(
+                colors=[colors.get(s, COLORS['neutral']) for s in df['strategy']],
+                line=dict(color=COLORS['bg_primary'], width=2)
+            ),
+            textinfo='percent',
+            textfont=dict(size=11, color=COLORS['text_primary']),
+            hovertemplate=(
+                '<b>%{label}</b><br>'
+                '交易数: %{value}<br>'
+                '占比: %{percent}<br>'
+                '<extra></extra>'
+            ),
+        )
+    ])
 
-# 欢迎信息
-st.markdown("""
-欢迎使用 Trading Coach 可视化分析工具！这是一个专为交易者设计的综合分析平台，
-帮助你深入理解交易表现、验证系统逻辑、并持续改进交易质量。
-""")
+    fig.update_layout(
+        height=200,
+        margin=dict(l=10, r=10, t=10, b=10),
+        paper_bgcolor=COLORS['bg_primary'],
+        plot_bgcolor=COLORS['bg_primary'],
+        font=dict(color=COLORS['text_secondary']),
+        showlegend=True,
+        legend=dict(
+            orientation='v',
+            yanchor='middle',
+            y=0.5,
+            xanchor='left',
+            x=1.05,
+            font=dict(size=10),
+        ),
+    )
 
-st.markdown("---")
+    st.plotly_chart(fig, use_container_width=True)
 
-# 功能介绍
-st.subheader("🎯 核心功能")
 
-col1, col2 = st.columns(2)
+def main():
+    """主函数"""
+    try:
+        loader = get_data_loader()
+    except Exception as e:
+        st.error(f"无法连接数据库: {e}")
+        return
 
-with col1:
-    st.markdown("""
-    <div class="feature-box">
-        <div class="feature-title">📊 数据概览</div>
-        <div class="feature-desc">
-            • 查看整体交易统计<br>
-            • 检查市场数据覆盖率<br>
-            • 识别数据缺失的股票<br>
-            • 快速补充市场数据
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # ================================================================
+    # Header
+    # ================================================================
+    header_container_style = "display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;"
+    title_style = f"font-size: 2rem; font-weight: 700; font-family: {FONTS['heading']}; color: {COLORS['text_primary']};"
+    subtitle_style = f"color: {COLORS['text_secondary']}; font-size: 0.9rem;"
+    st.markdown(f'<div style="{header_container_style}"><div><div style="{title_style}">Trading Coach</div><div style="{subtitle_style}">交易复盘与绩效分析</div></div></div>', unsafe_allow_html=True)
 
-    st.markdown("""
-    <div class="feature-box">
-        <div class="feature-title">🔄 FIFO 验证</div>
-        <div class="feature-desc">
-            • 可视化交易匹配过程<br>
-            • 验证先进先出逻辑<br>
-            • 对比数据库计算结果<br>
-            • 发现潜在的匹配问题
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # ================================================================
+    # KPI Cards
+    # ================================================================
+    kpis = loader.get_dashboard_kpis()
+    prev_kpis = loader.get_dashboard_kpis(days=60)  # 用于计算变化
 
-with col2:
-    st.markdown("""
-    <div class="feature-box">
-        <div class="feature-title">⭐ 质量评分</div>
-        <div class="feature-desc">
-            • 四维度评分分析<br>
-            • 评分分布与趋势<br>
-            • 按股票查看表现<br>
-            • 发现最佳/最差交易
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    render_kpi_cards(
+        total_pnl=kpis['total_pnl'],
+        win_rate=kpis['win_rate'],
+        avg_score=kpis['avg_score'],
+        trade_count=kpis['trade_count'],
+        prev_period_pnl=prev_kpis['total_pnl'] if prev_kpis['trade_count'] > 0 else None,
+        prev_period_win_rate=prev_kpis['win_rate'] if prev_kpis['trade_count'] > 0 else None,
+    )
 
-    st.markdown("""
-    <div class="feature-box">
-        <div class="feature-title">📈 技术指标</div>
-        <div class="feature-desc">
-            • K线图与技术指标<br>
-            • 标注交易点位<br>
-            • 验证指标正确性<br>
-            • 支持多种指标组合
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-st.markdown("---")
+    # ================================================================
+    # Equity Curve
+    # ================================================================
+    section_title_style = f"color: {COLORS['text_primary']}; font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem;"
+    st.markdown(f'<div style="{section_title_style}">📈 权益曲线</div>', unsafe_allow_html=True)
 
-# 快速开始
-st.subheader("🚀 快速开始")
+    # 时间范围选择
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 4])
 
-st.markdown("""
-1. **数据检查**: 点击左侧"📊 数据概览"查看当前数据状态
-2. **质量分析**: 前往"⭐ 质量评分"页面查看交易质量分析
-3. **验证逻辑**: 使用"🔄 FIFO验证"工具验证匹配算法
-4. **技术分析**: 在"📈 技术指标"页面查看价格走势和指标
-""")
+    time_ranges = {'1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': None}
 
-# 系统状态
-st.markdown("---")
-st.subheader("📡 系统状态")
-
-try:
-    from visualization.utils.data_loader import get_data_loader
-
-    loader = get_data_loader()
-    stats = loader.get_overview_stats()
-
-    col1, col2, col3, col4 = st.columns(4)
+    if 'equity_range' not in st.session_state:
+        st.session_state.equity_range = 'ALL'
 
     with col1:
-        st.metric("交易记录", f"{stats['total_trades']:,}")
+        if st.button("1M", use_container_width=True,
+                     type="primary" if st.session_state.equity_range == '1M' else "secondary"):
+            st.session_state.equity_range = '1M'
+    with col2:
+        if st.button("3M", use_container_width=True,
+                     type="primary" if st.session_state.equity_range == '3M' else "secondary"):
+            st.session_state.equity_range = '3M'
+    with col3:
+        if st.button("6M", use_container_width=True,
+                     type="primary" if st.session_state.equity_range == '6M' else "secondary"):
+            st.session_state.equity_range = '6M'
+    with col4:
+        if st.button("ALL", use_container_width=True,
+                     type="primary" if st.session_state.equity_range == 'ALL' else "secondary"):
+            st.session_state.equity_range = 'ALL'
+
+    days = time_ranges.get(st.session_state.equity_range)
+    equity_data = loader.get_equity_curve_data(days=days)
+
+    if not equity_data.empty:
+        fig = create_equity_curve(
+            equity_data,
+            date_col='close_time',
+            pnl_col='net_pnl',
+            show_drawdown=False,
+            show_trades=True,
+            height=300,
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("暂无交易数据")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ================================================================
+    # Trade Lists (Recent + Needs Review)
+    # ================================================================
+    col1, col2 = st.columns(2)
+
+    with col1:
+        recent_trades = loader.get_recent_trades(limit=5)
+        render_trade_list(recent_trades, "最近交易", "🕐")
+
+        if not recent_trades.empty:
+            st.markdown(f"""
+            <div style="text-align: right; margin-top: 0.5rem;">
+                <a href="/交易浏览" style="
+                    color: {COLORS['accent_cyan']};
+                    font-size: 0.8rem;
+                    text-decoration: none;
+                ">查看全部 →</a>
+            </div>
+            """, unsafe_allow_html=True)
 
     with col2:
-        st.metric("持仓数量", f"{stats['total_positions']:,}")
+        needs_review = loader.get_needs_review_trades(limit=5)
+        render_trade_list(needs_review, "待复盘", "⚠️", show_reason=True)
 
-    with col3:
-        coverage_pct = (stats['symbols_with_data'] / max(stats['total_symbols'], 1)) * 100
-        st.metric("数据覆盖率", f"{coverage_pct:.1f}%")
+        if not needs_review.empty:
+            st.markdown(f"""
+            <div style="text-align: right; margin-top: 0.5rem;">
+                <a href="/持仓分析" style="
+                    color: {COLORS['accent_cyan']};
+                    font-size: 0.8rem;
+                    text-decoration: none;
+                ">开始复盘 →</a>
+            </div>
+            """, unsafe_allow_html=True)
 
-    with col4:
-        st.metric("已评分", f"{stats['scored_positions']:,}")
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # 状态指示器
-    if coverage_pct < 50:
-        st.warning("⚠️ 市场数据覆盖率较低，建议补充数据以获得更准确的质量评分")
-        st.info("💡 提示: 使用命令 `python3 scripts/supplement_data_from_csv.py --from-db` 补充数据")
-    elif stats['scored_positions'] == 0:
-        st.warning("⚠️ 尚未进行质量评分")
-        st.info("💡 提示: 使用命令 `python3 scripts/score_positions.py --all` 进行评分")
-    else:
-        st.success("✅ 系统运行正常，所有功能可用")
+    # ================================================================
+    # Strategy Distribution + Calendar Preview
+    # ================================================================
+    col1, col2 = st.columns(2)
 
-except Exception as e:
-    st.error(f"❌ 无法连接数据库: {e}")
-    st.info("请确保数据库文件存在于 `data/tradingcoach.db`")
+    with col1:
+        st.markdown(f"""
+        <div style="
+            color: {COLORS['text_primary']};
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        ">📊 策略分布</div>
+        """, unsafe_allow_html=True)
 
-# 帮助信息
-st.markdown("---")
+        strategy_data = loader.get_strategy_breakdown()
+        render_strategy_donut(strategy_data)
 
-with st.expander("❓ 需要帮助？"):
-    st.markdown("""
-    **文档**:
-    - [可视化工具文档](../visualization/README.md)
-    - [数据补充指南](../project_docs/data_supplementation_guide.md)
-    - [FIFO验证工具](../verification/README.md)
+    with col2:
+        st.markdown(f"""
+        <div style="
+            color: {COLORS['text_primary']};
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        ">📅 本月盈亏日历</div>
+        """, unsafe_allow_html=True)
 
-    **常见问题**:
-    - Q: 如何补充市场数据？
-      A: 运行 `python3 scripts/supplement_data_from_csv.py --from-db`
+        now = datetime.now()
+        daily_pnl = loader.get_daily_pnl(year=now.year, month=now.month)
 
-    - Q: 如何重新评分？
-      A: 运行 `python3 scripts/score_positions.py --all --force`
+        if not daily_pnl.empty:
+            fig = create_month_calendar(
+                daily_pnl,
+                year=now.year,
+                month=now.month,
+                date_col='date',
+                pnl_col='pnl',
+                height=200,
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("本月暂无交易数据")
 
-    - Q: 仪表板运行缓慢？
-      A: 尝试刷新页面或减少显示的数据量
+    # ================================================================
+    # Footer
+    # ================================================================
+    st.markdown(f"""
+    <div style="
+        text-align: center;
+        color: {COLORS['text_muted']};
+        padding: 2rem 0 1rem 0;
+        font-size: 0.8rem;
+        border-top: 1px solid {COLORS['border']};
+        margin-top: 2rem;
+    ">
+        Trading Coach v2.0 · 使用左侧导航访问更多功能
+    </div>
+    """, unsafe_allow_html=True)
 
-    **技术支持**:
-    - 查看项目 README.md
-    - 检查日志文件
-    """)
 
-# 页脚
-st.markdown("---")
-st.markdown("""
-<div style="text-align: center; color: #999; padding: 2rem 0;">
-    Trading Coach Dashboard v1.0.0 |
-    基于 Streamlit + Plotly |
-    <a href="https://github.com/yourusername/tradingcoach" style="color: #1f77b4;">GitHub</a>
-</div>
-""", unsafe_allow_html=True)
+if __name__ == "__main__":
+    main()

@@ -147,6 +147,42 @@ class Position(Base):
     # 技术指标快照（平仓时）
     exit_indicators = Column(JSON, comment="平仓时技术指标")
 
+    # ==================== 策略分类 ====================
+    strategy_type = Column(
+        String(50),
+        comment="策略类型(trend/mean_reversion/breakout/range/momentum)"
+    )
+    strategy_confidence = Column(
+        Numeric(5, 2),
+        comment="策略置信度(0-100)"
+    )
+
+    # ==================== 复盘字段 ====================
+    review_notes = Column(JSON, comment="用户复盘备注")
+    emotion_tag = Column(
+        String(20),
+        comment="情绪标签(greedy/fearful/calm/impulsive)"
+    )
+    discipline_score = Column(
+        Integer,
+        comment="纪律执行评分(1-5)"
+    )
+    reviewed_at = Column(DateTime, comment="复盘时间")
+
+    # ==================== 离场后走势 ====================
+    post_exit_5d_pct = Column(
+        Numeric(10, 4),
+        comment="离场后5日涨跌幅"
+    )
+    post_exit_10d_pct = Column(
+        Numeric(10, 4),
+        comment="离场后10日涨跌幅"
+    )
+    post_exit_20d_pct = Column(
+        Numeric(10, 4),
+        comment="离场后20日涨跌幅"
+    )
+
     # ==================== 时间戳 ====================
     created_at = Column(
         DateTime,
@@ -291,4 +327,16 @@ class Position(Base):
             'overall_score': float(self.overall_score) if self.overall_score else None,
             'score_grade': self.score_grade,
             'holding_period_days': self.holding_period_days,
+            # 策略分类
+            'strategy_type': self.strategy_type,
+            'strategy_confidence': float(self.strategy_confidence) if self.strategy_confidence else None,
+            # 复盘字段
+            'review_notes': self.review_notes,
+            'emotion_tag': self.emotion_tag,
+            'discipline_score': self.discipline_score,
+            'reviewed_at': self.reviewed_at.isoformat() if self.reviewed_at else None,
+            # 离场后走势
+            'post_exit_5d_pct': float(self.post_exit_5d_pct) if self.post_exit_5d_pct else None,
+            'post_exit_10d_pct': float(self.post_exit_10d_pct) if self.post_exit_10d_pct else None,
+            'post_exit_20d_pct': float(self.post_exit_20d_pct) if self.post_exit_20d_pct else None,
         }

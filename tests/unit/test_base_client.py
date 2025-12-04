@@ -247,3 +247,5 @@ class TestExceptions:
 
         with pytest.raises(RateLimitError, match=msg):
             raise RateLimitError(msg)
+
+

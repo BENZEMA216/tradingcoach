@@ -204,6 +204,197 @@ class IndicatorCalculator:
 
         return atr
 
+    # ==================== EMA (Exponential Moving Average) ====================
+
+    def calculate_ema(
+        self,
+        df: pd.DataFrame,
+        periods: List[int] = [12, 26],
+        column: str = 'Close'
+    ) -> Dict[str, pd.Series]:
+        """
+        计算多个周期的指数移动平均线
+
+        Args:
+            df: DataFrame with OHLCV data
+            periods: EMA周期列表（默认[12, 26]）
+            column: 用于计算的列名（默认Close）
+
+        Returns:
+            dict: {f'ema_{period}': EMA值}
+
+        Formula:
+            EMA = Close × k + EMA(前一天) × (1 - k)
+            k = 2 / (period + 1)
+        """
+        if df.empty or column not in df.columns:
+            return {f'ema_{p}': pd.Series(dtype=float) for p in periods}
+
+        result = {}
+        for period in periods:
+            result[f'ema_{period}'] = df[column].ewm(span=period, adjust=False).mean()
+
+        return result
+
+    # ==================== ADX (Average Directional Index) ====================
+
+    def calculate_adx(
+        self,
+        df: pd.DataFrame,
+        period: int = 14
+    ) -> Dict[str, pd.Series]:
+        """
+        计算ADX趋势强度指标和方向性指标
+
+        Args:
+            df: DataFrame with OHLC data
+            period: ADX周期（默认14）
+
+        Returns:
+            dict: {
+                'adx': ADX趋势强度 (0-100),
+                'plus_di': +DI方向指标 (0-100),
+                'minus_di': -DI方向指标 (0-100)
+            }
+
+        Formula:
+            +DM = High - PrevHigh (if positive and > |Low - PrevLow|, else 0)
+            -DM = PrevLow - Low (if positive and > High - PrevHigh, else 0)
+            TR = max(High-Low, |High-PrevClose|, |Low-PrevClose|)
+            +DI = 100 × EMA(+DM) / EMA(TR)
+            -DI = 100 × EMA(-DM) / EMA(TR)
+            DX = 100 × |+DI - -DI| / (+DI + -DI)
+            ADX = EMA(DX, period)
+
+        Note:
+            ADX > 25: 强趋势
+            ADX < 20: 弱趋势或震荡
+            +DI > -DI: 上升趋势
+            -DI > +DI: 下降趋势
+        """
+        if df.empty or not all(col in df.columns for col in ['High', 'Low', 'Close']):
+            return {
+                'adx': pd.Series(dtype=float),
+                'plus_di': pd.Series(dtype=float),
+                'minus_di': pd.Series(dtype=float)
+            }
+
+        high = df['High']
+        low = df['Low']
+        close = df['Close']
+
+        # 计算+DM和-DM
+        up_move = high.diff()
+        down_move = low.shift(1) - low
+
+        # +DM: 当日高点上移幅度大于低点下移幅度时取值
+        plus_dm = pd.Series(0.0, index=df.index)
+        plus_dm[(up_move > down_move) & (up_move > 0)] = up_move
+
+        # -DM: 当日低点下移幅度大于高点上移幅度时取值
+        minus_dm = pd.Series(0.0, index=df.index)
+        minus_dm[(down_move > up_move) & (down_move > 0)] = down_move
+
+        # 计算True Range
+        high_low = high - low
+        high_close = (high - close.shift()).abs()
+        low_close = (low - close.shift()).abs()
+        tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+
+        # 使用EMA平滑
+        atr = tr.ewm(span=period, adjust=False).mean()
+        plus_dm_smooth = plus_dm.ewm(span=period, adjust=False).mean()
+        minus_dm_smooth = minus_dm.ewm(span=period, adjust=False).mean()
+
+        # 计算+DI和-DI
+        plus_di = 100 * plus_dm_smooth / atr
+        minus_di = 100 * minus_dm_smooth / atr
+
+        # 处理除零情况
+        plus_di = plus_di.replace([np.inf, -np.inf], 0).fillna(0)
+        minus_di = minus_di.replace([np.inf, -np.inf], 0).fillna(0)
+
+        # 计算DX
+        di_sum = plus_di + minus_di
+        di_diff = (plus_di - minus_di).abs()
+        dx = 100 * di_diff / di_sum
+        dx = dx.replace([np.inf, -np.inf], 0).fillna(0)
+
+        # 计算ADX (DX的EMA)
+        adx = dx.ewm(span=period, adjust=False).mean()
+
+        return {
+            'adx': adx,
+            'plus_di': plus_di,
+            'minus_di': minus_di
+        }
+
+    # ==================== Stochastic Oscillator ====================
+
+    def calculate_stochastic(
+        self,
+        df: pd.DataFrame,
+        k_period: int = 14,
+        d_period: int = 3,
+        smooth_k: int = 3
+    ) -> Dict[str, pd.Series]:
+        """
+        计算Stochastic随机指标
+
+        Args:
+            df: DataFrame with OHLC data
+            k_period: %K周期（默认14）
+            d_period: %D周期（默认3）
+            smooth_k: %K平滑周期（默认3）
+
+        Returns:
+            dict: {
+                'stoch_k': %K值 (0-100),
+                'stoch_d': %D值 (0-100)
+            }
+
+        Formula:
+            %K = 100 × (Close - LowestLow) / (HighestHigh - LowestLow)
+            Slow %K = SMA(%K, smooth_k)
+            %D = SMA(Slow %K, d_period)
+
+        Note:
+            %K < 20: 超卖
+            %K > 80: 超买
+            %K上穿%D: 金叉，看涨信号
+            %K下穿%D: 死叉，看跌信号
+        """
+        if df.empty or not all(col in df.columns for col in ['High', 'Low', 'Close']):
+            return {
+                'stoch_k': pd.Series(dtype=float),
+                'stoch_d': pd.Series(dtype=float)
+            }
+
+        high = df['High']
+        low = df['Low']
+        close = df['Close']
+
+        # 计算周期内最高价和最低价
+        highest_high = high.rolling(window=k_period).max()
+        lowest_low = low.rolling(window=k_period).min()
+
+        # 计算Fast %K
+        fast_k = 100 * (close - lowest_low) / (highest_high - lowest_low)
+
+        # 处理除零情况
+        fast_k = fast_k.replace([np.inf, -np.inf], 50).fillna(50)
+
+        # 计算Slow %K (平滑后的%K)
+        stoch_k = fast_k.rolling(window=smooth_k).mean()
+
+        # 计算%D (Slow %K的移动平均)
+        stoch_d = stoch_k.rolling(window=d_period).mean()
+
+        return {
+            'stoch_k': stoch_k,
+            'stoch_d': stoch_d
+        }
+
     # ==================== MA (Moving Average) ====================
 
     def calculate_ma(
@@ -267,13 +458,45 @@ class IndicatorCalculator:
             df_result['bb_middle'] = bb_result['middle']
             df_result['bb_lower'] = bb_result['lower']
 
+            # BB Width (波动率压缩/扩张指标)
+            # BB Width = (上轨 - 下轨) / 中轨 × 100
+            bb_width = (bb_result['upper'] - bb_result['lower']) / bb_result['middle'] * 100
+            df_result['bb_width'] = bb_width.replace([np.inf, -np.inf], np.nan)
+
+            # BB %B (价格在布林带中的相对位置)
+            # %B = (Close - 下轨) / (上轨 - 下轨)
+            # %B > 1: 价格在上轨之上; %B < 0: 价格在下轨之下; %B = 0.5: 价格在中轨
+            if 'Close' in df.columns:
+                bb_percent_b = (df['Close'] - bb_result['lower']) / (bb_result['upper'] - bb_result['lower'])
+                df_result['bb_percent_b'] = bb_percent_b.replace([np.inf, -np.inf], np.nan)
+
             # ATR
             df_result['atr_14'] = self.calculate_atr(df, period=14)
+
+            # EMA系列
+            ema_result = self.calculate_ema(df, periods=[12, 26])
+            df_result['ema_12'] = ema_result['ema_12']
+            df_result['ema_26'] = ema_result['ema_26']
+
+            # ADX和方向性指标
+            adx_result = self.calculate_adx(df, period=14)
+            df_result['adx'] = adx_result['adx']
+            df_result['plus_di'] = adx_result['plus_di']
+            df_result['minus_di'] = adx_result['minus_di']
+
+            # Stochastic随机指标
+            stoch_result = self.calculate_stochastic(df, k_period=14, d_period=3, smooth_k=3)
+            df_result['stoch_k'] = stoch_result['stoch_k']
+            df_result['stoch_d'] = stoch_result['stoch_d']
 
             # MA系列
             ma_result = self.calculate_ma(df, periods=[5, 10, 20, 50, 200])
             for key, value in ma_result.items():
                 df_result[key] = value
+
+            # Volume SMA (成交量20日均线)
+            if 'Volume' in df.columns:
+                df_result['volume_sma_20'] = df['Volume'].rolling(window=20).mean()
 
             logger.info(f"Calculated all indicators for {len(df)} records")
 
@@ -321,16 +544,46 @@ class IndicatorCalculator:
                     record.rsi_14 = float(row['rsi_14']) if pd.notna(row['rsi_14']) else None
                     record.macd = float(row['macd']) if pd.notna(row['macd']) else None
                     record.macd_signal = float(row['macd_signal']) if pd.notna(row['macd_signal']) else None
-                    record.macd_histogram = float(row['macd_histogram']) if pd.notna(row['macd_histogram']) else None
+                    record.macd_hist = float(row['macd_histogram']) if pd.notna(row['macd_histogram']) else None
                     record.bb_upper = float(row['bb_upper']) if pd.notna(row['bb_upper']) else None
                     record.bb_middle = float(row['bb_middle']) if pd.notna(row['bb_middle']) else None
                     record.bb_lower = float(row['bb_lower']) if pd.notna(row['bb_lower']) else None
+
+                    # BB Width 和 BB %B
+                    if 'bb_width' in row and pd.notna(row['bb_width']):
+                        record.bb_width = float(row['bb_width'])
+
                     record.atr_14 = float(row['atr_14']) if pd.notna(row['atr_14']) else None
+
+                    # EMA
+                    if 'ema_12' in row and pd.notna(row['ema_12']):
+                        record.ema_12 = float(row['ema_12'])
+                    if 'ema_26' in row and pd.notna(row['ema_26']):
+                        record.ema_26 = float(row['ema_26'])
+
+                    # ADX和方向性指标
+                    if 'adx' in row and pd.notna(row['adx']):
+                        record.adx = float(row['adx'])
+                    if 'plus_di' in row and pd.notna(row['plus_di']):
+                        record.plus_di = float(row['plus_di'])
+                    if 'minus_di' in row and pd.notna(row['minus_di']):
+                        record.minus_di = float(row['minus_di'])
+
+                    # Stochastic
+                    if 'stoch_k' in row and pd.notna(row['stoch_k']):
+                        record.stoch_k = float(row['stoch_k'])
+                    if 'stoch_d' in row and pd.notna(row['stoch_d']):
+                        record.stoch_d = float(row['stoch_d'])
+
                     record.ma_5 = float(row['ma_5']) if pd.notna(row['ma_5']) else None
                     record.ma_10 = float(row['ma_10']) if pd.notna(row['ma_10']) else None
                     record.ma_20 = float(row['ma_20']) if pd.notna(row['ma_20']) else None
                     record.ma_50 = float(row['ma_50']) if pd.notna(row['ma_50']) else None
                     record.ma_200 = float(row['ma_200']) if pd.notna(row['ma_200']) else None
+
+                    # Volume SMA
+                    if 'volume_sma_20' in row and pd.notna(row['volume_sma_20']):
+                        record.volume_sma_20 = float(row['volume_sma_20'])
 
                     record.updated_at = datetime.now()
                     updated_count += 1

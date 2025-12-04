@@ -1,5 +1,5 @@
 """
-Quality Scoring Page
+Quality Scoring Page - Terminal Finance 主题
 质量评分页面
 """
 
@@ -21,8 +21,12 @@ from visualization.components.charts import (
     create_score_trend_chart
 )
 from visualization.components.metrics import grade_badge, pnl_badge, percentage_badge, dimension_scores_table
+from visualization.styles import inject_global_css, COLORS, FONTS
 
 st.set_page_config(page_title="质量评分", page_icon="⭐", layout="wide")
+
+# 注入全局样式
+inject_global_css()
 
 st.title("⭐ 质量评分分析")
 st.markdown("深入分析交易质量评分，发现优秀交易模式")

@@ -397,6 +397,13 @@ class TestYFinanceClientSymbolConversion:
         assert client.convert_symbol_for_yfinance('  AAPL  ') == 'AAPL'
         assert client.convert_symbol_for_yfinance('  09988  ') == '9988.HK'
 
+    def test_convert_index_symbols(self, client):
+        """Test index symbol conversion (VIX, etc.)"""
+        assert client.convert_symbol_for_yfinance('VIX') == '^VIX'
+        assert client.convert_symbol_for_yfinance('vix') == '^VIX'  # Case insensitive
+        assert client.convert_symbol_for_yfinance('DJI') == '^DJI'
+        assert client.convert_symbol_for_yfinance('SPX') == '^GSPC'
+
 
 class TestYFinanceClientRetry:
     """Test retry mechanism"""

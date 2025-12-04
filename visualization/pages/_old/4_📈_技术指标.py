@@ -1,5 +1,5 @@
 """
-Technical Indicators Page
+Technical Indicators Page - Terminal Finance 主题
 技术指标页面
 """
 
@@ -12,9 +12,13 @@ from datetime import datetime, timedelta
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from visualization.utils.data_loader import get_data_loader
-from visualization.components.charts import create_candlestick_chart
+from visualization.components.charts import create_candlestick_chart, resample_to_weekly
+from visualization.styles import inject_global_css
 
 st.set_page_config(page_title="技术指标", page_icon="📈", layout="wide")
+
+# 注入全局样式
+inject_global_css()
 
 st.title("📈 技术指标分析")
 st.markdown("查看K线图与技术指标，验证数据正确性")
@@ -65,13 +69,55 @@ try:
         st.info("请选择股票代码")
         st.stop()
 
+    # 时间范围快捷选择
+    st.markdown("**快捷选择时间范围**")
+    range_cols = st.columns(5)
+
+    # 使用session_state来存储选择的时间范围
+    if 'selected_range' not in st.session_state:
+        st.session_state.selected_range = 365  # 默认1年
+
+    with range_cols[0]:
+        if st.button("3个月", use_container_width=True):
+            st.session_state.selected_range = 90
+    with range_cols[1]:
+        if st.button("6个月", use_container_width=True):
+            st.session_state.selected_range = 180
+    with range_cols[2]:
+        if st.button("1年", use_container_width=True, type="primary" if st.session_state.selected_range == 365 else "secondary"):
+            st.session_state.selected_range = 365
+    with range_cols[3]:
+        if st.button("2年", use_container_width=True):
+            st.session_state.selected_range = 730
+    with range_cols[4]:
+        if st.button("全部", use_container_width=True):
+            st.session_state.selected_range = None  # None表示全部数据
+
+    # 时间粒度选择
+    st.markdown("")
+    timeframe = st.radio(
+        "时间粒度",
+        ["日线", "周线"],
+        horizontal=True,
+        help="选择K线的时间粒度"
+    )
+
     # 日期范围选择
     col1, col2 = st.columns(2)
+
+    # 计算默认开始日期
+    if st.session_state.selected_range is None:
+        default_start = min_date.date() if len(sample_data) > 0 else (datetime.now() - timedelta(days=365)).date()
+    else:
+        default_start = (max_date - timedelta(days=st.session_state.selected_range)).date() if len(sample_data) > 0 else (datetime.now() - timedelta(days=st.session_state.selected_range)).date()
+        # 确保不早于最小日期
+        if len(sample_data) > 0 and default_start < min_date.date():
+            default_start = min_date.date()
 
     with col1:
         start_date = st.date_input(
             "开始日期",
-            value=(max_date - timedelta(days=90)).date() if len(sample_data) > 0 else min_date.date(),
+            value=default_start,
             min_value=min_date.date() if len(sample_data) > 0 else None,
             max_value=max_date.date() if len(sample_data) > 0 else None
         )
@@ -117,6 +163,14 @@ try:
         st.warning(f"股票 {selected_symbol} 在指定日期范围内没有市场数据")
         st.stop()
 
+    # 根据时间粒度转换数据
+    if timeframe == "周线":
+        display_df = resample_to_weekly(market_df)
+        timeframe_label = "周线"
+    else:
+        display_df = market_df
+        timeframe_label = "日线"
+
     # 获取交易数据（如果需要）
     trades = None
     if show_trades:
@@ -128,10 +182,10 @@ try:
         ]
 
     # 绘制K线图
-    st.subheader(f"📊 {selected_symbol} K线图与技术指标")
+    st.subheader(f"📊 {selected_symbol} {timeframe_label}K线图与技术指标")
 
     fig = create_candlestick_chart(
-        market_df,
+        display_df,
         trades=trades if show_trades else None,
         show_ma=show_ma,
         show_bb=show_bb
@@ -142,7 +196,7 @@ try:
     st.markdown("---")
 
     # 技术指标统计
-    st.subheader("📊 技术指标统计")
+    st.subheader(f"📊 技术指标统计 ({timeframe_label})")
 
     tab1, tab2, tab3 = st.tabs(["价格统计", "技术指标", "交易统计"])
 
@@ -150,13 +204,13 @@ try:
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            st.metric("最高价", f"${market_df['high'].max():.2f}")
-            st.metric("最低价", f"${market_df['low'].min():.2f}")
+            st.metric("最高价", f"${display_df['high'].max():.2f}")
+            st.metric("最低价", f"${display_df['low'].min():.2f}")
 
         with col2:
-            st.metric("当前价", f"${market_df['close'].iloc[-1]:.2f}")
-            price_change = market_df['close'].iloc[-1] - market_df['close'].iloc[0]
-            price_change_pct = (price_change / market_df['close'].iloc[0]) * 100
+            st.metric("当前价", f"${display_df['close'].iloc[-1]:.2f}")
+            price_change = display_df['close'].iloc[-1] - display_df['close'].iloc[0]
+            price_change_pct = (price_change / display_df['close'].iloc[0]) * 100
             st.metric(
                 "期间涨跌",
                 f"${price_change:.2f}",
@@ -164,23 +218,23 @@ try:
             )
 
         with col3:
-            st.metric("平均价", f"${market_df['close'].mean():.2f}")
-            st.metric("平均成交量", f"{market_df['volume'].mean():,.0f}")
+            st.metric("平均价", f"${display_df['close'].mean():.2f}")
+            st.metric("平均成交量", f"{display_df['volume'].mean():,.0f}")
 
         with col4:
-            volatility = market_df['close'].pct_change().std() * 100
+            volatility = display_df['close'].pct_change().std() * 100
             st.metric("波动率", f"{volatility:.2f}%")
 
-            if 'atr' in market_df.columns and market_df['atr'].notna().any():
-                st.metric("平均ATR", f"${market_df['atr'].mean():.2f}")
+            if 'atr' in display_df.columns and display_df['atr'].notna().any():
+                st.metric("平均ATR", f"${display_df['atr'].mean():.2f}")
 
     with tab2:
-        if 'rsi' in market_df.columns and market_df['rsi'].notna().any():
+        if 'rsi' in display_df.columns and display_df['rsi'].notna().any():
             col1, col2, col3, col4 = st.columns(4)
 
             with col1:
                 st.markdown("**RSI**")
-                current_rsi = market_df['rsi'].iloc[-1]
+                current_rsi = display_df['rsi'].iloc[-1]
                 st.metric("当前RSI", f"{current_rsi:.2f}")
 
                 if current_rsi > 70:
@@ -192,9 +246,9 @@ try:
 
             with col2:
                 st.markdown("**MACD**")
-                if 'macd' in market_df.columns and market_df['macd'].notna().any():
-                    current_macd = market_df['macd'].iloc[-1]
-                    current_signal = market_df['macd_signal'].iloc[-1]
+                if 'macd' in display_df.columns and display_df['macd'].notna().any():
+                    current_macd = display_df['macd'].iloc[-1]
+                    current_signal = display_df['macd_signal'].iloc[-1]
                     st.metric("MACD", f"{current_macd:.3f}")
                     st.metric("Signal", f"{current_signal:.3f}")
 
@@ -205,19 +259,19 @@ try:
 
             with col3:
                 st.markdown("**移动平均线**")
-                if 'ma_5' in market_df.columns and market_df['ma_5'].notna().any():
-                    st.metric("MA5", f"${market_df['ma_5'].iloc[-1]:.2f}")
-                if 'ma_20' in market_df.columns and market_df['ma_20'].notna().any():
-                    st.metric("MA20", f"${market_df['ma_20'].iloc[-1]:.2f}")
-                if 'ma_50' in market_df.columns and market_df['ma_50'].notna().any():
-                    st.metric("MA50", f"${market_df['ma_50'].iloc[-1]:.2f}")
+                if 'ma_5' in display_df.columns and display_df['ma_5'].notna().any():
+                    st.metric("MA5", f"${display_df['ma_5'].iloc[-1]:.2f}")
+                if 'ma_20' in display_df.columns and display_df['ma_20'].notna().any():
+                    st.metric("MA20", f"${display_df['ma_20'].iloc[-1]:.2f}")
+                if 'ma_50' in display_df.columns and display_df['ma_50'].notna().any():
+                    st.metric("MA50", f"${display_df['ma_50'].iloc[-1]:.2f}")
 
             with col4:
                 st.markdown("**布林带**")
-                if 'bb_upper' in market_df.columns and market_df['bb_upper'].notna().any():
-                    st.metric("上轨", f"${market_df['bb_upper'].iloc[-1]:.2f}")
-                    st.metric("中轨", f"${market_df['bb_middle'].iloc[-1]:.2f}")
-                    st.metric("下轨", f"${market_df['bb_lower'].iloc[-1]:.2f}")
+                if 'bb_upper' in display_df.columns and display_df['bb_upper'].notna().any():
+                    st.metric("上轨", f"${display_df['bb_upper'].iloc[-1]:.2f}")
+                    st.metric("中轨", f"${display_df['bb_middle'].iloc[-1]:.2f}")
+                    st.metric("下轨", f"${display_df['bb_lower'].iloc[-1]:.2f}")
 
         else:
             st.info("该股票没有技术指标数据")
