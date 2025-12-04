@@ -1161,6 +1161,816 @@ class QualityScorer:
         else:
             return 'F'
 
+    # ==================== 期权专属评分 ====================
+
+    def score_option_entry(
+        self,
+        position: Position,
+        entry_market_data: Optional[MarketData],
+        option_info: Dict
+    ) -> Dict[str, float]:
+        """
+        期权入场质量评分（0-100分）
+
+        评分维度：
+        1. Moneyness选择 (25%): ATM通常风险/收益均衡
+        2. 正股趋势一致性 (25%): Call要看涨趋势，Put要看跌
+        3. 波动率环境 (25%): 低波动时买入期权更有利
+        4. 时间价值 (25%): DTE是否与预期持有匹配
+
+        Args:
+            position: Position对象
+            entry_market_data: 入场时标的股票的市场数据
+            option_info: 期权合约信息 {type, strike, expiry, underlying}
+
+        Returns:
+            dict: 包含各维度评分和总分
+        """
+        if not entry_market_data or not option_info:
+            return {'option_entry_score': 50.0}
+
+        # 1. Moneyness选择评分 (25%)
+        moneyness_score = self._score_option_moneyness(
+            entry_market_data, option_info
+        )
+
+        # 2. 正股趋势一致性评分 (25%)
+        trend_alignment_score = self._score_option_trend_alignment(
+            entry_market_data, option_info
+        )
+
+        # 3. 波动率环境评分 (25%)
+        volatility_score = self._score_option_volatility_entry(
+            entry_market_data
+        )
+
+        # 4. 时间价值评分 (25%)
+        time_value_score = self._score_option_time_value(option_info)
+
+        # 加权计算总分
+        option_entry_score = (
+            moneyness_score * 0.25 +
+            trend_alignment_score * 0.25 +
+            volatility_score * 0.25 +
+            time_value_score * 0.25
+        )
+
+        return {
+            'option_entry_score': option_entry_score,
+            'moneyness_score': moneyness_score,
+            'trend_alignment_score': trend_alignment_score,
+            'volatility_score': volatility_score,
+            'time_value_score': time_value_score
+        }
+
+    def _score_option_moneyness(
+        self,
+        md: MarketData,
+        option_info: Dict
+    ) -> float:
+        """
+        评估期权Moneyness选择
+
+        Moneyness = (正股价格 - 行权价) / 行权价
+        - Call: 正值表示ITM，负值表示OTM
+        - Put: 负值表示ITM，正值表示OTM
+
+        评分逻辑：
+        - ATM (-5% ~ +5%): 风险/收益均衡，适合大多数策略
+        - 轻度OTM (-15% ~ -5%): 杠杆更高，适合方向性交易
+        - 深度OTM (< -15%): 高风险高回报
+        - ITM (> +5%): 更稳健，时间价值损耗小
+        """
+        if not md.close or not option_info.get('strike'):
+            return 50.0
+
+        stock_price = float(md.close)
+        strike = float(option_info['strike'])
+        option_type = option_info.get('type', '').lower()
+
+        # 计算Moneyness百分比
+        moneyness_pct = ((stock_price - strike) / strike) * 100
+
+        # 根据期权类型调整
+        if option_type == 'put':
+            moneyness_pct = -moneyness_pct
+
+        # 评分逻辑
+        abs_moneyness = abs(moneyness_pct)
+
+        if abs_moneyness <= 2:
+            return 90  # ATM，最均衡
+        elif abs_moneyness <= 5:
+            return 85  # 接近ATM
+        elif abs_moneyness <= 10:
+            if moneyness_pct > 0:
+                return 80  # 轻度ITM，稳健
+            else:
+                return 75  # 轻度OTM，适度杠杆
+        elif abs_moneyness <= 15:
+            if moneyness_pct > 0:
+                return 70  # 中度ITM
+            else:
+                return 60  # 中度OTM，风险增加
+        elif abs_moneyness <= 25:
+            if moneyness_pct > 0:
+                return 60  # 深度ITM，时间价值少
+            else:
+                return 45  # 深度OTM，高风险
+        else:
+            return 35  # 极端OTM/ITM
+
+    def _score_option_trend_alignment(
+        self,
+        md: MarketData,
+        option_info: Dict
+    ) -> float:
+        """
+        评估期权类型与正股趋势的一致性
+
+        - Call期权: 应在正股上涨趋势时买入
+        - Put期权: 应在正股下跌趋势时买入
+
+        使用多个技术指标综合判断趋势
+        """
+        option_type = option_info.get('type', '').lower()
+        is_call = option_type == 'call'
+
+        confirmations = 0
+        total_checks = 0
+
+        # 1. 价格相对MA20位置
+        if md.ma_20 is not None and md.close is not None:
+            total_checks += 1
+            above_ma20 = float(md.close) > float(md.ma_20)
+            if (is_call and above_ma20) or (not is_call and not above_ma20):
+                confirmations += 1
+
+        # 2. MA5 vs MA20 (短期趋势)
+        if md.ma_5 is not None and md.ma_20 is not None:
+            total_checks += 1
+            ma_bullish = float(md.ma_5) > float(md.ma_20)
+            if (is_call and ma_bullish) or (not is_call and not ma_bullish):
+                confirmations += 1
+
+        # 3. MACD方向
+        if md.macd is not None:
+            total_checks += 1
+            macd_positive = float(md.macd) > 0
+            if (is_call and macd_positive) or (not is_call and not macd_positive):
+                confirmations += 1
+
+        # 4. RSI位置
+        if md.rsi_14 is not None:
+            total_checks += 1
+            rsi = float(md.rsi_14)
+            if is_call:
+                # Call: RSI < 70 且不在超买区
+                if rsi < 70:
+                    confirmations += 1
+            else:
+                # Put: RSI > 30 且不在超卖区
+                if rsi > 30:
+                    confirmations += 1
+
+        # 5. ADX方向指标
+        if md.plus_di is not None and md.minus_di is not None:
+            total_checks += 1
+            bullish_di = float(md.plus_di) > float(md.minus_di)
+            if (is_call and bullish_di) or (not is_call and not bullish_di):
+                confirmations += 1
+
+        if total_checks == 0:
+            return 50.0
+
+        # 根据确认比例评分
+        confirm_ratio = confirmations / total_checks
+        if confirm_ratio >= 0.8:
+            return 95  # 强趋势一致
+        elif confirm_ratio >= 0.6:
+            return 80  # 良好一致
+        elif confirm_ratio >= 0.4:
+            return 60  # 中等
+        elif confirm_ratio >= 0.2:
+            return 40  # 趋势不明确
+        else:
+            return 25  # 逆势交易
+
+    def _score_option_volatility_entry(self, md: MarketData) -> float:
+        """
+        评估入场时的波动率环境
+
+        买入期权时：
+        - 低波动率环境更有利（期权便宜）
+        - 高波动率环境不利（期权贵，且可能压缩）
+
+        使用ATR和布林带宽度评估波动率
+        """
+        scores = []
+
+        # 1. ATR相对价格的比率
+        if md.atr_14 is not None and md.close is not None and float(md.close) > 0:
+            atr_pct = (float(md.atr_14) / float(md.close)) * 100
+
+            if atr_pct < 2:
+                scores.append(90)  # 低波动，期权便宜
+            elif atr_pct < 3:
+                scores.append(80)  # 中低波动
+            elif atr_pct < 4:
+                scores.append(65)  # 中等波动
+            elif atr_pct < 6:
+                scores.append(50)  # 中高波动
+            else:
+                scores.append(35)  # 高波动，期权贵
+
+        # 2. 布林带宽度
+        if all([md.bb_upper, md.bb_lower, md.bb_middle]):
+            bb_width = (float(md.bb_upper) - float(md.bb_lower)) / float(md.bb_middle) * 100
+
+            if bb_width < 4:
+                scores.append(90)  # 压缩，可能即将突破
+            elif bb_width < 6:
+                scores.append(75)  # 正常波动
+            elif bb_width < 10:
+                scores.append(55)  # 扩张中
+            else:
+                scores.append(40)  # 高波动
+
+        return np.mean(scores) if scores else 60.0
+
+    def _score_option_time_value(self, option_info: Dict) -> float:
+        """
+        评估期权时间价值（DTE合理性）
+
+        DTE（Days to Expiry）分类：
+        - 周期权 (< 7天): 时间价值损耗极快，需要方向快速验证
+        - 短期 (7-21天): 时间价值损耗快，适合短线
+        - 中期 (21-45天): 平衡点，最常用
+        - 长期 (45-90天): 时间价值损耗慢，适合波动策略
+        - 超长期 (> 90天): LEAPS，时间价值损耗最慢
+        """
+        dte = option_info.get('dte')
+
+        if dte is None:
+            return 50.0
+
+        if dte < 7:
+            return 40  # 周期权，高风险
+        elif dte < 14:
+            return 55  # 短期，时间压力大
+        elif dte < 21:
+            return 70  # 短中期
+        elif dte < 45:
+            return 90  # 最佳区间
+        elif dte < 60:
+            return 85  # 良好
+        elif dte < 90:
+            return 75  # 中长期
+        elif dte < 180:
+            return 65  # 长期
+        else:
+            return 55  # LEAPS，资金效率低
+
+    def score_option_exit(
+        self,
+        position: Position,
+        exit_market_data: Optional[MarketData],
+        option_info: Dict
+    ) -> Dict[str, float]:
+        """
+        期权出场质量评分（0-100分）
+
+        评分维度：
+        1. 正股方向有利性 (30%): 是否在正股有利方向时出场
+        2. 时间价值剩余 (25%): 避免临近到期
+        3. 盈利目标达成 (25%): 实际盈亏评估
+        4. 止损执行 (20%): 是否及时止损
+
+        Args:
+            position: Position对象
+            exit_market_data: 出场时标的股票的市场数据
+            option_info: 期权合约信息
+
+        Returns:
+            dict: 包含各维度评分和总分
+        """
+        # 1. 正股方向有利性 (30%)
+        direction_score = self._score_option_exit_direction(
+            position, exit_market_data, option_info
+        )
+
+        # 2. 时间价值剩余 (25%)
+        time_remaining_score = self._score_option_exit_time(option_info)
+
+        # 3. 盈利目标达成 (25%)
+        profit_score = self._score_option_profit(position)
+
+        # 4. 止损执行 (20%)
+        stop_score = self._score_option_stop_loss(position)
+
+        # 加权计算总分
+        option_exit_score = (
+            direction_score * 0.30 +
+            time_remaining_score * 0.25 +
+            profit_score * 0.25 +
+            stop_score * 0.20
+        )
+
+        return {
+            'option_exit_score': option_exit_score,
+            'direction_score': direction_score,
+            'time_remaining_score': time_remaining_score,
+            'profit_score': profit_score,
+            'stop_score': stop_score
+        }
+
+    def _score_option_exit_direction(
+        self,
+        position: Position,
+        md: Optional[MarketData],
+        option_info: Dict
+    ) -> float:
+        """
+        评估出场时正股方向是否有利
+
+        盈利出场：
+        - Call盈利: 正股应该上涨，技术指标应该到达目标
+        - Put盈利: 正股应该下跌
+
+        亏损出场：
+        - 及时止损比拖延好
+        """
+        if not md:
+            return 60.0
+
+        is_profit = position.realized_pnl and float(position.realized_pnl) > 0
+        option_type = option_info.get('type', '').lower()
+        is_call = option_type == 'call'
+
+        if is_profit:
+            # 盈利出场评估
+            confirmations = 0
+            total_checks = 0
+
+            # RSI是否到达目标区域
+            if md.rsi_14 is not None:
+                total_checks += 1
+                rsi = float(md.rsi_14)
+                if is_call and rsi > 60:  # Call盈利，RSI应该升高
+                    confirmations += 1
+                elif not is_call and rsi < 40:  # Put盈利，RSI应该降低
+                    confirmations += 1
+
+            # 价格相对布林带位置
+            if all([md.bb_upper, md.bb_lower, md.close]):
+                total_checks += 1
+                bb_width = float(md.bb_upper) - float(md.bb_lower)
+                if bb_width > 0:
+                    bb_position = (float(md.close) - float(md.bb_lower)) / bb_width
+                    if is_call and bb_position > 0.7:  # Call盈利，价格应在上轨
+                        confirmations += 1
+                    elif not is_call and bb_position < 0.3:  # Put盈利，价格应在下轨
+                        confirmations += 1
+
+            if total_checks > 0:
+                ratio = confirmations / total_checks
+                if ratio >= 0.5:
+                    return 85  # 良好的盈利出场
+                else:
+                    return 70  # 可能提前出场
+            return 75
+        else:
+            # 亏损出场 - 及时止损是好的
+            pnl_pct = float(position.realized_pnl_pct or 0)
+            if pnl_pct >= -20:
+                return 75  # 控制在20%内
+            elif pnl_pct >= -30:
+                return 65  # 控制在30%内
+            elif pnl_pct >= -50:
+                return 50  # 损失较大
+            else:
+                return 35  # 损失过大
+
+    def _score_option_exit_time(self, option_info: Dict) -> float:
+        """
+        评估出场时的剩余时间价值
+
+        避免在DTE过低时出场（除非止损）
+        """
+        exit_dte = option_info.get('exit_dte')
+
+        if exit_dte is None:
+            return 60.0
+
+        if exit_dte >= 21:
+            return 90  # 充足时间价值
+        elif exit_dte >= 14:
+            return 80  # 良好
+        elif exit_dte >= 7:
+            return 65  # 时间压力增加
+        elif exit_dte >= 3:
+            return 50  # 临近到期
+        elif exit_dte >= 1:
+            return 40  # 危险区域
+        else:
+            return 30  # 到期日
+
+    def _score_option_profit(self, position: Position) -> float:
+        """
+        评估期权盈利目标达成
+
+        期权收益特点：
+        - 盈利可以很大（几倍）
+        - 亏损最多为本金（买入期权）
+        """
+        if position.realized_pnl is None:
+            return 50.0
+
+        pnl_pct = float(position.realized_pnl_pct or 0)
+
+        if pnl_pct >= 100:
+            return 100  # 翻倍
+        elif pnl_pct >= 50:
+            return 95  # 优秀
+        elif pnl_pct >= 30:
+            return 85  # 良好
+        elif pnl_pct >= 15:
+            return 75  # 不错
+        elif pnl_pct >= 5:
+            return 65  # 小赚
+        elif pnl_pct >= 0:
+            return 55  # 保本
+        elif pnl_pct >= -20:
+            return 60  # 止损及时
+        elif pnl_pct >= -50:
+            return 45  # 止损偏晚
+        else:
+            return 30  # 大亏
+
+    def _score_option_stop_loss(self, position: Position) -> float:
+        """
+        评估期权止损执行
+
+        使用MAE评估回撤控制
+        """
+        if position.mae_pct is None:
+            return 60.0
+
+        mae_pct = abs(float(position.mae_pct))
+
+        if mae_pct <= 10:
+            return 95  # 回撤控制极好
+        elif mae_pct <= 20:
+            return 85  # 良好
+        elif mae_pct <= 30:
+            return 70  # 尚可
+        elif mae_pct <= 50:
+            return 55  # 回撤较大
+        else:
+            return 40  # 回撤过大
+
+    def score_option_strategy(
+        self,
+        position: Position,
+        entry_market_data: Optional[MarketData],
+        exit_market_data: Optional[MarketData],
+        option_info: Dict
+    ) -> Dict[str, float]:
+        """
+        期权策略整体评分（0-100分）
+
+        评分维度：
+        1. 到期日选择 (30%): DTE与实际持有时间匹配
+        2. 行权价选择 (30%): Moneyness与策略匹配
+        3. 方向判断 (20%): Call/Put选择正确性
+        4. 执行效率 (20%): 实际收益vs理论最大收益
+
+        Args:
+            position: Position对象
+            entry_market_data: 入场时市场数据
+            exit_market_data: 出场时市场数据
+            option_info: 期权合约信息
+
+        Returns:
+            dict: 包含各维度评分和总分
+        """
+        # 1. 到期日选择评分 (30%)
+        expiry_score = self._score_option_expiry_selection(position, option_info)
+
+        # 2. 行权价选择评分 (30%)
+        strike_score = self._score_option_strike_selection(
+            entry_market_data, exit_market_data, option_info
+        )
+
+        # 3. 方向判断评分 (20%)
+        direction_score = self._score_option_direction_choice(
+            position, entry_market_data, exit_market_data, option_info
+        )
+
+        # 4. 执行效率评分 (20%)
+        efficiency_score = self._score_option_execution_efficiency(
+            position, option_info
+        )
+
+        # 加权计算总分
+        option_strategy_score = (
+            expiry_score * 0.30 +
+            strike_score * 0.30 +
+            direction_score * 0.20 +
+            efficiency_score * 0.20
+        )
+
+        return {
+            'option_strategy_score': option_strategy_score,
+            'expiry_score': expiry_score,
+            'strike_score': strike_score,
+            'direction_score': direction_score,
+            'efficiency_score': efficiency_score
+        }
+
+    def _score_option_expiry_selection(
+        self,
+        position: Position,
+        option_info: Dict
+    ) -> float:
+        """
+        评估到期日选择是否合理
+
+        好的到期日选择：
+        - 持有时间应该少于DTE的一半（避免时间价值快速损耗）
+        - 不应该持有到临近到期
+        """
+        entry_dte = option_info.get('dte')
+        exit_dte = option_info.get('exit_dte')
+        holding_days = position.holding_period_days
+
+        if entry_dte is None or holding_days is None:
+            return 60.0
+
+        # 计算持有时间占DTE的比例
+        hold_ratio = holding_days / entry_dte if entry_dte > 0 else 1
+
+        if hold_ratio <= 0.3:
+            return 95  # 持有时间适中
+        elif hold_ratio <= 0.5:
+            return 85  # 良好
+        elif hold_ratio <= 0.7:
+            return 70  # 持有偏长
+        elif hold_ratio <= 0.9:
+            return 55  # 持有太长
+        else:
+            return 40  # 持有到临近到期
+
+    def _score_option_strike_selection(
+        self,
+        entry_md: Optional[MarketData],
+        exit_md: Optional[MarketData],
+        option_info: Dict
+    ) -> float:
+        """
+        评估行权价选择是否合理
+
+        好的行权价选择：
+        - 如果盈利：行权价应该被触及或接近
+        - 如果亏损：行权价选择可能过于激进
+        """
+        if not entry_md or not exit_md or not option_info.get('strike'):
+            return 60.0
+
+        strike = float(option_info['strike'])
+        entry_price = float(entry_md.close) if entry_md.close else None
+        exit_price = float(exit_md.close) if exit_md.close else None
+
+        if not entry_price or not exit_price:
+            return 60.0
+
+        option_type = option_info.get('type', '').lower()
+
+        # 计算价格变动
+        price_change_pct = ((exit_price - entry_price) / entry_price) * 100
+
+        # 计算strike相对入场价的位置
+        strike_distance_pct = ((strike - entry_price) / entry_price) * 100
+
+        if option_type == 'call':
+            # Call期权：strike高于入场价
+            if price_change_pct > 0:  # 正股上涨
+                # 如果涨幅足够触及strike
+                if exit_price >= strike:
+                    return 95  # 完美选择
+                elif exit_price >= strike * 0.98:
+                    return 85  # 接近strike
+                elif price_change_pct >= strike_distance_pct * 0.5:
+                    return 70  # 涨了一半
+                else:
+                    return 55  # strike选太高
+            else:  # 正股下跌
+                if abs(strike_distance_pct) <= 5:
+                    return 60  # ATM选择合理，方向错误
+                else:
+                    return 45  # OTM且方向错误
+        else:  # Put
+            strike_distance_pct = -strike_distance_pct  # Put的方向相反
+            if price_change_pct < 0:  # 正股下跌
+                if exit_price <= strike:
+                    return 95
+                elif exit_price <= strike * 1.02:
+                    return 85
+                elif abs(price_change_pct) >= abs(strike_distance_pct) * 0.5:
+                    return 70
+                else:
+                    return 55
+            else:
+                if abs(strike_distance_pct) <= 5:
+                    return 60
+                else:
+                    return 45
+
+    def _score_option_direction_choice(
+        self,
+        position: Position,
+        entry_md: Optional[MarketData],
+        exit_md: Optional[MarketData],
+        option_info: Dict
+    ) -> float:
+        """
+        评估Call/Put方向选择是否正确
+
+        基于实际结果评估：
+        - 盈利 = 方向选择正确
+        - 亏损 = 需要分析是否是方向错误还是执行问题
+        """
+        if position.realized_pnl is None:
+            return 50.0
+
+        is_profit = float(position.realized_pnl) > 0
+        pnl_pct = float(position.realized_pnl_pct or 0)
+
+        if is_profit:
+            # 盈利情况下，按盈利幅度评分
+            if pnl_pct >= 50:
+                return 100  # 方向判断完美
+            elif pnl_pct >= 20:
+                return 90
+            elif pnl_pct >= 10:
+                return 80
+            else:
+                return 70  # 小赚，方向正确但幅度不大
+        else:
+            # 亏损情况下，分析是否可以改善
+            if not entry_md or not exit_md:
+                return 50.0
+
+            # 检查正股实际走势
+            entry_price = float(entry_md.close) if entry_md.close else None
+            exit_price = float(exit_md.close) if exit_md.close else None
+
+            if entry_price and exit_price:
+                price_change = exit_price - entry_price
+                option_type = option_info.get('type', '').lower()
+
+                # 检查方向是否正确
+                direction_correct = (
+                    (option_type == 'call' and price_change > 0) or
+                    (option_type == 'put' and price_change < 0)
+                )
+
+                if direction_correct:
+                    return 55  # 方向对了但还是亏损（可能strike/dte问题）
+                else:
+                    # 方向错误
+                    if pnl_pct >= -30:
+                        return 45  # 及时止损
+                    else:
+                        return 30  # 方向错误且亏损大
+
+            return 40
+
+    def _score_option_execution_efficiency(
+        self,
+        position: Position,
+        option_info: Dict
+    ) -> float:
+        """
+        评估期权执行效率
+
+        效率 = 实际盈亏 / 理论最大盈亏机会
+
+        考虑因素：
+        - 持有时间效率
+        - 资金使用效率
+        """
+        if position.holding_period_days is None or position.holding_period_days <= 0:
+            return 60.0
+
+        if position.realized_pnl_pct is None:
+            return 50.0
+
+        pnl_pct = float(position.realized_pnl_pct)
+        holding_days = position.holding_period_days
+
+        # 计算日均收益率
+        daily_return = pnl_pct / holding_days
+
+        # 期权的日均收益期望更高
+        if daily_return >= 5:
+            return 100  # 极高效率
+        elif daily_return >= 2:
+            return 90  # 优秀
+        elif daily_return >= 1:
+            return 80  # 良好
+        elif daily_return >= 0.5:
+            return 70  # 中等
+        elif daily_return >= 0:
+            return 60  # 保本但低效
+        elif daily_return >= -1:
+            return 50  # 小亏
+        elif daily_return >= -2:
+            return 40  # 亏损
+        else:
+            return 30  # 大亏
+
+    def calculate_option_overall_score(
+        self,
+        session: Session,
+        position: Position
+    ) -> Dict[str, float]:
+        """
+        计算期权交易的综合质量评分
+
+        结合股票评分和期权专属评分
+
+        Args:
+            session: Database session
+            position: Position对象（期权持仓）
+
+        Returns:
+            dict: 包含所有评分维度和综合评分
+        """
+        # 检查是否为期权
+        if not OptionParser.is_option_symbol(position.symbol):
+            logger.warning(f"Position {position.id} is not an option")
+            return self.calculate_overall_score(session, position)
+
+        # 解析期权信息
+        option_info = OptionParser.parse(position.symbol)
+        if not option_info:
+            logger.warning(f"Failed to parse option symbol: {position.symbol}")
+            return self.calculate_overall_score(session, position)
+
+        # 获取标的股票的市场数据
+        underlying = option_info.get('underlying')
+        entry_md = self._get_market_data(session, underlying, position.open_time)
+        exit_md = self._get_market_data(
+            session, underlying, position.close_time
+        ) if position.close_time else None
+
+        # 计算DTE
+        if option_info.get('expiry') and position.open_time:
+            from datetime import datetime
+            expiry = option_info['expiry']
+            if isinstance(expiry, str):
+                expiry = datetime.strptime(expiry, '%Y-%m-%d').date()
+            entry_date = position.open_time.date() if hasattr(position.open_time, 'date') else position.open_time
+            option_info['dte'] = (expiry - entry_date).days
+
+            if position.close_time:
+                exit_date = position.close_time.date() if hasattr(position.close_time, 'date') else position.close_time
+                option_info['exit_dte'] = (expiry - exit_date).days
+
+        # 计算股票基础评分
+        base_result = self.calculate_overall_score(session, position)
+
+        # 计算期权专属评分
+        option_entry_result = self.score_option_entry(position, entry_md, option_info)
+        option_exit_result = self.score_option_exit(position, exit_md, option_info)
+        option_strategy_result = self.score_option_strategy(
+            position, entry_md, exit_md, option_info
+        )
+
+        # 综合评分：股票基础评分(60%) + 期权专属评分(40%)
+        option_overall_score = (
+            base_result['overall_score'] * 0.60 +
+            option_entry_result['option_entry_score'] * 0.15 +
+            option_exit_result['option_exit_score'] * 0.10 +
+            option_strategy_result['option_strategy_score'] * 0.15
+        )
+
+        grade = self._assign_grade(option_overall_score)
+
+        return {
+            **base_result,
+            'option_overall_score': option_overall_score,
+            'option_grade': grade,
+            'option_entry_score': option_entry_result['option_entry_score'],
+            'option_exit_score': option_exit_result['option_exit_score'],
+            'option_strategy_score': option_strategy_result['option_strategy_score'],
+            **option_entry_result,
+            **option_exit_result,
+            **option_strategy_result,
+            'option_info': option_info
+        }
+
     # ==================== 批量处理 ====================
 
     def score_all_positions(

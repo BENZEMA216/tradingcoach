@@ -265,7 +265,7 @@ Thumbs.db
 
 # Data analysis outputs
 outputs/
-reports/
+# Note: reports/ here means output reports, not src/reports/ code directory
 
 # ==================== Frontend (React/Vite) ====================
 frontend/node_modules/

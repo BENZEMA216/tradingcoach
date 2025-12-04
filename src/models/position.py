@@ -97,6 +97,24 @@ class Position(Base):
     underlying_symbol = Column(String(50), index=True, comment="标的股票代码")
     is_option = Column(Integer, default=0, comment="是否为期权（0/1）")
 
+    # 期权合约详情
+    option_type = Column(String(10), comment="期权类型（call/put）")
+    strike_price = Column(Numeric(15, 4), comment="行权价")
+    expiry_date = Column(Date, comment="到期日")
+
+    # 期权分析指标
+    entry_moneyness = Column(Numeric(10, 4), comment="入场时Moneyness百分比")
+    entry_dte = Column(Integer, comment="入场时剩余天数（DTE）")
+    exit_dte = Column(Integer, comment="出场时剩余天数（DTE）")
+
+    # 期权评分
+    option_entry_score = Column(Numeric(5, 2), comment="期权入场评分（0-100）")
+    option_exit_score = Column(Numeric(5, 2), comment="期权出场评分（0-100）")
+    option_strategy_score = Column(Numeric(5, 2), comment="期权策略评分（0-100）")
+
+    # 期权分析结果（JSON格式）
+    option_analysis = Column(JSON, comment="期权分析详情（JSON）")
+
     # ==================== 质量评分 ====================
     # 四维度评分
     entry_quality_score = Column(
@@ -237,6 +255,9 @@ class Position(Base):
 
         # 期权查询
         Index('idx_pos_underlying', 'underlying_symbol'),
+        Index('idx_pos_is_option', 'is_option'),
+        Index('idx_pos_option_type', 'option_type'),
+        Index('idx_pos_expiry_date', 'expiry_date'),
     )
 
     def __repr__(self):
@@ -339,4 +360,19 @@ class Position(Base):
             'post_exit_5d_pct': float(self.post_exit_5d_pct) if self.post_exit_5d_pct else None,
             'post_exit_10d_pct': float(self.post_exit_10d_pct) if self.post_exit_10d_pct else None,
             'post_exit_20d_pct': float(self.post_exit_20d_pct) if self.post_exit_20d_pct else None,
+            # 期权信息
+            'underlying_symbol': self.underlying_symbol,
+            'is_option': bool(self.is_option) if self.is_option else False,
+            'option_type': self.option_type,
+            'strike_price': float(self.strike_price) if self.strike_price else None,
+            'expiry_date': self.expiry_date.isoformat() if self.expiry_date else None,
+            # 期权分析指标
+            'entry_moneyness': float(self.entry_moneyness) if self.entry_moneyness else None,
+            'entry_dte': self.entry_dte,
+            'exit_dte': self.exit_dte,
+            # 期权评分
+            'option_entry_score': float(self.option_entry_score) if self.option_entry_score else None,
+            'option_exit_score': float(self.option_exit_score) if self.option_exit_score else None,
+            'option_strategy_score': float(self.option_strategy_score) if self.option_strategy_score else None,
+            'option_analysis': self.option_analysis,
         }
