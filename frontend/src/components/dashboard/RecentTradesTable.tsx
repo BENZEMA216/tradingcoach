@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { RecentTradeItem } from '@/types';
 import { formatCurrency, formatPercent, formatDate, getPnLColorClass, getGradeBadgeClass } from '@/utils/format';
 import clsx from 'clsx';
@@ -5,9 +6,13 @@ import clsx from 'clsx';
 interface RecentTradesTableProps {
   trades: RecentTradeItem[];
   isLoading?: boolean;
+  title?: string;
 }
 
-export function RecentTradesTable({ trades, isLoading }: RecentTradesTableProps) {
+export function RecentTradesTable({ trades, isLoading, title }: RecentTradesTableProps) {
+  const { t } = useTranslation();
+  const displayTitle = title || t('dashboard.recentTrades');
+
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
@@ -25,7 +30,7 @@ export function RecentTradesTable({ trades, isLoading }: RecentTradesTableProps)
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Recent Trades
+          {displayTitle}
         </h3>
       </div>
       <div className="overflow-x-auto">
@@ -33,19 +38,19 @@ export function RecentTradesTable({ trades, isLoading }: RecentTradesTableProps)
           <thead className="bg-gray-50 dark:bg-gray-900/50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Symbol
+                {t('positions.symbol')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Date
+                {t('positions.closeDate')}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                P&L
+                {t('positions.pnl')}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Return
+                {t('positions.pnlPct')}
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Grade
+                {t('positions.grade')}
               </th>
             </tr>
           </thead>

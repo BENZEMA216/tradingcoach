@@ -13,30 +13,76 @@
   --color-grade-c: #eab308;
   --color-grade-d: #f97316;
   --color-grade-f: #ef4444;
+
+  /* Light mode surfaces */
+  --surface-primary: #ffffff;
+  --surface-secondary: #f9fafb;
+  --surface-tertiary: #f3f4f6;
+  --border-primary: #e5e7eb;
+  --border-secondary: #f3f4f6;
+}
+
+/* Dark mode variables - Neutral gray palette */
+.dark {
+  /* Surfaces - pure neutral grays */
+  --surface-primary: #121212;
+  --surface-secondary: #1a1a1a;
+  --surface-tertiary: #242424;
+  --surface-elevated: #2d2d2d;
+
+  /* Borders - subtle */
+  --border-primary: #333333;
+  --border-secondary: rgba(255, 255, 255, 0.06);
+
+  /* Trading colors - TradingView style */
+  --color-profit: #26a69a;
+  --color-loss: #ef5350;
+
+  /* Accent blue */
+  --color-accent: #2962ff;
 }
 
 /* Base styles */
 body {
-  @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+  @apply bg-neutral-50 text-neutral-900;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.dark body,
+body.dark {
+  background: var(--surface-primary);
+  color: #d1d4dc;
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-neutral-100;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--surface-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded;
+  @apply bg-neutral-300 rounded-full;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+  @apply bg-neutral-400;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #444444;
 }
 
 /* Utility classes */
@@ -56,9 +102,405 @@ body {
   background-color: var(--color-loss);
 }
 
-/* Grade badge colors */
-.grade-a { @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200; }
-.grade-b { @apply bg-lime-100 text-lime-800 dark:bg-lime-900 dark:text-lime-200; }
-.grade-c { @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200; }
-.grade-d { @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200; }
-.grade-f { @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200; }
+/* Grade badge colors - refined for dark mode */
+.grade-a { @apply bg-green-100 text-green-800; }
+.grade-b { @apply bg-lime-100 text-lime-800; }
+.grade-c { @apply bg-yellow-100 text-yellow-800; }
+.grade-d { @apply bg-orange-100 text-orange-800; }
+.grade-f { @apply bg-red-100 text-red-800; }
+
+.dark .grade-a { background: rgba(38, 166, 154, 0.2); color: #26a69a; }
+.dark .grade-b { background: rgba(102, 187, 106, 0.2); color: #66bb6a; }
+.dark .grade-c { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+.dark .grade-d { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+.dark .grade-f { background: rgba(239, 83, 80, 0.2); color: #ef5350; }
+
+/* Report Section Styles */
+.report-section {
+  @apply mb-20;
+}
+
+.report-section:last-child {
+  @apply mb-10;
+}
+
+/* Hero number styling - 72px desktop, 48px mobile */
+.hero-number {
+  @apply text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+/* Section header typography */
+.section-number {
+  @apply text-xs font-medium tracking-widest text-neutral-400 dark:text-neutral-500;
+}
+
+.section-title {
+  @apply text-xs font-semibold tracking-widest uppercase text-neutral-900 dark:text-neutral-100;
+}
+
+/* Insight text styling - enhanced */
+.insight-text {
+  @apply text-sm text-neutral-600 italic;
+  @apply border-l-[3px] border-neutral-300 pl-5 py-1 mt-4;
+}
+
+.dark .insight-text {
+  color: #9598a1;
+  border-color: #333333;
+}
+
+/* Insight quote with icon */
+.insight-quote {
+  @apply flex items-start gap-3 text-sm text-neutral-600;
+  @apply bg-neutral-50 rounded-lg p-4 mt-4;
+}
+
+.dark .insight-quote {
+  background: var(--surface-tertiary);
+  color: #9598a1;
+}
+
+.insight-quote-icon {
+  @apply w-4 h-4 mt-0.5 flex-shrink-0;
+}
+
+.insight-quote-text {
+  @apply leading-relaxed;
+}
+
+/* Highlight numbers in insight text */
+.insight-highlight {
+  @apply font-semibold text-neutral-900 not-italic;
+}
+
+.dark .insight-highlight {
+  color: #d1d4dc;
+}
+
+/* Chart grid layouts - responsive */
+.chart-grid-2 {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6;
+}
+
+.chart-grid-3 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6;
+}
+
+.chart-grid-4 {
+  @apply grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6;
+}
+
+/* Large screen: support 3-column layout */
+@media (min-width: 1440px) {
+  .chart-grid-2 {
+    @apply gap-8;
+  }
+  .chart-grid-3 {
+    @apply gap-8;
+  }
+}
+
+/* Metric card in report style */
+.metric-card {
+  @apply bg-white rounded-xl border border-neutral-200;
+  @apply p-5 md:p-6 transition-all;
+}
+
+.dark .metric-card {
+  background: var(--surface-secondary);
+  border-color: var(--border-primary);
+}
+
+.dark .metric-card:hover {
+  background: var(--surface-tertiary);
+}
+
+.metric-value {
+  @apply text-xl md:text-2xl font-semibold text-neutral-900 tracking-tight;
+}
+
+.dark .metric-value {
+  color: #d1d4dc;
+}
+
+.metric-label {
+  @apply text-[10px] md:text-xs font-medium tracking-wide uppercase text-neutral-400 mt-1;
+}
+
+.dark .metric-label {
+  color: #787b86;
+}
+
+/* Chart height adjustments for mobile */
+.chart-container-mobile {
+  @apply h-48 sm:h-56 md:h-64;
+}
+
+/* Report page specific background */
+.report-page {
+  @apply min-h-screen bg-neutral-50;
+}
+
+.dark .report-page {
+  background: var(--surface-primary);
+}
+
+/* Period selector styling */
+.period-selector {
+  @apply flex items-center gap-2 bg-white;
+  @apply border border-neutral-200 rounded-lg px-4 py-2;
+}
+
+.dark .period-selector {
+  background: var(--surface-secondary);
+  border-color: var(--border-primary);
+}
+
+.period-button {
+  @apply px-3 py-1.5 text-sm font-medium rounded-md transition-colors;
+  @apply text-neutral-500;
+  @apply hover:text-neutral-900 hover:bg-neutral-100;
+}
+
+.dark .period-button {
+  color: #787b86;
+}
+
+.dark .period-button:hover {
+  color: #d1d4dc;
+  background: var(--surface-tertiary);
+}
+
+.period-button.active {
+  @apply bg-neutral-900 text-white;
+}
+
+.dark .period-button.active {
+  background: #2962ff;
+  color: #ffffff;
+}
+
+/* Animation for collapsible sections */
+.collapsible-content {
+  @apply transition-all duration-200 ease-in-out overflow-hidden;
+}
+
+/* Summary quote styling */
+.summary-quote {
+  @apply text-base text-neutral-600;
+  @apply max-w-2xl leading-relaxed;
+}
+
+.dark .summary-quote {
+  color: #9598a1;
+}
+
+.summary-quote::before {
+  content: '"';
+}
+
+.summary-quote::after {
+  content: '"';
+}
+
+/* ===== Dark Mode Global Overrides ===== */
+
+/* Cards and surfaces */
+.dark .bg-white {
+  background: var(--surface-secondary) !important;
+}
+
+.dark .bg-gray-50,
+.dark .bg-neutral-50 {
+  background: var(--surface-primary) !important;
+}
+
+.dark .bg-gray-100,
+.dark .bg-neutral-100 {
+  background: var(--surface-tertiary) !important;
+}
+
+/* Borders */
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-neutral-100,
+.dark .border-neutral-200 {
+  border-color: var(--border-primary) !important;
+}
+
+.dark .border-gray-700,
+.dark .border-gray-800,
+.dark .border-neutral-700,
+.dark .border-neutral-800 {
+  border-color: var(--border-primary) !important;
+}
+
+/* Text colors - TradingView style */
+.dark .text-gray-900,
+.dark .text-neutral-900 {
+  color: #d1d4dc !important;
+}
+
+.dark .text-gray-800,
+.dark .text-neutral-800 {
+  color: #c3c5cb !important;
+}
+
+.dark .text-gray-700,
+.dark .text-neutral-700 {
+  color: #b2b5be !important;
+}
+
+.dark .text-gray-600,
+.dark .text-neutral-600 {
+  color: #9598a1 !important;
+}
+
+.dark .text-gray-500,
+.dark .text-neutral-500 {
+  color: #787b86 !important;
+}
+
+.dark .text-gray-400,
+.dark .text-neutral-400 {
+  color: #5d606b !important;
+}
+
+/* Chart and graph specific */
+.dark .recharts-cartesian-grid line {
+  stroke: #333333 !important;
+}
+
+.dark .recharts-text {
+  fill: #787b86 !important;
+}
+
+/* Sidebar and surface overrides - pure neutral grays */
+.dark .bg-gray-800 {
+  background: #1a1a1a !important;
+}
+
+.dark .bg-gray-900 {
+  background: #121212 !important;
+}
+
+.dark .bg-gray-700 {
+  background: #242424 !important;
+}
+
+.dark .hover\:bg-gray-700:hover {
+  background: #2d2d2d !important;
+}
+
+.dark .bg-blue-900\/50 {
+  background: rgba(45, 45, 45, 0.8) !important;
+}
+
+.dark .dark\:bg-blue-900\/50 {
+  background: rgba(45, 45, 45, 0.8) !important;
+}
+
+.dark .border-gray-700 {
+  border-color: #333333 !important;
+}
+
+/* Neutral colors override */
+.dark .bg-neutral-800 {
+  background: #262626 !important;
+}
+
+.dark .dark\:bg-neutral-800 {
+  background: #262626 !important;
+}
+
+.dark .hover\:bg-neutral-800:hover,
+.dark .dark\:hover\:bg-neutral-800:hover {
+  background: #2d2d2d !important;
+}
+
+/* Hover states */
+.dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-neutral-100:hover {
+  background: var(--surface-tertiary) !important;
+}
+
+.dark .hover\:bg-gray-700:hover,
+.dark .hover\:bg-neutral-800:hover {
+  background: var(--surface-elevated) !important;
+}
+
+/* Focus rings */
+.dark .focus\:ring-gray-500:focus {
+  --tw-ring-color: #3f3f46 !important;
+}
+
+/* Trading colors - TradingView style (teal green & coral red) */
+.dark .text-green-500,
+.dark .text-green-600,
+.dark .text-green-400 {
+  color: #26a69a !important;
+}
+
+.dark .text-red-500,
+.dark .text-red-600,
+.dark .text-red-400 {
+  color: #ef5350 !important;
+}
+
+.dark .bg-green-500 {
+  background-color: #26a69a !important;
+}
+
+.dark .bg-green-400 {
+  background-color: #4db6ac !important;
+}
+
+.dark .bg-green-300 {
+  background-color: #80cbc4 !important;
+}
+
+.dark .bg-green-200 {
+  background-color: #b2dfdb !important;
+}
+
+.dark .bg-red-500 {
+  background-color: #ef5350 !important;
+}
+
+.dark .bg-red-400 {
+  background-color: #e57373 !important;
+}
+
+.dark .bg-red-300 {
+  background-color: #ef9a9a !important;
+}
+
+.dark .bg-red-200 {
+  background-color: #ffcdd2 !important;
+}
+
+/* Subtle backgrounds for badges - TradingView style */
+.dark .bg-green-100 {
+  background: rgba(38, 166, 154, 0.15) !important;
+}
+
+.dark .bg-red-100 {
+  background: rgba(239, 83, 80, 0.15) !important;
+}
+
+.dark .bg-amber-100,
+.dark .bg-yellow-100 {
+  background: rgba(255, 193, 7, 0.15) !important;
+}
+
+.dark .bg-blue-100 {
+  background: rgba(41, 98, 255, 0.15) !important;
+}
+
+/* Dividers */
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-primary) !important;
+}

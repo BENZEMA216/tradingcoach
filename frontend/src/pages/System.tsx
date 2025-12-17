@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { systemApi } from '@/api/client';
 import { formatNumber, formatDate } from '@/utils/format';
 import { Database, Activity, CheckCircle } from 'lucide-react';
 
 export function System() {
+  const { t } = useTranslation();
   const { data: stats, isLoading } = useQuery({
     queryKey: ['system', 'stats'],
     queryFn: () => systemApi.getStats(),
@@ -28,10 +30,10 @@ export function System() {
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          System Status
+          {t('system.title')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Database and system information
+          {t('system.subtitle')}
         </p>
       </div>
 
@@ -53,14 +55,14 @@ export function System() {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              API Status
+              {t('system.apiStatus')}
             </h3>
             <p
               className={`text-sm ${
                 health?.status === 'healthy' ? 'text-green-600' : 'text-red-600'
               }`}
             >
-              {health?.status === 'healthy' ? 'All systems operational' : 'System issues detected'}
+              {health?.status === 'healthy' ? t('system.healthy') : t('system.unhealthy')}
             </p>
           </div>
         </div>
@@ -75,24 +77,24 @@ export function System() {
               <Database className="w-5 h-5 text-blue-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Positions
+              {t('system.positions')}
             </h3>
           </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-500">Total Records</span>
+              <span className="text-gray-500">{t('system.totalRecords')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 {formatNumber(stats?.database.positions.count)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Symbols</span>
+              <span className="text-gray-500">{t('system.symbols')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 {stats?.database.positions.symbols}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Date Range</span>
+              <span className="text-gray-500">{t('system.dateRange')}</span>
               <span className="font-medium text-gray-900 dark:text-white text-sm">
                 {formatDate(stats?.database.positions.date_range.start)} -{' '}
                 {formatDate(stats?.database.positions.date_range.end)}
@@ -108,18 +110,18 @@ export function System() {
               <Database className="w-5 h-5 text-green-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Trades
+              {t('system.trades')}
             </h3>
           </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-500">Total Records</span>
+              <span className="text-gray-500">{t('system.totalRecords')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 {formatNumber(stats?.database.trades.count)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Date Range</span>
+              <span className="text-gray-500">{t('system.dateRange')}</span>
               <span className="font-medium text-gray-900 dark:text-white text-sm">
                 {formatDate(stats?.database.trades.date_range.start)} -{' '}
                 {formatDate(stats?.database.trades.date_range.end)}
@@ -135,24 +137,24 @@ export function System() {
               <Database className="w-5 h-5 text-purple-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Market Data
+              {t('system.marketData')}
             </h3>
           </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-500">Total Records</span>
+              <span className="text-gray-500">{t('system.totalRecords')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 {formatNumber(stats?.database.market_data.count)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Symbols</span>
+              <span className="text-gray-500">{t('system.symbols')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 {stats?.database.market_data.symbols}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Date Range</span>
+              <span className="text-gray-500">{t('system.dateRange')}</span>
               <span className="font-medium text-gray-900 dark:text-white text-sm">
                 {formatDate(stats?.database.market_data.date_range.start)} -{' '}
                 {formatDate(stats?.database.market_data.date_range.end)}
@@ -164,7 +166,7 @@ export function System() {
 
       {/* Last Updated */}
       <div className="text-sm text-gray-500 text-center">
-        Last updated: {stats?.timestamp ? new Date(stats.timestamp).toLocaleString() : '-'}
+        {t('system.lastUpdated')}: {stats?.timestamp ? new Date(stats.timestamp).toLocaleString() : '-'}
       </div>
     </div>
   );

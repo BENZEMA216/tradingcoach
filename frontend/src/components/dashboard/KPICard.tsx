@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import clsx from 'clsx';
 
 interface KPICardProps {
-  title: string;
+  title: ReactNode;
   value: string | number;
   subtitle?: string;
   icon?: ReactNode;

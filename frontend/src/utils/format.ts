@@ -69,8 +69,12 @@ export const getGradeBadgeClass = (grade: string | null | undefined): string => 
 };
 
 // Format holding days
-export const formatHoldingDays = (days: number | null | undefined): string => {
+export const formatHoldingDays = (days: number | null | undefined, isZh: boolean = false): string => {
   if (days === null || days === undefined) return '-';
+  if (isZh) {
+    if (days === 0) return '当天';
+    return `${days}天`;
+  }
   if (days === 0) return 'Same day';
   if (days === 1) return '1 day';
   return `${days} days`;
@@ -82,21 +86,5 @@ export const formatNumber = (value: number | null | undefined): string => {
   return new Intl.NumberFormat('en-US').format(value);
 };
 
-// Translate strategy type
-export const translateStrategy = (strategy: string | null): string => {
-  if (!strategy) return 'Unclassified';
-  const map: Record<string, string> = {
-    trend: 'Trend Following',
-    mean_reversion: 'Mean Reversion',
-    breakout: 'Breakout',
-    range: 'Range Trading',
-    momentum: 'Momentum',
-    unknown: 'Unclassified',
-  };
-  return map[strategy] || strategy;
-};
-
-// Translate direction
-export const translateDirection = (direction: string): string => {
-  return direction === 'long' ? 'Long' : 'Short';
-};
+// Note: Strategy and direction translations are now handled via i18n
+// Use t('strategy.{key}') and t('direction.{key}') in components

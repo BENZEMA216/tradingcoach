@@ -14,7 +14,9 @@ frontend/
 │   ├── pages/             # 页面组件
 │   │   ├── Dashboard.tsx  # 仪表板首页
 │   │   ├── Positions.tsx  # 持仓列表
-│   │   ├── Statistics.tsx # 统计分析
+│   │   ├── PositionDetail.tsx # 持仓详情
+│   │   ├── Statistics.tsx # 统计报告 (报告式布局)
+│   │   ├── Reports.tsx    # 报告页面
 │   │   └── System.tsx     # 系统信息
 │   ├── components/        # 可复用组件
 │   │   ├── layout/        # 布局组件
@@ -23,13 +25,38 @@ frontend/
 │   │   ├── dashboard/     # 仪表板组件
 │   │   │   ├── KPICard.tsx
 │   │   │   └── RecentTradesTable.tsx
-│   │   └── charts/        # 图表组件
-│   │       ├── EquityCurveChart.tsx
-│   │       └── StrategyPieChart.tsx
-│   ├── services/          # API 服务层
+│   │   ├── charts/        # 图表组件
+│   │   │   ├── EquityCurveChart.tsx
+│   │   │   ├── EquityDrawdownChart.tsx
+│   │   │   ├── MonthlyPerformanceChart.tsx
+│   │   │   ├── PnLDistributionChart.tsx
+│   │   │   ├── RollingWinRateChart.tsx
+│   │   │   ├── TradingHeatmap.tsx
+│   │   │   ├── HourlyPerformanceChart.tsx
+│   │   │   ├── DurationPnLChart.tsx
+│   │   │   ├── SymbolRiskQuadrant.tsx
+│   │   │   ├── AssetTypeChart.tsx
+│   │   │   ├── StrategyPerformanceChart.tsx
+│   │   │   ├── StrategyPieChart.tsx
+│   │   │   └── PriceChart.tsx
+│   │   ├── report/        # 报告专用组件
+│   │   │   ├── ReportSection.tsx    # 带编号的章节
+│   │   │   ├── ChartWithInsight.tsx # 图表+洞察
+│   │   │   ├── HeroSummary.tsx      # 顶部摘要
+│   │   │   └── CollapsibleTable.tsx # 可折叠表格
+│   │   ├── common/        # 通用组件
+│   │   │   ├── DrillDownModal.tsx
+│   │   │   └── InfoTooltip.tsx
+│   │   └── insights/      # AI 洞察组件
+│   │       └── AICoachPanel.tsx
+│   ├── api/               # API 客户端
+│   │   └── client.ts
 │   ├── stores/            # 状态管理 (Zustand)
 │   ├── types/             # TypeScript 类型定义
+│   ├── i18n/              # 国际化配置
 │   └── utils/             # 工具函数
+│       ├── format.ts      # 格式化工具
+│       └── insights.ts    # 洞察文案生成
 ├── public/                # 静态资源
 └── package.json           # 依赖配置
 ```
@@ -62,10 +89,29 @@ frontend/
 - 支持按 symbol、direction、status 过滤
 - 支持按评分、盈亏排序
 
-### Statistics (统计)
-- 按股票统计
-- 按月份统计
-- 按策略统计
+### Statistics (统计报告)
+
+采用报告式布局，从"看表格"转变为"读报告"的体验：
+
+**设计风格**: Dashboard Pro - 双色极简 (黑白为主，红绿仅用于盈亏)
+
+**页面结构**:
+- **Hero Summary**: 顶部大数字摘要 - 净盈亏 + 关键指标
+- **01 / Performance**: 权益曲线 + 月度表现 + 洞察文案
+- **02 / Risk Analysis**: 风险指标 + 盈亏分布 + 滚动胜率
+- **03 / Trading Behavior**: 交易热力图 + 时段分析 + 持仓时长
+- **04 / Portfolio**: 标的风险象限 + 资产类型 + 策略分布
+- **05 / Detailed Data**: 可折叠的详细表格
+
+**报告组件** (`components/report/`):
+- `ReportSection` - 带编号的章节组件 (01/, 02/, etc.)
+- `ChartWithInsight` - 图表+洞察文字组合
+- `HeroSummary` - 顶部大数字摘要区域
+- `CollapsibleTable` - 可折叠表格
+
+**洞察生成** (`utils/insights.ts`):
+- 自动生成图表洞察文案 (支持中英文)
+- 包含权益曲线、月度表现、盈亏分布、时段分析等
 
 ### System (系统)
 - 健康检查
@@ -265,8 +311,10 @@ VITE_APP_TITLE=Trading Coach
 
 ## 扩展计划
 
-- [ ] 暗色模式支持
-- [ ] 国际化 (i18n)
+- [x] 暗色模式支持 (已完成)
+- [x] 国际化 i18n (已完成 - 中/英文)
+- [x] 报告式布局 (Statistics 页面)
 - [ ] PWA 支持
 - [ ] 单元测试 (Vitest)
 - [ ] E2E 测试 (Playwright)
+- [ ] PDF 导出

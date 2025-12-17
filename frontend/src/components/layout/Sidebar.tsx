@@ -1,21 +1,27 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   List,
   BarChart3,
   Settings,
   TrendingUp,
+  Sparkles,
 } from 'lucide-react';
 import clsx from 'clsx';
+import { LanguageSwitcher } from '@/components/common';
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/positions', icon: List, label: 'Positions' },
-  { to: '/statistics', icon: BarChart3, label: 'Statistics' },
-  { to: '/system', icon: Settings, label: 'System' },
+  { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
+  { to: '/positions', icon: List, labelKey: 'nav.positions' },
+  { to: '/statistics', icon: BarChart3, labelKey: 'nav.statistics' },
+  { to: '/ai-coach', icon: Sparkles, labelKey: 'nav.aiCoach' },
+  { to: '/system', icon: Settings, labelKey: 'nav.settings' },
 ];
 
 export function Sidebar() {
+  const { t } = useTranslation();
+
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
       {/* Logo */}
@@ -37,21 +43,24 @@ export function Sidebar() {
                   clsx(
                     'flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-200'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                      ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800'
                   )
                 }
               >
                 <item.icon className="w-5 h-5 mr-3" />
-                {item.label}
+                {t(item.labelKey)}
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      {/* Footer with Language Switcher */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+        <div className="flex justify-center">
+          <LanguageSwitcher />
+        </div>
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
           Trading Coach v1.0
         </p>
