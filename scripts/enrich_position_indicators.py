@@ -167,12 +167,15 @@ def enrich_positions(session, force: bool = False) -> dict:
 
     for i, pos in enumerate(positions, 1):
         try:
+            # 对于期权，使用标的资产的市场数据
+            query_symbol = pos.underlying_symbol if pos.is_option and pos.underlying_symbol else pos.symbol
+
             # 获取入场指标
             entry_snapshot = None
             if pos.open_date:
                 entry_snapshot = get_indicator_snapshot(
                     session,
-                    pos.symbol,
+                    query_symbol,
                     pos.open_date
                 )
 
@@ -181,7 +184,7 @@ def enrich_positions(session, force: bool = False) -> dict:
             if pos.close_date:
                 exit_snapshot = get_indicator_snapshot(
                     session,
-                    pos.symbol,
+                    query_symbol,
                     pos.close_date
                 )
 

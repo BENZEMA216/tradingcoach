@@ -4,7 +4,7 @@ API v1 Router - Aggregates all endpoint routers
 
 from fastapi import APIRouter
 
-from .endpoints import dashboard, positions, trades, market_data, statistics, system
+from .endpoints import dashboard, positions, trades, market_data, statistics, system, ai_coach
 
 api_router = APIRouter()
 
@@ -43,4 +43,9 @@ api_router.include_router(
     system.router,
     prefix="/system",
     tags=["System"]
+)
+
+api_router.include_router(
+    ai_coach.router,
+    tags=["AI Coach"]
 )

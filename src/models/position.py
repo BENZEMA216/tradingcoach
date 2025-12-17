@@ -297,21 +297,25 @@ class Position(Base):
         if self.close_price is None or self.open_price is None:
             return
 
+        # 期权合约乘数：每张期权代表100股标的资产
+        multiplier = 100 if self.is_option else 1
+
         if self.direction == 'long':
-            # 做多: (卖出价 - 买入价) * 数量
-            self.realized_pnl = (self.close_price - self.open_price) * self.quantity
+            # 做多: (卖出价 - 买入价) * 数量 * 乘数
+            self.realized_pnl = (self.close_price - self.open_price) * self.quantity * multiplier
         elif self.direction == 'short':
-            # 做空: (卖空价 - 买入回补价) * 数量
-            self.realized_pnl = (self.open_price - self.close_price) * self.quantity
+            # 做空: (卖空价 - 买入回补价) * 数量 * 乘数
+            self.realized_pnl = (self.open_price - self.close_price) * self.quantity * multiplier
 
         # 计算盈亏百分比
-        if self.open_price > 0:
-            self.realized_pnl_pct = (self.realized_pnl / (self.open_price * self.quantity)) * 100
+        cost_basis = self.open_price * self.quantity * multiplier
+        if cost_basis > 0:
+            self.realized_pnl_pct = (self.realized_pnl / cost_basis) * 100
 
         # 计算净盈亏
         if self.total_fees:
             self.net_pnl = self.realized_pnl - self.total_fees
-            self.net_pnl_pct = (self.net_pnl / (self.open_price * self.quantity)) * 100
+            self.net_pnl_pct = (self.net_pnl / cost_basis) * 100 if cost_basis > 0 else 0
 
     def assign_score_grade(self):
         """分配评分等级"""

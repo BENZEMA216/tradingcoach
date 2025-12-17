@@ -11,8 +11,10 @@ from src.data_sources.base_client import (
     DataNotFoundError
 )
 from src.data_sources.yfinance_client import YFinanceClient
+from src.data_sources.options_client import OptionsClient, get_options_client
 from src.data_sources.cache_manager import CacheManager
 from src.data_sources.batch_fetcher import BatchFetcher
+from src.data_sources.market_env_fetcher import MarketEnvironmentFetcher
 
 __all__ = [
     # Base
@@ -23,10 +25,15 @@ __all__ = [
 
     # Clients
     'YFinanceClient',
+    'OptionsClient',
+    'get_options_client',
 
     # Cache
     'CacheManager',
 
     # Batch
     'BatchFetcher',
+
+    # Market Environment
+    'MarketEnvironmentFetcher',
 ]

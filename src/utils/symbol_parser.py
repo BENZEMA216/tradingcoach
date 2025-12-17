@@ -78,9 +78,10 @@ def parse_symbol(symbol: str, symbol_name: str = None, market: str = None) -> Di
 
 def _is_us_option(symbol: str) -> bool:
     """判断是否为美股期权"""
-    # 美股期权格式: AAPL250117C00150000
-    # 格式: 标的(1-5字母) + 到期日(6位YYMMDD) + C/P + 行权价(8位，包含小数点)
-    pattern = r'^[A-Z]{1,5}\d{6}[CP]\d{8}$'
+    # 美股期权格式: AAPL250117C00150000 或 SPY250321C565000
+    # 格式: 标的(1-5字母) + 到期日(6位YYMMDD) + C/P + 行权价(5-8位数字)
+    # 行权价可能是5-8位，取决于价格和券商格式
+    pattern = r'^[A-Z]{1,5}\d{6}[CP]\d{5,8}$'
     return bool(re.match(pattern, symbol))
 
 
@@ -88,11 +89,11 @@ def _parse_us_option(symbol: str) -> Dict:
     """
     解析美股期权代码
 
-    格式: AAPL250117C00150000
-    - AAPL: 标的
+    格式: AAPL250117C00150000 或 SPY250321C565000
+    - AAPL/SPY: 标的
     - 250117: 到期日 (2025-01-17)
     - C: CALL (P: PUT)
-    - 00150000: 行权价 $150.00
+    - 00150000/565000: 行权价 (5-8位数字)
 
     Examples:
         >>> _parse_us_option("AAPL250117C00150000")
@@ -107,8 +108,8 @@ def _parse_us_option(symbol: str) -> Dict:
         }
     """
     try:
-        # 使用正则提取各部分
-        match = re.match(r'^([A-Z]{1,5})(\d{6})([CP])(\d{8})$', symbol)
+        # 使用正则提取各部分 (行权价5-8位)
+        match = re.match(r'^([A-Z]{1,5})(\d{6})([CP])(\d{5,8})$', symbol)
         if not match:
             logger.warning(f"Invalid US option format: {symbol}")
             return _create_symbol_info(SymbolType.UNKNOWN, symbol)
@@ -124,8 +125,11 @@ def _parse_us_option(symbol: str) -> Dict:
         day = int(date_str[4:6])
         expiration_date = datetime(year, month, day).date()
 
-        # 解析行权价: 8位数字，除以1000
-        strike_price = int(strike_str) / 1000.0
+        # 解析行权价: 统一除以 1000
+        # 格式: 565000 = $565.00, 185000 = $185.00, 50000 = $50.00
+        # 不管是 5位还是8位，都是实际价格 * 1000
+        strike_int = int(strike_str)
+        strike_price = strike_int / 1000.0
 
         return {
             'type': SymbolType.US_OPTION,

@@ -125,46 +125,78 @@ class QualityScorer:
         """
         评估进场时的技术指标配合度（加权平均）
 
-        权重分配：
-        - RSI评分 (25%)
-        - MACD评分 (20%)
-        - 布林带评分 (15%)
-        - ADX趋势强度评分 (15%)
-        - Stochastic评分 (15%)
-        - 成交量确认评分 (10%)
+        权重分配（新增指标后重新分配）：
+        - RSI评分 (15%)
+        - MACD评分 (12%)
+        - 布林带评分 (10%)
+        - ADX趋势强度评分 (10%)
+        - Stochastic评分 (10%)
+        - 成交量确认评分 (8%)
+        - NEW: CCI评分 (8%)
+        - NEW: MFI资金流评分 (8%)
+        - NEW: Ichimoku云图评分 (10%)
+        - NEW: 挤压信号评分 (5%)
+        - NEW: OBV背离评分 (4%)
         """
         weighted_scores = []
         is_long = position.direction in ['buy', 'buy_to_open', 'long']
 
-        # 1. RSI评分 (权重25%)
+        # 1. RSI评分 (权重15%)
         rsi_score = self._score_rsi(md, is_long)
         if rsi_score is not None:
-            weighted_scores.append((rsi_score, 0.25))
+            weighted_scores.append((rsi_score, 0.15))
 
-        # 2. MACD评分 (权重20%)
+        # 2. MACD评分 (权重12%)
         macd_score = self._score_macd(md, is_long)
         if macd_score is not None:
-            weighted_scores.append((macd_score, 0.20))
+            weighted_scores.append((macd_score, 0.12))
 
-        # 3. 布林带评分 (权重15%)
+        # 3. 布林带评分 (权重10%)
         bb_score = self._score_bollinger(md, is_long)
         if bb_score is not None:
-            weighted_scores.append((bb_score, 0.15))
+            weighted_scores.append((bb_score, 0.10))
 
-        # 4. ADX趋势强度评分 (权重15%)
+        # 4. ADX趋势强度评分 (权重10%)
         adx_score = self._score_adx(md, is_long)
         if adx_score is not None:
-            weighted_scores.append((adx_score, 0.15))
+            weighted_scores.append((adx_score, 0.10))
 
-        # 5. Stochastic评分 (权重15%)
+        # 5. Stochastic评分 (权重10%)
         stoch_score = self._score_stochastic(md, is_long)
         if stoch_score is not None:
-            weighted_scores.append((stoch_score, 0.15))
+            weighted_scores.append((stoch_score, 0.10))
 
-        # 6. 成交量确认评分 (权重10%)
+        # 6. 成交量确认评分 (权重8%)
         volume_score = self._score_volume_confirmation(md)
         if volume_score is not None:
-            weighted_scores.append((volume_score, 0.10))
+            weighted_scores.append((volume_score, 0.08))
+
+        # ==================== 新增指标评分 ====================
+
+        # 7. CCI评分 (权重8%)
+        cci_score = self._score_cci(md, is_long)
+        if cci_score is not None:
+            weighted_scores.append((cci_score, 0.08))
+
+        # 8. MFI资金流评分 (权重8%)
+        mfi_score = self._score_mfi(md, is_long)
+        if mfi_score is not None:
+            weighted_scores.append((mfi_score, 0.08))
+
+        # 9. Ichimoku云图评分 (权重10%)
+        ichimoku_score = self._score_ichimoku(md, is_long)
+        if ichimoku_score is not None:
+            weighted_scores.append((ichimoku_score, 0.10))
+
+        # 10. 挤压信号评分 (权重5%)
+        squeeze_score = self._score_squeeze(md)
+        if squeeze_score is not None:
+            weighted_scores.append((squeeze_score, 0.05))
+
+        # 11. SuperTrend方向评分 (权重4%)
+        supertrend_score = self._score_supertrend(md, is_long)
+        if supertrend_score is not None:
+            weighted_scores.append((supertrend_score, 0.04))
 
         # 计算加权平均分
         if not weighted_scores:
@@ -419,6 +451,269 @@ class QualityScorer:
         else:
             # 无均量数据，给基本分
             return 60
+
+    # ==================== 新增指标评分方法 ====================
+
+    def _score_cci(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """
+        CCI商品通道指数评分
+
+        CCI范围: -300 ~ +300，通常 -100 ~ +100 为正常区域
+        - 做多：CCI < -100 超卖区买入得分高
+        - 做空：CCI > +100 超买区卖出得分高
+        """
+        if md.cci_20 is None:
+            return None
+
+        cci = float(md.cci_20)
+
+        if is_long:
+            if cci < -200:
+                return 95  # 极度超卖
+            elif cci < -100:
+                return 85  # 超卖区
+            elif cci < -50:
+                return 70  # 接近超卖
+            elif cci < 50:
+                return 55  # 中性区
+            elif cci < 100:
+                return 40  # 偏高
+            else:
+                return 25  # 超买区做多风险大
+        else:
+            if cci > 200:
+                return 95  # 极度超买
+            elif cci > 100:
+                return 85  # 超买区
+            elif cci > 50:
+                return 70  # 接近超买
+            elif cci > -50:
+                return 55  # 中性区
+            elif cci > -100:
+                return 40  # 偏低
+            else:
+                return 25  # 超卖区做空风险大
+
+    def _score_mfi(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """
+        MFI资金流量指数评分
+
+        MFI是量加权的RSI，范围0-100
+        - 做多：MFI < 20 超卖买入，MFI > 80 超买避免
+        - 做空：MFI > 80 超买卖出，MFI < 20 超卖避免
+        """
+        if md.mfi_14 is None:
+            return None
+
+        mfi = float(md.mfi_14)
+
+        if is_long:
+            if mfi < 20:
+                return 95  # 资金严重流出，买入良机
+            elif mfi < 30:
+                return 80  # 资金流出
+            elif mfi < 50:
+                return 65  # 中性偏弱
+            elif mfi < 70:
+                return 50  # 中性
+            elif mfi < 80:
+                return 35  # 资金流入强
+            else:
+                return 20  # 超买
+        else:
+            if mfi > 80:
+                return 95  # 资金严重流入，卖出良机
+            elif mfi > 70:
+                return 80  # 资金流入
+            elif mfi > 50:
+                return 65  # 中性偏强
+            elif mfi > 30:
+                return 50  # 中性
+            elif mfi > 20:
+                return 35  # 资金流出强
+            else:
+                return 20  # 超卖
+
+    def _score_ichimoku(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """
+        Ichimoku一目均衡图评分
+
+        评分维度：
+        1. 价格相对云图位置
+        2. 转换线与基准线关系
+        3. 迟行线位置
+        """
+        # 检查必要数据
+        if md.close is None:
+            return None
+
+        close = float(md.close)
+        scores = []
+
+        # 1. 云图位置评分
+        if md.ichi_senkou_a is not None and md.ichi_senkou_b is not None:
+            senkou_a = float(md.ichi_senkou_a)
+            senkou_b = float(md.ichi_senkou_b)
+            cloud_top = max(senkou_a, senkou_b)
+            cloud_bottom = min(senkou_a, senkou_b)
+
+            if is_long:
+                if close > cloud_top:
+                    scores.append(90)  # 价格在云上方，强势
+                elif close > cloud_bottom:
+                    scores.append(60)  # 价格在云中
+                else:
+                    scores.append(30)  # 价格在云下方
+            else:
+                if close < cloud_bottom:
+                    scores.append(90)  # 价格在云下方，弱势
+                elif close < cloud_top:
+                    scores.append(60)  # 价格在云中
+                else:
+                    scores.append(30)  # 价格在云上方
+
+        # 2. 转换线与基准线关系
+        if md.ichi_tenkan is not None and md.ichi_kijun is not None:
+            tenkan = float(md.ichi_tenkan)
+            kijun = float(md.ichi_kijun)
+
+            if is_long:
+                if tenkan > kijun:
+                    scores.append(85)  # 金叉
+                else:
+                    scores.append(40)  # 死叉
+            else:
+                if tenkan < kijun:
+                    scores.append(85)  # 死叉
+                else:
+                    scores.append(40)  # 金叉
+
+        return np.mean(scores) if scores else None
+
+    def _score_squeeze(self, md: MarketData) -> Optional[float]:
+        """
+        布林带挤压信号评分
+
+        bb_squeeze = 1 表示布林带在肯特纳通道内（挤压状态）
+        挤压通常预示即将有大波动
+        """
+        if md.bb_squeeze is None:
+            return None
+
+        if md.bb_squeeze == 1:
+            return 85  # 挤压状态，准备突破
+        else:
+            return 60  # 非挤压状态
+
+    def _score_supertrend(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """
+        SuperTrend方向评分
+
+        supertrend_dir: 1=多头, -1=空头
+        """
+        if md.supertrend_dir is None:
+            return None
+
+        if is_long:
+            if md.supertrend_dir == 1:
+                return 90  # SuperTrend多头，顺势做多
+            else:
+                return 35  # SuperTrend空头，逆势做多
+        else:
+            if md.supertrend_dir == -1:
+                return 90  # SuperTrend空头，顺势做空
+            else:
+                return 35  # SuperTrend多头，逆势做空
+
+    def _score_psar(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """
+        Parabolic SAR评分
+
+        psar_dir: 1=多头, -1=空头
+        """
+        if md.psar_dir is None:
+            return None
+
+        if is_long:
+            if md.psar_dir == 1:
+                return 85  # SAR在价格下方，多头
+            else:
+                return 40  # SAR在价格上方，空头
+        else:
+            if md.psar_dir == -1:
+                return 85  # SAR在价格上方，空头
+            else:
+                return 40  # SAR在价格下方，多头
+
+    def _score_williams_r(self, md: MarketData, is_long: bool) -> Optional[float]:
+        """
+        Williams %R评分
+
+        范围: -100 ~ 0
+        - < -80: 超卖
+        - > -20: 超买
+        """
+        if md.willr_14 is None:
+            return None
+
+        willr = float(md.willr_14)
+
+        if is_long:
+            if willr < -80:
+                return 90  # 超卖，买入良机
+            elif willr < -60:
+                return 75  # 偏弱
+            elif willr < -40:
+                return 55  # 中性
+            elif willr < -20:
+                return 40  # 偏强
+            else:
+                return 25  # 超买
+        else:
+            if willr > -20:
+                return 90  # 超买，卖出良机
+            elif willr > -40:
+                return 75  # 偏强
+            elif willr > -60:
+                return 55  # 中性
+            elif willr > -80:
+                return 40  # 偏弱
+            else:
+                return 25  # 超卖
+
+    def _score_volatility_environment(self, md: MarketData) -> Optional[float]:
+        """
+        波动率环境评分
+
+        使用hvol_20（历史波动率）和atr_pct评估
+        """
+        scores = []
+
+        # ATR百分比评分
+        if md.atr_pct is not None:
+            atr_pct = float(md.atr_pct)
+            if atr_pct < 2:
+                scores.append(90)  # 低波动
+            elif atr_pct < 3:
+                scores.append(75)  # 中等波动
+            elif atr_pct < 5:
+                scores.append(55)  # 中高波动
+            else:
+                scores.append(40)  # 高波动
+
+        # 波动率排名评分
+        if md.vol_rank is not None:
+            vol_rank = float(md.vol_rank)
+            if vol_rank < 25:
+                scores.append(85)  # 低位波动率
+            elif vol_rank < 50:
+                scores.append(70)  # 中等波动率
+            elif vol_rank < 75:
+                scores.append(55)  # 中高波动率
+            else:
+                scores.append(40)  # 高位波动率
+
+        return np.mean(scores) if scores else None
 
     def _score_entry_position(
         self,

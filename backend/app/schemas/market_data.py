@@ -63,6 +63,51 @@ class TechnicalIndicators(BaseModel):
     stoch_k: Optional[float] = None
     stoch_d: Optional[float] = None
 
+    # ==================== 新增成交量指标 ====================
+    obv: Optional[float] = None
+    vwap: Optional[float] = None
+    mfi_14: Optional[float] = None
+    ad_line: Optional[float] = None
+    cmf_20: Optional[float] = None
+    volume_ratio: Optional[float] = None
+
+    # ==================== 新增动量指标 ====================
+    cci_20: Optional[float] = None
+    willr_14: Optional[float] = None
+    roc_12: Optional[float] = None
+    mom_10: Optional[float] = None
+    uo: Optional[float] = None
+    rsi_div: Optional[int] = None
+
+    # ==================== 新增波动率指标 ====================
+    kc_upper: Optional[float] = None
+    kc_middle: Optional[float] = None
+    kc_lower: Optional[float] = None
+    dc_upper: Optional[float] = None
+    dc_lower: Optional[float] = None
+    hvol_20: Optional[float] = None
+    atr_pct: Optional[float] = None
+    bb_squeeze: Optional[int] = None
+    vol_rank: Optional[float] = None
+
+    # ==================== 新增趋势指标 ====================
+    ichi_tenkan: Optional[float] = None
+    ichi_kijun: Optional[float] = None
+    ichi_senkou_a: Optional[float] = None
+    ichi_senkou_b: Optional[float] = None
+    ichi_chikou: Optional[float] = None
+    psar: Optional[float] = None
+    psar_dir: Optional[int] = None
+    supertrend: Optional[float] = None
+    supertrend_dir: Optional[int] = None
+    trix: Optional[float] = None
+    dpo: Optional[float] = None
+
+    # ==================== 期权指标 ====================
+    iv_rank: Optional[float] = None
+    iv_percentile: Optional[float] = None
+    pcr: Optional[float] = None
+
 
 class MarketDataPoint(OHLCVData):
     """Single market data point with indicators"""

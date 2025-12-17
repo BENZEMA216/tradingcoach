@@ -154,3 +154,122 @@ class DrawdownItem(BaseModel):
     drawdown_pct: float
     recovery_date: Optional[date] = None
     duration_days: int
+
+
+class RiskMetrics(BaseModel):
+    """Comprehensive risk metrics"""
+    # Drawdown metrics
+    max_drawdown: float
+    max_drawdown_pct: Optional[float] = None
+    avg_drawdown: Optional[float] = None
+    max_drawdown_duration_days: Optional[int] = None
+    current_drawdown: Optional[float] = None
+
+    # Risk-adjusted returns
+    sharpe_ratio: Optional[float] = None
+    sortino_ratio: Optional[float] = None
+    calmar_ratio: Optional[float] = None
+
+    # Value at Risk (simplified)
+    var_95: Optional[float] = None  # 95% VaR
+    expected_shortfall: Optional[float] = None  # CVaR
+
+    # Other metrics
+    profit_factor: Optional[float] = None
+    payoff_ratio: Optional[float] = None  # avg_win / abs(avg_loss)
+    expectancy: Optional[float] = None  # (win_rate * avg_win) - (loss_rate * avg_loss)
+
+    # Volatility
+    daily_volatility: Optional[float] = None
+    annualized_volatility: Optional[float] = None
+
+
+class EquityCurvePoint(BaseModel):
+    """Equity curve data point"""
+    date: date
+    cumulative_pnl: float
+    drawdown: float
+    drawdown_pct: Optional[float] = None
+
+
+# ============================================================
+# Advanced Visualization Schemas
+# ============================================================
+
+
+class EquityDrawdownItem(BaseModel):
+    """Equity and drawdown data point for combo chart"""
+    date: date
+    cumulative_pnl: float
+    drawdown: float
+    drawdown_pct: Optional[float] = None
+    peak: float
+
+
+class PnLDistributionBin(BaseModel):
+    """P&L distribution histogram bin"""
+    min_value: float
+    max_value: float
+    count: int
+    is_profit: bool
+
+
+class RollingMetricsItem(BaseModel):
+    """Rolling metrics data point"""
+    trade_index: int
+    close_date: date
+    rolling_win_rate: float
+    rolling_avg_pnl: float
+    cumulative_pnl: float
+
+
+class DurationPnLItem(BaseModel):
+    """Duration vs P&L scatter plot data point"""
+    position_id: int
+    holding_days: float
+    pnl: float
+    pnl_pct: Optional[float] = None
+    symbol: str
+    direction: str
+    is_winner: bool
+
+
+class SymbolRiskItem(BaseModel):
+    """Symbol risk quadrant data point"""
+    symbol: str
+    avg_win: float
+    avg_loss: float
+    trade_count: int
+    win_rate: float
+    total_pnl: float
+    risk_reward_ratio: Optional[float] = None
+
+
+class HourlyPerformanceItem(BaseModel):
+    """Hourly performance data point"""
+    hour: int
+    trade_count: int
+    win_rate: float
+    total_pnl: float
+    avg_pnl: float
+
+
+class TradingHeatmapCell(BaseModel):
+    """Trading heatmap cell (weekday x hour)"""
+    day_of_week: int  # 0=Monday, 6=Sunday
+    day_name: str
+    hour: int
+    trade_count: int
+    win_rate: float
+    avg_pnl: float
+    total_pnl: float
+
+
+class AssetTypeBreakdownItem(BaseModel):
+    """Asset type breakdown data point"""
+    asset_type: str  # "stock", "option"
+    count: int
+    total_pnl: float
+    win_rate: float
+    avg_pnl: float
+    avg_holding_days: float

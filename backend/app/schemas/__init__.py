@@ -65,6 +65,24 @@ from .statistics import (
     StatisticsSummary,
     CalendarHeatmapItem,
     DrawdownItem,
+    RiskMetrics,
+    EquityCurvePoint as StatsEquityCurvePoint,
+    # Advanced Visualization
+    EquityDrawdownItem,
+    PnLDistributionBin,
+    RollingMetricsItem,
+    DurationPnLItem,
+    SymbolRiskItem,
+    HourlyPerformanceItem,
+    TradingHeatmapCell,
+    AssetTypeBreakdownItem,
+)
+
+from .insights import (
+    InsightType,
+    InsightCategory,
+    TradingInsight,
+    InsightsResponse,
 )
 
 __all__ = [
@@ -121,4 +139,20 @@ __all__ = [
     "StatisticsSummary",
     "CalendarHeatmapItem",
     "DrawdownItem",
+    "RiskMetrics",
+    "StatsEquityCurvePoint",
+    # Advanced Visualization
+    "EquityDrawdownItem",
+    "PnLDistributionBin",
+    "RollingMetricsItem",
+    "DurationPnLItem",
+    "SymbolRiskItem",
+    "HourlyPerformanceItem",
+    "TradingHeatmapCell",
+    "AssetTypeBreakdownItem",
+    # Insights
+    "InsightType",
+    "InsightCategory",
+    "TradingInsight",
+    "InsightsResponse",
 ]

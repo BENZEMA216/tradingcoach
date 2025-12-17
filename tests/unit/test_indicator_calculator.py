@@ -522,3 +522,365 @@ class TestBatchCalculation:
         # AAPL and MSFT should have 0 (no matching records in DB)
         # TSLA should have 0 (empty DataFrame)
         assert results['TSLA'] == 0
+
+
+# ==================== 新增指标测试 ====================
+
+class TestNewVolumeIndicators:
+    """Test new volume indicators (OBV, VWAP, MFI, AD, CMF)"""
+
+    @pytest.fixture
+    def calculator(self):
+        return IndicatorCalculator()
+
+    @pytest.fixture
+    def sample_ohlcv(self):
+        """Create sample OHLCV data"""
+        np.random.seed(42)
+        n = 50
+        dates = pd.date_range('2024-01-01', periods=n, freq='D')
+        close = 100 + np.cumsum(np.random.randn(n) * 0.5)
+
+        data = {
+            'Open': close + np.random.randn(n) * 0.1,
+            'High': close + np.abs(np.random.randn(n) * 0.5),
+            'Low': close - np.abs(np.random.randn(n) * 0.5),
+            'Close': close,
+            'Volume': np.random.randint(1000000, 5000000, n)
+        }
+        return pd.DataFrame(data, index=dates)
+
+    def test_obv_calculation(self, calculator, sample_ohlcv):
+        """Test OBV (On Balance Volume) calculation"""
+        obv = calculator.calculate_obv(sample_ohlcv)
+
+        assert len(obv) == len(sample_ohlcv)
+        assert not obv.empty
+        # OBV should have one NaN at start
+        assert obv.isna().sum() <= 1
+
+    def test_vwap_calculation(self, calculator, sample_ohlcv):
+        """Test VWAP (Volume Weighted Average Price) calculation"""
+        vwap = calculator.calculate_vwap(sample_ohlcv)
+
+        assert len(vwap) == len(sample_ohlcv)
+        # VWAP should be positive
+        valid_vwap = vwap.dropna()
+        assert (valid_vwap > 0).all()
+
+    def test_mfi_calculation(self, calculator, sample_ohlcv):
+        """Test MFI (Money Flow Index) calculation"""
+        mfi = calculator.calculate_mfi(sample_ohlcv, period=14)
+
+        assert len(mfi) == len(sample_ohlcv)
+        # MFI should be between 0 and 100
+        valid_mfi = mfi.dropna()
+        assert (valid_mfi >= 0).all()
+        assert (valid_mfi <= 100).all()
+
+    def test_ad_line_calculation(self, calculator, sample_ohlcv):
+        """Test A/D Line (Accumulation/Distribution) calculation"""
+        ad_line = calculator.calculate_ad_line(sample_ohlcv)
+
+        assert len(ad_line) == len(sample_ohlcv)
+        assert not ad_line.empty
+
+    def test_cmf_calculation(self, calculator, sample_ohlcv):
+        """Test CMF (Chaikin Money Flow) calculation"""
+        cmf = calculator.calculate_cmf(sample_ohlcv, period=20)
+
+        assert len(cmf) == len(sample_ohlcv)
+        # CMF should be between -1 and 1
+        valid_cmf = cmf.dropna()
+        assert (valid_cmf >= -1).all()
+        assert (valid_cmf <= 1).all()
+
+    def test_volume_ratio_calculation(self, calculator, sample_ohlcv):
+        """Test Volume Ratio calculation"""
+        vol_ratio = calculator.calculate_volume_ratio(sample_ohlcv, period=20)
+
+        assert len(vol_ratio) == len(sample_ohlcv)
+        # Volume ratio should be positive
+        valid_ratio = vol_ratio.dropna()
+        assert (valid_ratio > 0).all()
+
+
+class TestNewMomentumIndicators:
+    """Test new momentum indicators (CCI, Williams %R, ROC, Momentum, UO)"""
+
+    @pytest.fixture
+    def calculator(self):
+        return IndicatorCalculator()
+
+    @pytest.fixture
+    def sample_ohlcv(self):
+        """Create sample OHLCV data"""
+        np.random.seed(42)
+        n = 50
+        dates = pd.date_range('2024-01-01', periods=n, freq='D')
+        close = 100 + np.cumsum(np.random.randn(n) * 0.5)
+
+        data = {
+            'Open': close + np.random.randn(n) * 0.1,
+            'High': close + np.abs(np.random.randn(n) * 0.5),
+            'Low': close - np.abs(np.random.randn(n) * 0.5),
+            'Close': close,
+            'Volume': np.random.randint(1000000, 5000000, n)
+        }
+        return pd.DataFrame(data, index=dates)
+
+    def test_cci_calculation(self, calculator, sample_ohlcv):
+        """Test CCI (Commodity Channel Index) calculation"""
+        cci = calculator.calculate_cci(sample_ohlcv, period=20)
+
+        assert len(cci) == len(sample_ohlcv)
+        assert not cci.empty
+
+    def test_williams_r_calculation(self, calculator, sample_ohlcv):
+        """Test Williams %R calculation"""
+        willr = calculator.calculate_williams_r(sample_ohlcv, period=14)
+
+        assert len(willr) == len(sample_ohlcv)
+        # Williams %R should be between -100 and 0
+        valid_willr = willr.dropna()
+        assert (valid_willr >= -100).all()
+        assert (valid_willr <= 0).all()
+
+    def test_roc_calculation(self, calculator, sample_ohlcv):
+        """Test ROC (Rate of Change) calculation"""
+        roc = calculator.calculate_roc(sample_ohlcv, period=12)
+
+        assert len(roc) == len(sample_ohlcv)
+        assert not roc.empty
+
+    def test_momentum_calculation(self, calculator, sample_ohlcv):
+        """Test Momentum calculation"""
+        mom = calculator.calculate_momentum(sample_ohlcv, period=10)
+
+        assert len(mom) == len(sample_ohlcv)
+        assert not mom.empty
+
+    def test_ultimate_oscillator_calculation(self, calculator, sample_ohlcv):
+        """Test Ultimate Oscillator calculation"""
+        uo = calculator.calculate_ultimate_oscillator(sample_ohlcv)
+
+        assert len(uo) == len(sample_ohlcv)
+        # UO should be between 0 and 100
+        valid_uo = uo.dropna()
+        assert (valid_uo >= 0).all()
+        assert (valid_uo <= 100).all()
+
+
+class TestNewVolatilityIndicators:
+    """Test new volatility indicators (Keltner, Donchian, HVol, Squeeze)"""
+
+    @pytest.fixture
+    def calculator(self):
+        return IndicatorCalculator()
+
+    @pytest.fixture
+    def sample_ohlcv(self):
+        """Create sample OHLCV data"""
+        np.random.seed(42)
+        n = 50
+        dates = pd.date_range('2024-01-01', periods=n, freq='D')
+        close = 100 + np.cumsum(np.random.randn(n) * 0.5)
+
+        data = {
+            'Open': close + np.random.randn(n) * 0.1,
+            'High': close + np.abs(np.random.randn(n) * 0.5),
+            'Low': close - np.abs(np.random.randn(n) * 0.5),
+            'Close': close,
+            'Volume': np.random.randint(1000000, 5000000, n)
+        }
+        return pd.DataFrame(data, index=dates)
+
+    def test_keltner_channel_calculation(self, calculator, sample_ohlcv):
+        """Test Keltner Channel calculation"""
+        kc = calculator.calculate_keltner_channel(sample_ohlcv)
+
+        assert 'kc_upper' in kc
+        assert 'kc_middle' in kc
+        assert 'kc_lower' in kc
+        assert len(kc['kc_upper']) == len(sample_ohlcv)
+
+        # Upper > Middle > Lower
+        valid_idx = ~(kc['kc_upper'].isna() | kc['kc_lower'].isna())
+        assert (kc['kc_upper'][valid_idx] >= kc['kc_middle'][valid_idx]).all()
+        assert (kc['kc_middle'][valid_idx] >= kc['kc_lower'][valid_idx]).all()
+
+    def test_donchian_channel_calculation(self, calculator, sample_ohlcv):
+        """Test Donchian Channel calculation"""
+        dc = calculator.calculate_donchian_channel(sample_ohlcv, period=20)
+
+        assert 'dc_upper' in dc
+        assert 'dc_lower' in dc
+        assert len(dc['dc_upper']) == len(sample_ohlcv)
+
+        # Upper >= Lower
+        valid_idx = ~(dc['dc_upper'].isna() | dc['dc_lower'].isna())
+        assert (dc['dc_upper'][valid_idx] >= dc['dc_lower'][valid_idx]).all()
+
+    def test_historical_volatility_calculation(self, calculator, sample_ohlcv):
+        """Test Historical Volatility calculation"""
+        hvol = calculator.calculate_historical_volatility(sample_ohlcv, period=20)
+
+        assert len(hvol) == len(sample_ohlcv)
+        # Volatility should be positive
+        valid_hvol = hvol.dropna()
+        assert (valid_hvol >= 0).all()
+
+    def test_bb_squeeze_calculation(self, calculator, sample_ohlcv):
+        """Test Bollinger Band Squeeze calculation"""
+        squeeze = calculator.calculate_bb_squeeze(sample_ohlcv)
+
+        assert len(squeeze) == len(sample_ohlcv)
+        # Squeeze should be 0 or 1
+        valid_squeeze = squeeze.dropna()
+        assert set(valid_squeeze.unique()).issubset({0, 1})
+
+
+class TestNewTrendIndicators:
+    """Test new trend indicators (Ichimoku, SAR, SuperTrend, TRIX, DPO)"""
+
+    @pytest.fixture
+    def calculator(self):
+        return IndicatorCalculator()
+
+    @pytest.fixture
+    def sample_ohlcv(self):
+        """Create sample OHLCV data with enough history for Ichimoku"""
+        np.random.seed(42)
+        n = 100  # Ichimoku needs at least 52 periods
+        dates = pd.date_range('2024-01-01', periods=n, freq='D')
+        close = 100 + np.cumsum(np.random.randn(n) * 0.5)
+
+        data = {
+            'Open': close + np.random.randn(n) * 0.1,
+            'High': close + np.abs(np.random.randn(n) * 0.5),
+            'Low': close - np.abs(np.random.randn(n) * 0.5),
+            'Close': close,
+            'Volume': np.random.randint(1000000, 5000000, n)
+        }
+        return pd.DataFrame(data, index=dates)
+
+    def test_ichimoku_calculation(self, calculator, sample_ohlcv):
+        """Test Ichimoku Cloud calculation"""
+        ichi = calculator.calculate_ichimoku(sample_ohlcv)
+
+        assert 'ichi_tenkan' in ichi
+        assert 'ichi_kijun' in ichi
+        assert 'ichi_senkou_a' in ichi
+        assert 'ichi_senkou_b' in ichi
+        assert 'ichi_chikou' in ichi
+        assert len(ichi['ichi_tenkan']) == len(sample_ohlcv)
+
+    def test_parabolic_sar_calculation(self, calculator, sample_ohlcv):
+        """Test Parabolic SAR calculation"""
+        psar = calculator.calculate_parabolic_sar(sample_ohlcv)
+
+        assert 'psar' in psar
+        assert 'psar_dir' in psar
+        assert len(psar['psar']) == len(sample_ohlcv)
+
+        # Direction should be 1 or -1
+        valid_dir = psar['psar_dir'].dropna()
+        assert set(valid_dir.unique()).issubset({1, -1})
+
+    def test_supertrend_calculation(self, calculator, sample_ohlcv):
+        """Test SuperTrend calculation"""
+        st = calculator.calculate_supertrend(sample_ohlcv)
+
+        assert 'supertrend' in st
+        assert 'supertrend_dir' in st
+        assert len(st['supertrend']) == len(sample_ohlcv)
+
+        # Direction should be 1 or -1
+        valid_dir = st['supertrend_dir'].dropna()
+        assert set(valid_dir.unique()).issubset({1, -1})
+
+    def test_trix_calculation(self, calculator, sample_ohlcv):
+        """Test TRIX calculation"""
+        trix = calculator.calculate_trix(sample_ohlcv, period=15)
+
+        assert len(trix) == len(sample_ohlcv)
+        assert not trix.empty
+
+    def test_dpo_calculation(self, calculator, sample_ohlcv):
+        """Test DPO (Detrended Price Oscillator) calculation"""
+        dpo = calculator.calculate_dpo(sample_ohlcv, period=20)
+
+        assert len(dpo) == len(sample_ohlcv)
+        assert not dpo.empty
+
+
+class TestCalculateAllIndicatorsWithNew:
+    """Test that calculate_all_indicators includes new indicators"""
+
+    @pytest.fixture
+    def calculator(self):
+        return IndicatorCalculator()
+
+    @pytest.fixture
+    def sample_ohlcv(self):
+        """Create complete OHLCV dataset"""
+        np.random.seed(42)
+        n = 100
+
+        dates = pd.date_range('2024-01-01', periods=n, freq='D')
+        close = 100 + np.cumsum(np.random.randn(n) * 0.5)
+
+        data = {
+            'Open': close + np.random.randn(n) * 0.1,
+            'High': close + np.abs(np.random.randn(n) * 0.5),
+            'Low': close - np.abs(np.random.randn(n) * 0.5),
+            'Close': close,
+            'Volume': np.random.randint(1000000, 5000000, n)
+        }
+        return pd.DataFrame(data, index=dates)
+
+    def test_new_volume_indicators_included(self, calculator, sample_ohlcv):
+        """Test that new volume indicators are calculated"""
+        result = calculator.calculate_all_indicators(sample_ohlcv)
+
+        assert 'obv' in result.columns
+        assert 'vwap' in result.columns
+        assert 'mfi_14' in result.columns
+        assert 'ad_line' in result.columns
+        assert 'cmf_20' in result.columns
+        assert 'volume_ratio' in result.columns
+
+    def test_new_momentum_indicators_included(self, calculator, sample_ohlcv):
+        """Test that new momentum indicators are calculated"""
+        result = calculator.calculate_all_indicators(sample_ohlcv)
+
+        assert 'cci_20' in result.columns
+        assert 'willr_14' in result.columns
+        assert 'roc_12' in result.columns
+        assert 'mom_10' in result.columns
+        assert 'uo' in result.columns
+
+    def test_new_volatility_indicators_included(self, calculator, sample_ohlcv):
+        """Test that new volatility indicators are calculated"""
+        result = calculator.calculate_all_indicators(sample_ohlcv)
+
+        assert 'kc_upper' in result.columns
+        assert 'kc_middle' in result.columns
+        assert 'kc_lower' in result.columns
+        assert 'dc_upper' in result.columns
+        assert 'dc_lower' in result.columns
+        assert 'hvol_20' in result.columns
+        assert 'bb_squeeze' in result.columns
+
+    def test_new_trend_indicators_included(self, calculator, sample_ohlcv):
+        """Test that new trend indicators are calculated"""
+        result = calculator.calculate_all_indicators(sample_ohlcv)
+
+        assert 'ichi_tenkan' in result.columns
+        assert 'ichi_kijun' in result.columns
+        assert 'psar' in result.columns
+        assert 'psar_dir' in result.columns
+        assert 'supertrend' in result.columns
+        assert 'supertrend_dir' in result.columns
+        assert 'trix' in result.columns
+        assert 'dpo' in result.columns

@@ -78,22 +78,60 @@ class SymbolMatcher:
         """
         处理开仓交易（买入或卖空）
 
+        注意：由于券商系统可能不区分 "买入" 和 "买券还券"，
+        当看到 BUY 交易时，需要检查是否有未平仓的做空头寸。
+        如果有，则优先平掉做空（即 BUY 实际上是 BUY_TO_COVER）。
+
         Args:
             trade: 交易记录
 
         Returns:
             List[Position]: 通常返回空列表，只有在反向平仓时才返回持仓
         """
-        tq = TradeQuantity(trade)
-
         if trade.direction == TradeDirection.BUY:
-            # 买入：加入做多队列
-            self.open_long_queue.append(tq)
-            logger.debug(f"Added to long queue: {tq}, queue size: {len(self.open_long_queue)}")
-            return []
+            # 买入：首先检查是否有未平仓的做空头寸需要平仓
+            if self.open_short_queue:
+                # 有做空头寸，优先平仓（视为 BUY_TO_COVER）
+                logger.debug(f"BUY trade found with open short positions, treating as BUY_TO_COVER")
+
+                # 计算做空队列总数量
+                short_queue_qty = sum(tq.remaining_quantity for tq in self.open_short_queue)
+
+                if trade.filled_quantity <= short_queue_qty:
+                    # BUY 数量 <= 做空数量，全部用于平仓
+                    return self._match_against_queue(
+                        trade,
+                        self.open_short_queue,
+                        position_direction='short'
+                    )
+                else:
+                    # BUY 数量 > 做空数量，先平掉所有做空，剩余开多仓
+                    positions = self._match_against_queue(
+                        trade,
+                        self.open_short_queue,
+                        position_direction='short'
+                    )
+
+                    # 计算剩余数量开多仓
+                    remaining_qty = trade.filled_quantity - short_queue_qty
+                    if remaining_qty > 0:
+                        # 创建一个虚拟的 TradeQuantity 来追踪剩余数量
+                        tq = TradeQuantity(trade)
+                        tq.consume(short_queue_qty)  # 消耗掉已用于平仓的数量
+                        self.open_long_queue.append(tq)
+                        logger.debug(f"Remaining {remaining_qty} shares added to long queue after closing shorts")
+
+                    return positions
+            else:
+                # 没有做空头寸，正常开多仓
+                tq = TradeQuantity(trade)
+                self.open_long_queue.append(tq)
+                logger.debug(f"Added to long queue: {tq}, queue size: {len(self.open_long_queue)}")
+                return []
 
         elif trade.direction == TradeDirection.SELL_SHORT:
             # 卖空：加入做空队列
+            tq = TradeQuantity(trade)
             self.open_short_queue.append(tq)
             logger.debug(f"Added to short queue: {tq}, queue size: {len(self.open_short_queue)}")
             return []
@@ -276,15 +314,18 @@ class SymbolMatcher:
         close_price = float(position.close_price)
         quantity = int(position.quantity)
 
+        # 期权合约乘数：每张期权代表100股标的资产
+        multiplier = 100 if position.is_option else 1
+
         # 计算价差盈亏
         if position.direction == 'long':
-            # 做多：盈利 = (卖出价 - 买入价) × 数量
+            # 做多：盈利 = (卖出价 - 买入价) × 数量 × 乘数
             price_diff = close_price - open_price
         else:  # short
-            # 做空：盈利 = (卖空价 - 买券还券价) × 数量
+            # 做空：盈利 = (卖空价 - 买券还券价) × 数量 × 乘数
             price_diff = open_price - close_price
 
-        position.realized_pnl = round(price_diff * quantity, 2)
+        position.realized_pnl = round(price_diff * quantity * multiplier, 2)
 
         # 计算百分比
         if open_price > 0:
@@ -294,8 +335,8 @@ class SymbolMatcher:
         position.total_fees = (position.open_fee or 0) + (position.close_fee or 0)
         position.net_pnl = round(position.realized_pnl - position.total_fees, 2)
 
-        # 净盈亏百分比
-        cost_basis = open_price * quantity
+        # 净盈亏百分比（基于实际成本）
+        cost_basis = open_price * quantity * multiplier
         if cost_basis > 0:
             position.net_pnl_pct = round((position.net_pnl / cost_basis) * 100, 2)
 

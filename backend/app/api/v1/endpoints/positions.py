@@ -8,7 +8,7 @@ from sqlalchemy import desc, asc
 from typing import Optional
 from datetime import date, datetime
 
-from ....database import get_db, Position, PositionStatus, Trade
+from ....database import get_db, Position, PositionStatus, Trade, MarketData
 from ....schemas import (
     PaginatedResponse,
     PositionListItem,
@@ -20,6 +20,12 @@ from ....schemas import (
     PositionSummary,
     MessageResponse,
 )
+
+# Import insight generator
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..'))
+from src.analyzers.insight_generator import generate_insights_for_position
 
 router = APIRouter()
 
@@ -339,3 +345,300 @@ async def list_symbols(
         .all()
     )
     return [s[0] for s in symbols]
+
+
+@router.get("/{position_id}/trades", response_model=list[dict])
+async def get_position_trades(
+    position_id: int = Path(..., description="Position ID"),
+    db: Session = Depends(get_db),
+) -> list[dict]:
+    """
+    Get trades associated with a specific position.
+    """
+    position = db.query(Position).filter(Position.id == position_id).first()
+    if not position:
+        raise HTTPException(status_code=404, detail="Position not found")
+
+    trades = db.query(Trade).filter(Trade.position_id == position_id).order_by(Trade.filled_time).all()
+
+    return [
+        {
+            "id": t.id,
+            "symbol": t.symbol,
+            "direction": t.direction.value if t.direction else None,
+            "filled_price": float(t.filled_price) if t.filled_price else None,
+            "filled_quantity": t.filled_quantity,
+            "filled_amount": float(t.filled_amount) if t.filled_amount else None,
+            "filled_time": t.filled_time.isoformat() if t.filled_time else None,
+            "total_fee": float(t.total_fee) if t.total_fee else None,
+            "order_price": float(t.order_price) if t.order_price else None,
+            "slippage": (
+                float(t.filled_price - t.order_price)
+                if t.filled_price and t.order_price
+                else None
+            ),
+        }
+        for t in trades
+    ]
+
+
+@router.get("/{position_id}/market-data", response_model=dict)
+async def get_position_market_data(
+    position_id: int = Path(..., description="Position ID"),
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Get market data for the holding period of a position.
+
+    Returns OHLCV data from open_date to close_date (or today if still open),
+    with some context days before and after.
+    """
+    from datetime import timedelta
+    from ....database import MarketData
+
+    position = db.query(Position).filter(Position.id == position_id).first()
+    if not position:
+        raise HTTPException(status_code=404, detail="Position not found")
+
+    # Determine the symbol to query (use underlying for options)
+    query_symbol = position.underlying_symbol if position.is_option and position.underlying_symbol else position.symbol
+
+    # Determine date range with context
+    start_date = position.open_date - timedelta(days=30) if position.open_date else None
+    end_date = (position.close_date or date.today()) + timedelta(days=10)
+
+    if not start_date:
+        raise HTTPException(status_code=400, detail="Position has no open date")
+
+    # Query market data
+    data = (
+        db.query(MarketData)
+        .filter(MarketData.symbol == query_symbol.upper())
+        .filter(MarketData.interval == "1d")
+        .filter(MarketData.date >= start_date)
+        .filter(MarketData.date <= end_date)
+        .order_by(MarketData.date)
+        .all()
+    )
+
+    if not data:
+        return {
+            "symbol": query_symbol,
+            "position_id": position_id,
+            "candles": [],
+            "entry_marker": None,
+            "exit_marker": None,
+            "message": f"No market data found for {query_symbol}",
+        }
+
+    # Build candle data with indicators
+    candles = [
+        {
+            "date": d.date.isoformat(),
+            "timestamp": d.timestamp.isoformat() if d.timestamp else None,
+            "open": float(d.open) if d.open else None,
+            "high": float(d.high) if d.high else None,
+            "low": float(d.low) if d.low else None,
+            "close": float(d.close) if d.close else None,
+            "volume": d.volume,
+            "rsi_14": float(d.rsi_14) if d.rsi_14 else None,
+            "macd": float(d.macd) if d.macd else None,
+            "macd_signal": float(d.macd_signal) if d.macd_signal else None,
+            "bb_upper": float(d.bb_upper) if d.bb_upper else None,
+            "bb_middle": float(d.bb_middle) if d.bb_middle else None,
+            "bb_lower": float(d.bb_lower) if d.bb_lower else None,
+            "ma_20": float(d.ma_20) if d.ma_20 else None,
+            "ma_50": float(d.ma_50) if d.ma_50 else None,
+        }
+        for d in data
+    ]
+
+    # Entry and exit markers
+    entry_marker = {
+        "date": position.open_date.isoformat() if position.open_date else None,
+        "price": float(position.open_price) if position.open_price else None,
+        "type": "entry",
+    }
+
+    exit_marker = None
+    if position.close_date and position.close_price:
+        exit_marker = {
+            "date": position.close_date.isoformat(),
+            "price": float(position.close_price),
+            "type": "exit",
+        }
+
+    # Calculate MAE/MFE levels for display
+    mae_level = float(position.mae) / position.quantity if position.mae and position.quantity else None
+    mfe_level = float(position.mfe) / position.quantity if position.mfe and position.quantity else None
+
+    return {
+        "symbol": query_symbol,
+        "position_id": position_id,
+        "candles": candles,
+        "entry_marker": entry_marker,
+        "exit_marker": exit_marker,
+        "mae_level": mae_level,
+        "mfe_level": mfe_level,
+        "holding_period": {
+            "start": position.open_date.isoformat() if position.open_date else None,
+            "end": position.close_date.isoformat() if position.close_date else None,
+        },
+    }
+
+
+@router.get("/{position_id}/insights", response_model=list[dict])
+async def get_position_insights(
+    position_id: int = Path(..., description="Position ID"),
+    db: Session = Depends(get_db),
+) -> list[dict]:
+    """
+    Generate AI insights for a specific position.
+
+    Analyzes entry/exit timing, risk management, and provides suggestions.
+    """
+    position = db.query(Position).filter(Position.id == position_id).first()
+    if not position:
+        raise HTTPException(status_code=404, detail="Position not found")
+
+    # Build position dict
+    position_dict = {
+        'id': position.id,
+        'symbol': position.symbol,
+        'direction': position.direction,
+        'net_pnl': float(position.net_pnl) if position.net_pnl else 0,
+        'realized_pnl': float(position.realized_pnl) if position.realized_pnl else 0,
+        'total_fees': float(position.total_fees) if position.total_fees else 0,
+        'open_price': float(position.open_price) if position.open_price else 0,
+        'close_price': float(position.close_price) if position.close_price else None,
+        'quantity': position.quantity,
+        'holding_period_days': position.holding_period_days,
+        'mae': float(position.mae) if position.mae else None,
+        'mfe': float(position.mfe) if position.mfe else None,
+        'entry_quality_score': float(position.entry_quality_score) if position.entry_quality_score else None,
+        'exit_quality_score': float(position.exit_quality_score) if position.exit_quality_score else None,
+        'risk_mgmt_score': float(position.risk_mgmt_score) if position.risk_mgmt_score else None,
+        'trend_quality_score': float(position.trend_quality_score) if position.trend_quality_score else None,
+        'strategy_type': position.strategy_type,
+    }
+
+    # Get entry indicators
+    entry_indicators = position.entry_indicators if position.entry_indicators else None
+    exit_indicators = position.exit_indicators if position.exit_indicators else None
+
+    # Get similar positions (same symbol)
+    similar_positions = (
+        db.query(Position)
+        .filter(Position.symbol == position.symbol)
+        .filter(Position.id != position_id)
+        .filter(Position.status == PositionStatus.CLOSED)
+        .order_by(desc(Position.close_date))
+        .limit(20)
+        .all()
+    )
+
+    similar_dicts = [
+        {
+            'net_pnl': float(p.net_pnl) if p.net_pnl else 0,
+            'holding_period_days': p.holding_period_days,
+        }
+        for p in similar_positions
+    ]
+
+    # Generate insights
+    insights = generate_insights_for_position(
+        position_dict,
+        entry_indicators,
+        exit_indicators,
+        similar_dicts if similar_dicts else None
+    )
+
+    return insights
+
+
+@router.get("/{position_id}/related", response_model=list[dict])
+async def get_related_positions(
+    position_id: int = Path(..., description="Position ID"),
+    db: Session = Depends(get_db),
+) -> list[dict]:
+    """
+    Get related positions for a specific position.
+
+    For options, returns positions with the same underlying symbol.
+    For stocks, returns option positions using this stock as underlying.
+
+    This helps bundle option and stock trades together.
+    """
+    position = db.query(Position).filter(Position.id == position_id).first()
+    if not position:
+        raise HTTPException(status_code=404, detail="Position not found")
+
+    related_positions = []
+
+    if position.is_option and position.underlying_symbol:
+        # For options: find the underlying stock and other options on same underlying
+        # 1. Stock positions with the same symbol as underlying
+        stock_positions = (
+            db.query(Position)
+            .filter(Position.symbol == position.underlying_symbol)
+            .filter(Position.id != position_id)
+            .filter(Position.status == PositionStatus.CLOSED)
+            .order_by(desc(Position.close_date))
+            .all()
+        )
+        related_positions.extend(stock_positions)
+
+        # 2. Other options with the same underlying
+        other_options = (
+            db.query(Position)
+            .filter(Position.underlying_symbol == position.underlying_symbol)
+            .filter(Position.is_option == True)
+            .filter(Position.id != position_id)
+            .filter(Position.status == PositionStatus.CLOSED)
+            .order_by(desc(Position.close_date))
+            .all()
+        )
+        related_positions.extend(other_options)
+    else:
+        # For stocks: find option positions using this stock as underlying
+        option_positions = (
+            db.query(Position)
+            .filter(Position.underlying_symbol == position.symbol)
+            .filter(Position.is_option == True)
+            .filter(Position.id != position_id)
+            .filter(Position.status == PositionStatus.CLOSED)
+            .order_by(desc(Position.close_date))
+            .all()
+        )
+        related_positions.extend(option_positions)
+
+    # Remove duplicates and sort by close_date
+    seen_ids = set()
+    unique_positions = []
+    for p in related_positions:
+        if p.id not in seen_ids:
+            seen_ids.add(p.id)
+            unique_positions.append(p)
+
+    # Sort by close_date descending
+    unique_positions.sort(key=lambda x: x.close_date or date.min, reverse=True)
+
+    # Convert to response format
+    return [
+        {
+            "id": p.id,
+            "symbol": p.symbol,
+            "symbol_name": p.symbol_name,
+            "direction": p.direction,
+            "is_option": bool(p.is_option),
+            "underlying_symbol": p.underlying_symbol,
+            "open_date": p.open_date.isoformat() if p.open_date else None,
+            "close_date": p.close_date.isoformat() if p.close_date else None,
+            "holding_period_days": p.holding_period_days,
+            "net_pnl": float(p.net_pnl) if p.net_pnl else None,
+            "net_pnl_pct": float(p.net_pnl_pct) if p.net_pnl_pct else None,
+            "overall_score": float(p.overall_score) if p.overall_score else None,
+            "score_grade": p.score_grade,
+        }
+        for p in unique_positions[:20]  # Limit to 20 related positions
+    ]
