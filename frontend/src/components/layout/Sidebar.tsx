@@ -7,6 +7,7 @@ import {
   Settings,
   TrendingUp,
   Sparkles,
+  Upload,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { LanguageSwitcher } from '@/components/common';
@@ -15,6 +16,7 @@ const navItems = [
   { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
   { to: '/positions', icon: List, labelKey: 'nav.positions' },
   { to: '/statistics', icon: BarChart3, labelKey: 'nav.statistics' },
+  { to: '/upload', icon: Upload, labelKey: 'nav.upload' },
   { to: '/ai-coach', icon: Sparkles, labelKey: 'nav.aiCoach' },
   { to: '/system', icon: Settings, labelKey: 'nav.settings' },
 ];

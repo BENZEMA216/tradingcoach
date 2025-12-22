@@ -73,13 +73,40 @@ class UploadHistoryItem(BaseModel):
     status: str
 
 
+def clear_all_trading_data(session):
+    """清除所有交易数据，为新一批数据导入做准备"""
+    from sqlalchemy import text
+
+    # 按顺序删除（注意外键依赖）
+    tables_to_clear = [
+        'positions',      # 持仓记录
+        'trades',         # 交易记录
+        'import_history', # 导入历史
+    ]
+
+    for table in tables_to_clear:
+        try:
+            session.execute(text(f"DELETE FROM {table}"))
+            logger.info(f"Cleared table: {table}")
+        except Exception as e:
+            logger.warning(f"Failed to clear {table}: {e}")
+
+    session.commit()
+    logger.info("All trading data cleared for fresh import")
+
+
 @router.post("/trades", response_model=UploadResponse)
-async def upload_trades(file: UploadFile = File(...)):
+async def upload_trades(
+    file: UploadFile = File(...),
+    replace_mode: bool = True  # 默认替换模式：清除旧数据
+):
     """
     上传交易记录CSV文件
 
     支持富途证券导出的中文/英文CSV格式
-    自动去重，只导入新交易
+
+    - replace_mode=True (默认): 清除所有旧数据，只分析本次上传的数据
+    - replace_mode=False: 增量导入，与旧数据合并
     """
     start_time = datetime.now()
 
@@ -112,7 +139,17 @@ async def upload_trades(file: UploadFile = File(...)):
                 detail="Unsupported CSV format. Please use Futu Securities export."
             )
 
-        # 增量导入
+        # 替换模式：先清除所有旧数据
+        if replace_mode:
+            logger.info("Replace mode enabled - clearing all existing data")
+            engine = init_database(config.DATABASE_URL, echo=False)
+            session = get_session()
+            try:
+                clear_all_trading_data(session)
+            finally:
+                session.close()
+
+        # 导入（替换模式下相当于全新导入）
         importer = IncrementalImporter(tmp_path, dry_run=False)
         result = importer.run()
 
@@ -128,26 +165,15 @@ async def upload_trades(file: UploadFile = File(...)):
                 # FIFO配对
                 logger.info("Running FIFO matching...")
                 matcher = FIFOMatcher(session)
-                match_result = matcher.match_all()
+                match_result = matcher.match_all_trades()
                 positions_matched = match_result.get('positions_created', 0)
 
                 # 评分
                 logger.info("Running quality scoring...")
                 scorer = QualityScorer()
-
-                # 获取未评分的持仓
-                from sqlalchemy import text
-                unscored = session.execute(text("""
-                    SELECT id FROM positions
-                    WHERE overall_score IS NULL OR overall_score = 0
-                """)).fetchall()
-
-                for (pos_id,) in unscored:
-                    try:
-                        scorer.score_position(pos_id, session)
-                        positions_scored += 1
-                    except Exception as e:
-                        logger.warning(f"Failed to score position {pos_id}: {e}")
+                score_result = scorer.score_all_positions(session, update_db=True)
+                positions_scored = score_result.get('scored', 0)
+                logger.info(f"Scoring completed: {positions_scored} positions scored")
 
                 session.commit()
 

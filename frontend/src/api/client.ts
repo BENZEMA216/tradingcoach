@@ -336,4 +336,82 @@ export const aiCoachApi = {
   },
 };
 
+// Upload API
+export interface UploadResponse {
+  success: boolean;
+  message: string;
+  file_name: string;
+  file_hash: string;
+  language: string;
+  total_rows: number;
+  completed_trades: number;
+  new_trades: number;
+  duplicates_skipped: number;
+  positions_matched: number;
+  positions_scored: number;
+  processing_time_ms: number;
+  errors: number;
+  error_messages: string[];
+}
+
+export interface UploadHistoryItem {
+  id: number;
+  import_time: string;
+  file_name: string;
+  file_type: string;
+  total_rows: number;
+  new_trades: number;
+  duplicates_skipped: number;
+  status: string;
+}
+
+export const uploadApi = {
+  /**
+   * 上传交易记录CSV文件
+   * @param file CSV文件
+   * @param replaceMode 替换模式(默认true) - 清除旧数据，只分析本次上传
+   */
+  uploadTrades: async (file: File, replaceMode: boolean = true): Promise<UploadResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await api.post<UploadResponse>(
+      `/upload/trades?replace_mode=${replaceMode}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 60000, // 60 seconds for upload
+      }
+    );
+    return data;
+  },
+
+  /**
+   * 获取导入历史
+   */
+  getHistory: async (limit: number = 20): Promise<UploadHistoryItem[]> => {
+    const { data } = await api.get<UploadHistoryItem[]>('/upload/history', {
+      params: { limit },
+    });
+    return data;
+  },
+
+  /**
+   * 上传持仓快照进行对账
+   */
+  uploadSnapshot: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await api.post('/upload/snapshot', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data;
+  },
+};
+
 export default api;

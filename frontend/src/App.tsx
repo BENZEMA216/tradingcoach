@@ -6,6 +6,7 @@ import { PositionDetail } from '@/pages/PositionDetail';
 import { Statistics } from '@/pages/Statistics';
 import { System } from '@/pages/System';
 import { AICoach } from '@/pages/AICoach';
+import { Upload } from '@/pages/Upload';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="positions/:id" element={<PositionDetail />} />
           <Route path="statistics" element={<Statistics />} />
           <Route path="ai-coach" element={<AICoach />} />
+          <Route path="upload" element={<Upload />} />
           <Route path="system" element={<System />} />
         </Route>
       </Routes>

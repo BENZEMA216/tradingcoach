@@ -23,7 +23,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 import config
 from src.models.base import init_database, get_session, create_all_tables
-from src.models.trade import Trade
+from src.models.trade import Trade, TradeDirection, TradeStatus, MarketType
 from src.importers.csv_parser import CSVParser
 from src.importers.english_csv_parser import (
     EnglishCSVParser,
@@ -326,19 +326,46 @@ class IncrementalImporter:
 
         # 验证必填字段
         symbol = clean_value(row.get('symbol'))
-        direction = clean_value(row.get('direction'))
+        direction_str = clean_value(row.get('direction'))
         filled_qty = clean_value(row.get('filled_quantity'))
         filled_time = clean_value(row.get(time_col))
 
-        if not symbol or not direction or not filled_qty or not filled_time:
+        if not symbol or not direction_str or not filled_qty or not filled_time:
             return None
+
+        # 转换方向为枚举
+        direction_mapping = {
+            'buy': TradeDirection.BUY,
+            'sell': TradeDirection.SELL,
+            'sell_short': TradeDirection.SELL_SHORT,
+            'buy_to_cover': TradeDirection.BUY_TO_COVER,
+            # 中文格式
+            '买入': TradeDirection.BUY,
+            '卖出': TradeDirection.SELL,
+        }
+        direction_enum = direction_mapping.get(direction_str.lower() if direction_str else '')
+        if not direction_enum:
+            logger.warning(f"Unknown direction: {direction_str}")
+            return None
+
+        # 转换市场为枚举
+        market_str = clean_value(row.get('market')) or 'US'
+        market_mapping = {
+            'US': MarketType.US_STOCK,
+            '美股': MarketType.US_STOCK,
+            'HK': MarketType.HK_STOCK,
+            '港股': MarketType.HK_STOCK,
+            'CN': MarketType.CN_STOCK,
+            '沪深': MarketType.CN_STOCK,
+        }
+        market_enum = market_mapping.get(market_str, MarketType.US_STOCK)
 
         # 创建Trade对象
         trade = Trade(
             symbol=symbol,
             symbol_name=clean_value(row.get('symbol_name')),
-            direction=direction,
-            market=clean_value(row.get('market')) or 'US',
+            direction=direction_enum,
+            market=market_enum,
             currency=clean_value(row.get('currency')) or 'USD',
         )
 
@@ -402,7 +429,25 @@ class IncrementalImporter:
 
         # 其他
         trade.notes = clean_value(row.get('notes'))
-        trade.status = clean_value(row.get('status')) or '全部成交'
+
+        # 转换状态为枚举
+        raw_status = clean_value(row.get('status')) or 'filled'
+        status_mapping = {
+            # 中文格式
+            '全部成交': TradeStatus.FILLED,
+            '已撤单': TradeStatus.CANCELLED,
+            '部分成交': TradeStatus.PARTIALLY_FILLED,
+            '待成交': TradeStatus.PENDING,
+            # 英文格式（直接从CSV）
+            'Filled': TradeStatus.FILLED,
+            'Cancelled': TradeStatus.CANCELLED,
+            # 已转换的枚举值字符串
+            'filled': TradeStatus.FILLED,
+            'cancelled': TradeStatus.CANCELLED,
+            'partially_filled': TradeStatus.PARTIALLY_FILLED,
+            'pending': TradeStatus.PENDING,
+        }
+        trade.status = status_mapping.get(raw_status, TradeStatus.FILLED)
 
         return trade
 
