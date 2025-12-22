@@ -1,23 +1,29 @@
 """
-QualityScorer - 交易质量评分引擎
+QualityScorer - 交易质量评分引擎 (v2.0)
 
-实现四维度交易质量评分系统：
-1. 进场质量（30%）- 技术指标配合度、位置、成交量、市场环境
-2. 出场质量（25%）- 时机、目标达成、止损执行、持仓时间
-3. 趋势把握（25%）- 方向一致性、强度、持续性
-4. 风险管理（20%）- RR比、仓位管理
+input: Position持仓, MarketData市场数据, 技术指标
+output: 8维度评分(0-100), 综合评分, 等级(A-F)
+pos: 分析引擎层核心 - 量化评估交易质量，输出可比较的分数
+
+维度权重: 进场20% | 出场18% | 趋势15% | 风险13% | 市场环境12% | 行为12% | 执行5% | 期权5%
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
+import json
 import pandas as pd
 import numpy as np
 import logging
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Any
 from datetime import datetime
 from sqlalchemy.orm import Session
 
 from src.models.position import Position, PositionStatus
 from src.models.market_data import MarketData
 from src.utils.option_parser import OptionParser
+from src.analyzers.market_env_scorer import MarketEnvironmentScorer
+from src.analyzers.behavior_scorer import TradingBehaviorScorer
+from src.analyzers.execution_scorer import ExecutionQualityScorer
 from config import (
     SCORE_WEIGHT_ENTRY,
     SCORE_WEIGHT_EXIT,
@@ -46,15 +52,44 @@ class QualityScorer:
     4. 更新positions表的评分字段
     """
 
-    def __init__(self):
-        """初始化评分器"""
-        self.weights = {
-            'entry': SCORE_WEIGHT_ENTRY,
-            'exit': SCORE_WEIGHT_EXIT,
-            'trend': SCORE_WEIGHT_TREND,
-            'risk': SCORE_WEIGHT_RISK
-        }
-        logger.info("QualityScorer initialized")
+    # 新版8维度权重配置
+    WEIGHTS_V2 = {
+        'entry': 0.20,        # 入场质量
+        'exit': 0.18,         # 出场质量
+        'market_env': 0.12,   # 市场环境
+        'behavior': 0.12,     # 交易行为
+        'trend': 0.15,        # 趋势把握
+        'risk': 0.13,         # 风险管理
+        'execution': 0.05,    # 执行质量
+        'options': 0.05,      # 期权希腊字母 (条件应用)
+    }
+
+    def __init__(self, use_v2: bool = True):
+        """
+        初始化评分器
+
+        Args:
+            use_v2: 是否使用新版8维度评分系统
+        """
+        self.use_v2 = use_v2
+
+        if use_v2:
+            self.weights = self.WEIGHTS_V2.copy()
+        else:
+            # 兼容旧版4维度权重
+            self.weights = {
+                'entry': SCORE_WEIGHT_ENTRY,
+                'exit': SCORE_WEIGHT_EXIT,
+                'trend': SCORE_WEIGHT_TREND,
+                'risk': SCORE_WEIGHT_RISK
+            }
+
+        # 初始化子评分器
+        self.market_env_scorer = MarketEnvironmentScorer()
+        self.behavior_scorer = TradingBehaviorScorer()
+        self.execution_scorer = ExecutionQualityScorer()
+
+        logger.info(f"QualityScorer initialized (v2={use_v2})")
 
     # ==================== 进场质量评分（30%权重）====================
 
@@ -1321,7 +1356,7 @@ class QualityScorer:
         self,
         session: Session,
         position: Position
-    ) -> Dict[str, float]:
+    ) -> Dict[str, Any]:
         """
         计算交易的综合质量评分
 
@@ -1340,35 +1375,221 @@ class QualityScorer:
             session, position.symbol, position.close_time
         ) if position.close_time else None
 
-        # 计算四个维度的评分
+        # 计算基础四维度评分
         entry_result = self.score_entry_quality(position, entry_md)
         exit_result = self.score_exit_quality(position, exit_md)
         trend_result = self.score_trend_quality(position, entry_md, exit_md)
         risk_result = self.score_risk_management(position, entry_md)
 
+        # V2: 计算新增维度评分
+        if self.use_v2:
+            return self._calculate_v2_score(
+                session, position, entry_md, exit_md,
+                entry_result, exit_result, trend_result, risk_result
+            )
+        else:
+            # V1 兼容模式
+            overall_score = (
+                entry_result['entry_score'] * self.weights['entry'] +
+                exit_result['exit_score'] * self.weights['exit'] +
+                trend_result['trend_score'] * self.weights['trend'] +
+                risk_result['risk_score'] * self.weights['risk']
+            )
+
+            grade = self._assign_grade(overall_score)
+
+            return {
+                'overall_score': overall_score,
+                'grade': grade,
+                'entry_score': entry_result['entry_score'],
+                'exit_score': exit_result['exit_score'],
+                'trend_score': trend_result['trend_score'],
+                'risk_score': risk_result['risk_score'],
+                **entry_result,
+                **exit_result,
+                **trend_result,
+                **risk_result
+            }
+
+    def _calculate_v2_score(
+        self,
+        session: Session,
+        position: Position,
+        entry_md: Optional[MarketData],
+        exit_md: Optional[MarketData],
+        entry_result: Dict,
+        exit_result: Dict,
+        trend_result: Dict,
+        risk_result: Dict
+    ) -> Dict[str, Any]:
+        """
+        计算V2版本8维度评分
+
+        Args:
+            session: Database session
+            position: Position对象
+            entry_md: 入场市场数据
+            exit_md: 出场市场数据
+            entry_result: 入场评分结果
+            exit_result: 出场评分结果
+            trend_result: 趋势评分结果
+            risk_result: 风险评分结果
+
+        Returns:
+            完整的评分结果字典
+        """
+        score_details = {}
+
+        # 1. 市场环境评分
+        trade_date = position.open_date or (
+            position.open_time.date() if position.open_time else None
+        )
+        if trade_date:
+            market_snapshot = self.market_env_scorer.get_market_snapshot(
+                session, trade_date
+            )
+            market_env_result = self.market_env_scorer.score(
+                trade_date=trade_date,
+                direction=position.direction,
+                symbol=position.symbol,
+                market_snapshot=market_snapshot,
+                market_data=entry_md
+            )
+            market_env_score = market_env_result.total_score
+            score_details['market_env'] = market_env_result.details
+        else:
+            market_env_score = 70.0
+            score_details['market_env'] = {'status': 'no_date'}
+
+        # 2. 交易行为评分
+        recent_trades = self.behavior_scorer.get_recent_trades(
+            session,
+            symbol=position.underlying_symbol or position.symbol,
+            before_date=position.open_time,
+            days=7
+        ) if position.open_time else []
+
+        historical_prices = self._get_historical_prices(entry_md)
+
+        behavior_result = self.behavior_scorer.score(
+            position=position,
+            market_data=entry_md,
+            recent_trades=recent_trades,
+            historical_prices=historical_prices
+        )
+        behavior_score = behavior_result.total_score
+        score_details['behavior'] = behavior_result.details
+        behavior_warnings = behavior_result.warnings
+
+        # 3. 执行质量评分
+        trades = list(position.trades) if hasattr(position, 'trades') else None
+        execution_result = self.execution_scorer.score(
+            position=position,
+            trades=trades
+        )
+        execution_score = execution_result.total_score
+        score_details['execution'] = execution_result.details
+
+        # 4. 期权评分 (仅期权)
+        is_option = bool(position.is_option)
+        if is_option:
+            options_score = self._calculate_options_score(position, entry_md, exit_md)
+            score_details['options'] = {'score': options_score}
+        else:
+            options_score = None
+
         # 计算综合评分
+        weights = self.weights.copy()
+
+        # 非期权时重新分配期权权重
+        if not is_option:
+            options_weight = weights.pop('options', 0)
+            # 将期权权重分配给其他维度
+            for key in weights:
+                weights[key] += options_weight / len(weights)
+
         overall_score = (
-            entry_result['entry_score'] * self.weights['entry'] +
-            exit_result['exit_score'] * self.weights['exit'] +
-            trend_result['trend_score'] * self.weights['trend'] +
-            risk_result['risk_score'] * self.weights['risk']
+            entry_result['entry_score'] * weights['entry'] +
+            exit_result['exit_score'] * weights['exit'] +
+            market_env_score * weights['market_env'] +
+            behavior_score * weights['behavior'] +
+            trend_result['trend_score'] * weights['trend'] +
+            risk_result['risk_score'] * weights['risk'] +
+            execution_score * weights['execution']
         )
 
-        # 确定等级
+        if is_option and options_score is not None:
+            overall_score += options_score * weights.get('options', 0.05)
+
         grade = self._assign_grade(overall_score)
 
-        return {
-            'overall_score': overall_score,
+        # 构建完整结果
+        result = {
+            'overall_score': round(overall_score, 2),
             'grade': grade,
+            # 8维度评分
             'entry_score': entry_result['entry_score'],
             'exit_score': exit_result['exit_score'],
+            'market_env_score': market_env_score,
+            'behavior_score': behavior_score,
             'trend_score': trend_result['trend_score'],
             'risk_score': risk_result['risk_score'],
+            'execution_score': execution_score,
+            'options_greeks_score': options_score,
+            # 详细信息
+            'score_details': score_details,
+            'behavior_warnings': behavior_warnings,
+            # 兼容旧字段
             **entry_result,
             **exit_result,
             **trend_result,
             **risk_result
         }
+
+        return result
+
+    def _get_historical_prices(self, md: Optional[MarketData]) -> Optional[Dict]:
+        """从市场数据提取历史价格信息"""
+        if not md:
+            return None
+
+        result = {}
+
+        if hasattr(md, 'high') and md.high:
+            result['high_5d'] = float(md.high) * 1.02  # 估算
+        if hasattr(md, 'low') and md.low:
+            result['low_5d'] = float(md.low) * 0.98  # 估算
+        if hasattr(md, 'prev_close') and md.prev_close:
+            result['prev_close'] = float(md.prev_close)
+        if hasattr(md, 'change_pct') and md.change_pct:
+            result['prev_change_pct'] = float(md.change_pct)
+
+        return result if result else None
+
+    def _calculate_options_score(
+        self,
+        position: Position,
+        entry_md: Optional[MarketData],
+        exit_md: Optional[MarketData]
+    ) -> float:
+        """
+        计算期权希腊字母评分
+
+        简化版本: 基于现有期权评分
+        """
+        scores = []
+
+        if position.option_entry_score:
+            scores.append(float(position.option_entry_score))
+        if position.option_exit_score:
+            scores.append(float(position.option_exit_score))
+        if position.option_strategy_score:
+            scores.append(float(position.option_strategy_score))
+
+        if scores:
+            return sum(scores) / len(scores)
+        else:
+            return 70.0  # 默认分数
 
     def _get_market_data(
         self,
@@ -2271,7 +2492,8 @@ class QualityScorer:
     def score_all_positions(
         self,
         session: Session,
-        update_db: bool = True
+        update_db: bool = True,
+        limit: Optional[int] = None
     ) -> Dict[str, int]:
         """
         批量评分所有已平仓的交易
@@ -2279,20 +2501,27 @@ class QualityScorer:
         Args:
             session: Database session
             update_db: 是否更新数据库
+            limit: 限制评分数量 (用于测试)
 
         Returns:
             dict: 统计信息
         """
         # 查询所有已平仓的交易
-        positions = session.query(Position).filter(
+        query = session.query(Position).filter(
             Position.status == PositionStatus.CLOSED,
             Position.close_time.isnot(None)
-        ).all()
+        )
+
+        if limit:
+            query = query.limit(limit)
+
+        positions = query.all()
 
         stats = {
             'total': len(positions),
             'scored': 0,
-            'failed': 0
+            'failed': 0,
+            'v2_mode': self.use_v2
         }
 
         for position in positions:
@@ -2301,13 +2530,40 @@ class QualityScorer:
                 result = self.calculate_overall_score(session, position)
 
                 if update_db:
-                    # 更新数据库
+                    # 更新基础评分字段
                     position.entry_quality_score = result['entry_score']
                     position.exit_quality_score = result['exit_score']
                     position.trend_quality_score = result['trend_score']
                     position.risk_mgmt_score = result['risk_score']
                     position.overall_score = result['overall_score']
                     position.score_grade = result['grade']
+
+                    # V2: 更新新增评分字段
+                    if self.use_v2:
+                        position.market_env_score = result.get('market_env_score')
+                        position.behavior_score = result.get('behavior_score')
+                        position.execution_score = result.get('execution_score')
+                        position.options_greeks_score = result.get('options_greeks_score')
+
+                        # 保存详情为JSON
+                        if result.get('score_details'):
+                            position.score_details = json.dumps(
+                                result['score_details'],
+                                ensure_ascii=False,
+                                default=str
+                            )
+
+                        # 保存行为分析
+                        if result.get('behavior_warnings'):
+                            behavior_analysis = {
+                                'warnings': result['behavior_warnings'],
+                                'details': result.get('score_details', {}).get('behavior', {})
+                            }
+                            position.behavior_analysis = json.dumps(
+                                behavior_analysis,
+                                ensure_ascii=False,
+                                default=str
+                            )
 
                 stats['scored'] += 1
                 logger.info(
@@ -2316,6 +2572,8 @@ class QualityScorer:
 
             except Exception as e:
                 logger.error(f"Failed to score position {position.id}: {e}")
+                import traceback
+                logger.error(traceback.format_exc())
                 stats['failed'] += 1
 
         if update_db:

@@ -1,6 +1,25 @@
-# data_sources - 市场数据层
+# data_sources/
 
-负责获取、缓存和管理市场 OHLCV 数据。
+一旦我所属的文件夹有所变化，请更新我
+
+## 架构说明
+
+市场数据获取和缓存层。采用三级缓存架构（内存→数据库→文件）减少API调用，
+支持多数据源切换（YFinance/Polygon等），提供批量获取和限流控制。
+
+## 文件清单
+
+| 文件名 | 角色 | 功能 |
+|--------|------|------|
+| `__init__.py` | 模块入口 | 导出客户端类 |
+| `base_client.py` | 抽象基类 | 定义数据源接口标准 |
+| `yfinance_client.py` | YFinance客户端 | 免费数据源，支持美/港/A股 |
+| `options_client.py` | 期权数据客户端 | 获取期权链和Greeks数据 |
+| `cache_manager.py` | 缓存管理器 | 三级缓存：L1内存/L2数据库/L3文件 |
+| `batch_fetcher.py` | 批量获取器 | 并发控制、进度显示、断点续传 |
+| `market_env_fetcher.py` | 市场环境获取器 | 获取VIX、指数等市场环境数据 |
+
+---
 
 ## 设计思路
 

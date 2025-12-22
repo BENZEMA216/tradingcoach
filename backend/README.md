@@ -1,24 +1,57 @@
-# backend - FastAPI 后端服务
+# backend/
 
-基于 FastAPI 的 RESTful API 服务，为前端 React 应用提供数据接口。
+一旦我所属的文件夹有所变化，请更新我
+
+## 架构说明
+
+FastAPI RESTful API 服务，为前端 React 应用提供数据接口。
+采用分层架构：API 路由 → 业务服务 → 数据访问，复用 src/models。
+
+## 文件清单
+
+### app/ 核心目录
+
+| 文件名 | 角色 | 功能 |
+|--------|------|------|
+| `main.py` | 应用入口 | FastAPI 实例创建、中间件配置、路由挂载 |
+| `config.py` | 配置管理 | 数据库URL、CORS、环境变量 |
+| `database.py` | 数据库连接 | SQLAlchemy Session 管理 |
+
+### app/api/v1/endpoints/ API 端点
+
+| 文件名 | 角色 | 功能 |
+|--------|------|------|
+| `dashboard.py` | Dashboard API | 总览统计、KPI、权益曲线 |
+| `positions.py` | 持仓 API | 持仓列表、详情、过滤排序 |
+| `trades.py` | 交易 API | 交易记录查询 |
+| `statistics.py` | 统计 API | 多维度统计分析 |
+| `market_data.py` | 市场数据 API | OHLCV、技术指标 |
+| `upload.py` | 上传 API | CSV 文件上传、增量导入 |
+| `ai_coach.py` | AI 教练 API | LLM 交易分析和建议 |
+| `system.py` | 系统 API | 健康检查、数据库统计 |
+
+### app/schemas/ 数据模型
+
+| 文件名 | 角色 | 功能 |
+|--------|------|------|
+| `position.py` | 持仓模型 | PositionResponse/PositionDetail |
+| `trade.py` | 交易模型 | TradeResponse |
+| `dashboard.py` | Dashboard 模型 | OverviewStats/KPIData |
+| `statistics.py` | 统计模型 | StatsSummary/BySymbol 等 |
+| `common.py` | 通用模型 | 分页、过滤、排序 |
+
+### app/services/ 业务服务
+
+| 文件名 | 角色 | 功能 |
+|--------|------|------|
+| `ai_coach.py` | AI 教练服务 | 调用 LLM 生成交易建议 |
+| `insight_engine.py` | 洞察引擎 | 生成交易模式分析 |
+
+---
 
 ## 设计思路
 
-采用分层架构，将 API 路由、业务逻辑和数据访问分离：
-
-```
-backend/
-├── app/
-│   ├── main.py           # 应用入口
-│   ├── config.py         # 配置管理
-│   ├── database.py       # 数据库连接
-│   ├── api/v1/           # API 路由
-│   │   ├── router.py     # 路由聚合
-│   │   └── endpoints/    # 各端点实现
-│   ├── schemas/          # Pydantic 数据模型
-│   └── services/         # 业务逻辑层 (计划中)
-└── tests/                # API 测试
-```
+采用分层架构，将 API 路由、业务逻辑和数据访问分离。
 
 ## 技术栈
 

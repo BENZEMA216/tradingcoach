@@ -1,7 +1,11 @@
 """
 YFinanceClient - yfinance 数据源客户端
 
-使用 yfinance 库获取股票市场数据
+input: 股票代码, 日期范围
+output: OHLCV DataFrame, 股票信息
+pos: 数据源层主实现 - 免费市场数据获取，支持美/港/A股
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 import yfinance as yf

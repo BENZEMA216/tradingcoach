@@ -1,5 +1,11 @@
 """
 Trade model - 交易记录表
+
+input: base.py (Base类)
+output: Trade ORM模型, TradeDirection/TradeStatus/MarketType枚举
+pos: 数据模型层基础 - 原子交易记录，被Position引用
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 from sqlalchemy import (
@@ -126,6 +132,15 @@ class Trade(Base):
         Integer,
         ForeignKey('market_environment.id'),
         comment="关联的市场环境ID"
+    )
+
+    # ==================== 去重和导入 ====================
+    trade_fingerprint = Column(
+        String(64),
+        unique=True,
+        index=True,
+        nullable=True,
+        comment="交易唯一指纹（用于去重）"
     )
 
     # ==================== 元数据和备注 ====================

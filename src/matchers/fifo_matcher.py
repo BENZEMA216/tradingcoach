@@ -1,7 +1,11 @@
 """
 FIFO Matcher - 交易配对总协调器
 
-协调所有交易标的的FIFO配对，生成持仓记录
+input: Trade表(已成交交易), SymbolMatcher(单标的配对器)
+output: Position记录(已平仓/未平仓), 配对统计结果
+pos: 配对引擎层核心 - 按标的分组调度配对，汇总生成持仓
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 from collections import defaultdict

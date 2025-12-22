@@ -1,65 +1,53 @@
-# frontend - React 前端应用
+# frontend/
 
-现代化的 React SPA 应用，为 Trading Coach 提供交互式用户界面。
+一旦我所属的文件夹有所变化，请更新我
+
+## 架构说明
+
+React 19 SPA 应用，采用组件化架构和 TypeScript 强类型。
+使用 Vite 构建、TanStack Query 管理服务端状态、Tailwind CSS 样式。
+
+## 文件清单
+
+### src/pages/ 页面组件
+
+| 文件名 | 角色 | 功能 |
+|--------|------|------|
+| `Dashboard.tsx` | 仪表板页 | 总览KPI、权益曲线、最近交易 |
+| `Positions.tsx` | 持仓列表页 | 分页表格、过滤排序、批量操作 |
+| `PositionDetail.tsx` | 持仓详情页 | 单笔持仓详细分析、评分明细 |
+| `Statistics.tsx` | 统计报告页 | 报告式布局、多维度分析图表 |
+| `Upload.tsx` | 上传页 | 拖拽上传CSV、导入历史 |
+| `AICoach.tsx` | AI教练页 | LLM交易分析、智能建议 |
+| `System.tsx` | 系统页 | 健康检查、数据库统计、版本信息 |
+
+### src/components/ 组件库
+
+| 目录 | 角色 | 内容 |
+|------|------|------|
+| `layout/` | 布局组件 | Layout、Sidebar、Header |
+| `dashboard/` | 仪表板组件 | KPICard、RecentTradesTable |
+| `charts/` | 图表组件 | EquityCurve、Heatmap、Distribution等12+图表 |
+| `report/` | 报告组件 | ReportSection、ChartWithInsight、HeroSummary |
+| `common/` | 通用组件 | DrillDownModal、InfoTooltip、LanguageSwitcher |
+| `insights/` | 洞察组件 | AICoachPanel |
+
+### src/ 其他目录
+
+| 目录 | 角色 | 功能 |
+|------|------|------|
+| `api/` | API 客户端 | Axios 封装、类型定义、错误处理 |
+| `i18n/` | 国际化 | 中英文翻译、语言切换 |
+| `hooks/` | 自定义Hooks | 复用业务逻辑 |
+| `store/` | 状态管理 | Zustand 全局状态 |
+| `types/` | 类型定义 | TypeScript 接口 |
+| `utils/` | 工具函数 | 格式化、洞察文案生成 |
+
+---
 
 ## 设计思路
 
-采用组件化架构，将 UI 拆分为可复用的独立组件：
-
-```
-frontend/
-├── src/
-│   ├── main.tsx           # 应用入口
-│   ├── App.tsx            # 根组件 + 路由
-│   ├── pages/             # 页面组件
-│   │   ├── Dashboard.tsx  # 仪表板首页
-│   │   ├── Positions.tsx  # 持仓列表
-│   │   ├── PositionDetail.tsx # 持仓详情
-│   │   ├── Statistics.tsx # 统计报告 (报告式布局)
-│   │   ├── Reports.tsx    # 报告页面
-│   │   └── System.tsx     # 系统信息
-│   ├── components/        # 可复用组件
-│   │   ├── layout/        # 布局组件
-│   │   │   ├── Layout.tsx
-│   │   │   └── Sidebar.tsx
-│   │   ├── dashboard/     # 仪表板组件
-│   │   │   ├── KPICard.tsx
-│   │   │   └── RecentTradesTable.tsx
-│   │   ├── charts/        # 图表组件
-│   │   │   ├── EquityCurveChart.tsx
-│   │   │   ├── EquityDrawdownChart.tsx
-│   │   │   ├── MonthlyPerformanceChart.tsx
-│   │   │   ├── PnLDistributionChart.tsx
-│   │   │   ├── RollingWinRateChart.tsx
-│   │   │   ├── TradingHeatmap.tsx
-│   │   │   ├── HourlyPerformanceChart.tsx
-│   │   │   ├── DurationPnLChart.tsx
-│   │   │   ├── SymbolRiskQuadrant.tsx
-│   │   │   ├── AssetTypeChart.tsx
-│   │   │   ├── StrategyPerformanceChart.tsx
-│   │   │   ├── StrategyPieChart.tsx
-│   │   │   └── PriceChart.tsx
-│   │   ├── report/        # 报告专用组件
-│   │   │   ├── ReportSection.tsx    # 带编号的章节
-│   │   │   ├── ChartWithInsight.tsx # 图表+洞察
-│   │   │   ├── HeroSummary.tsx      # 顶部摘要
-│   │   │   └── CollapsibleTable.tsx # 可折叠表格
-│   │   ├── common/        # 通用组件
-│   │   │   ├── DrillDownModal.tsx
-│   │   │   └── InfoTooltip.tsx
-│   │   └── insights/      # AI 洞察组件
-│   │       └── AICoachPanel.tsx
-│   ├── api/               # API 客户端
-│   │   └── client.ts
-│   ├── stores/            # 状态管理 (Zustand)
-│   ├── types/             # TypeScript 类型定义
-│   ├── i18n/              # 国际化配置
-│   └── utils/             # 工具函数
-│       ├── format.ts      # 格式化工具
-│       └── insights.ts    # 洞察文案生成
-├── public/                # 静态资源
-└── package.json           # 依赖配置
-```
+采用组件化架构，将 UI 拆分为可复用的独立组件。
 
 ## 技术栈
 

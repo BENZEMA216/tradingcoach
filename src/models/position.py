@@ -1,5 +1,11 @@
 """
 Position model - 持仓记录表
+
+input: base.py (Base类), trade.py (Trade关联)
+output: Position ORM模型, PositionStatus枚举
+pos: 数据模型层核心 - 持仓周期记录，包含盈亏计算和评分字段
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 from sqlalchemy import (
@@ -143,6 +149,32 @@ class Position(Base):
 
     # 评分等级（A/B/C/D/F）
     score_grade = Column(String(2), comment="评分等级")
+
+    # ==================== V2 新增评分字段 ====================
+    # 市场环境评分
+    market_env_score = Column(
+        Numeric(5, 2),
+        comment="市场环境评分（0-100）"
+    )
+    # 交易行为评分
+    behavior_score = Column(
+        Numeric(5, 2),
+        comment="交易行为评分（0-100）"
+    )
+    # 执行质量评分
+    execution_score = Column(
+        Numeric(5, 2),
+        comment="执行质量评分（0-100）"
+    )
+    # 期权希腊字母评分
+    options_greeks_score = Column(
+        Numeric(5, 2),
+        comment="期权希腊字母评分（0-100）"
+    )
+    # 评分详情 (JSON)
+    score_details = Column(JSON, comment="评分详情（JSON格式）")
+    # 行为分析 (JSON)
+    behavior_analysis = Column(JSON, comment="行为分析结果（JSON格式）")
 
     # ==================== 市场环境关联 ====================
     entry_market_env_id = Column(
@@ -349,8 +381,20 @@ class Position(Base):
             'quantity': self.quantity,
             'net_pnl': float(self.net_pnl) if self.net_pnl else None,
             'net_pnl_pct': float(self.net_pnl_pct) if self.net_pnl_pct else None,
+            # 基础评分
             'overall_score': float(self.overall_score) if self.overall_score else None,
             'score_grade': self.score_grade,
+            'entry_quality_score': float(self.entry_quality_score) if self.entry_quality_score else None,
+            'exit_quality_score': float(self.exit_quality_score) if self.exit_quality_score else None,
+            'trend_quality_score': float(self.trend_quality_score) if self.trend_quality_score else None,
+            'risk_mgmt_score': float(self.risk_mgmt_score) if self.risk_mgmt_score else None,
+            # V2 新增评分
+            'market_env_score': float(self.market_env_score) if self.market_env_score else None,
+            'behavior_score': float(self.behavior_score) if self.behavior_score else None,
+            'execution_score': float(self.execution_score) if self.execution_score else None,
+            'options_greeks_score': float(self.options_greeks_score) if self.options_greeks_score else None,
+            'score_details': self.score_details,
+            'behavior_analysis': self.behavior_analysis,
             'holding_period_days': self.holding_period_days,
             # 策略分类
             'strategy_type': self.strategy_type,

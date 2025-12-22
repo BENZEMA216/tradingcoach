@@ -1,7 +1,11 @@
 """
-CSV解析器
+CSV解析器 - 中文富途格式
 
-解析券商导出的交易记录CSV文件
+input: 原始CSV文件 (UTF-8 BOM编码，中文字段名)
+output: 标准化DataFrame (英文字段名，统一格式)
+pos: 数据导入层入口 - 将券商原始数据转换为系统可处理格式
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 import pandas as pd

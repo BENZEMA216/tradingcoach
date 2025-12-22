@@ -1,7 +1,11 @@
 """
 IndicatorCalculator - 技术指标计算器
 
-使用纯 pandas 实现常用技术指标计算
+input: OHLCV DataFrame
+output: DataFrame含25+技术指标 (RSI/MACD/BB/ATR/ADX/MA等)
+pos: 指标计算层核心 - 纯pandas实现，供评分系统使用
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 import pandas as pd

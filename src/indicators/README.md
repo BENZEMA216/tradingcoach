@@ -1,6 +1,21 @@
-# indicators - 技术指标计算层
+# indicators/
 
-使用纯 pandas 实现常用技术指标计算。
+一旦我所属的文件夹有所变化，请更新我
+
+## 架构说明
+
+技术指标计算层，使用纯 pandas 实现常用技术指标。支持趋势指标（MA/EMA/ADX）、
+动量指标（RSI/MACD/Stochastic）、波动指标（ATR/Bollinger）等多种类型。
+
+## 文件清单
+
+| 文件名 | 角色 | 功能 |
+|--------|------|------|
+| `__init__.py` | 模块入口 | 导出计算器类 |
+| `calculator.py` | 指标计算器 | 计算RSI/MACD/BB/ATR/ADX等25+指标 |
+| `timeframe_converter.py` | 时间周期转换器 | 1分钟→5分钟→日线等周期转换 |
+
+---
 
 ## 设计思路
 

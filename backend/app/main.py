@@ -1,5 +1,11 @@
 """
 FastAPI Application Entry Point
+
+input: config.py配置, api/v1/router路由
+output: FastAPI实例, CORS中间件, API文档
+pos: 后端服务入口 - 创建应用实例，挂载路由和中间件
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 from fastapi import FastAPI
