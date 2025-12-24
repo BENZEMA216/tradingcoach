@@ -22,6 +22,12 @@ tests/
 │   ├── test_quality_scorer.py
 │   ├── test_option_analyzer.py   # 期权分析测试 (24个用例)
 │   └── ...
+├── data_integrity/          # 数据完整性测试 (33个检查项)
+│   ├── conftest.py              # 数据库 fixtures
+│   ├── test_trade_integrity.py  # Trade 表检查 (7项)
+│   ├── test_position_integrity.py # Position 表检查 (12项)
+│   ├── test_matching_integrity.py # FIFO 配对检查 (7项)
+│   └── test_business_rules.py   # 业务规则检查 (7项)
 ├── fixtures/                # 测试数据
 │   ├── sample_trades.csv
 │   └── sample_positions.json
@@ -117,6 +123,22 @@ python -m pytest tests/ -v -m "not slow"
 | TestScoresCalculation | 评分计算 |
 | TestFullPositionAnalysis | 完整持仓分析 |
 | TestEdgeCases | 边界情况处理 |
+
+### data_integrity/ (33 个数据完整性检查)
+
+基于 `project_docs/DATA_INTEGRITY_CHECKLIST.md` 定义的检查项自动化测试。
+
+| 测试文件 | 检查内容 |
+|----------|---------|
+| test_trade_integrity.py | 交易指纹唯一、必填字段、方向枚举、费用计算 |
+| test_position_integrity.py | 持仓字段、盈亏计算、评分范围、评分等级匹配 |
+| test_matching_integrity.py | FIFO 配对关联、外键有效性、方向一致性 |
+| test_business_rules.py | 时序一致、数量价格匹配、市场数据完整 |
+
+运行数据完整性测试：
+```bash
+python -m pytest tests/data_integrity/ -v
+```
 
 ## Fixture 示例
 
