@@ -185,7 +185,7 @@ SCORE_WEIGHT_TREND = 0.25  # 趋势质量权重
 SCORE_WEIGHT_RISK = 0.20   # 风险管理权重
 
 # 新闻契合度评分配置
-NEWS_SEARCH_ENABLED = True               # 是否启用新闻搜索
+NEWS_SEARCH_ENABLED = False              # 是否启用新闻搜索（默认关闭，避免API限流延迟）
 NEWS_SEARCH_RANGE_DAYS = 3               # 搜索交易日前后天数
 NEWS_SEARCH_CACHE_TTL_DAYS = 7           # 新闻缓存有效期
 SCORE_WEIGHT_NEWS_ALIGNMENT = 0.07       # 新闻契合度权重 (7%)

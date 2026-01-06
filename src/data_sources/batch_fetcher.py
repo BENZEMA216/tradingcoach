@@ -2,6 +2,8 @@
 BatchFetcher - 批量数据获取器
 
 分析数据库中的交易记录，批量获取所需的市场数据
+
+性能优化：支持并发获取（可配置 max_workers）
 """
 
 import time
@@ -12,6 +14,8 @@ from typing import List, Dict, Set, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 
 from src.models.trade import Trade
 from src.data_sources.base_client import BaseDataClient, DataNotFoundError, InvalidSymbolError
@@ -43,9 +47,10 @@ class BatchFetcher:
         client: Optional[BaseDataClient] = None,
         cache_manager: Optional[CacheManager] = None,
         batch_size: int = 50,
-        request_delay: float = 0.2,
+        request_delay: float = 0.1,  # 降低延迟（配合并发使用）
         extra_days: int = 200,  # 为技术指标计算额外获取的天数
-        use_router: bool = True  # 使用智能路由器（自动选择 AKShare/YFinance）
+        use_router: bool = True,  # 使用智能路由器（自动选择 AKShare/YFinance）
+        max_workers: int = 4  # 并发线程数（增加可提升速度但可能触发 API 限流）
     ):
         """
         初始化批量获取器
@@ -54,9 +59,10 @@ class BatchFetcher:
             client: 数据源客户端（如果 use_router=True 则忽略）
             cache_manager: 缓存管理器
             batch_size: 批次大小
-            request_delay: 请求间隔（秒）
+            request_delay: 请求间隔（秒），并发时每个线程的延迟
             extra_days: 额外获取天数（用于技术指标计算）
             use_router: 是否使用智能路由器（自动为A股使用AKShare）
+            max_workers: 并发线程数（1=串行，>1=并发；建议 4-8）
         """
         self.use_router = use_router
         self._router = None
@@ -73,10 +79,15 @@ class BatchFetcher:
         self.batch_size = batch_size
         self.request_delay = request_delay
         self.extra_days = extra_days
+        self.max_workers = max_workers
+
+        # 线程安全的计数器
+        self._lock = threading.Lock()
 
         logger.info(
             f"BatchFetcher initialized: "
-            f"source={source_name}, batch_size={batch_size}, use_router={use_router}"
+            f"source={source_name}, batch_size={batch_size}, use_router={use_router}, "
+            f"max_workers={max_workers}"
         )
 
     def fetch_required_data(self, session: Session) -> Dict[str, any]:
@@ -231,9 +242,56 @@ class BatchFetcher:
 
         return missing
 
+    def _fetch_single(self, req: Dict) -> Dict:
+        """
+        获取单个 symbol 的数据（线程安全）
+
+        Args:
+            req: 需求字典
+
+        Returns:
+            dict with result: {success, records, symbol, error}
+        """
+        symbol = req['symbol']
+        start_date = req['start_date']
+        end_date = req['end_date']
+
+        try:
+            # 使用路由器或单个客户端
+            if self.use_router and self._router:
+                df = self._router.get_ohlcv(symbol, start_date, end_date)
+                source_name = self._router.detect_market(symbol)
+            else:
+                if hasattr(self.client, 'convert_symbol_for_yfinance'):
+                    symbol_converted = self.client.convert_symbol_for_yfinance(symbol)
+                else:
+                    symbol_converted = symbol
+                df = self.client.get_ohlcv(symbol_converted, start_date, end_date)
+                source_name = self.client.get_source_name()
+
+            if df is not None and not df.empty:
+                # 缓存数据（线程安全）
+                if self.cache:
+                    self.cache.set(symbol, df, data_source=source_name)
+                return {'success': True, 'records': len(df), 'symbol': symbol}
+
+            return {'success': False, 'records': 0, 'symbol': symbol, 'error': 'Empty data'}
+
+        except (DataNotFoundError, InvalidSymbolError) as e:
+            logger.warning(f"Skipped {symbol}: {e}")
+            return {'success': False, 'records': 0, 'symbol': symbol, 'error': str(e)}
+
+        except Exception as e:
+            logger.error(f"Failed to fetch {symbol}: {e}")
+            return {'success': False, 'records': 0, 'symbol': symbol, 'error': str(e)}
+
+        finally:
+            # 限流延迟
+            time.sleep(self.request_delay)
+
     def _batch_fetch(self, requirements: List[Dict]) -> Dict:
         """
-        批量获取数据
+        批量获取数据（支持并发）
 
         Args:
             requirements: 需求列表
@@ -247,66 +305,38 @@ class BatchFetcher:
         failed = []
         total_records = 0
 
-        # 使用 tqdm 显示进度
-        pbar = tqdm(requirements, desc="Fetching market data", unit="symbol")
-
-        for req in pbar:
-            symbol = req['symbol']
-            start_date = req['start_date']
-            end_date = req['end_date']
-
-            try:
-                # 使用路由器或单个客户端
-                if self.use_router and self._router:
-                    # 使用智能路由器（自动选择 AKShare 或 YFinance）
-                    df = self._router.get_ohlcv(symbol, start_date, end_date)
-                    source_name = self._router.detect_market(symbol)
-                else:
-                    # 使用传统单客户端
-                    # 转换为 yfinance 格式（如需要）
-                    if hasattr(self.client, 'convert_symbol_for_yfinance'):
-                        symbol_converted = self.client.convert_symbol_for_yfinance(symbol)
-                    else:
-                        symbol_converted = symbol
-
-                    df = self.client.get_ohlcv(symbol_converted, start_date, end_date)
-                    source_name = self.client.get_source_name()
-
-                if df is not None and not df.empty:
-                    # 缓存数据
-                    if self.cache:
-                        self.cache.set(
-                            symbol,  # 使用原始 symbol 缓存
-                            df,
-                            data_source=source_name
-                        )
-
+        if self.max_workers <= 1:
+            # 串行模式（兼容旧行为）
+            pbar = tqdm(requirements, desc="Fetching market data", unit="symbol")
+            for req in pbar:
+                result = self._fetch_single(req)
+                if result['success']:
                     success_count += 1
-                    total_records += len(df)
+                    total_records += result['records']
+                else:
+                    failed.append({'symbol': result['symbol'], 'reason': result.get('error', 'Unknown')})
+                pbar.set_postfix({'success': success_count, 'records': total_records})
+            pbar.close()
+        else:
+            # 并发模式
+            logger.info(f"Using {self.max_workers} concurrent workers")
+            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+                futures = {executor.submit(self._fetch_single, req): req for req in requirements}
+                pbar = tqdm(as_completed(futures), total=len(requirements),
+                           desc="Fetching market data", unit="symbol")
 
-                    pbar.set_postfix({
-                        'success': success_count,
-                        'records': total_records
-                    })
+                for future in pbar:
+                    result = future.result()
+                    if result['success']:
+                        with self._lock:
+                            success_count += 1
+                            total_records += result['records']
+                    else:
+                        with self._lock:
+                            failed.append({'symbol': result['symbol'], 'reason': result.get('error', 'Unknown')})
 
-                # 限流：等待
-                time.sleep(self.request_delay)
-
-            except (DataNotFoundError, InvalidSymbolError) as e:
-                logger.warning(f"Skipped {symbol}: {e}")
-                failed.append({
-                    'symbol': symbol,
-                    'reason': str(e)
-                })
-
-            except Exception as e:
-                logger.error(f"Failed to fetch {symbol}: {e}")
-                failed.append({
-                    'symbol': symbol,
-                    'reason': str(e)
-                })
-
-        pbar.close()
+                    pbar.set_postfix({'success': success_count, 'records': total_records})
+                pbar.close()
 
         duration = time.time() - start_time
 

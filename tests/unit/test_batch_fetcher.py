@@ -30,8 +30,9 @@ class TestBatchFetcherInit:
         assert fetcher.client == mock_client
         assert fetcher.cache == mock_cache
         assert fetcher.batch_size == 50
-        assert fetcher.request_delay == 0.2
+        assert fetcher.request_delay == 0.1  # 优化后默认 0.1（配合并发）
         assert fetcher.extra_days == 200
+        assert fetcher.max_workers == 4  # 新增：默认并发数
 
     def test_init_with_router(self):
         """Test initialization with router (default behavior)"""
@@ -343,7 +344,8 @@ class TestBatchFetcherBatchFetch:
         mock_client = Mock(spec=BaseDataClient)
         mock_client.get_source_name.return_value = 'yfinance'
         mock_cache = Mock(spec=CacheManager)
-        return BatchFetcher(mock_client, mock_cache, request_delay=0.01, use_router=False)  # Fast delay for tests
+        # 使用 max_workers=1 串行模式以便测试（避免并发模式的 mock 复杂性）
+        return BatchFetcher(mock_client, mock_cache, request_delay=0.01, use_router=False, max_workers=1)
 
     @pytest.fixture
     def sample_df(self):

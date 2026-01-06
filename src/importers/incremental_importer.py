@@ -386,21 +386,29 @@ class IncrementalImporter:
             return set()
 
     def _save_trades(self, df: pd.DataFrame):
-        """保存交易到数据库"""
+        """保存交易到数据库（优化版：使用to_dict替代iterrows，批量提交）"""
         saved = 0
         errors = 0
+        batch_size = 500  # 增加批处理大小提升性能
+        pending_trades = []
 
-        for idx, row in df.iterrows():
+        # 使用 to_dict('records') 比 iterrows() 快 2-3 倍
+        records = df.to_dict('records')
+        total = len(records)
+
+        for idx, row in enumerate(records):
             try:
                 trade = self._row_to_trade(row)
                 if trade is not None:
-                    self.session.add(trade)
+                    pending_trades.append(trade)
                     saved += 1
 
-                    # 每100条提交一次
-                    if saved % 100 == 0:
+                    # 批量提交
+                    if len(pending_trades) >= batch_size:
+                        self.session.add_all(pending_trades)
                         self.session.commit()
-                        logger.info(f"  Saved {saved}/{len(df)} trades...")
+                        logger.info(f"  Saved {saved}/{total} trades...")
+                        pending_trades = []
 
             except Exception as e:
                 logger.error(f"Error importing row {idx}: {e}")
@@ -408,7 +416,9 @@ class IncrementalImporter:
                 self.result.error_messages.append(f"Row {idx}: {e}")
 
         # 提交剩余
-        self.session.commit()
+        if pending_trades:
+            self.session.add_all(pending_trades)
+            self.session.commit()
 
         self.result.new_trades = saved
         self.result.errors = errors

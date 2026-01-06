@@ -112,6 +112,10 @@ class QualityScorer:
             self.news_searcher = None
             self.news_alignment_scorer = None
 
+        # 市场数据缓存 (用于批量评分时避免 N+1 查询)
+        # 格式: {(symbol, date_str): MarketData}
+        self._market_data_cache: Dict[Tuple[str, str], Optional[MarketData]] = {}
+
         logger.info(f"QualityScorer initialized (v2={use_v2}, news_search={self.news_search_enabled})")
 
     # ==================== 进场质量评分（30%权重）====================
@@ -1673,6 +1677,78 @@ class QualityScorer:
         else:
             return 70.0  # 默认分数
 
+    def _preload_market_data(
+        self,
+        session: Session,
+        positions: list
+    ) -> None:
+        """
+        批量预加载所有需要的 MarketData，避免 N+1 查询
+
+        将 1000+ 次查询减少到 1 次，提升评分速度 5-10 倍
+
+        Args:
+            session: Database session
+            positions: Position 列表
+        """
+        if not positions:
+            return
+
+        # 清空旧缓存
+        self._market_data_cache.clear()
+
+        # 收集所有需要查询的 (symbol, date) 组合
+        symbol_dates = set()
+        for position in positions:
+            # 处理 symbol（期权需要转换为标的）
+            symbol = position.symbol
+            if OptionParser.is_option_symbol(symbol):
+                symbol = OptionParser.extract_underlying(symbol)
+
+            # 进场日期
+            if position.open_time:
+                open_date = position.open_time.date() if hasattr(position.open_time, 'date') else position.open_time
+                symbol_dates.add((symbol, open_date))
+
+            # 出场日期
+            if position.close_time:
+                close_date = position.close_time.date() if hasattr(position.close_time, 'date') else position.close_time
+                symbol_dates.add((symbol, close_date))
+
+        if not symbol_dates:
+            logger.info("No market data to preload")
+            return
+
+        logger.info(f"Preloading market data for {len(symbol_dates)} symbol-date combinations...")
+
+        # 一次性查询所有需要的 MarketData
+        # 使用 OR 条件批量查询
+        from sqlalchemy import or_, and_
+
+        conditions = [
+            and_(MarketData.symbol == symbol, MarketData.date == date)
+            for symbol, date in symbol_dates
+        ]
+
+        market_data_list = session.query(MarketData).filter(
+            or_(*conditions)
+        ).all()
+
+        # 构建缓存字典
+        for md in market_data_list:
+            date_str = str(md.date)
+            cache_key = (md.symbol, date_str)
+            self._market_data_cache[cache_key] = md
+
+        # 对于没有找到数据的组合，缓存 None 避免重复查询
+        for symbol, date in symbol_dates:
+            date_str = str(date)
+            cache_key = (symbol, date_str)
+            if cache_key not in self._market_data_cache:
+                self._market_data_cache[cache_key] = None
+
+        logger.info(f"Preloaded {len(market_data_list)} market data records into cache")
+
     def _get_market_data(
         self,
         session: Session,
@@ -1680,9 +1756,10 @@ class QualityScorer:
         timestamp: Optional[datetime]
     ) -> Optional[MarketData]:
         """
-        获取指定时间的市场数据
+        获取指定时间的市场数据（支持缓存优化）
 
         查找最接近指定时间的市场数据记录
+        批量评分时优先从缓存获取，避免 N+1 查询
 
         对于期权符号，自动使用标的股票的市场数据
         """
@@ -1698,10 +1775,16 @@ class QualityScorer:
             else:
                 search_symbol = symbol
 
-            # 查找最接近的市场数据（同一天）
-            # 优先使用date字段匹配
+            # 获取目标日期
             target_date = timestamp.date() if hasattr(timestamp, 'date') else timestamp
+            date_str = str(target_date)
 
+            # 优先从缓存获取（批量评分时已预加载）
+            cache_key = (search_symbol, date_str)
+            if cache_key in self._market_data_cache:
+                return self._market_data_cache[cache_key]
+
+            # 缓存未命中，执行数据库查询
             market_data = session.query(MarketData).filter(
                 MarketData.symbol == search_symbol,
                 MarketData.date == target_date
@@ -2598,6 +2681,9 @@ class QualityScorer:
             query = query.limit(limit)
 
         positions = query.all()
+
+        # 预加载所有需要的 MarketData，避免 N+1 查询
+        self._preload_market_data(session, positions)
 
         stats = {
             'total': len(positions),

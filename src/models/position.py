@@ -297,6 +297,10 @@ class Position(Base):
         # 按状态查询
         Index('idx_pos_status', 'status'),
 
+        # 统计查询优化：状态+日期复合索引（高频查询）
+        Index('idx_pos_status_close_date', 'status', 'close_date'),
+        Index('idx_pos_status_open_date', 'status', 'open_date'),
+
         # 按评分查询
         Index('idx_pos_overall_score', 'overall_score'),
         Index('idx_pos_score_grade', 'score_grade'),
