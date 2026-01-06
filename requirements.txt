@@ -3,6 +3,12 @@ pandas>=2.0.0
 numpy>=1.24.0
 sqlalchemy>=2.0.0
 
+# Web 框架 (后端 API)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
 # 数据获取
 yfinance>=0.2.30
 alpha-vantage>=2.3.1  # 备用数据源
