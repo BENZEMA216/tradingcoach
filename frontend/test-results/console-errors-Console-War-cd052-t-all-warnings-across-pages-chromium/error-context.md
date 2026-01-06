@@ -1,0 +1,296 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - img [ref=e6]
+      - generic [ref=e9]: TradingCoach
+    - button "Home" [ref=e11]:
+      - img [ref=e12]
+      - text: Home
+    - navigation [ref=e15]:
+      - paragraph [ref=e16]: Analysis
+      - list [ref=e17]:
+        - listitem [ref=e18]:
+          - link "Statistics" [ref=e19] [cursor=pointer]:
+            - /url: /statistics
+            - img [ref=e20]
+            - text: Statistics
+        - listitem [ref=e22]:
+          - link "Positions" [ref=e23] [cursor=pointer]:
+            - /url: /positions
+            - img [ref=e24]
+            - text: Positions
+        - listitem [ref=e25]:
+          - link "Events" [ref=e26] [cursor=pointer]:
+            - /url: /events
+            - img [ref=e27]
+            - text: Events
+      - button "Upload New Data" [ref=e30]:
+        - img [ref=e31]
+        - text: Upload New Data
+    - generic [ref=e34]:
+      - button "Select language" [ref=e37]:
+        - img [ref=e38]
+        - generic [ref=e41]: 🇺🇸
+        - generic [ref=e42]: English
+      - paragraph [ref=e43]: TradingCoach v1.0
+  - main [ref=e44]:
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - heading "AI Trading Coach" [level=1] [ref=e48]:
+            - img [ref=e49]
+            - text: AI Trading Coach
+          - paragraph [ref=e51]: Smart analysis of your trading performance with personalized suggestions
+        - generic [ref=e53]: anthropic - claude-3-haiku-20240307
+      - navigation [ref=e56]:
+        - button "Insights 20" [ref=e57]:
+          - img [ref=e58]
+          - text: Insights
+          - generic [ref=e60]: "20"
+        - button "Chat" [ref=e61]:
+          - img [ref=e62]
+          - text: Chat
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - img [ref=e69]
+              - generic [ref=e71]:
+                - heading "AI Summary" [level=3] [ref=e72]
+                - paragraph [ref=e73]: 2024-10-15 至 2025-11-03
+              - button "Refresh" [ref=e74]:
+                - img [ref=e75]
+            - paragraph [ref=e78]: 尊敬的交易者, 整体来看,你在2024年10月至2025年11月期间的交易表现还算不错。总体盈利超过7.6万美元,胜率达到47.1%,平均盈利也有不错的表现。但同时也发现了一些值得关注的问题,希望以下建议对你未来的交易能有所帮助。 首先,我们发现你存在一些可能的报复性交易行为。亏损后下一笔交易的盈利率明显低于平均水平,这可能是由于情绪化操作导致的。建议你在亏损后暂停交易,冷静下来再做决策,避免情绪化的决策。 其次,我们发现你在一些标的上出现了连续亏损的情况,如YINN、TSLA、AAPL等。建议在出现3次以上连续亏损时,你应该暂停交易,仔细分析原因,找出问题所在,再重新制定交易计划。这样可以有效避免亏损扩大。 另一方面,我们也发现了你的一些优势标的,如CONL、NVDL、01810等。这些标的的胜率和总盈利都表现出色,建议你继续关注这些标的,挖掘更多的交易机会。 总的来说,你的整体交易表现还算不错,但仍有进步的空间。希望上述建议对你未来的交易能有所帮助。如有任何疑问,欢迎随时与我沟通。祝你交易顺利!
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: "Type:"
+              - generic [ref=e82]:
+                - button "All" [ref=e83]
+                - button "Problems (12)" [ref=e84]:
+                  - img [ref=e85]
+                  - text: Problems
+                  - generic [ref=e87]: (12)
+                - button "Strengths (7)" [ref=e88]:
+                  - img [ref=e89]
+                  - text: Strengths
+                  - generic [ref=e91]: (7)
+                - button "Reminders (1)" [ref=e92]:
+                  - img [ref=e93]
+                  - text: Reminders
+                  - generic [ref=e95]: (1)
+            - generic [ref=e96]:
+              - generic [ref=e97]: "Category:"
+              - combobox [ref=e98]:
+                - option "All" [selected]
+                - option "Symbol"
+                - option "Risk"
+                - option "Holding"
+                - option "Behavior"
+                - option "Time"
+                - option "Fees"
+                - option "Options"
+          - generic [ref=e99]:
+            - generic [ref=e101] [cursor=pointer]:
+              - generic [ref=e104]:
+                - generic [ref=e105]:
+                  - generic [ref=e106]: Issue
+                  - generic [ref=e107]: 可能存在报复性交易
+                  - generic [ref=e108]: $213 · 26.8%
+                - paragraph [ref=e109]: 亏损后的下一笔交易仅27%盈利，低于平均水平
+              - img [ref=e110]
+            - generic [ref=e113] [cursor=pointer]:
+              - generic [ref=e116]:
+                - generic [ref=e117]:
+                  - generic [ref=e118]: Issue
+                  - generic [ref=e119]: YINN连续亏损
+                  - generic [ref=e120]: YINN · $6
+                - paragraph [ref=e121]: YINN曾出现连续6笔亏损
+              - img [ref=e122]
+            - generic [ref=e125] [cursor=pointer]:
+              - generic [ref=e128]:
+                - generic [ref=e129]:
+                  - generic [ref=e130]: Issue
+                  - generic [ref=e131]: TSLA连续亏损
+                  - generic [ref=e132]: TSLA · $3
+                - paragraph [ref=e133]: TSLA曾出现连续3笔亏损
+              - img [ref=e134]
+            - generic [ref=e137] [cursor=pointer]:
+              - generic [ref=e140]:
+                - generic [ref=e141]:
+                  - generic [ref=e142]: Issue
+                  - generic [ref=e143]: AAPL连续亏损
+                  - generic [ref=e144]: AAPL · $3
+                - paragraph [ref=e145]: AAPL曾出现连续3笔亏损
+              - img [ref=e146]
+            - generic [ref=e149] [cursor=pointer]:
+              - generic [ref=e152]:
+                - generic [ref=e153]:
+                  - generic [ref=e154]: Issue
+                  - generic [ref=e155]: TSLL连续亏损
+                  - generic [ref=e156]: TSLL · $7
+                - paragraph [ref=e157]: TSLL曾出现连续7笔亏损
+              - img [ref=e158]
+            - generic [ref=e161] [cursor=pointer]:
+              - generic [ref=e164]:
+                - generic [ref=e165]:
+                  - generic [ref=e166]: Issue
+                  - generic [ref=e167]: 01810连续亏损
+                  - generic [ref=e168]: 01810 · $3
+                - paragraph [ref=e169]: 01810曾出现连续3笔亏损
+              - img [ref=e170]
+            - generic [ref=e173] [cursor=pointer]:
+              - generic [ref=e176]:
+                - generic [ref=e177]:
+                  - generic [ref=e178]: Issue
+                  - generic [ref=e179]: MSTU连续亏损
+                  - generic [ref=e180]: MSTU · $3
+                - paragraph [ref=e181]: MSTU曾出现连续3笔亏损
+              - img [ref=e182]
+            - generic [ref=e185] [cursor=pointer]:
+              - generic [ref=e188]:
+                - generic [ref=e189]:
+                  - generic [ref=e190]: Issue
+                  - generic [ref=e191]: TQQQ连续亏损
+                  - generic [ref=e192]: TQQQ · $5
+                - paragraph [ref=e193]: TQQQ曾出现连续5笔亏损
+              - img [ref=e194]
+            - generic [ref=e197] [cursor=pointer]:
+              - generic [ref=e200]:
+                - generic [ref=e201]:
+                  - generic [ref=e202]: Issue
+                  - generic [ref=e203]: 09988连续亏损
+                  - generic [ref=e204]: 09988 · $4
+                - paragraph [ref=e205]: 09988曾出现连续4笔亏损
+              - img [ref=e206]
+            - generic [ref=e209] [cursor=pointer]:
+              - generic [ref=e212]:
+                - generic [ref=e213]:
+                  - generic [ref=e214]: Issue
+                  - generic [ref=e215]: SVXY连续亏损
+                  - generic [ref=e216]: SVXY · $8
+                - paragraph [ref=e217]: SVXY曾出现连续8笔亏损
+              - img [ref=e218]
+            - generic [ref=e221] [cursor=pointer]:
+              - generic [ref=e224]:
+                - generic [ref=e225]:
+                  - generic [ref=e226]: Issue
+                  - generic [ref=e227]: FIG连续亏损
+                  - generic [ref=e228]: FIG · $10
+                - paragraph [ref=e229]: FIG曾出现连续10笔亏损
+              - img [ref=e230]
+            - generic [ref=e233] [cursor=pointer]:
+              - generic [ref=e236]:
+                - generic [ref=e237]:
+                  - generic [ref=e238]: Issue
+                  - generic [ref=e239]: SVXY表现不佳
+                  - generic [ref=e240]: SVXY · 12
+                - paragraph [ref=e241]: SVXY胜率仅33%（12笔），总亏损$489
+              - img [ref=e242]
+            - generic [ref=e245] [cursor=pointer]:
+              - generic [ref=e248]:
+                - generic [ref=e249]:
+                  - generic [ref=e250]: Strength
+                  - generic [ref=e251]: CONL是优势标的
+                  - generic [ref=e252]: CONL · 15
+                - paragraph [ref=e253]: CONL胜率87%（15笔），总盈利$1,842
+              - img [ref=e254]
+            - generic [ref=e257] [cursor=pointer]:
+              - generic [ref=e260]:
+                - generic [ref=e261]:
+                  - generic [ref=e262]: Strength
+                  - generic [ref=e263]: NVDL是优势标的
+                  - generic [ref=e264]: NVDL · 16
+                - paragraph [ref=e265]: NVDL胜率75%（16笔），总盈利$458
+              - img [ref=e266]
+            - generic [ref=e269] [cursor=pointer]:
+              - generic [ref=e272]:
+                - generic [ref=e273]:
+                  - generic [ref=e274]: Strength
+                  - generic [ref=e275]: 01810是优势标的
+                  - generic [ref=e276]: 01810 · 14
+                - paragraph [ref=e277]: 01810胜率79%（14笔），总盈利$56,893
+              - img [ref=e278]
+            - generic [ref=e281] [cursor=pointer]:
+              - generic [ref=e284]:
+                - generic [ref=e285]:
+                  - generic [ref=e286]: Strength
+                  - generic [ref=e287]: PLTR是优势标的
+                  - generic [ref=e288]: PLTR · 12
+                - paragraph [ref=e289]: PLTR胜率75%（12笔），总盈利$839
+              - img [ref=e290]
+            - generic [ref=e293] [cursor=pointer]:
+              - generic [ref=e296]:
+                - generic [ref=e297]:
+                  - generic [ref=e298]: Strength
+                  - generic [ref=e299]: GOOGL是优势标的
+                  - generic [ref=e300]: GOOGL · 6
+                - paragraph [ref=e301]: GOOGL胜率100%（6笔），总盈利$723
+              - img [ref=e302]
+            - generic [ref=e305] [cursor=pointer]:
+              - generic [ref=e308]:
+                - generic [ref=e309]:
+                  - generic [ref=e310]: Strength
+                  - generic [ref=e311]: INOD是优势标的
+                  - generic [ref=e312]: INOD · 15
+                - paragraph [ref=e313]: INOD胜率87%（15笔），总盈利$997
+              - img [ref=e314]
+            - generic [ref=e317] [cursor=pointer]:
+              - generic [ref=e320]:
+                - generic [ref=e321]:
+                  - generic [ref=e322]: Strength
+                  - generic [ref=e323]: OSCR是优势标的
+                  - generic [ref=e324]: OSCR · 9
+                - paragraph [ref=e325]: OSCR胜率78%（9笔），总盈利$208
+              - img [ref=e326]
+            - generic [ref=e329] [cursor=pointer]:
+              - generic [ref=e332]:
+                - generic [ref=e333]:
+                  - generic [ref=e334]: Note
+                  - generic [ref=e335]: 出现过连续亏损
+                  - generic [ref=e336]: $19
+                - paragraph [ref=e337]: 最长连续亏损19笔
+              - img [ref=e338]
+        - generic [ref=e340]:
+          - generic [ref=e341]:
+            - generic [ref=e342]:
+              - img [ref=e343]
+              - heading "Key Metrics" [level=3] [ref=e345]
+            - generic [ref=e346]:
+              - generic [ref=e347]:
+                - generic [ref=e348]: Total Trades
+                - generic [ref=e349]: "403"
+              - generic [ref=e350]:
+                - generic [ref=e351]: Win Rate
+                - generic [ref=e352]: +47.1%
+              - generic [ref=e353]:
+                - generic [ref=e354]: Total P&L
+                - generic [ref=e355]: $76,282.40
+              - generic [ref=e356]:
+                - generic [ref=e357]:
+                  - generic [ref=e358]: Avg Win
+                  - generic [ref=e359]: $493.08
+                - generic [ref=e360]:
+                  - generic [ref=e361]: Avg Loss
+                  - generic [ref=e362]: $81.70
+          - generic [ref=e363]:
+            - heading "Insights Overview" [level=3] [ref=e364]
+            - generic [ref=e365]:
+              - generic [ref=e366]:
+                - generic [ref=e367]:
+                  - img [ref=e369]
+                  - generic [ref=e371]: Problems
+                - generic [ref=e372]: "12"
+              - generic [ref=e373]:
+                - generic [ref=e374]:
+                  - img [ref=e376]
+                  - generic [ref=e378]: Strengths
+                - generic [ref=e379]: "7"
+              - generic [ref=e380]:
+                - generic [ref=e381]:
+                  - img [ref=e383]
+                  - generic [ref=e385]: Reminders
+                - generic [ref=e386]: "1"
+```
