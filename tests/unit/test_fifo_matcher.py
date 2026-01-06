@@ -24,7 +24,8 @@ def mock_session():
     session = Mock()
     session.query = Mock()
     session.commit = Mock()
-    session.bulk_save_objects = Mock()
+    session.add = Mock()
+    session.flush = Mock()
     return session
 
 
@@ -271,7 +272,10 @@ class TestFIFOMatcherSavePositions:
 
         # _save_positions 本身会调用数据库，不管是否 dry_run
         # dry_run 的检查在调用方（match_all_trades）中
-        mock_session.bulk_save_objects.assert_called_once_with(positions)
+        # 重构后使用 add + flush 而不是 bulk_save_objects
+        assert mock_session.add.call_count == len(positions)
+        mock_session.add.assert_called_with(positions[0])
+        mock_session.flush.assert_called_once()
 
     def test_save_positions_production(self, fifo_matcher_production, mock_session):
         """测试生产模式保存"""
@@ -289,15 +293,18 @@ class TestFIFOMatcherSavePositions:
 
         fifo_matcher_production._save_positions(positions)
 
-        # 生产模式应该调用bulk_save_objects
-        mock_session.bulk_save_objects.assert_called_once_with(positions)
+        # 生产模式使用 add + flush 保存持仓
+        assert mock_session.add.call_count == len(positions)
+        mock_session.add.assert_called_with(positions[0])
+        mock_session.flush.assert_called_once()
 
     def test_save_empty_positions(self, fifo_matcher_production, mock_session):
         """测试保存空持仓列表"""
         fifo_matcher_production._save_positions([])
 
         # 空列表不应该调用数据库
-        mock_session.bulk_save_objects.assert_not_called()
+        mock_session.add.assert_not_called()
+        mock_session.flush.assert_not_called()
 
 
 class TestFIFOMatcherMatchAllTrades:

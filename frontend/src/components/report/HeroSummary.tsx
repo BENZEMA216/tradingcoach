@@ -1,5 +1,6 @@
 import clsx from 'clsx';
-import { formatCurrency, formatPercent } from '@/utils/format';
+import { formatPercent } from '@/utils/format';
+import { usePrivacyFormat } from '@/hooks/usePrivacyFormat';
 
 interface MetricItem {
   label: string;
@@ -26,6 +27,8 @@ export function HeroSummary({
   expectancy,
   isZh,
 }: HeroSummaryProps) {
+  const { formatPrivacyCurrency, formatPrivacyPnL } = usePrivacyFormat();
+
   // Generate summary text based on data
   const getSummary = () => {
     const performance = profitFactor && profitFactor > 1.5
@@ -55,7 +58,7 @@ export function HeroSummary({
     },
     {
       label: isZh ? '期望值' : 'Expectancy',
-      value: expectancy ? formatCurrency(expectancy) : '-',
+      value: expectancy ? formatPrivacyCurrency(expectancy) : '-',
     },
   ];
 
@@ -87,7 +90,7 @@ export function HeroSummary({
             'hero-number',
             totalPnL >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
           )}>
-            {formatCurrency(totalPnL)}
+            {formatPrivacyPnL(totalPnL)}
           </p>
           <p className="text-xs font-semibold tracking-[0.15em] uppercase text-neutral-400 dark:text-neutral-500 mt-3">
             {isZh ? '净盈亏' : 'Net P&L'}
@@ -102,8 +105,12 @@ export function HeroSummary({
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {metrics.map((metric, index) => (
-            <div key={index} className="text-center md:text-left">
-              <p className="text-2xl md:text-3xl font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
+            <div
+              key={index}
+              className="text-center md:text-left animate-fade-in"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <p className="text-2xl md:text-3xl font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight transition-transform duration-300 hover:scale-105">
                 {metric.value}
               </p>
               <p className="text-[11px] font-medium tracking-[0.1em] uppercase text-neutral-400 dark:text-neutral-500 mt-1.5">

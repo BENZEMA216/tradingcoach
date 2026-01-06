@@ -18,6 +18,9 @@ SQLAlchemy ORM 数据模型定义层。定义核心业务实体（Trade/Position
 | `market_data.py` | 市场数据模型 | OHLCV数据、技术指标字段 |
 | `market_environment.py` | 市场环境模型 | 趋势状态、波动率、市场情绪快照 |
 | `stock_classification.py` | 股票分类模型 | 板块、行业、市值分类 |
+| `news_context.py` | 新闻上下文模型 | 交易日相关新闻、情感分析、新闻契合度评分 |
+| `event_context.py` | 事件上下文模型 | 财报/宏观/异常事件记录、市场反应、持仓影响 |
+| `task.py` | 后台任务模型 | 异步任务状态追踪 |
 
 ---
 
@@ -51,27 +54,48 @@ class Trade(Base):
     symbol: str              # 股票代码
     direction: TradeDirection  # 交易方向 (buy/sell/sell_short/buy_to_cover)
     status: TradeStatus      # 交易状态 (filled/cancelled/pending)
+    market: MarketType       # 市场类型 (美股/港股/沪深)
 
     # 成交信息
     filled_price: Decimal    # 成交价格
     filled_quantity: int     # 成交数量
     filled_time: datetime    # 成交时间
+    trade_date: date         # 交易日期
 
-    # 费用明细
+    # 费用明细 (通用)
     commission: Decimal      # 佣金
+    platform_fee: Decimal    # 平台使用费
+    clearing_fee: Decimal    # 交收费/清算费
+    stamp_duty: Decimal      # 印花税 (港股)
     total_fee: Decimal       # 合计费用
+
+    # A股特有字段 (v2.0新增)
+    exchange: str            # 交易所代码 (sse=上交所, szse=深交所)
+    seat_code: str           # 席位代码/营业部代码
+    shareholder_code: str    # 股东代码/证券账号
+    transfer_fee: Decimal    # 过户费 (万分之0.1)
+    handling_fee: Decimal    # 经手费 (交易所收取)
+    regulation_fee: Decimal  # 证管费 (证监会收取)
+    other_fees: Decimal      # 其他费用
 
     # 期权信息
     is_option: int           # 是否期权 (0/1)
     underlying_symbol: str   # 标的代码
+    option_type: str         # CALL/PUT
     strike_price: Decimal    # 行权价
     expiration_date: date    # 到期日
+
+    # 导入追踪 (v2.0新增)
+    trade_fingerprint: str   # 交易唯一指纹 (SHA256, 用于去重)
+    broker_id: str           # 券商ID (futu_cn, citic, huatai等)
+    import_batch_id: str     # 导入批次ID
+    source_row_number: int   # 原始CSV行号
 ```
 
 **枚举类型**:
 - `TradeDirection`: BUY, SELL, SELL_SHORT, BUY_TO_COVER
 - `TradeStatus`: FILLED, PARTIALLY_FILLED, CANCELLED, PENDING
-- `MarketType`: US_STOCK, HK_STOCK, CN_STOCK
+- `MarketType`: US_STOCK (美股), HK_STOCK (港股), CN_STOCK (沪深)
 
 ### Position (持仓记录)
 
@@ -140,6 +164,83 @@ class MarketData(Base):
     ma_5/10/20/50/200: float # 移动平均线
 ```
 
+### NewsContext (新闻上下文)
+
+```python
+class NewsContext(Base):
+    # 关联信息
+    position_id: int         # 关联持仓ID
+    symbol: str              # 股票代码
+    search_date: date        # 搜索中心日期
+
+    # 新闻类别标记
+    has_earnings: bool       # 是否有财报新闻
+    has_product_news: bool   # 是否有产品新闻
+    has_analyst_rating: bool # 是否有分析师评级
+    has_sector_news: bool    # 是否有行业新闻
+    has_macro_news: bool     # 是否有宏观新闻
+    has_geopolitical: bool   # 是否有地缘政治新闻
+
+    # 情感分析
+    overall_sentiment: str   # bullish/bearish/neutral/mixed
+    sentiment_score: Decimal # -100 to +100
+    news_impact_level: str   # high/medium/low/none
+
+    # 新闻存储
+    news_items: JSON         # [{title, source, date, sentiment, category}]
+    news_count: int          # 新闻数量
+
+    # 评分
+    news_alignment_score: Decimal  # 新闻契合度评分 (0-100)
+    score_breakdown: JSON          # 评分细节
+```
+
+**枚举类型**:
+- `NewsSentiment`: BULLISH, BEARISH, NEUTRAL, MIXED
+- `NewsImpactLevel`: HIGH, MEDIUM, LOW, NONE
+- `NewsCategory`: EARNINGS, PRODUCT, ANALYST, SECTOR, MACRO, GEOPOLITICAL, etc.
+
+### EventContext (事件上下文)
+
+```python
+class EventContext(Base):
+    # 关联信息
+    position_id: int         # 关联持仓ID (可选)
+    symbol: str              # 股票代码
+
+    # 事件基本信息
+    event_type: str          # earnings/split/macro/fed/geopolitical/price_anomaly等
+    event_date: date         # 事件日期
+    event_title: str         # 事件标题
+    event_description: str   # 事件详情
+
+    # 事件影响评估
+    event_impact: str        # positive/negative/neutral/mixed
+    event_importance: int    # 1-10 重要性评分
+    is_surprise: bool        # 是否超预期
+    surprise_direction: str  # beat/miss
+
+    # 市场反应指标
+    price_before: Decimal    # 事件前收盘价
+    price_after: Decimal     # 事件后收盘价
+    price_change_pct: Decimal # 价格变动百分比
+    volume_spike: Decimal    # 成交量倍数 (相对20日均量)
+    volatility_spike: Decimal # 波动率变化
+    gap_pct: Decimal         # 跳空百分比
+
+    # 持仓影响
+    position_pnl_on_event: Decimal      # 事件日持仓盈亏
+    position_pnl_pct_on_event: Decimal  # 事件日盈亏百分比
+
+    # 数据来源
+    source: str              # polygon/yfinance/manual/detected
+    confidence: Decimal      # 置信度 (0-100)
+```
+
+**枚举类型**:
+- `EventType`: EARNINGS, SPLIT, DIVIDEND, MACRO, FED, CPI, NFP, GEOPOLITICAL, PRICE_ANOMALY, etc.
+- `EventImpact`: POSITIVE, NEGATIVE, NEUTRAL, MIXED, UNKNOWN
+
 ## 关系设计
 
 ```
@@ -151,16 +252,22 @@ Trade ──────────────────┐
 Position ◄──────────────┘
   │ entry_market_env_id (FK)
   │ exit_market_env_id (FK)
+  │ news_context_id (FK)
   ▼
 MarketEnvironment
+NewsContext
 ```
 
 ## 索引设计
 
 ### Trade 索引
 - `idx_symbol_filled_time`: 按代码和时间查询
+- `idx_symbol_trade_date`: 按代码和交易日期查询
 - `idx_direction_status`: 按方向和状态查询
 - `idx_underlying_symbol_time`: 期权标的查询
+- `idx_market_trade_date`: 按市场类型和交易日期查询
+- `idx_broker_trade_date`: 按券商和交易日期查询 (v2.0新增)
+- `idx_import_batch`: 按导入批次查询 (v2.0新增)
 
 ### Position 索引
 - `idx_pos_symbol_open_time`: 按代码和开仓时间

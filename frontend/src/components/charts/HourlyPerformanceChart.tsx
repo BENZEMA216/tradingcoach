@@ -11,8 +11,11 @@ import {
   Cell,
 } from 'recharts';
 import type { HourlyPerformanceItem } from '@/types';
-import { formatCurrency } from '@/utils/format';
+import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
+import { usePrivacyStore } from '@/store/usePrivacyStore';
+import { ChartSkeleton } from '@/components/common/ChartSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface HourlyPerformanceChartProps {
   data: HourlyPerformanceItem[];
@@ -25,26 +28,27 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
   const { t } = useTranslation();
   const colors = useChartColors();
 
+  // Subscribe to privacy state for re-renders
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
+
   if (isLoading) {
-    if (bare) return <div className="h-64 bg-neutral-100 dark:bg-neutral-800 rounded animate-pulse" />;
+    if (bare) return <ChartSkeleton height="h-64" showTitle={false} />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4 animate-pulse" />
-        <div className="h-64 bg-gray-100 dark:bg-gray-700/50 rounded animate-pulse" />
+        <ChartSkeleton height="h-64" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    if (bare) return <div className="h-64 flex items-center justify-center text-neutral-500">{t('common.noData')}</div>;
+    if (bare) return <EmptyState icon="chart" height="h-64" size="sm" />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('charts.hourlyPerformance')}
         </h3>
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          {t('common.noData')}
-        </div>
+        <EmptyState icon="chart" height="h-64" size="sm" />
       </div>
     );
   }
@@ -78,7 +82,7 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
               tick={{ fontSize: 11, fill: colors.text }}
               tickLine={false}
               axisLine={{ stroke: colors.axis }}
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={formatAxis}
             />
             <Tooltip
               cursor={{ fill: 'rgba(0,0,0,0.05)' }}
@@ -90,7 +94,7 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
                       <p className="font-semibold text-neutral-900 dark:text-neutral-100">{data.hour}</p>
                       <div className="mt-1 space-y-0.5 text-sm">
                         <p style={{ color: data.avgPnl >= 0 ? colors.profit : colors.loss }}>
-                          {t('charts.avgPnl')}: {formatCurrency(data.avgPnl)}
+                          {t('charts.avgPnl')}: {formatPnL(data.avgPnl)}
                         </p>
                         <p className="text-neutral-600 dark:text-neutral-400">
                           {t('charts.tradeCount')}: {data.trades}
@@ -137,7 +141,7 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
             <div>
               <span className="text-neutral-400">{t('charts.bestHour')}:</span>
               <span className="font-semibold text-green-600 ml-1">
-                {bestHour.hour}:00 ({formatCurrency(bestHour.avg_pnl)})
+                {bestHour.hour}:00 ({formatPnL(bestHour.avg_pnl)})
               </span>
             </div>
           )}
@@ -145,7 +149,7 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
             <div>
               <span className="text-neutral-400">{t('charts.worstHour')}:</span>
               <span className="font-semibold text-red-600 ml-1">
-                {worstHour.hour}:00 ({formatCurrency(worstHour.avg_pnl)})
+                {worstHour.hour}:00 ({formatPnL(worstHour.avg_pnl)})
               </span>
             </div>
           )}
@@ -171,7 +175,7 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
             <div>
               <span className="text-gray-500 dark:text-gray-400">{t('charts.bestHour')}: </span>
               <span className="font-medium text-green-500">
-                {bestHour.hour}:00 ({formatCurrency(bestHour.avg_pnl)})
+                {bestHour.hour}:00 ({formatPnL(bestHour.avg_pnl)})
               </span>
             </div>
           )}
@@ -179,7 +183,7 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
             <div>
               <span className="text-gray-500 dark:text-gray-400">{t('charts.worstHour')}: </span>
               <span className="font-medium text-red-500">
-                {worstHour.hour}:00 ({formatCurrency(worstHour.avg_pnl)})
+                {worstHour.hour}:00 ({formatPnL(worstHour.avg_pnl)})
               </span>
             </div>
           )}

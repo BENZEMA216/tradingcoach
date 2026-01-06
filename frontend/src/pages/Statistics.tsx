@@ -2,8 +2,9 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
-import { statisticsApi, dashboardApi } from '@/api/client';
-import { formatCurrency, formatPercent, formatDate } from '@/utils/format';
+import { statisticsApi, dashboardApi, eventsApi } from '@/api/client';
+import { formatPercent, formatDate, getPrivacyAwareFormatters } from '@/utils/format';
+import { usePrivacyStore } from '@/store/usePrivacyStore';
 import {
   getEquityCurveInsight,
   getMonthlyInsight,
@@ -13,7 +14,7 @@ import {
   getSymbolRiskInsight,
   getRollingWinRateInsight,
 } from '@/utils/insights';
-import { DrillDownModal } from '@/components/common';
+import { DrillDownModal, PrivacyModeToggle } from '@/components/common';
 import { AICoachPanel } from '@/components/insights';
 import {
   ReportSection,
@@ -32,6 +33,7 @@ import {
   HourlyPerformanceChart,
   AssetTypeChart,
   StrategyPerformanceChart,
+  EventTimelineChart,
 } from '@/components/charts';
 import type { PositionFilters } from '@/types';
 import clsx from 'clsx';
@@ -175,6 +177,10 @@ export function Statistics() {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
 
+  // Subscribe to privacy state for re-renders
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  const { formatCurrency, formatPnL: _formatPnL } = getPrivacyAwareFormatters();
+
   const [periodType, setPeriodType] = useState<PeriodType>('all');
   const [periodOffset, setPeriodOffset] = useState(0);
 
@@ -309,6 +315,15 @@ export function Statistics() {
     queryFn: () => statisticsApi.getByAssetType(dateParams),
   });
 
+  // Events query
+  const { data: eventsData, isLoading: loadingEvents } = useQuery({
+    queryKey: ['events', 'list', dateParams],
+    queryFn: () => eventsApi.list(1, 50, {
+      date_start: dateParams.date_start,
+      date_end: dateParams.date_end,
+    }),
+  });
+
   const periodTabs: { type: PeriodType; label: string }[] = [
     { type: 'all', label: isZh ? '全部' : 'All' },
     { type: 'week', label: isZh ? '周' : 'Week' },
@@ -345,22 +360,25 @@ export function Statistics() {
           )}
           {periodType === 'all' && <div />}
 
-          {/* Period Type Tabs */}
-          <div className="flex gap-1 bg-neutral-200 dark:bg-neutral-800 p-1 rounded-lg">
-            {periodTabs.map((tab) => (
-              <button
-                key={tab.type}
-                onClick={() => setPeriodType(tab.type)}
-                className={clsx(
-                  'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
-                  periodType === tab.type
-                    ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-                    : 'text-neutral-500 hover:text-neutral-700'
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {/* Right side: Privacy Toggle + Period Tabs */}
+          <div className="flex items-center gap-3">
+            <PrivacyModeToggle />
+            <div className="flex gap-1 bg-neutral-200 dark:bg-neutral-800 p-1 rounded-lg">
+              {periodTabs.map((tab) => (
+                <button
+                  key={tab.type}
+                  onClick={() => setPeriodType(tab.type)}
+                  className={clsx(
+                    'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
+                    periodType === tab.type
+                      ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                      : 'text-neutral-500 hover:text-neutral-700'
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -601,8 +619,32 @@ export function Statistics() {
             </div>
           </ReportSection>
 
-          {/* Section 05: Detailed Data */}
-          <ReportSection number="05" title="DETAILED DATA" subtitle={isZh ? '详细数据' : 'Detailed Data'}>
+          {/* Section 05: Event Analysis */}
+          {eventsData?.items && eventsData.items.length > 0 && (
+            <ReportSection number="05" title="EVENT ANALYSIS" subtitle={isZh ? '事件分析' : 'Event Analysis'}>
+              <ChartWithInsight
+                title={isZh ? '事件时间线' : 'Event Timeline'}
+                chart={
+                  <EventTimelineChart
+                    events={eventsData.items}
+                    isLoading={loadingEvents}
+                    showPnL={true}
+                  />
+                }
+                insight={
+                  eventsData.items.length > 0
+                    ? isZh
+                      ? `检测到 ${eventsData.items.length} 个事件，其中 ${eventsData.items.filter(e => e.is_key_event).length} 个关键事件`
+                      : `Detected ${eventsData.items.length} events, ${eventsData.items.filter(e => e.is_key_event).length} key events`
+                    : undefined
+                }
+                fullWidth
+              />
+            </ReportSection>
+          )}
+
+          {/* Section 06: Detailed Data */}
+          <ReportSection number="06" title="DETAILED DATA" subtitle={isZh ? '详细数据' : 'Detailed Data'}>
             {/* By Symbol - Collapsible */}
             <CollapsibleTable
               title={isZh ? 'Top 10 标的' : 'Top 10 Symbols'}

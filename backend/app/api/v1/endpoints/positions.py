@@ -14,6 +14,7 @@ from ....schemas import (
     PositionListItem,
     PositionDetail,
     PositionScoreDetail,
+    NewsContextSummary,
     PositionRiskMetrics,
     PositionFilterParams,
     PositionReviewUpdate,
@@ -268,6 +269,11 @@ async def get_position_detail(
             exit_quality_score=float(position.exit_quality_score) if position.exit_quality_score else None,
             trend_quality_score=float(position.trend_quality_score) if position.trend_quality_score else None,
             risk_mgmt_score=float(position.risk_mgmt_score) if position.risk_mgmt_score else None,
+            market_env_score=float(position.market_env_score) if hasattr(position, 'market_env_score') and position.market_env_score else None,
+            behavior_score=float(position.behavior_score) if hasattr(position, 'behavior_score') and position.behavior_score else None,
+            execution_score=float(position.execution_score) if hasattr(position, 'execution_score') and position.execution_score else None,
+            options_greeks_score=float(position.options_greeks_score) if hasattr(position, 'options_greeks_score') and position.options_greeks_score else None,
+            news_alignment_score=float(position.news_alignment_score) if hasattr(position, 'news_alignment_score') and position.news_alignment_score else None,
             overall_score=float(position.overall_score) if position.overall_score else None,
             score_grade=position.score_grade,
         ),
@@ -292,9 +298,76 @@ async def get_position_detail(
         discipline_score=position.discipline_score,
         reviewed_at=position.reviewed_at,
         analysis_notes=position.analysis_notes,
+        news_context=_build_news_context(position),
         trade_ids=trade_ids,
         created_at=position.created_at,
         updated_at=position.updated_at,
+    )
+
+
+def _build_news_context(position: Position) -> Optional[NewsContextSummary]:
+    """Build news context summary from position's news_context relationship."""
+    if not hasattr(position, 'news_context') or not position.news_context:
+        # Return basic info from position's news_alignment_score if available
+        if hasattr(position, 'news_alignment_score') and position.news_alignment_score:
+            return NewsContextSummary(
+                news_alignment_score=float(position.news_alignment_score)
+            )
+        return None
+
+    nc = position.news_context
+
+    # Build score breakdown (return as dict, pydantic will validate)
+    # Note: score_breakdown stores nested dicts like {'direction': {'score': 60.0, 'weight': ...}, ...}
+    score_breakdown = None
+    if nc.score_breakdown:
+        def extract_score(item):
+            """Extract score value from breakdown item (handles both flat and nested formats)."""
+            if item is None:
+                return None
+            if isinstance(item, (int, float)):
+                return float(item)
+            if isinstance(item, dict):
+                return float(item.get('score', 0))
+            return None
+
+        score_breakdown = {
+            'direction': extract_score(nc.score_breakdown.get('direction')),
+            'timing': extract_score(nc.score_breakdown.get('timing')),
+            'completeness': extract_score(nc.score_breakdown.get('completeness')),
+            'risk': extract_score(nc.score_breakdown.get('risk')),
+        }
+
+    # Build news items list (return as dicts, pydantic will validate)
+    news_items = None
+    if nc.news_items:
+        news_items = [
+            {
+                'title': item.get('title', ''),
+                'source': item.get('source'),
+                'date': item.get('date'),
+                'url': item.get('url'),
+                'category': item.get('category'),
+                'sentiment': item.get('sentiment'),
+                'relevance': item.get('relevance'),
+            }
+            for item in nc.news_items
+        ]
+
+    return NewsContextSummary(
+        news_count=nc.news_count,
+        overall_sentiment=nc.overall_sentiment,
+        sentiment_score=float(nc.sentiment_score) if nc.sentiment_score else None,
+        news_impact_level=nc.news_impact_level,
+        has_earnings=bool(nc.has_earnings),
+        has_product_news=bool(nc.has_product_news) if hasattr(nc, 'has_product_news') else False,
+        has_analyst_rating=bool(nc.has_analyst_rating),
+        has_sector_news=bool(nc.has_sector_news) if hasattr(nc, 'has_sector_news') else False,
+        has_macro_news=bool(nc.has_macro_news),
+        has_geopolitical=bool(nc.has_geopolitical),
+        news_alignment_score=float(nc.news_alignment_score) if nc.news_alignment_score else None,
+        score_breakdown=score_breakdown,
+        news_items=news_items,
     )
 
 

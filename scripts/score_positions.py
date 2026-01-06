@@ -159,6 +159,31 @@ def score_and_display(session, scorer, position_ids=None, update_db=True):
                     pos.overall_score = result['overall_score']
                     pos.score_grade = result['grade']
 
+                    # V2 新增评分
+                    if result.get('market_env_score') is not None:
+                        pos.market_env_score = result['market_env_score']
+                    if result.get('behavior_score') is not None:
+                        pos.behavior_score = result['behavior_score']
+                    if result.get('execution_score') is not None:
+                        pos.execution_score = result['execution_score']
+                    if result.get('options_greeks_score') is not None:
+                        pos.options_greeks_score = result['options_greeks_score']
+                    if result.get('news_alignment_score') is not None:
+                        pos.news_alignment_score = result['news_alignment_score']
+
+                    # 保存评分详情
+                    if result.get('details'):
+                        pos.score_details = result['details']
+
+                    # 保存 NewsContext
+                    news_search_result = result.get('news_search_result')
+                    news_alignment_result = result.get('news_alignment_result')
+                    if news_search_result and news_alignment_result:
+                        scorer._save_news_context(
+                            session, pos,
+                            news_search_result, news_alignment_result
+                        )
+
                 stats['scored'] += 1
                 logger.info(f"Scored position {pos.id}: {result['overall_score']:.1f} ({result['grade']})")
 

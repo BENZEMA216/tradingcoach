@@ -20,7 +20,9 @@ export function ChartWithInsight({ title, chart, insight, className, fullWidth =
     <div
       className={clsx(
         'bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800',
-        'transition-shadow hover:shadow-sm',
+        'transition-all duration-300 ease-out',
+        'hover:shadow-lg hover:shadow-neutral-200/50 dark:hover:shadow-neutral-950/50',
+        'hover:border-neutral-300 dark:hover:border-neutral-700',
         fullWidth ? 'col-span-2' : '',
         className
       )}
@@ -28,7 +30,7 @@ export function ChartWithInsight({ title, chart, insight, className, fullWidth =
       {/* Chart Title */}
       {title && (
         <div className="px-7 pt-6 pb-3">
-          <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+          <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 transition-colors duration-200">
             {title}
           </h3>
         </div>
@@ -42,7 +44,7 @@ export function ChartWithInsight({ title, chart, insight, className, fullWidth =
       {/* Insight */}
       {insight && (
         <div className="px-7 pb-6">
-          <p className="text-[13px] text-neutral-500 dark:text-neutral-400 leading-relaxed border-l-2 border-neutral-200 dark:border-neutral-700 pl-4 mt-3">
+          <p className="text-[13px] text-neutral-500 dark:text-neutral-400 leading-relaxed border-l-2 border-neutral-200 dark:border-neutral-700 pl-4 mt-3 transition-colors duration-200">
             {insight}
           </p>
         </div>

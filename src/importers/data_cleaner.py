@@ -22,13 +22,13 @@ from src.utils.timezone import parse_datetime_with_timezone
 logger = logging.getLogger(__name__)
 
 
-# 交易方向映射（中文 -> 英文枚举值）
+# 交易方向映射（中文 -> 英文枚举名，大写）
 DIRECTION_MAPPING = {
-    '买入': 'buy',
-    '卖出': 'sell',
-    '卖空': 'sell_short',
-    '买券还券': 'buy_to_cover',
-    '补券': 'buy_to_cover',
+    '买入': 'BUY',
+    '卖出': 'SELL',
+    '卖空': 'SELL_SHORT',
+    '买券还券': 'BUY_TO_COVER',
+    '补券': 'BUY_TO_COVER',
 }
 
 # 需要过滤的订单状态
@@ -201,6 +201,20 @@ class DataCleaner:
             'filled_time': 'filled_time_utc',
         }
 
+        def get_timezone_hint(row):
+            """获取时区提示，优先使用 market，其次从 exchange 推断"""
+            market = row.get('market', None)
+            if market:
+                return market
+
+            # 从 exchange 推断时区（A股）
+            exchange = row.get('exchange', None)
+            if exchange:
+                if exchange in ['上交所', '深交所', '上海A股', '深圳A股', '沪市', '深市']:
+                    return '沪深'
+
+            return None
+
         for cn_field, en_field in time_fields.items():
             if cn_field not in self.df.columns:
                 continue
@@ -209,7 +223,7 @@ class DataCleaner:
             self.df[en_field] = self.df.apply(
                 lambda row: parse_datetime_with_timezone(
                     row[cn_field],
-                    timezone_hint=row.get('market', None)
+                    timezone_hint=get_timezone_hint(row)
                 ),
                 axis=1
             )

@@ -66,13 +66,60 @@ class PositionListItem(BaseModel):
 
 
 class PositionScoreDetail(BaseModel):
-    """Position score breakdown"""
+    """Position score breakdown (V2: 9 dimensions)"""
+    # Basic 4 dimensions
     entry_quality_score: Optional[float] = None
     exit_quality_score: Optional[float] = None
     trend_quality_score: Optional[float] = None
     risk_mgmt_score: Optional[float] = None
+    # V2 dimensions
+    market_env_score: Optional[float] = None
+    behavior_score: Optional[float] = None
+    execution_score: Optional[float] = None
+    options_greeks_score: Optional[float] = None
+    news_alignment_score: Optional[float] = None
+    # Overall
     overall_score: Optional[float] = None
     score_grade: Optional[str] = None
+
+
+class NewsItem(BaseModel):
+    """Single news item"""
+    title: str
+    source: Optional[str] = None
+    date: Optional[str] = None
+    url: Optional[str] = None
+    category: Optional[str] = None
+    sentiment: Optional[str] = None  # bullish/bearish/neutral
+    relevance: Optional[float] = None
+
+
+class NewsScoreBreakdown(BaseModel):
+    """News alignment score breakdown by dimension"""
+    direction: Optional[float] = None  # 方向对齐 (0-100)
+    timing: Optional[float] = None     # 时机质量 (0-100)
+    completeness: Optional[float] = None  # 信息完整度 (0-100)
+    risk: Optional[float] = None       # 风险意识 (0-100)
+
+
+class NewsContextSummary(BaseModel):
+    """News context summary for position"""
+    news_count: Optional[int] = None
+    overall_sentiment: Optional[str] = None  # bullish/bearish/neutral/mixed
+    sentiment_score: Optional[float] = None  # -100 to +100
+    news_impact_level: Optional[str] = None  # high/medium/low/none
+    # 分类标记
+    has_earnings: bool = False
+    has_product_news: bool = False
+    has_analyst_rating: bool = False
+    has_sector_news: bool = False
+    has_macro_news: bool = False
+    has_geopolitical: bool = False
+    # 评分
+    news_alignment_score: Optional[float] = None
+    score_breakdown: Optional[NewsScoreBreakdown] = None
+    # 新闻列表
+    news_items: Optional[List[NewsItem]] = None
 
 
 class PositionRiskMetrics(BaseModel):
@@ -149,6 +196,9 @@ class PositionDetail(BaseModel):
 
     # Analysis notes
     analysis_notes: Optional[dict] = None
+
+    # News context (V2.1)
+    news_context: Optional[NewsContextSummary] = None
 
     # Associated trades
     trade_ids: List[int] = []

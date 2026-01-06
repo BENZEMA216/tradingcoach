@@ -201,13 +201,37 @@ class TradeImporter:
             # Skip invalid rows
             return None
 
+        # 推断 market 字段
+        market = clean_value(row.get('market'))
+        exchange = clean_value(row.get('exchange'))
+
+        # 如果没有 market，尝试从 exchange 推断
+        if not market and exchange:
+            exchange_to_market = {
+                '上交所': 'CN_STOCK', '深交所': 'CN_STOCK',
+                '上海A股': 'CN_STOCK', '深圳A股': 'CN_STOCK',
+                '沪市': 'CN_STOCK', '深市': 'CN_STOCK',
+            }
+            market = exchange_to_market.get(exchange, 'CN_STOCK')
+
+        # 如果还是没有 market，从 symbol 推断（A股 symbol 格式）
+        if not market and symbol:
+            # A股：600xxx(沪), 601xxx(沪), 603xxx(沪), 000xxx(深), 002xxx(深), 300xxx(深)
+            if symbol[:3] in ['600', '601', '603', '000', '002', '300']:
+                market = 'CN_STOCK'
+
+        # 推断 currency
+        currency = clean_value(row.get('currency'))
+        if not currency:
+            currency = 'CNY' if market == 'CN_STOCK' else 'USD'
+
         # 基本信息
         trade = Trade(
             symbol=symbol,
             symbol_name=clean_value(row.get('symbol_name')),
             direction=direction,
-            market=clean_value(row.get('market')),
-            currency=clean_value(row.get('currency')) or 'USD',
+            market=market,
+            currency=currency,
         )
 
         # 订单信息
@@ -237,6 +261,11 @@ class TradeImporter:
         trade.option_regulatory_fee = clean_value(row.get('option_regulatory_fee'))
         trade.option_clearing_fee = clean_value(row.get('option_clearing_fee'))
         trade.total_fee = clean_value(row.get('total_fee')) or 0
+
+        # A股特有字段
+        trade.exchange = exchange  # 已在前面获取
+        trade.transfer_fee = clean_value(row.get('transfer_fee'))
+        trade.shareholder_code = clean_value(row.get('shareholder_code'))
 
         # Symbol解析信息
         trade.is_option = 1 if clean_value(row.get('parsed_is_option')) else 0

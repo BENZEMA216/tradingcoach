@@ -1,0 +1,185 @@
+# 中信证券中文版 CSV 配置
+# 一旦我被更新，务必更新所属文件夹的 README.md
+
+broker_id: citic_cn
+broker_name: CITIC Securities (Chinese)
+broker_name_cn: 中信证券
+version: "1.0"
+
+# 文件格式
+encoding: gbk
+delimiter: ","
+quote_char: '"'
+header_row: 0
+
+# 自动检测规则
+detection:
+  columns:
+    - "买卖标志"
+    - "证券代码"
+    - "成交时间"
+    - "成交价格"
+    - "成交数量"
+  unique_columns:
+    - "股东代码"
+    - "席位代码"
+  encoding_hint: gbk
+  confidence_threshold: 0.8
+
+# 支持的市场
+markets: [cn]
+default_market: cn
+
+# 字段映射
+field_mappings:
+  # === 基本信息 ===
+  - source: "买卖标志"
+    target: direction
+    required: true
+
+  - source: "证券代码"
+    target: symbol
+    required: true
+    transform:
+      type: string
+      strip: true
+
+  - source: "证券名称"
+    target: symbol_name
+    transform:
+      type: string
+
+  # === 订单信息 ===
+  - source: "委托价格"
+    target: order_price
+    transform:
+      type: number
+
+  - source: "委托数量"
+    target: order_quantity
+    transform:
+      type: integer
+
+  - source: "委托时间"
+    target: order_time
+    transform:
+      type: datetime
+      format: "%H:%M:%S"
+
+  # === 成交信息 ===
+  - source: "成交价格"
+    target: filled_price
+    required: true
+    transform:
+      type: number
+
+  - source: "成交数量"
+    target: filled_quantity
+    required: true
+    transform:
+      type: integer
+
+  - source: "成交金额"
+    target: filled_amount
+    transform:
+      type: number
+
+  - source: "成交时间"
+    target: filled_time
+    required: true
+    transform:
+      type: datetime
+      format: "%Y%m%d %H:%M:%S"
+      # 备选格式
+      fallback_formats:
+        - "%Y-%m-%d %H:%M:%S"
+        - "%Y/%m/%d %H:%M:%S"
+
+  - source: "成交日期"
+    target: trade_date
+    transform:
+      type: date
+      format: "%Y%m%d"
+
+  # === 市场信息 ===
+  - source: "交易市场"
+    target: market
+
+  - source: "币种"
+    target: currency
+    transform:
+      type: string
+      default: "CNY"
+
+  # === 交易状态 ===
+  - source: "成交状态"
+    target: status
+
+  # === A股特有字段 ===
+  - source: "股东代码"
+    target: shareholder_code
+    transform:
+      type: string
+
+  - source: "席位代码"
+    target: seat_code
+    transform:
+      type: string
+
+# 状态映射
+status_mapping:
+  已成: filled
+  成交: filled
+  部成: partially_filled
+  撤单: cancelled
+  废单: cancelled
+
+# 方向映射
+direction_mapping:
+  买入: buy
+  卖出: sell
+  证券买入: buy
+  证券卖出: sell
+  融资买入: buy
+  融券卖出: sell_short
+  买券还券: buy_to_cover
+
+# 市场映射
+market_mapping:
+  上海A: cn
+  深圳A: cn
+  沪A: cn
+  深A: cn
+  上海: cn
+  深圳: cn
+
+# 费用配置
+fees:
+  fields:
+    - 佣金
+    - 印花税
+    - 过户费
+    - 结算费
+    - 经手费
+    - 证管费
+  total_field: "发生金额"
+  calculate_total: false
+  # A股费用通常包含在成交金额中
+  fee_included_in_amount: true
+
+# 验证规则
+validations:
+  - field: filled_quantity
+    rule: range
+    params:
+      min: 100
+      step: 100
+    error_message: "A股成交数量必须是100的整数倍"
+    level: warning
+
+  - field: filled_price
+    rule: range
+    params:
+      min: 0.01
+    error_message: "成交价格必须大于0"
+    level: error

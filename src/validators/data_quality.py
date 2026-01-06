@@ -31,7 +31,7 @@ class DataIssue:
     issue_type: str                      # 问题类型代码
     severity: IssueSeverity              # 严重程度
     message: str                         # 问题描述
-    field: Optional[str] = None          # 相关字段
+    field_name: Optional[str] = None     # 相关字段
     record_id: Optional[int] = None      # 相关记录ID
     record_type: Optional[str] = None    # 记录类型（Position/Trade等）
     suggested_fix: Optional[str] = None  # 建议修复方法
@@ -42,7 +42,7 @@ class DataIssue:
             'issue_type': self.issue_type,
             'severity': self.severity.value,
             'message': self.message,
-            'field': self.field,
+            'field': self.field_name,
             'record_id': self.record_id,
             'record_type': self.record_type,
             'suggested_fix': self.suggested_fix,

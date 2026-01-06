@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart,
@@ -11,7 +12,11 @@ import {
   LabelList,
 } from 'recharts';
 import type { AssetTypeBreakdownItem } from '@/types';
-import { formatCurrency } from '@/utils/format';
+import { getPrivacyAwareFormatters } from '@/utils/format';
+import { useResponsiveChart } from '@/hooks/useResponsiveChart';
+import { usePrivacyStore } from '@/store/usePrivacyStore';
+import { ChartSkeleton } from '@/components/common/ChartSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface AssetTypeChartProps {
   data: AssetTypeBreakdownItem[];
@@ -38,27 +43,30 @@ const ASSET_TYPE_LABELS: Record<string, string> = {
 
 export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: AssetTypeChartProps) {
   const { t } = useTranslation();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const chartConfig = useResponsiveChart(containerRef, { layout: 'horizontal' });
+
+  // Subscribe to privacy state for re-renders
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  const { formatCurrency: _formatCurrency, formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
-    if (bare) return <div className="h-64 bg-neutral-100 dark:bg-neutral-800 rounded animate-pulse" />;
+    if (bare) return <ChartSkeleton height="h-64" showTitle={false} />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4 animate-pulse" />
-        <div className="h-64 bg-gray-100 dark:bg-gray-700/50 rounded animate-pulse" />
+        <ChartSkeleton height="h-64" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    if (bare) return <div className="h-64 flex items-center justify-center text-neutral-500">{t('common.noData')}</div>;
+    if (bare) return <EmptyState icon="chart" height="h-64" size="sm" />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('charts.assetTypePerformance')}
         </h3>
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          {t('common.noData')}
-        </div>
+        <EmptyState icon="chart" height="h-64" size="sm" />
       </div>
     );
   }
@@ -77,28 +85,28 @@ export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: As
   const totalTrades = data.reduce((sum, item) => sum + item.count, 0);
 
   const chartContent = (
-    <div className="h-64">
+    <div ref={containerRef} className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 10, right: 60, left: 60, bottom: 5 }}
+            margin={chartConfig.margin}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" horizontal={true} vertical={false} />
             <XAxis
               type="number"
-              tick={{ fontSize: 11, fill: '#6b7280' }}
+              tick={{ fontSize: chartConfig.fontSize, fill: '#6b7280' }}
               tickLine={false}
               axisLine={{ stroke: '#e5e7eb' }}
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={formatAxis}
             />
             <YAxis
               type="category"
               dataKey="type"
-              tick={{ fontSize: 12, fill: '#6b7280' }}
+              tick={{ fontSize: chartConfig.fontSize, fill: '#6b7280' }}
               tickLine={false}
               axisLine={{ stroke: '#e5e7eb' }}
-              width={60}
+              width={chartConfig.yAxisWidth}
             />
             <Tooltip
               contentStyle={{
@@ -115,7 +123,7 @@ export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: As
                       <p className="font-semibold text-gray-900 dark:text-white">{data.type}</p>
                       <div className="mt-1 space-y-0.5 text-sm">
                         <p className={data.pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
-                          {t('statistics.totalPnl')}: {formatCurrency(data.pnl)}
+                          {t('statistics.totalPnl')}: {formatPnL(data.pnl)}
                         </p>
                         <p className="text-gray-600 dark:text-gray-400">
                           {t('charts.tradeCount')}: {data.count}
@@ -124,7 +132,7 @@ export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: As
                           {t('common.winRate')}: {data.winRate.toFixed(1)}%
                         </p>
                         <p className="text-gray-600 dark:text-gray-400">
-                          {t('charts.avgPnl')}: {formatCurrency(data.avgPnl)}
+                          {t('charts.avgPnl')}: {formatPnL(data.avgPnl)}
                         </p>
                         <p className="text-gray-600 dark:text-gray-400">
                           {t('statistics.avgHoldingDays')}: {data.avgHolding.toFixed(1)}
@@ -153,12 +161,14 @@ export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: As
                   fill={ASSET_TYPE_COLORS[entry.rawType] || '#6b7280'}
                 />
               ))}
-              <LabelList
-                dataKey="pnl"
-                position="right"
-                formatter={(value) => formatCurrency(Number(value))}
-                style={{ fontSize: 11, fill: '#6b7280' }}
-              />
+              {chartConfig.showLabels && (
+                <LabelList
+                  dataKey="pnl"
+                  position="right"
+                  formatter={(value) => formatPnL(Number(value))}
+                  style={{ fontSize: chartConfig.fontSize, fill: '#6b7280' }}
+                />
+              )}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -192,7 +202,7 @@ export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: As
           <div>
             <span className="text-neutral-400">{t('statistics.totalPnl')}:</span>
             <span className={`font-semibold ml-1 ${totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatCurrency(totalPnL)}
+              {formatPnL(totalPnL)}
             </span>
           </div>
         </div>
@@ -216,7 +226,7 @@ export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: As
           <div>
             <span className="text-gray-500 dark:text-gray-400">{t('statistics.totalPnl')}: </span>
             <span className={`font-medium ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {formatCurrency(totalPnL)}
+              {formatPnL(totalPnL)}
             </span>
           </div>
         </div>

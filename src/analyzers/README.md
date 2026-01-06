@@ -12,14 +12,20 @@
 | 文件名 | 角色 | 功能 |
 |--------|------|------|
 | `__init__.py` | 模块入口 | 导出分析器类 |
-| `quality_scorer.py` | 质量评分器 | V2评分系统：入场/出场/趋势/风险四维度评分 |
+| `quality_scorer.py` | 质量评分器 | V2.1评分系统：9维度评分（含新闻契合度） |
 | `behavior_scorer.py` | 行为评分器 | 分析交易行为模式，识别冲动/纪律等特征 |
 | `execution_scorer.py` | 执行评分器 | 评估交易执行质量，滑点/时机等 |
 | `market_env_scorer.py` | 市场环境评分器 | 评估入场时的市场环境适配度 |
+| `news_searcher.py` | 新闻搜索器 | 搜索交易日相关新闻，情感分析，类别标记 |
+| `news_alignment_scorer.py` | 新闻契合度评分器 | 评估交易与新闻背景的契合程度 |
+| `news_adapters/` | 新闻适配器模块 | 多提供商新闻搜索（Tavily/Bing/Polygon） |
 | `option_analyzer.py` | 期权分析器 | 期权交易专属分析：Moneyness/DTE/Greeks |
+| `option_strategy_detector.py` | 期权策略识别器 | 自动识别期权组合策略（Covered Call/Collar/Iron Condor等） |
 | `strategy_classifier.py` | 策略分类器 | 自动识别交易策略类型 |
 | `review_generator.py` | 复盘生成器 | 生成交易复盘文字总结 |
-| `insight_generator.py` | 洞察生成器 | 生成交易模式洞察和改进建议 |
+| `insight_generator.py` | 洞察生成器 | 生成交易模式洞察（含案例关联、模式统计、根因分析） |
+| `root_cause_analyzer.py` | 根因分析器 | 亏损/盈利归因（时机/方向/仓位/事件/执行）、行为模式检测 |
+| `event_detector.py` | 事件检测器 | 财报日历获取、价格/成交量异常检测、持仓事件关联 |
 
 ---
 

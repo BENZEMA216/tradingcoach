@@ -254,6 +254,18 @@ export const statisticsApi = {
 };
 
 // System API
+export interface DataResetResponse {
+  success: boolean;
+  message: string;
+  deleted_counts: {
+    positions: number;
+    trades: number;
+    import_history: number;
+    tasks: number;
+  };
+  timestamp: string;
+}
+
 export const systemApi = {
   health: async () => {
     const { data } = await api.get('/system/health');
@@ -267,6 +279,15 @@ export const systemApi = {
 
   getSymbols: async () => {
     const { data } = await api.get('/system/symbols');
+    return data;
+  },
+
+  /**
+   * 重置所有交易数据
+   * 警告：此操作不可撤销！
+   */
+  resetAllData: async (): Promise<DataResetResponse> => {
+    const { data } = await api.delete<DataResetResponse>('/system/data/reset');
     return data;
   },
 };
@@ -409,6 +430,198 @@ export const uploadApi = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+    });
+    return data;
+  },
+};
+
+// Task API
+export interface TaskStatus {
+  task_id: string;
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+  progress: number;
+  current_step: string | null;
+  file_name: string | null;
+  email: string | null;
+  result: {
+    language?: string;
+    total_rows?: number;
+    completed_trades?: number;
+    new_trades?: number;
+    duplicates_skipped?: number;
+    positions_matched?: number;
+    positions_scored?: number;
+    errors?: number;
+    error_messages?: string[];
+  } | null;
+  error_message: string | null;
+  logs: { time: string; level: string; message: string }[];
+  created_at: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+}
+
+export interface TaskCreateResponse {
+  success: boolean;
+  task_id: string;
+  message: string;
+}
+
+export interface TaskListResponse {
+  tasks: TaskStatus[];
+  total: number;
+}
+
+export const taskApi = {
+  /**
+   * 创建分析任务
+   * @param file CSV文件
+   * @param email 邮箱地址（可选）
+   * @param replaceMode 替换模式（默认true）
+   */
+  create: async (file: File, email?: string, replaceMode: boolean = true): Promise<TaskCreateResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const params = new URLSearchParams();
+    if (email) params.append('email', email);
+    params.append('replace_mode', String(replaceMode));
+
+    const { data } = await api.post<TaskCreateResponse>(
+      `/tasks/create?${params.toString()}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 30000,
+      }
+    );
+    return data;
+  },
+
+  /**
+   * 获取任务状态
+   */
+  getStatus: async (taskId: string): Promise<TaskStatus> => {
+    const { data } = await api.get<TaskStatus>(`/tasks/${taskId}`);
+    return data;
+  },
+
+  /**
+   * 获取任务列表
+   */
+  list: async (limit: number = 10, status?: string): Promise<TaskListResponse> => {
+    const params: Record<string, unknown> = { limit };
+    if (status) params.status = status;
+    const { data } = await api.get<TaskListResponse>('/tasks/', { params });
+    return data;
+  },
+
+  /**
+   * 取消任务
+   */
+  cancel: async (taskId: string): Promise<{ success: boolean; message: string }> => {
+    const { data } = await api.delete(`/tasks/${taskId}`);
+    return data;
+  },
+};
+
+// Events API
+import type {
+  EventListItem,
+  EventDetail,
+  EventStatistics,
+  EventPerformanceByType,
+  PaginatedEvents,
+  PositionEventsResponse,
+} from '@/types';
+
+export interface EventFilters {
+  symbol?: string;
+  event_type?: string;
+  event_impact?: string;
+  date_start?: string;
+  date_end?: string;
+  min_importance?: number;
+  is_key_event?: boolean;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
+}
+
+export const eventsApi = {
+  /**
+   * 获取事件列表（分页）
+   */
+  list: async (page = 1, pageSize = 20, filters?: EventFilters): Promise<PaginatedEvents> => {
+    const { data } = await api.get<PaginatedEvents>('/events', {
+      params: { page, page_size: pageSize, ...filters },
+    });
+    return data;
+  },
+
+  /**
+   * 获取事件详情
+   */
+  getDetail: async (eventId: number): Promise<EventDetail> => {
+    const { data } = await api.get<EventDetail>(`/events/${eventId}`);
+    return data;
+  },
+
+  /**
+   * 获取事件统计
+   */
+  getStatistics: async (params?: {
+    symbol?: string;
+    date_start?: string;
+    date_end?: string;
+  }): Promise<EventStatistics> => {
+    const { data } = await api.get<EventStatistics>('/events/statistics', { params });
+    return data;
+  },
+
+  /**
+   * 按事件类型获取绩效
+   */
+  getPerformanceByType: async (): Promise<EventPerformanceByType[]> => {
+    const { data } = await api.get<EventPerformanceByType[]>('/events/by-type-performance');
+    return data;
+  },
+
+  /**
+   * 获取持仓关联的事件
+   */
+  getForPosition: async (positionId: number): Promise<PositionEventsResponse> => {
+    const { data } = await api.get<PositionEventsResponse>(`/events/position/${positionId}`);
+    return data;
+  },
+
+  /**
+   * 获取标的事件时间线
+   */
+  getSymbolTimeline: async (symbol: string, days = 90): Promise<EventListItem[]> => {
+    const { data } = await api.get<EventListItem[]>(`/events/symbol/${symbol}/timeline`, {
+      params: { days },
+    });
+    return data;
+  },
+
+  /**
+   * 标记关键事件
+   */
+  markAsKey: async (eventId: number, isKey = true): Promise<EventDetail> => {
+    const { data } = await api.put<EventDetail>(`/events/${eventId}/mark-key`, null, {
+      params: { is_key: isKey },
+    });
+    return data;
+  },
+
+  /**
+   * 更新事件备注
+   */
+  updateNotes: async (eventId: number, notes: string): Promise<EventDetail> => {
+    const { data } = await api.put<EventDetail>(`/events/${eventId}/notes`, null, {
+      params: { notes },
     });
     return data;
   },

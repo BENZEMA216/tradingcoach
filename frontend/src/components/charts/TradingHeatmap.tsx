@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TradingHeatmapCell } from '@/types';
 import { formatCurrency } from '@/utils/format';
+import { ChartSkeleton } from '@/components/common/ChartSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface TradingHeatmapProps {
   data: TradingHeatmapCell[];
@@ -126,25 +128,22 @@ export function TradingHeatmap({ data, isLoading, bare = false }: TradingHeatmap
 
   // Early returns AFTER all hooks
   if (isLoading) {
-    if (bare) return <div className="h-48 bg-neutral-100 dark:bg-neutral-800 rounded animate-pulse" />;
+    if (bare) return <ChartSkeleton height="h-48" showTitle={false} />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4 animate-pulse" />
-        <div className="h-48 bg-gray-100 dark:bg-gray-700/50 rounded animate-pulse" />
+        <ChartSkeleton height="h-48" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    if (bare) return <div className="h-48 flex items-center justify-center text-neutral-500">{t('common.noData')}</div>;
+    if (bare) return <EmptyState icon="chart" height="h-48" size="sm" />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('charts.tradingHeatmap')}
         </h3>
-        <div className="h-48 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          {t('common.noData')}
-        </div>
+        <EmptyState icon="chart" height="h-48" size="sm" />
       </div>
     );
   }

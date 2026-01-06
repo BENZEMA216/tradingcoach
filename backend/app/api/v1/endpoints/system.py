@@ -1,16 +1,34 @@
 """
 System API endpoints
+
+input: 无
+output: 系统状态、统计信息、数据重置
+pos: 系统管理端点 - 健康检查、数据统计、数据重置
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
+import logging
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional
 
 from ....database import get_db, Position, Trade, MarketData
-from ....schemas import MessageResponse
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+class DataResetResponse(BaseModel):
+    """数据重置响应"""
+    success: bool
+    message: str
+    deleted_counts: dict
+    timestamp: str
 
 
 @router.get("/health")
@@ -134,3 +152,80 @@ async def list_all_symbols(
         "symbols": list(symbols.values()),
         "total": len(symbols),
     }
+
+
+@router.delete("/data/reset", response_model=DataResetResponse)
+async def reset_all_data(
+    db: Session = Depends(get_db),
+):
+    """
+    重置所有交易数据，清空数据库准备重新上传。
+
+    此操作将删除：
+    - 所有持仓记录 (positions)
+    - 所有交易记录 (trades)
+    - 所有导入历史 (import_history)
+    - 所有任务记录 (tasks)
+
+    警告：此操作不可撤销！
+    """
+    deleted_counts = {}
+
+    try:
+        # 先统计各表记录数
+        position_count = db.query(func.count(Position.id)).scalar() or 0
+        trade_count = db.query(func.count(Trade.id)).scalar() or 0
+
+        # 统计 import_history 和 tasks
+        import_history_count = 0
+        tasks_count = 0
+        try:
+            result = db.execute(text("SELECT COUNT(*) FROM import_history"))
+            import_history_count = result.scalar() or 0
+        except Exception:
+            pass
+
+        try:
+            result = db.execute(text("SELECT COUNT(*) FROM tasks"))
+            tasks_count = result.scalar() or 0
+        except Exception:
+            pass
+
+        # 按顺序删除（注意外键依赖）
+        tables_to_clear = [
+            ('positions', position_count),
+            ('trades', trade_count),
+            ('import_history', import_history_count),
+            ('tasks', tasks_count),
+        ]
+
+        for table, count in tables_to_clear:
+            try:
+                db.execute(text(f"DELETE FROM {table}"))
+                deleted_counts[table] = count
+                logger.info(f"Cleared table: {table} ({count} records)")
+            except Exception as e:
+                logger.warning(f"Failed to clear {table}: {e}")
+                deleted_counts[table] = 0
+
+        db.commit()
+        logger.info("All trading data cleared for fresh import")
+
+        total_deleted = sum(deleted_counts.values())
+
+        return DataResetResponse(
+            success=True,
+            message=f"Successfully deleted {total_deleted} records",
+            deleted_counts=deleted_counts,
+            timestamp=datetime.utcnow().isoformat(),
+        )
+
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to reset data: {e}")
+        return DataResetResponse(
+            success=False,
+            message=f"Failed to reset data: {str(e)}",
+            deleted_counts=deleted_counts,
+            timestamp=datetime.utcnow().isoformat(),
+        )

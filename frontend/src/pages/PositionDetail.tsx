@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { positionsApi } from '@/api/client';
+import { positionsApi, eventsApi } from '@/api/client';
 import {
   formatCurrency,
   formatPercent,
@@ -14,8 +14,10 @@ import { ChevronLeft } from 'lucide-react';
 import { TradeSummaryTab } from '@/components/position-detail/TradeSummaryTab';
 import { RiskAnalysisTab } from '@/components/position-detail/RiskAnalysisTab';
 import { ExecutionTab } from '@/components/position-detail/ExecutionTab';
+import { NewsContextSection } from '@/components/position-detail/NewsContextSection';
 import { InsightsTab } from '@/components/position-detail/InsightsTab';
 import { RelatedPositionsTab } from '@/components/position-detail/RelatedPositionsTab';
+import { EventTimelineChart } from '@/components/charts';
 
 export function PositionDetail() {
   const { t } = useTranslation();
@@ -55,6 +57,13 @@ export function PositionDetail() {
   const { data: relatedPositions, isLoading: loadingRelated } = useQuery({
     queryKey: ['position-related', positionId],
     queryFn: () => positionsApi.getRelated(positionId),
+    enabled: positionId > 0,
+  });
+
+  // Fetch events for this position
+  const { data: positionEvents, isLoading: loadingEvents } = useQuery({
+    queryKey: ['position-events', positionId],
+    queryFn: () => eventsApi.getForPosition(positionId),
     enabled: positionId > 0,
   });
 
@@ -162,7 +171,35 @@ export function PositionDetail() {
           <ExecutionTab trades={trades} loading={loadingTrades} />
         </section>
 
-        {/* Section 4: AI Insights */}
+        {/* Section 4: News Context */}
+        <section>
+          <NewsContextSection
+            newsContext={position.news_context}
+            direction={position.direction}
+            symbol={position.symbol}
+          />
+        </section>
+
+        {/* Section 5: Events During Position */}
+        {positionEvents && positionEvents.events && positionEvents.events.length > 0 && (
+          <section>
+            <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+              <h2 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+                {t('events.title', '事件复盘')}
+              </h2>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">
+                {t('events.subtitle', '持仓期间的重大市场事件')}
+              </p>
+              <EventTimelineChart
+                events={positionEvents.events}
+                isLoading={loadingEvents}
+                showPnL={true}
+              />
+            </div>
+          </section>
+        )}
+
+        {/* Section 6 (or 5 if no events): AI Insights */}
         <section>
           <InsightsTab
             position={position}
@@ -171,7 +208,7 @@ export function PositionDetail() {
           />
         </section>
 
-        {/* Section 5: Related Positions (Option-Stock Bundling) */}
+        {/* Section 6: Related Positions (Option-Stock Bundling) */}
         <section>
           <RelatedPositionsTab
             relatedPositions={relatedPositions}

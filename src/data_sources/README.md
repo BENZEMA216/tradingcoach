@@ -13,7 +13,9 @@
 |--------|------|------|
 | `__init__.py` | 模块入口 | 导出客户端类 |
 | `base_client.py` | 抽象基类 | 定义数据源接口标准 |
-| `yfinance_client.py` | YFinance客户端 | 免费数据源，支持美/港/A股 |
+| `yfinance_client.py` | YFinance客户端 | 免费数据源，支持美/港股 |
+| `akshare_client.py` | AKShare客户端 | 免费A股数据源，国内更稳定 |
+| `data_router.py` | 智能路由器 | 根据代码自动选择数据源 |
 | `options_client.py` | 期权数据客户端 | 获取期权链和Greeks数据 |
 | `cache_manager.py` | 缓存管理器 | 三级缓存：L1内存/L2数据库/L3文件 |
 | `batch_fetcher.py` | 批量获取器 | 并发控制、进度显示、断点续传 |
@@ -38,9 +40,14 @@
 **抽象工厂模式**:
 ```
 BaseDataClient (抽象接口)
-    ├── YFinanceClient (免费，主要使用)
+    ├── YFinanceClient (免费，美股/港股)
+    ├── AKShareClient (免费，A股专用)
     ├── PolygonClient (付费，期权数据) [计划中]
     └── AlphaVantageClient (备选)
+
+DataRouter (智能路由器)
+    ├── A股代码 → AKShareClient
+    └── 其他代码 → YFinanceClient
 ```
 
 ## 文件说明
@@ -161,6 +168,86 @@ try:
     df = client.get_ohlcv(...)
 except RateLimitError as e:
     print(f"需要等待: {e}")
+```
+
+## AKShareClient
+
+基于 AKShare 库的 A 股数据客户端。
+
+### 特性
+
+| 特性 | 说明 |
+|------|------|
+| 免费 | 无需 API Key |
+| A股专用 | 上交所、深交所、北交所 |
+| 国内稳定 | 无需翻墙 |
+| 前复权 | 自动调整历史价格 |
+
+### 支持的代码格式
+
+```python
+# 纯数字
+'000001' → 平安银行 (深圳)
+'600000' → 浦发银行 (上海)
+'300750' → 宁德时代 (创业板)
+
+# 带后缀
+'000001.SZ' → 深交所
+'600000.SH' → 上交所
+```
+
+### 使用示例
+
+```python
+from src.data_sources.akshare_client import AKShareClient
+from datetime import date
+
+client = AKShareClient()
+
+# 获取 A 股数据
+df = client.get_ohlcv(
+    symbol='000001',
+    start_date=date(2024, 1, 1),
+    end_date=date(2024, 12, 31)
+)
+
+# 获取实时行情
+quote = client.get_realtime_quote('000001')
+print(f"当前价: {quote['price']}, 涨跌幅: {quote['change_pct']}%")
+```
+
+## DataRouter
+
+智能数据源路由器，自动选择最佳数据源。
+
+### 路由规则
+
+| 代码类型 | 示例 | 数据源 |
+|----------|------|--------|
+| A股 | 000001, 600000.SH | AKShare |
+| 港股 | 00700.HK, 09988.HK | YFinance |
+| 美股 | AAPL, TSLA | YFinance |
+
+### 使用示例
+
+```python
+from src.data_sources.data_router import get_data_router
+from datetime import date
+
+router = get_data_router()
+
+# 自动路由 - A股使用 AKShare
+df = router.get_ohlcv('000001', date(2024, 1, 1), date(2024, 12, 31))
+
+# 自动路由 - 美股使用 YFinance
+df = router.get_ohlcv('AAPL', date(2024, 1, 1), date(2024, 12, 31))
+
+# 批量获取（自动分组）
+results = router.get_multiple_ohlcv(
+    symbols=['000001', 'AAPL', '00700.HK'],
+    start_date=date(2024, 1, 1),
+    end_date=date(2024, 12, 31)
+)
 ```
 
 ## CacheManager

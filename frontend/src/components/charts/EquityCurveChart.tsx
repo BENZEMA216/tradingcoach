@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -10,8 +10,11 @@ import {
   ReferenceLine,
 } from 'recharts';
 import type { EquityCurvePoint } from '@/types';
-import { formatCurrency } from '@/utils/format';
+import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
+import { usePrivacyStore } from '@/store/usePrivacyStore';
+import { ChartSkeleton } from '@/components/common/ChartSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface EquityCurveChartProps {
   data: EquityCurvePoint[];
@@ -28,28 +31,31 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
   const displayTitle = title || t('charts.equityCurve');
   const locale = i18n.language === 'zh' ? 'zh-CN' : 'en-US';
 
+  // Subscribe to privacy state for re-renders
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
+
   if (isLoading) {
+    if (bare) {
+      return <ChartSkeleton height="h-64" showTitle={false} />;
+    }
     return (
-      <div className={bare ? '' : 'bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700'}>
-        {!bare && (
-          <div className="h-6 w-32 bg-neutral-200 dark:bg-neutral-700 rounded mb-4 animate-pulse" />
-        )}
-        <div className="h-64 bg-neutral-100 dark:bg-neutral-800 rounded-lg animate-pulse" />
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        <ChartSkeleton height="h-64" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
+    if (bare) {
+      return <EmptyState icon="chart" height="h-64" size="sm" />;
+    }
     return (
-      <div className={bare ? '' : 'bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700'}>
-        {!bare && (
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {displayTitle}
-          </h3>
-        )}
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          {t('common.noData')}
-        </div>
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          {displayTitle}
+        </h3>
+        <EmptyState icon="chart" height="h-64" size="sm" />
       </div>
     );
   }
@@ -78,14 +84,14 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
               <span
                 className={`font-medium ${totalPnL >= 0 ? 'text-profit' : 'text-loss'}`}
               >
-                {formatCurrency(totalPnL)}
+                {formatPnL(totalPnL)}
               </span>
             </div>
             {maxDrawdown && maxDrawdown > 0 && (
               <div className="text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Max DD: </span>
                 <span className="font-medium text-loss">
-                  {formatCurrency(-maxDrawdown)}
+                  {formatPnL(-maxDrawdown)}
                 </span>
               </div>
             )}
@@ -94,29 +100,41 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
       )}
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+          <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+            <defs>
+              <linearGradient id="equityCurveGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={lineColor} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={lineColor} stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={colors.grid}
+              strokeOpacity={0.5}
+              vertical={false}
+            />
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 12, fill: colors.text }}
+              tick={{ fontSize: 11, fill: colors.text }}
               tickLine={false}
-              axisLine={{ stroke: colors.axis }}
+              axisLine={{ stroke: colors.axis, strokeOpacity: 0.5 }}
+              interval="preserveStartEnd"
             />
             <YAxis
-              tick={{ fontSize: 12, fill: colors.text }}
+              tick={{ fontSize: 11, fill: colors.text }}
               tickLine={false}
-              axisLine={{ stroke: colors.axis }}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+              axisLine={false}
+              tickFormatter={formatAxis}
             />
             <Tooltip
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3 shadow-lg">
-                      <p className="font-semibold text-neutral-900 dark:text-neutral-100">{data.date}</p>
-                      <p className="text-sm mt-1" style={{ color: data.pnl >= 0 ? colors.profit : colors.loss }}>
-                        {t('common.pnl')}: {formatCurrency(data.pnl)}
+                    <div className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3 shadow-xl backdrop-blur-sm">
+                      <p className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm">{data.date}</p>
+                      <p className="text-sm mt-1.5 font-semibold" style={{ color: data.pnl >= 0 ? colors.profit : colors.loss }}>
+                        {t('common.pnl')}: {formatPnL(data.pnl)}
                       </p>
                     </div>
                   );
@@ -124,16 +142,24 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
                 return null;
               }}
             />
-            <ReferenceLine y={0} stroke={colors.text} strokeDasharray="3 3" />
-            <Line
+            <ReferenceLine y={0} stroke={colors.zeroline} strokeDasharray="4 4" strokeOpacity={0.7} />
+            <Area
               type="monotone"
               dataKey="pnl"
               stroke={lineColor}
               strokeWidth={2}
+              fill="url(#equityCurveGradient)"
               dot={false}
-              activeDot={{ r: 4, fill: lineColor }}
+              activeDot={{
+                r: 5,
+                fill: lineColor,
+                stroke: colors.background,
+                strokeWidth: 2,
+              }}
+              animationDuration={1000}
+              animationEasing="ease-out"
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>

@@ -16,8 +16,14 @@ from tqdm import tqdm
 from src.models.trade import Trade
 from src.data_sources.base_client import BaseDataClient, DataNotFoundError, InvalidSymbolError
 from src.data_sources.cache_manager import CacheManager
+from typing import Optional, Union
 
 logger = logging.getLogger(__name__)
+
+# 延迟导入避免循环依赖
+def _get_data_router():
+    from src.data_sources.data_router import DataRouter, get_data_router
+    return get_data_router()
 
 
 class BatchFetcher:
@@ -34,23 +40,35 @@ class BatchFetcher:
 
     def __init__(
         self,
-        client: BaseDataClient,
-        cache_manager: CacheManager,
+        client: Optional[BaseDataClient] = None,
+        cache_manager: Optional[CacheManager] = None,
         batch_size: int = 50,
         request_delay: float = 0.2,
-        extra_days: int = 200  # 为技术指标计算额外获取的天数
+        extra_days: int = 200,  # 为技术指标计算额外获取的天数
+        use_router: bool = True  # 使用智能路由器（自动选择 AKShare/YFinance）
     ):
         """
         初始化批量获取器
 
         Args:
-            client: 数据源客户端
+            client: 数据源客户端（如果 use_router=True 则忽略）
             cache_manager: 缓存管理器
             batch_size: 批次大小
             request_delay: 请求间隔（秒）
             extra_days: 额外获取天数（用于技术指标计算）
+            use_router: 是否使用智能路由器（自动为A股使用AKShare）
         """
-        self.client = client
+        self.use_router = use_router
+        self._router = None
+
+        if use_router:
+            self._router = _get_data_router()
+            self.client = None
+            source_name = "DataRouter (AKShare + YFinance)"
+        else:
+            self.client = client
+            source_name = client.get_source_name() if client else "None"
+
         self.cache = cache_manager
         self.batch_size = batch_size
         self.request_delay = request_delay
@@ -58,7 +76,7 @@ class BatchFetcher:
 
         logger.info(
             f"BatchFetcher initialized: "
-            f"client={client.get_source_name()}, batch_size={batch_size}"
+            f"source={source_name}, batch_size={batch_size}, use_router={use_router}"
         )
 
     def fetch_required_data(self, session: Session) -> Dict[str, any]:
@@ -238,26 +256,30 @@ class BatchFetcher:
             end_date = req['end_date']
 
             try:
-                # 转换为 yfinance 格式（如需要）
-                if hasattr(self.client, 'convert_symbol_for_yfinance'):
-                    symbol_converted = self.client.convert_symbol_for_yfinance(symbol)
+                # 使用路由器或单个客户端
+                if self.use_router and self._router:
+                    # 使用智能路由器（自动选择 AKShare 或 YFinance）
+                    df = self._router.get_ohlcv(symbol, start_date, end_date)
+                    source_name = self._router.detect_market(symbol)
                 else:
-                    symbol_converted = symbol
+                    # 使用传统单客户端
+                    # 转换为 yfinance 格式（如需要）
+                    if hasattr(self.client, 'convert_symbol_for_yfinance'):
+                        symbol_converted = self.client.convert_symbol_for_yfinance(symbol)
+                    else:
+                        symbol_converted = symbol
 
-                # 获取数据
-                df = self.client.get_ohlcv(
-                    symbol_converted,
-                    start_date,
-                    end_date
-                )
+                    df = self.client.get_ohlcv(symbol_converted, start_date, end_date)
+                    source_name = self.client.get_source_name()
 
                 if df is not None and not df.empty:
                     # 缓存数据
-                    self.cache.set(
-                        symbol,  # 使用原始 symbol 缓存
-                        df,
-                        data_source=self.client.get_source_name()
-                    )
+                    if self.cache:
+                        self.cache.set(
+                            symbol,  # 使用原始 symbol 缓存
+                            df,
+                            data_source=source_name
+                        )
 
                     success_count += 1
                     total_records += len(df)

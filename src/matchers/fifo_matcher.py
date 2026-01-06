@@ -225,8 +225,12 @@ class FIFOMatcher:
 
         logger.info(f"Saving {len(positions)} positions to database...")
 
-        # 批量插入优化
-        self.session.bulk_save_objects(positions)
+        # 使用 add 而不是 bulk_save_objects，以便获取自动生成的 ID
+        for position in positions:
+            self.session.add(position)
+
+        # flush 以获取 ID，但不提交事务
+        self.session.flush()
 
         logger.info("Positions saved successfully")
 
@@ -234,13 +238,33 @@ class FIFOMatcher:
         """
         更新交易记录的position_id引用
 
+        遍历所有持仓，将关联的交易记录的position_id更新为持仓ID
+
         Args:
-            positions: 持仓列表
+            positions: 持仓列表（已保存，有ID）
         """
-        # TODO: 实现交易到持仓的反向引用
-        # 需要在Position模型中添加entry_trade_id和exit_trade_id字段
-        # 或者在Trade模型中添加position_id字段
-        pass
+        if not positions:
+            return
+
+        logger.info(f"Updating trade references for {len(positions)} positions...")
+
+        updated_count = 0
+        for position in positions:
+            # 获取临时存储的交易ID列表
+            entry_trade_ids = getattr(position, '_entry_trade_ids', [])
+            exit_trade_ids = getattr(position, '_exit_trade_ids', [])
+
+            all_trade_ids = entry_trade_ids + exit_trade_ids
+
+            if all_trade_ids and position.id:
+                # 批量更新这些交易的position_id
+                self.session.query(Trade)\
+                    .filter(Trade.id.in_(all_trade_ids))\
+                    .update({Trade.position_id: position.id}, synchronize_session=False)
+
+                updated_count += len(all_trade_ids)
+
+        logger.info(f"Updated {updated_count} trade references")
 
     def _print_summary(self):
         """打印配对总结"""

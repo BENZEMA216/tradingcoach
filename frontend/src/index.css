@@ -504,3 +504,501 @@ body.dark {
 .dark .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) {
   border-color: var(--border-primary) !important;
 }
+
+/* ===== Responsive Chart Styles ===== */
+
+/* Ensure chart containers have minimum dimensions to prevent ResponsiveContainer warnings */
+.h-64 .recharts-responsive-container,
+.h-72 .recharts-responsive-container {
+  min-width: 100px;
+  min-height: 100px;
+}
+
+/* Prevent chart label overflow */
+.recharts-wrapper {
+  overflow: visible;
+}
+
+/* Ensure label list text doesn't cause layout issues */
+.recharts-label-list text {
+  pointer-events: none;
+}
+
+/* Chart container with proper overflow handling */
+.chart-responsive-container {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hide labels on very small containers via CSS fallback */
+@container (max-width: 350px) {
+  .recharts-label-list {
+    opacity: 0;
+  }
+}
+
+/* Smooth transition for responsive chart updates */
+.recharts-surface {
+  transition: none;
+}
+
+/* Ensure Y-axis labels don't get clipped */
+.recharts-yAxis .recharts-cartesian-axis-tick-value {
+  text-anchor: end;
+}
+
+/* ============================================
+   Phase 4: Enhanced Animations & Interactions
+   ============================================ */
+
+/* Shimmer animation for loading skeletons */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Staggered fade in for lists */
+.stagger-fade-in > * {
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.stagger-fade-in > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-fade-in > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-fade-in > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-fade-in > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-fade-in > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-fade-in > *:nth-child(6) { animation-delay: 250ms; }
+
+/* Scale pulse animation for emphasis */
+@keyframes scalePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-scale-pulse {
+  animation: scalePulse 2s ease-in-out infinite;
+}
+
+/* Smooth hover lift effect for cards */
+.hover-lift {
+  @apply transition-all duration-200 ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Interactive table row */
+.interactive-row {
+  @apply transition-colors duration-150 cursor-pointer;
+}
+
+.interactive-row:hover {
+  @apply bg-neutral-50;
+}
+
+.dark .interactive-row:hover {
+  background: var(--surface-tertiary);
+}
+
+/* Button press effect */
+.btn-press {
+  @apply transition-transform duration-100;
+}
+
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+/* Chart tooltip animation */
+.recharts-tooltip-wrapper {
+  transition: left 0.1s ease-out, top 0.1s ease-out;
+}
+
+/* Enhanced focus states */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.dark .focus-ring {
+  @apply focus:ring-offset-neutral-900;
+}
+
+/* Glow effect for important elements */
+.glow-profit {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+.dark .glow-profit {
+  box-shadow: 0 0 20px rgba(38, 166, 154, 0.3);
+}
+
+.glow-loss {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.dark .glow-loss {
+  box-shadow: 0 0 20px rgba(239, 83, 80, 0.3);
+}
+
+/* Number counting animation */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-count {
+  animation: countUp 0.5s ease-out;
+}
+
+/* Chart line drawing animation */
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Badge hover animation */
+.badge-animated {
+  @apply transition-all duration-200;
+}
+
+.badge-animated:hover {
+  transform: scale(1.05);
+}
+
+/* Dropdown menu animation */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.15s ease-out;
+}
+
+/* Card border glow on hover */
+.card-glow {
+  @apply transition-all duration-300;
+  position: relative;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, transparent, transparent);
+  z-index: -1;
+  transition: background 0.3s ease;
+}
+
+.card-glow:hover::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+}
+
+/* ============================================
+   Processing Log Panel - Enhanced Animations
+   ============================================ */
+
+/* Log entry slide-in animation - more dramatic */
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(3px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-slide-in-from-top {
+  animation: slideInFromTop 0.35s ease-out;
+}
+
+/* Log entry highlight flash */
+@keyframes highlightFlash {
+  0% { background-color: transparent; }
+  30% { background-color: rgba(59, 130, 246, 0.15); }
+  100% { background-color: transparent; }
+}
+
+.log-entry-new {
+  animation: slideInFromTop 0.35s ease-out, highlightFlash 1.5s ease-out;
+}
+
+/* Pulsing loader for processing state */
+@keyframes processingPulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.animate-processing-pulse {
+  animation: processingPulse 1.5s ease-in-out infinite;
+}
+
+/* Scanning line effect for log container */
+@keyframes scanLine {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.log-container-scanning::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent);
+  animation: scanLine 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Typing cursor effect */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.typing-cursor::after {
+  content: '▊';
+  animation: blink 0.8s infinite;
+  color: #3b82f6;
+  margin-left: 2px;
+}
+
+/* Progress bar glow */
+@keyframes progressGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+  }
+}
+
+.progress-bar-glow {
+  animation: progressGlow 1.5s ease-in-out infinite;
+}
+
+/* Step indicator bounce */
+@keyframes stepBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.step-indicator-active {
+  animation: stepBounce 1s ease-in-out infinite;
+}
+
+/* Dot loading animation */
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.loading-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* Matrix-style rain effect (optional, for fun) */
+@keyframes matrixRain {
+  0% {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* Success checkmark animation */
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 50;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-checkmark {
+  stroke-dasharray: 50;
+  animation: checkmark 0.5s ease-out forwards;
+}
+
+/* Counter increment animation */
+@keyframes countIncrement {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  51% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-count-increment {
+  animation: countIncrement 0.3s ease-out;
+}
+
+/* Log level color pulses */
+@keyframes successPulse {
+  0%, 100% { color: #22c55e; }
+  50% { color: #4ade80; }
+}
+
+@keyframes errorPulse {
+  0%, 100% { color: #ef4444; }
+  50% { color: #f87171; }
+}
+
+@keyframes warningPulse {
+  0%, 100% { color: #f59e0b; }
+  50% { color: #fbbf24; }
+}
+
+.log-success-icon {
+  animation: successPulse 1s ease-in-out infinite;
+}
+
+.log-error-icon {
+  animation: errorPulse 1s ease-in-out infinite;
+}
+
+.log-warning-icon {
+  animation: warningPulse 1s ease-in-out infinite;
+}
+
+/* Hover glow for log entries */
+.log-entry-hover:hover {
+  background: rgba(59, 130, 246, 0.05);
+  box-shadow: inset 3px 0 0 0 #3b82f6;
+}
+
+.dark .log-entry-hover:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Terminal-style scrollbar for log container */
+.log-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.log-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.log-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+}
+
+.dark .log-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Processing status bar animation */
+@keyframes statusBarPulse {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.status-bar-animated {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+  background-size: 200% 100%;
+  animation: statusBarPulse 2s ease-in-out infinite;
+}

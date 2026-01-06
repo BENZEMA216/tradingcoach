@@ -1,0 +1,196 @@
+# 华泰证券中文版 CSV 配置
+# 一旦我被更新，务必更新所属文件夹的 README.md
+
+broker_id: huatai_cn
+broker_name: Huatai Securities (Chinese)
+broker_name_cn: 华泰证券
+version: "1.0"
+
+# 文件格式
+encoding: gbk
+delimiter: ","
+quote_char: '"'
+header_row: 0
+
+# 自动检测规则
+detection:
+  columns:
+    - "操作"
+    - "证券代码"
+    - "成交时间"
+    - "成交均价"
+    - "成交数量"
+  unique_columns:
+    - "资金账号"
+    - "股东账号"
+  encoding_hint: gbk
+  confidence_threshold: 0.8
+
+# 支持的市场
+markets: [cn]
+default_market: cn
+
+# 字段映射
+field_mappings:
+  # === 基本信息 ===
+  - source: "操作"
+    target: direction
+    required: true
+
+  - source: "证券代码"
+    target: symbol
+    required: true
+    transform:
+      type: string
+      strip: true
+      # 华泰证券代码可能带市场前缀
+      pattern: "^(SH|SZ)?(.+)$"
+      capture_group: 2
+
+  - source: "证券名称"
+    target: symbol_name
+    transform:
+      type: string
+
+  # === 订单信息 ===
+  - source: "委托价格"
+    target: order_price
+    transform:
+      type: number
+
+  - source: "委托数量"
+    target: order_quantity
+    transform:
+      type: integer
+
+  - source: "委托时间"
+    target: order_time
+    transform:
+      type: datetime
+      format: "%H:%M:%S"
+
+  # === 成交信息 ===
+  - source: "成交均价"
+    target: filled_price
+    required: true
+    transform:
+      type: number
+
+  - source: "成交数量"
+    target: filled_quantity
+    required: true
+    transform:
+      type: integer
+
+  - source: "成交金额"
+    target: filled_amount
+    transform:
+      type: number
+
+  - source: "成交时间"
+    target: filled_time
+    required: true
+    transform:
+      type: datetime
+      format: "%Y-%m-%d %H:%M:%S"
+      fallback_formats:
+        - "%Y%m%d %H:%M:%S"
+        - "%Y/%m/%d %H:%M:%S"
+
+  - source: "成交日期"
+    target: trade_date
+    transform:
+      type: date
+      format: "%Y-%m-%d"
+      fallback_formats:
+        - "%Y%m%d"
+
+  # === 市场信息 ===
+  - source: "交易市场"
+    target: market
+
+  - source: "币种"
+    target: currency
+    transform:
+      type: string
+      default: "CNY"
+
+  # === 交易状态 ===
+  - source: "委托状态"
+    target: status
+
+  # === A股特有字段 ===
+  - source: "股东账号"
+    target: shareholder_code
+    transform:
+      type: string
+
+  - source: "资金账号"
+    target: fund_account
+    transform:
+      type: string
+
+# 状态映射
+status_mapping:
+  已成: filled
+  全成: filled
+  部成: partially_filled
+  已撤: cancelled
+  废单: cancelled
+  待报: pending
+  已报: pending
+
+# 方向映射
+direction_mapping:
+  证券买入: buy
+  证券卖出: sell
+  买入: buy
+  卖出: sell
+  融资买入: buy
+  融券卖出: sell_short
+  卖券还款: sell
+  买券还券: buy_to_cover
+
+# 市场映射
+market_mapping:
+  上海A股: cn
+  深圳A股: cn
+  沪A: cn
+  深A: cn
+  上海: cn
+  深圳: cn
+
+# 费用配置
+fees:
+  fields:
+    - 佣金
+    - 印花税
+    - 过户费
+    - 其他费
+    - 规费
+  total_field: "总费用"
+  calculate_total: true
+
+# 验证规则
+validations:
+  - field: filled_quantity
+    rule: range
+    params:
+      min: 100
+      step: 100
+    error_message: "A股成交数量必须是100的整数倍"
+    level: warning
+
+  - field: filled_price
+    rule: range
+    params:
+      min: 0.01
+    error_message: "成交价格必须大于0"
+    level: error
+
+# 华泰特殊处理
+special_handling:
+  # 华泰导出的成交时间可能只有时分秒，需要结合成交日期
+  combine_date_time: true
+  date_field: trade_date
+  time_field: filled_time

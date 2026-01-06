@@ -1,20 +1,22 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { uploadApi } from '@/api/client';
-import type { UploadResponse, UploadHistoryItem } from '@/api/client';
+import { uploadApi, taskApi, systemApi } from '@/api/client';
+import type { UploadHistoryItem } from '@/api/client';
 import {
   Upload as UploadIcon,
   FileText,
-  CheckCircle,
   AlertCircle,
   Clock,
   Loader2,
   History,
-  ArrowRight,
   FileSpreadsheet,
+  Mail,
+  Trash2,
+  AlertTriangle,
+  X,
 } from 'lucide-react';
-import { formatNumber, formatDate } from '@/utils/format';
+import { formatDate } from '@/utils/format';
 import { useNavigate } from 'react-router-dom';
 
 export function Upload() {
@@ -24,7 +26,31 @@ export function Upload() {
 
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
+  const [email, setEmail] = useState('');
+  const [replaceMode, setReplaceMode] = useState(true);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle click to open file dialog
+  const handleClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  // Get system stats for data count
+  const { data: systemStats } = useQuery({
+    queryKey: ['system', 'stats'],
+    queryFn: () => systemApi.getStats(),
+  });
+
+  // Reset all data mutation
+  const resetMutation = useMutation({
+    mutationFn: () => systemApi.resetAllData(),
+    onSuccess: () => {
+      setShowResetModal(false);
+      // Invalidate all queries to refresh data
+      queryClient.invalidateQueries();
+    },
+  });
 
   // Get upload history
   const { data: history, isLoading: historyLoading } = useQuery({
@@ -32,17 +58,13 @@ export function Upload() {
     queryFn: () => uploadApi.getHistory(10),
   });
 
-  // Upload mutation
-  const uploadMutation = useMutation({
-    mutationFn: (file: File) => uploadApi.uploadTrades(file),
+  // Create task mutation (async)
+  const createTaskMutation = useMutation({
+    mutationFn: ({ file, email }: { file: File; email?: string }) =>
+      taskApi.create(file, email, replaceMode),
     onSuccess: (data) => {
-      setUploadResult(data);
-      setSelectedFile(null);
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ['positions'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['statistics'] });
-      queryClient.invalidateQueries({ queryKey: ['upload', 'history'] });
+      // Navigate to task status page
+      navigate(`/tasks/${data.task_id}`);
     },
   });
 
@@ -67,7 +89,6 @@ export function Upload() {
       const file = e.dataTransfer.files[0];
       if (file.name.endsWith('.csv')) {
         setSelectedFile(file);
-        setUploadResult(null);
       }
     }
   }, []);
@@ -76,15 +97,23 @@ export function Upload() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
-      setUploadResult(null);
     }
   };
 
   // Handle upload
   const handleUpload = () => {
     if (selectedFile) {
-      uploadMutation.mutate(selectedFile);
+      createTaskMutation.mutate({
+        file: selectedFile,
+        email: email.trim() || undefined,
+      });
     }
+  };
+
+  // Validate email
+  const isValidEmail = (email: string) => {
+    if (!email) return true; // Empty is valid (optional field)
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   return (
@@ -99,26 +128,147 @@ export function Upload() {
         </p>
       </div>
 
+      {/* Data Reset Section */}
+      {(systemStats?.database?.positions?.count ?? 0) > 0 && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <div>
+                <p className="font-medium text-amber-800 dark:text-amber-200">
+                  {t('upload.existingData', 'You have existing data')}
+                </p>
+                <p className="text-sm text-amber-600 dark:text-amber-300">
+                  {t('upload.existingDataDesc', '{{positions}} positions, {{trades}} trades', {
+                    positions: systemStats?.database?.positions?.count || 0,
+                    trades: systemStats?.database?.trades?.count || 0,
+                  })}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowResetModal(true)}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center space-x-2 text-sm font-medium"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>{t('upload.resetData', 'Reset All Data')}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Confirmation Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {t('upload.resetConfirmTitle', 'Confirm Data Reset')}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                {t('upload.resetConfirmDesc', 'This action will permanently delete:')}
+              </p>
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span>{t('upload.resetItem1', 'All trade records ({{count}})', { count: systemStats?.database?.trades?.count || 0 })}</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span>{t('upload.resetItem2', 'All position data ({{count}})', { count: systemStats?.database?.positions?.count || 0 })}</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span>{t('upload.resetItem3', 'All import history')}</span>
+                </li>
+              </ul>
+              <p className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
+                {t('upload.resetWarning', 'This action cannot be undone!')}
+              </p>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                {t('common.cancel', 'Cancel')}
+              </button>
+              <button
+                onClick={() => resetMutation.mutate()}
+                disabled={resetMutation.isPending}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center justify-center space-x-2"
+              >
+                {resetMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>{t('upload.resetting', 'Resetting...')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>{t('upload.confirmReset', 'Yes, Reset All')}</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {resetMutation.isError && (
+              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {(resetMutation.error as Error)?.message || 'Reset failed'}
+                </p>
+              </div>
+            )}
+
+            {resetMutation.isSuccess && (
+              <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <p className="text-sm text-green-600 dark:text-green-400">
+                  {t('upload.resetSuccess', 'All data has been reset successfully!')}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Upload Area */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        {/* Hidden file input - outside the clickable area */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+
         <div
-          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer ${
             dragActive
               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-              : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+              : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/30'
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
+          onClick={handleClick}
         >
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleFileChange}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
-
           <div className="flex flex-col items-center space-y-4">
             <div className={`p-4 rounded-full ${
               dragActive ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-gray-100 dark:bg-gray-700'
@@ -143,135 +293,98 @@ export function Upload() {
           </div>
         </div>
 
-        {/* Selected File */}
+        {/* Selected File and Options */}
         {selectedFile && (
-          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <FileSpreadsheet className="w-8 h-8 text-green-600" />
-              <div>
-                <p className="font-medium text-gray-900 dark:text-white">
-                  {selectedFile.name}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {(selectedFile.size / 1024).toFixed(1)} KB
-                </p>
+          <div className="mt-6 space-y-4">
+            {/* File Info */}
+            <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <FileSpreadsheet className="w-8 h-8 text-green-600" />
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {selectedFile.name}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {(selectedFile.size / 1024).toFixed(1)} KB
+                  </p>
+                </div>
               </div>
+              <button
+                onClick={() => setSelectedFile(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                &times;
+              </button>
             </div>
 
+            {/* Email Input (Optional) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Mail className="w-4 h-4 inline mr-2" />
+                {t('upload.emailLabel', 'Email for notification (optional)')}
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t('upload.emailPlaceholder', 'your@email.com')}
+                className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isValidEmail(email)
+                    ? 'border-red-300 dark:border-red-600'
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {t('upload.emailHint', 'We will notify you when analysis is complete')}
+              </p>
+            </div>
+
+            {/* Replace Mode Toggle */}
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="replaceMode"
+                checked={replaceMode}
+                onChange={(e) => setReplaceMode(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="replaceMode" className="text-sm text-gray-700 dark:text-gray-300">
+                {t('upload.replaceMode', 'Replace existing data (recommended for full re-analysis)')}
+              </label>
+            </div>
+
+            {/* Upload Button */}
             <button
               onClick={handleUpload}
-              disabled={uploadMutation.isPending}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              disabled={createTaskMutation.isPending || !isValidEmail(email)}
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 font-medium"
             >
-              {uploadMutation.isPending ? (
+              {createTaskMutation.isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>{t('upload.processing', 'Processing...')}</span>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>{t('upload.creating', 'Creating task...')}</span>
                 </>
               ) : (
                 <>
-                  <UploadIcon className="w-4 h-4" />
-                  <span>{t('upload.uploadBtn', 'Upload')}</span>
+                  <UploadIcon className="w-5 h-5" />
+                  <span>{t('upload.startAnalysis', 'Start Analysis')}</span>
                 </>
               )}
             </button>
           </div>
         )}
 
-        {/* Upload Result */}
-        {uploadResult && (
-          <div className={`mt-4 p-4 rounded-lg ${
-            uploadResult.success
-              ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
-              : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-          }`}>
-            <div className="flex items-start space-x-3">
-              {uploadResult.success ? (
-                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-              ) : (
-                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-              )}
-              <div className="flex-1">
-                <p className={`font-medium ${
-                  uploadResult.success ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
-                }`}>
-                  {uploadResult.message}
-                </p>
-
-                {/* Stats */}
-                <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {t('upload.totalRows', 'Total Rows')}
-                    </p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {formatNumber(uploadResult.total_rows)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {t('upload.newTrades', 'New Trades')}
-                    </p>
-                    <p className="text-lg font-semibold text-green-600">
-                      +{formatNumber(uploadResult.new_trades)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {t('upload.duplicatesSkipped', 'Duplicates Skipped')}
-                    </p>
-                    <p className="text-lg font-semibold text-gray-500">
-                      {formatNumber(uploadResult.duplicates_skipped)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {t('upload.processingTime', 'Processing Time')}
-                    </p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {uploadResult.processing_time_ms}ms
-                    </p>
-                  </div>
-                </div>
-
-                {/* Additional Info */}
-                {uploadResult.positions_matched > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {t('upload.positionsMatched', 'Positions matched')}: {uploadResult.positions_matched} |{' '}
-                      {t('upload.positionsScored', 'Positions scored')}: {uploadResult.positions_scored}
-                    </p>
-                  </div>
-                )}
-
-                {/* View Results Button */}
-                {uploadResult.new_trades > 0 && (
-                  <div className="mt-4">
-                    <button
-                      onClick={() => navigate('/positions')}
-                      className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700"
-                    >
-                      <span>{t('upload.viewPositions', 'View Positions')}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Error */}
-        {uploadMutation.isError && (
+        {createTaskMutation.isError && (
           <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
             <div className="flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
               <div>
                 <p className="font-medium text-red-800 dark:text-red-200">
-                  {t('upload.error', 'Upload failed')}
+                  {t('upload.error', 'Failed to create task')}
                 </p>
                 <p className="text-sm text-red-600 dark:text-red-300 mt-1">
-                  {(uploadMutation.error as Error)?.message || 'Unknown error'}
+                  {(createTaskMutation.error as Error)?.message || 'Unknown error'}
                 </p>
               </div>
             </div>

@@ -194,12 +194,22 @@ class TestQualityScorerInit:
     """测试QualityScorer初始化"""
 
     def test_init(self, scorer):
-        """测试初始化"""
+        """测试初始化 - 默认使用V2权重"""
         assert scorer is not None
-        assert scorer.weights['entry'] == 0.30
-        assert scorer.weights['exit'] == 0.25
-        assert scorer.weights['trend'] == 0.25
-        assert scorer.weights['risk'] == 0.20
+        # V2 权重配置
+        assert scorer.weights['entry'] == 0.18
+        assert scorer.weights['exit'] == 0.17
+        assert scorer.weights['trend'] == 0.14
+        assert scorer.weights['risk'] == 0.12
+
+    def test_init_v1_weights(self):
+        """测试V1权重配置（兼容模式）"""
+        scorer_v1 = QualityScorer(use_v2=False)
+        # V1 使用 config.py 中的原始权重
+        assert scorer_v1.weights['entry'] == 0.30
+        assert scorer_v1.weights['exit'] == 0.25
+        assert scorer_v1.weights['trend'] == 0.25
+        assert scorer_v1.weights['risk'] == 0.20
 
 
 # ==================== 进场质量评分测试 ====================
@@ -516,10 +526,12 @@ class TestStringRepresentation:
     """测试字符串表示"""
 
     def test_repr(self, scorer):
-        """测试__repr__方法"""
+        """测试__repr__方法 - V2版本"""
         repr_str = repr(scorer)
 
         assert 'QualityScorer' in repr_str
-        assert '30%' in repr_str  # entry权重
-        assert '25%' in repr_str  # exit和trend权重
-        assert '20%' in repr_str  # risk权重
+        # V2 权重：entry=18%, exit=17%, trend=14%, risk=12%
+        assert '18%' in repr_str  # entry权重
+        assert '17%' in repr_str  # exit权重
+        assert '14%' in repr_str  # trend权重
+        assert '12%' in repr_str  # risk权重

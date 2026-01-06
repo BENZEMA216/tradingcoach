@@ -259,8 +259,12 @@ class SymbolMatcher:
             quantity=quantity,
             market=opening_trade.market.value if hasattr(opening_trade.market, 'value') else opening_trade.market,
             currency=opening_trade.currency,
+            # 期权字段
             is_option=opening_trade.is_option,
-            underlying_symbol=opening_trade.underlying_symbol
+            underlying_symbol=opening_trade.underlying_symbol,
+            option_type=opening_trade.option_type,
+            strike_price=opening_trade.strike_price,
+            expiry_date=opening_trade.expiration_date  # Trade用expiration_date, Position用expiry_date
         )
 
         # 开仓信息
@@ -291,7 +295,11 @@ class SymbolMatcher:
         # 计算盈亏（在position_calculator中实现更详细的计算）
         self._calculate_basic_pnl(position)
 
-        # 记录关联
+        # 记录关联的交易ID（用于后续更新trade.position_id）
+        # 使用临时属性存储，在保存position后用于更新trades
+        position._entry_trade_ids = [opening_trade.id]
+        position._exit_trade_ids = [closing_trade.id] if closing_trade else []
+
         opening_tq.add_matched_position(position.id if position.id else 0)
 
         logger.info(f"Created position: {position.symbol} {direction} {quantity} shares, "
@@ -406,6 +414,10 @@ class SymbolMatcher:
         position.holding_period_hours = None
         position.realized_pnl = None
         position.net_pnl = None
+
+        # 记录关联的交易ID（用于后续更新trade.position_id）
+        position._entry_trade_ids = [opening_trade.id]
+        position._exit_trade_ids = []
 
         logger.info(f"Created open position: {position.symbol} {direction} {position.quantity} shares")
 

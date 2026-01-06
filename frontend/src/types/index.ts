@@ -114,6 +114,8 @@ export interface PositionDetail extends PositionListItem {
   trade_ids: number[];
   created_at: string | null;
   updated_at: string | null;
+  // 新闻上下文
+  news_context?: NewsContext | null;
 }
 
 // Pagination
@@ -515,4 +517,150 @@ export interface InsightsOnlyResponse {
     start: string;
     end: string;
   };
+}
+
+// ============================================================
+// News Context Types
+// ============================================================
+
+export interface NewsItem {
+  title: string;
+  source: string;
+  date: string;
+  url?: string;
+  category: string;
+  sentiment: 'bullish' | 'bearish' | 'neutral';
+  relevance?: number;
+}
+
+export interface NewsScoreBreakdown {
+  direction: number;      // 方向对齐 (0-100)
+  timing: number;         // 时机质量 (0-100)
+  completeness: number;   // 信息完整度 (0-100)
+  risk: number;           // 风险意识 (0-100)
+}
+
+export interface NewsContext {
+  id: number;
+  position_id: number;
+  symbol: string;
+  search_date: string;
+  // 分类标记
+  has_earnings: boolean;
+  has_product_news: boolean;
+  has_analyst_rating: boolean;
+  has_sector_news: boolean;
+  has_macro_news: boolean;
+  has_geopolitical: boolean;
+  // 情感分析
+  overall_sentiment: 'bullish' | 'bearish' | 'neutral' | 'mixed' | null;
+  sentiment_score: number | null;  // -100 to +100
+  news_impact_level: 'high' | 'medium' | 'low' | 'none';
+  // 评分
+  news_alignment_score: number | null;
+  score_breakdown: NewsScoreBreakdown | null;
+  // 新闻数据
+  news_items: NewsItem[] | null;
+  news_count: number;
+}
+
+// ============================================================
+// Event Context Types
+// ============================================================
+
+export type EventType =
+  | 'earnings'
+  | 'earnings_pre'
+  | 'earnings_post'
+  | 'dividend'
+  | 'split'
+  | 'product'
+  | 'guidance'
+  | 'analyst'
+  | 'insider'
+  | 'buyback'
+  | 'offering'
+  | 'fda'
+  | 'contract'
+  | 'management'
+  | 'macro'
+  | 'fed'
+  | 'cpi'
+  | 'nfp'
+  | 'geopolitical'
+  | 'sector'
+  | 'price_anomaly'
+  | 'volume_anomaly'
+  | 'other';
+
+export type EventImpact = 'positive' | 'negative' | 'neutral' | 'mixed' | 'unknown';
+
+export interface EventListItem {
+  id: number;
+  symbol: string;
+  event_type: EventType;
+  event_date: string;
+  event_title: string;
+  event_impact: EventImpact | null;
+  event_importance: number | null;
+  price_change_pct: number | null;
+  volume_spike: number | null;
+  position_id: number | null;
+  position_pnl_on_event: number | null;
+  is_key_event: boolean;
+}
+
+export interface EventDetail extends EventListItem {
+  underlying_symbol: string | null;
+  event_time: string | null;
+  event_description: string | null;
+  is_surprise: boolean;
+  surprise_direction: 'beat' | 'miss' | null;
+  surprise_magnitude: number | null;
+  price_before: number | null;
+  price_after: number | null;
+  price_change: number | null;
+  event_day_high: number | null;
+  event_day_low: number | null;
+  event_day_range_pct: number | null;
+  gap_pct: number | null;
+  volume_on_event: number | null;
+  volume_avg_20d: number | null;
+  position_pnl_pct_on_event: number | null;
+  source: string | null;
+  confidence: number | null;
+  user_notes: string | null;
+}
+
+export interface EventStatistics {
+  total_events: number;
+  by_type: Record<string, number>;
+  by_impact: Record<string, number>;
+  high_impact_count: number;
+  avg_price_change: number | null;
+}
+
+export interface EventPerformanceByType {
+  event_type: EventType;
+  event_count: number;
+  total_pnl: number;
+  avg_pnl: number;
+  win_rate: number;
+  avg_price_change: number | null;
+}
+
+export interface PaginatedEvents {
+  items: EventListItem[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export interface PositionEventsResponse {
+  position_id: number;
+  symbol: string;
+  events: EventListItem[];
+  total_events: number;
+  key_events_count: number;
 }

@@ -12,8 +12,11 @@ import {
   Cell,
 } from 'recharts';
 import type { SymbolRiskItem } from '@/types';
-import { formatCurrency } from '@/utils/format';
+import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
+import { usePrivacyStore } from '@/store/usePrivacyStore';
+import { ChartSkeleton } from '@/components/common/ChartSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface SymbolRiskQuadrantProps {
   data: SymbolRiskItem[];
@@ -26,26 +29,27 @@ export function SymbolRiskQuadrant({ data, isLoading, onDotClick, bare = false }
   const { t } = useTranslation();
   const colors = useChartColors();
 
+  // Subscribe to privacy state for re-renders
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  const { formatCurrency, formatAxis } = getPrivacyAwareFormatters();
+
   if (isLoading) {
-    if (bare) return <div className="h-72 bg-neutral-100 dark:bg-neutral-800 rounded animate-pulse" />;
+    if (bare) return <ChartSkeleton height="h-72" showTitle={false} />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4 animate-pulse" />
-        <div className="h-64 bg-gray-100 dark:bg-gray-700/50 rounded animate-pulse" />
+        <ChartSkeleton height="h-72" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    if (bare) return <div className="h-72 flex items-center justify-center text-neutral-500">{t('common.noData')}</div>;
+    if (bare) return <EmptyState icon="chart" height="h-72" size="sm" />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('charts.symbolRiskQuadrant')}
         </h3>
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          {t('common.noData')}
-        </div>
+        <EmptyState icon="chart" height="h-64" size="sm" />
       </div>
     );
   }
@@ -80,7 +84,7 @@ export function SymbolRiskQuadrant({ data, isLoading, onDotClick, bare = false }
               tick={{ fontSize: 11, fill: colors.text }}
               tickLine={false}
               axisLine={{ stroke: colors.axis }}
-              tickFormatter={(v) => `$${v.toFixed(0)}`}
+              tickFormatter={formatAxis}
               label={{
                 value: t('charts.avgLoss'),
                 position: 'insideBottom',
@@ -95,7 +99,7 @@ export function SymbolRiskQuadrant({ data, isLoading, onDotClick, bare = false }
               tick={{ fontSize: 11, fill: colors.text }}
               tickLine={false}
               axisLine={{ stroke: colors.axis }}
-              tickFormatter={(v) => `$${v.toFixed(0)}`}
+              tickFormatter={formatAxis}
               label={{
                 value: t('charts.avgWin'),
                 angle: -90,

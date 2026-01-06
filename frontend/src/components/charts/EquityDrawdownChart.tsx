@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 import {
   ComposedChart,
   Area,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -12,8 +11,9 @@ import {
   Legend,
 } from 'recharts';
 import type { EquityDrawdownItem } from '@/types';
-import { formatCurrency } from '@/utils/format';
+import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
+import { usePrivacyStore } from '@/store/usePrivacyStore';
 
 interface EquityDrawdownChartProps {
   data: EquityDrawdownItem[];
@@ -25,6 +25,10 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
   const { t, i18n } = useTranslation();
   const colors = useChartColors();
   const locale = i18n.language === 'zh' ? 'zh-CN' : 'en-US';
+
+  // Subscribe to privacy state for re-renders
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
     if (bare) {
@@ -82,13 +86,13 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
         <div>
           <span className="text-gray-500 dark:text-gray-400">{t('common.pnl')}: </span>
           <span className={`font-medium ${currentPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {formatCurrency(currentPnL)}
+            {formatPnL(currentPnL)}
           </span>
         </div>
         <div>
           <span className="text-gray-500 dark:text-gray-400">{t('statistics.maxDrawdown')}: </span>
           <span className="font-medium text-red-500">
-            {formatCurrency(-maxDrawdown)}
+            {formatPnL(-maxDrawdown)}
           </span>
         </div>
       </div>
@@ -101,33 +105,52 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
             <defs>
-              <linearGradient id="drawdownGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={colors.loss} stopOpacity={0.3} />
-                <stop offset="95%" stopColor={colors.loss} stopOpacity={0.05} />
+              {/* Equity gradient - green with fade */}
+              <linearGradient id="equityGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={colors.profit} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={colors.profit} stopOpacity={0.05} />
               </linearGradient>
+              {/* Drawdown gradient - red with fade */}
+              <linearGradient id="drawdownGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={colors.loss} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={colors.loss} stopOpacity={0.08} />
+              </linearGradient>
+              {/* Glow filter for equity line */}
+              <filter id="equityGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={colors.grid}
+              strokeOpacity={0.5}
+              vertical={false}
+            />
             <XAxis
               dataKey="date"
               tick={{ fontSize: 11, fill: colors.text }}
               tickLine={false}
-              axisLine={{ stroke: colors.axis }}
+              axisLine={{ stroke: colors.axis, strokeOpacity: 0.5 }}
               interval="preserveStartEnd"
             />
             <YAxis
               yAxisId="left"
               tick={{ fontSize: 11, fill: colors.text }}
               tickLine={false}
-              axisLine={{ stroke: colors.axis }}
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              axisLine={false}
+              tickFormatter={formatAxis}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
               tick={{ fontSize: 11, fill: colors.text }}
               tickLine={false}
-              axisLine={{ stroke: colors.axis }}
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              axisLine={false}
+              tickFormatter={formatAxis}
               domain={['auto', 0]}
             />
             <Tooltip
@@ -135,15 +158,24 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3 shadow-lg">
-                      <p className="font-semibold text-neutral-900 dark:text-neutral-100">{data.date}</p>
-                      <div className="mt-1 space-y-0.5 text-sm">
-                        <p style={{ color: data.equity >= 0 ? colors.profit : colors.loss }}>
-                          {t('common.pnl')}: {formatCurrency(data.equity)}
-                        </p>
-                        <p style={{ color: colors.loss }}>
-                          {t('statistics.drawdown')}: {formatCurrency(data.drawdown)}
-                        </p>
+                    <div className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3 shadow-xl backdrop-blur-sm">
+                      <p className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm">{data.date}</p>
+                      <div className="mt-2 space-y-1.5">
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-xs text-neutral-500">{t('common.pnl')}</span>
+                          <span
+                            className="text-sm font-semibold"
+                            style={{ color: data.equity >= 0 ? colors.profit : colors.loss }}
+                          >
+                            {formatPnL(data.equity)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-xs text-neutral-500">{t('statistics.drawdown')}</span>
+                          <span className="text-sm font-semibold" style={{ color: colors.loss }}>
+                            {formatPnL(data.drawdown)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -153,31 +185,50 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
             />
             <Legend
               wrapperStyle={{ paddingTop: '10px' }}
+              iconType="line"
               formatter={(value) => {
-                if (value === 'equity') return t('common.pnl');
-                if (value === 'drawdown') return t('statistics.drawdown');
+                if (value === 'equity') return <span className="text-xs">{t('common.pnl')}</span>;
+                if (value === 'drawdown') return <span className="text-xs">{t('statistics.drawdown')}</span>;
                 return value;
               }}
             />
-            <ReferenceLine y={0} yAxisId="left" stroke={colors.text} strokeDasharray="3 3" />
+            <ReferenceLine
+              y={0}
+              yAxisId="left"
+              stroke={colors.zeroline}
+              strokeDasharray="4 4"
+              strokeOpacity={0.7}
+            />
+            {/* Drawdown area - below zero line */}
             <Area
               yAxisId="right"
               type="monotone"
               dataKey="drawdown"
               stroke={colors.loss}
-              strokeWidth={1}
+              strokeWidth={1.5}
               fill="url(#drawdownGradient)"
               name="drawdown"
+              animationDuration={1000}
+              animationEasing="ease-out"
             />
-            <Line
+            {/* Equity area with gradient fill */}
+            <Area
               yAxisId="left"
               type="monotone"
               dataKey="equity"
               stroke={colors.profit}
               strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 4, fill: colors.profit }}
+              fill="url(#equityGradient)"
               name="equity"
+              dot={false}
+              activeDot={{
+                r: 5,
+                fill: colors.profit,
+                stroke: colors.background,
+                strokeWidth: 2,
+              }}
+              animationDuration={1000}
+              animationEasing="ease-out"
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -192,13 +243,13 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
           <div>
             <span className="text-neutral-400">{t('common.pnl')}:</span>
             <span className={`font-semibold ml-1 ${currentPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatCurrency(currentPnL)}
+              {formatPnL(currentPnL)}
             </span>
           </div>
           <div>
             <span className="text-neutral-400">{t('statistics.maxDrawdown')}:</span>
             <span className="font-semibold ml-1 text-red-600">
-              {formatCurrency(-maxDrawdown)}
+              {formatPnL(-maxDrawdown)}
             </span>
           </div>
         </div>

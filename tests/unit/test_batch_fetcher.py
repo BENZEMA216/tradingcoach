@@ -20,17 +20,27 @@ class TestBatchFetcherInit:
     """Test BatchFetcher initialization"""
 
     def test_init_default_params(self):
-        """Test initialization with default parameters"""
+        """Test initialization with default parameters (use_router=False for testing)"""
         mock_client = Mock(spec=BaseDataClient)
         mock_cache = Mock(spec=CacheManager)
 
-        fetcher = BatchFetcher(mock_client, mock_cache)
+        # 使用 use_router=False 以便测试 client 参数
+        fetcher = BatchFetcher(mock_client, mock_cache, use_router=False)
 
         assert fetcher.client == mock_client
         assert fetcher.cache == mock_cache
         assert fetcher.batch_size == 50
         assert fetcher.request_delay == 0.2
         assert fetcher.extra_days == 200
+
+    def test_init_with_router(self):
+        """Test initialization with router (default behavior)"""
+        fetcher = BatchFetcher(use_router=True)
+
+        # 使用 router 时 client 为 None
+        assert fetcher.client is None
+        assert fetcher.use_router is True
+        assert fetcher._router is not None
 
     def test_init_custom_params(self):
         """Test initialization with custom parameters"""
@@ -42,7 +52,8 @@ class TestBatchFetcherInit:
             mock_cache,
             batch_size=100,
             request_delay=0.5,
-            extra_days=300
+            extra_days=300,
+            use_router=False
         )
 
         assert fetcher.batch_size == 100
@@ -55,7 +66,7 @@ class TestBatchFetcherInit:
         mock_client.get_source_name.return_value = 'yfinance'
         mock_cache = Mock(spec=CacheManager)
 
-        fetcher = BatchFetcher(mock_client, mock_cache, batch_size=50, request_delay=0.2)
+        fetcher = BatchFetcher(mock_client, mock_cache, batch_size=50, request_delay=0.2, use_router=False)
 
         repr_str = repr(fetcher)
         assert 'BatchFetcher' in repr_str
@@ -71,7 +82,7 @@ class TestBatchFetcherOptionParsing:
         """Create BatchFetcher for testing"""
         mock_client = Mock(spec=BaseDataClient)
         mock_cache = Mock(spec=CacheManager)
-        return BatchFetcher(mock_client, mock_cache)
+        return BatchFetcher(mock_client, mock_cache, use_router=False)
 
     def test_parse_option_symbol_call(self, fetcher):
         """Test parsing call option"""
@@ -137,7 +148,7 @@ class TestBatchFetcherAnalyzeRequirements:
         """Create BatchFetcher for testing"""
         mock_client = Mock(spec=BaseDataClient)
         mock_cache = Mock(spec=CacheManager)
-        return BatchFetcher(mock_client, mock_cache, extra_days=10)
+        return BatchFetcher(mock_client, mock_cache, extra_days=10, use_router=False)
 
     @pytest.fixture
     def mock_session(self):
@@ -240,7 +251,7 @@ class TestBatchFetcherFilterMissing:
         """Create BatchFetcher with mock cache"""
         mock_client = Mock(spec=BaseDataClient)
         mock_cache = Mock(spec=CacheManager)
-        return BatchFetcher(mock_client, mock_cache)
+        return BatchFetcher(mock_client, mock_cache, use_router=False)
 
     def test_filter_missing_all_cached(self, fetcher):
         """Test when all data is already cached"""
@@ -332,7 +343,7 @@ class TestBatchFetcherBatchFetch:
         mock_client = Mock(spec=BaseDataClient)
         mock_client.get_source_name.return_value = 'yfinance'
         mock_cache = Mock(spec=CacheManager)
-        return BatchFetcher(mock_client, mock_cache, request_delay=0.01)  # Fast delay for tests
+        return BatchFetcher(mock_client, mock_cache, request_delay=0.01, use_router=False)  # Fast delay for tests
 
     @pytest.fixture
     def sample_df(self):
@@ -460,7 +471,7 @@ class TestBatchFetcherFetchRequiredData:
         """Create BatchFetcher"""
         mock_client = Mock(spec=BaseDataClient)
         mock_cache = Mock(spec=CacheManager)
-        return BatchFetcher(mock_client, mock_cache)
+        return BatchFetcher(mock_client, mock_cache, use_router=False)
 
     @pytest.fixture
     def mock_session(self):
@@ -512,7 +523,7 @@ class TestBatchFetcherWarmupCache:
         """Create BatchFetcher"""
         mock_client = Mock(spec=BaseDataClient)
         mock_cache = Mock(spec=CacheManager)
-        return BatchFetcher(mock_client, mock_cache)
+        return BatchFetcher(mock_client, mock_cache, use_router=False)
 
     @pytest.fixture
     def mock_session(self):

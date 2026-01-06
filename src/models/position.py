@@ -171,6 +171,17 @@ class Position(Base):
         Numeric(5, 2),
         comment="期权希腊字母评分（0-100）"
     )
+    # 新闻契合度评分 (V2.1 新增)
+    news_alignment_score = Column(
+        Numeric(5, 2),
+        comment="新闻契合度评分（0-100）"
+    )
+    # 新闻上下文关联
+    news_context_id = Column(
+        Integer,
+        ForeignKey('news_context.id'),
+        comment="关联的新闻上下文ID"
+    )
     # 评分详情 (JSON)
     score_details = Column(JSON, comment="评分详情（JSON格式）")
     # 行为分析 (JSON)
@@ -267,6 +278,14 @@ class Position(Base):
         "MarketEnvironment",
         foreign_keys=[exit_market_env_id],
         backref="exit_positions"
+    )
+
+    # 新闻上下文关联 (通过 Position.news_context_id 关联)
+    news_context = relationship(
+        "NewsContext",
+        uselist=False,
+        foreign_keys=[news_context_id],
+        primaryjoin="Position.news_context_id == NewsContext.id"
     )
 
     # ==================== 索引 ====================
@@ -393,6 +412,7 @@ class Position(Base):
             'behavior_score': float(self.behavior_score) if self.behavior_score else None,
             'execution_score': float(self.execution_score) if self.execution_score else None,
             'options_greeks_score': float(self.options_greeks_score) if self.options_greeks_score else None,
+            'news_alignment_score': float(self.news_alignment_score) if self.news_alignment_score else None,
             'score_details': self.score_details,
             'behavior_analysis': self.behavior_analysis,
             'holding_period_days': self.holding_period_days,

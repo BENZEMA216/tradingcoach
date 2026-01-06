@@ -2,6 +2,8 @@
  * Format utilities for Trading Coach
  */
 
+import { usePrivacyStore } from '@/store/usePrivacyStore';
+
 // Format number as currency
 export const formatCurrency = (value: number | null | undefined, currency = 'USD'): string => {
   if (value === null || value === undefined) return '-';
@@ -88,3 +90,82 @@ export const formatNumber = (value: number | null | undefined): string => {
 
 // Note: Strategy and direction translations are now handled via i18n
 // Use t('strategy.{key}') and t('direction.{key}') in components
+
+// ==================== Privacy Mode Formatters ====================
+// For use in non-React contexts (chart callbacks, tooltips, etc.)
+// In React components, prefer using the usePrivacyFormat hook
+
+/**
+ * Get privacy-aware formatters for use in non-React contexts
+ * Call this function inside callbacks to get current privacy state
+ */
+export function getPrivacyAwareFormatters() {
+  const { isPrivacyMode, initialCapital } = usePrivacyStore.getState();
+
+  const formatCurrencyPrivate = (
+    value: number | null | undefined,
+    options?: { showSign?: boolean }
+  ): string => {
+    if (value === null || value === undefined) return '-';
+
+    if (isPrivacyMode && initialCapital) {
+      const pct = (value / initialCapital) * 100;
+      const sign = pct >= 0 && options?.showSign ? '+' : '';
+      return `${sign}${pct.toFixed(2)}%`;
+    }
+
+    const formatted = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+
+    if (options?.showSign && value > 0) {
+      return `+${formatted}`;
+    }
+    return formatted;
+  };
+
+  const formatPnLPrivate = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return '-';
+
+    if (isPrivacyMode && initialCapital) {
+      const pct = (value / initialCapital) * 100;
+      return `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+    }
+
+    const absValue = Math.abs(value);
+    const formatted = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(absValue);
+
+    return value >= 0 ? `+${formatted}` : `-${formatted.replace('$', '')}`;
+  };
+
+  const formatAxisPrivate = (value: number): string => {
+    if (isPrivacyMode && initialCapital) {
+      const pct = (value / initialCapital) * 100;
+      return `${pct.toFixed(1)}%`;
+    }
+
+    if (Math.abs(value) >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`;
+    }
+    if (Math.abs(value) >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`;
+    }
+    return `$${value.toFixed(0)}`;
+  };
+
+  return {
+    formatCurrency: formatCurrencyPrivate,
+    formatPnL: formatPnLPrivate,
+    formatAxis: formatAxisPrivate,
+    isPrivacyMode,
+    initialCapital,
+  };
+}

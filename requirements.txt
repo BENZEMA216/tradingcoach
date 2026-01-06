@@ -6,6 +6,7 @@ sqlalchemy>=2.0.0
 # 数据获取
 yfinance>=0.2.30
 alpha-vantage>=2.3.1  # 备用数据源
+akshare>=1.12.0  # A股数据源（免费）
 # polygon-api-client>=1.12.0  # 可选，期权数据
 
 # 技术指标
@@ -18,6 +19,9 @@ pytz>=2023.3
 
 # HTTP请求
 requests>=2.31.0
+
+# 新闻搜索 (免费，无需API Key)
+ddgs>=7.0.0  # DuckDuckGo/Bing/Yahoo 多引擎搜索
 
 # 重试机制
 tenacity>=8.2.3
@@ -41,9 +45,21 @@ colorlog>=6.7.0  # 彩色日志输出
 # 开发工具
 pytest>=7.4.0
 pytest-cov>=4.1.0  # 测试覆盖率
+pytest-benchmark>=4.0.0  # 性能基准测试
+pytest-xdist>=3.5.0  # 并行测试
+pytest-timeout>=2.2.0  # 测试超时
 black>=23.0.0  # 代码格式化
 flake8>=6.1.0  # 代码检查
 mypy>=1.5.0  # 类型检查
+ruff>=0.1.0  # 快速 Python 检查
+
+# 测试工具
+factory-boy>=3.3.0  # 测试数据工厂
+httpx>=0.25.0  # 异步 HTTP 客户端（测试用）
+allure-pytest>=2.13.0  # Allure 测试报告
+
+# 突变测试（可选）
+mutmut>=2.4.0  # 突变测试
 
 # 性能分析（可选）
 # line-profiler>=4.0.0

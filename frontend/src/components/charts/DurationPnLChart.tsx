@@ -12,7 +12,10 @@ import {
   ZAxis,
 } from 'recharts';
 import type { DurationPnLItem } from '@/types';
-import { formatCurrency } from '@/utils/format';
+import { getPrivacyAwareFormatters } from '@/utils/format';
+import { usePrivacyStore } from '@/store/usePrivacyStore';
+import { ChartSkeleton } from '@/components/common/ChartSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface DurationPnLChartProps {
   data: DurationPnLItem[];
@@ -27,8 +30,12 @@ const LOSS_COLOR = '#ef5350';
 export function DurationPnLChart({ data, isLoading, bare = false }: DurationPnLChartProps) {
   const { t } = useTranslation();
 
+  // Subscribe to privacy state for re-renders
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
+
   // Calculate optimal visualization settings based on data density
-  const { processedData, dotSize, dotOpacity, xAxisScale } = useMemo(() => {
+  const { processedData, dotSize, dotOpacity } = useMemo(() => {
     if (!data || data.length === 0) {
       return { processedData: [], dotSize: 40, dotOpacity: 0.6, xAxisScale: 'linear' };
     }
@@ -71,25 +78,22 @@ export function DurationPnLChart({ data, isLoading, bare = false }: DurationPnLC
   }, [data]);
 
   if (isLoading) {
-    if (bare) return <div className="h-64 bg-neutral-100 dark:bg-neutral-800 rounded animate-pulse" />;
+    if (bare) return <ChartSkeleton height="h-72" showTitle={false} />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4 animate-pulse" />
-        <div className="h-64 bg-gray-100 dark:bg-gray-700/50 rounded animate-pulse" />
+        <ChartSkeleton height="h-72" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    if (bare) return <div className="h-64 flex items-center justify-center text-neutral-500">{t('common.noData')}</div>;
+    if (bare) return <EmptyState icon="chart" height="h-72" size="sm" />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('charts.durationVsPnl')}
         </h3>
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          {t('common.noData')}
-        </div>
+        <EmptyState icon="chart" height="h-72" size="sm" />
       </div>
     );
   }
@@ -139,7 +143,7 @@ export function DurationPnLChart({ data, isLoading, bare = false }: DurationPnLC
               tick={{ fontSize: 11, fill: '#9ca3af' }}
               tickLine={false}
               axisLine={{ stroke: '#4b5563' }}
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={formatAxis}
             />
             <ZAxis range={[dotSize, dotSize]} />
             <Tooltip
@@ -154,7 +158,7 @@ export function DurationPnLChart({ data, isLoading, bare = false }: DurationPnLC
                       </p>
                       <div className="mt-1 space-y-0.5 text-sm">
                         <p style={{ color: d.pnl >= 0 ? PROFIT_COLOR : LOSS_COLOR }}>
-                          {t('common.pnl')}: {formatCurrency(d.pnl)}
+                          {t('common.pnl')}: {formatPnL(d.pnl)}
                         </p>
                         <p className="text-neutral-600 dark:text-neutral-400">
                           {t('charts.holdingDays')}: {d.original_days} {t('common.days')}

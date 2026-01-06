@@ -1,0 +1,156 @@
+# A股通用交易记录配置
+# 适用于国内券商导出的标准格式
+
+broker_id: astock_generic
+broker_name: A-Stock Generic
+broker_name_cn: A股通用格式
+version: "1.0"
+
+# 文件格式
+encoding: utf-8
+delimiter: ","
+quote_char: '"'
+header_row: 0
+skip_rows: []
+
+# 自动检测规则
+detection:
+  columns:
+    - "证券代码"
+    - "证券名称"
+    - "买卖标志"
+    - "成交数量"
+    - "成交价格"
+  unique_columns:
+    - "股东代码"
+    - "过户费"
+  encoding_hint: utf-8
+  confidence_threshold: 0.8
+
+# 字段映射
+field_mappings:
+  - source: "证券代码"
+    target: symbol
+    required: true
+    transform:
+      type: string
+      strip: true
+
+  - source: "证券名称"
+    target: symbol_name
+    required: false
+    transform:
+      type: string
+      strip: true
+
+  - source: "买卖标志"
+    target: direction
+    required: true
+
+  - source: "成交数量"
+    target: filled_quantity
+    required: true
+    transform:
+      type: integer
+
+  - source: "成交价格"
+    target: filled_price
+    required: true
+    transform:
+      type: number
+
+  - source: "成交金额"
+    target: filled_amount
+    required: false
+    transform:
+      type: number
+
+  - source: "成交时间"
+    target: filled_time
+    required: true
+    transform:
+      type: datetime
+      format: "%Y-%m-%d %H:%M:%S"
+
+  - source: "成交日期"
+    target: trade_date
+    required: true
+    transform:
+      type: date
+      format: "%Y-%m-%d"
+
+  - source: "佣金"
+    target: commission
+    required: false
+    transform:
+      type: number
+
+  - source: "印花税"
+    target: stamp_duty
+    required: false
+    transform:
+      type: number
+
+  - source: "过户费"
+    target: transfer_fee
+    required: false
+    transform:
+      type: number
+
+  - source: "交易所"
+    target: exchange
+    required: false
+    transform:
+      type: string
+
+  - source: "股东代码"
+    target: shareholder_code
+    required: false
+    transform:
+      type: string
+
+  - source: "交易状态"
+    target: status
+    required: false
+    aliases:
+      - "状态"
+      - "订单状态"
+
+# 枚举映射
+direction_mapping:
+  买入: buy
+  卖出: sell
+  融资买入: buy
+  融券卖出: sell_short
+  买券还券: buy_to_cover
+
+status_mapping:
+  成交: filled
+  全部成交: filled
+  部分成交: partially_filled
+
+market_mapping:
+  上交所: cn
+  深交所: cn
+  上海A股: cn
+  深圳A股: cn
+  沪市: cn
+  深市: cn
+
+# 费用配置
+fees:
+  fields:
+    - 佣金
+    - 印花税
+    - 过户费
+  calculate_total: true
+  field_mapping:
+    佣金: commission
+    印花税: stamp_duty
+    过户费: transfer_fee
+
+# 市场默认值
+defaults:
+  market: cn
+  currency: CNY
+  status: filled

@@ -1,11 +1,11 @@
 """
-QualityScorer - 交易质量评分引擎 (v2.0)
+QualityScorer - 交易质量评分引擎 (v2.1)
 
-input: Position持仓, MarketData市场数据, 技术指标
-output: 8维度评分(0-100), 综合评分, 等级(A-F)
+input: Position持仓, MarketData市场数据, 技术指标, 新闻搜索
+output: 9维度评分(0-100), 综合评分, 等级(A-F)
 pos: 分析引擎层核心 - 量化评估交易质量，输出可比较的分数
 
-维度权重: 进场20% | 出场18% | 趋势15% | 风险13% | 市场环境12% | 行为12% | 执行5% | 期权5%
+维度权重: 进场18% | 出场17% | 趋势14% | 风险12% | 市场环境11% | 行为11% | 新闻契合7% | 执行5% | 期权5%
 
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
@@ -20,10 +20,14 @@ from sqlalchemy.orm import Session
 
 from src.models.position import Position, PositionStatus
 from src.models.market_data import MarketData
+from src.models.news_context import NewsContext
 from src.utils.option_parser import OptionParser
 from src.analyzers.market_env_scorer import MarketEnvironmentScorer
 from src.analyzers.behavior_scorer import TradingBehaviorScorer
 from src.analyzers.execution_scorer import ExecutionQualityScorer
+from src.analyzers.news_searcher import NewsSearcher
+from src.analyzers.news_alignment_scorer import NewsAlignmentScorer
+from src.analyzers.news_adapters import create_search_func_from_config
 from config import (
     SCORE_WEIGHT_ENTRY,
     SCORE_WEIGHT_EXIT,
@@ -35,7 +39,10 @@ from config import (
     STOCH_OVERBOUGHT,
     ADX_WEAK_TREND,
     ADX_MODERATE_TREND,
-    ADX_STRONG_TREND
+    ADX_STRONG_TREND,
+    NEWS_SEARCH_ENABLED,
+    NEWS_SEARCH_RANGE_DAYS,
+    SCORE_WEIGHT_NEWS_ALIGNMENT
 )
 
 logger = logging.getLogger(__name__)
@@ -52,16 +59,17 @@ class QualityScorer:
     4. 更新positions表的评分字段
     """
 
-    # 新版8维度权重配置
+    # 新版9维度权重配置 (含新闻契合度)
     WEIGHTS_V2 = {
-        'entry': 0.20,        # 入场质量
-        'exit': 0.18,         # 出场质量
-        'market_env': 0.12,   # 市场环境
-        'behavior': 0.12,     # 交易行为
-        'trend': 0.15,        # 趋势把握
-        'risk': 0.13,         # 风险管理
+        'entry': 0.18,        # 入场质量 (原20%, -2%)
+        'exit': 0.17,         # 出场质量 (原18%, -1%)
+        'market_env': 0.11,   # 市场环境 (原12%, -1%)
+        'behavior': 0.11,     # 交易行为 (原12%, -1%)
+        'trend': 0.14,        # 趋势把握 (原15%, -1%)
+        'risk': 0.12,         # 风险管理 (原13%, -1%)
         'execution': 0.05,    # 执行质量
         'options': 0.05,      # 期权希腊字母 (条件应用)
+        'news_alignment': 0.07,  # 新闻契合度 (新增7%)
     }
 
     def __init__(self, use_v2: bool = True):
@@ -89,7 +97,22 @@ class QualityScorer:
         self.behavior_scorer = TradingBehaviorScorer()
         self.execution_scorer = ExecutionQualityScorer()
 
-        logger.info(f"QualityScorer initialized (v2={use_v2})")
+        # 新闻评分器 (可选)
+        self.news_search_enabled = NEWS_SEARCH_ENABLED
+        if self.news_search_enabled:
+            # 从配置自动获取新闻搜索函数（支持国际/中国网络）
+            search_func = create_search_func_from_config()
+            self.news_searcher = NewsSearcher(search_func=search_func)
+            self.news_alignment_scorer = NewsAlignmentScorer()
+            if search_func:
+                logger.info("News search adapter configured from config")
+            else:
+                logger.warning("No news search adapter available, news search will return empty results")
+        else:
+            self.news_searcher = None
+            self.news_alignment_scorer = None
+
+        logger.info(f"QualityScorer initialized (v2={use_v2}, news_search={self.news_search_enabled})")
 
     # ==================== 进场质量评分（30%权重）====================
 
@@ -1498,6 +1521,49 @@ class QualityScorer:
         else:
             options_score = None
 
+        # 5. 新闻契合度评分 (可选)
+        news_alignment_score = None
+        news_search_result = None
+        news_alignment_result = None
+
+        if self.news_search_enabled and self.news_searcher and trade_date:
+            try:
+                # 搜索新闻
+                underlying = position.underlying_symbol or position.symbol
+                news_search_result = self.news_searcher.search(
+                    symbol=position.symbol,
+                    trade_date=trade_date,
+                    range_days=NEWS_SEARCH_RANGE_DAYS,
+                    underlying_symbol=underlying if position.is_option else None
+                )
+
+                # 计算新闻契合度评分
+                news_alignment_result = self.news_alignment_scorer.score(
+                    news_result=news_search_result,
+                    position_direction=position.direction or 'long',
+                    position_open_date=trade_date
+                )
+
+                news_alignment_score = news_alignment_result.overall_score
+                score_details['news_alignment'] = {
+                    'score': news_alignment_score,
+                    'news_count': news_search_result.news_count,
+                    'sentiment': news_search_result.overall_sentiment,
+                    'impact_level': news_search_result.news_impact_level,
+                    'breakdown': news_alignment_result.breakdown,
+                    'warnings': news_alignment_result.warnings,
+                }
+
+                logger.debug(
+                    f"News alignment score for {position.symbol}: "
+                    f"{news_alignment_score:.1f} (news={news_search_result.news_count})"
+                )
+
+            except Exception as e:
+                logger.warning(f"News alignment scoring failed for position {position.id}: {e}")
+                news_alignment_score = 50.0  # 失败时给默认分
+                score_details['news_alignment'] = {'error': str(e)}
+
         # 计算综合评分
         weights = self.weights.copy()
 
@@ -1505,8 +1571,16 @@ class QualityScorer:
         if not is_option:
             options_weight = weights.pop('options', 0)
             # 将期权权重分配给其他维度
-            for key in weights:
-                weights[key] += options_weight / len(weights)
+            remaining_weights = [k for k in weights if k != 'news_alignment']
+            for key in remaining_weights:
+                weights[key] += options_weight / len(remaining_weights)
+
+        # 新闻搜索未启用时重新分配权重
+        if not self.news_search_enabled or news_alignment_score is None:
+            news_weight = weights.pop('news_alignment', 0)
+            remaining_weights = list(weights.keys())
+            for key in remaining_weights:
+                weights[key] += news_weight / len(remaining_weights)
 
         overall_score = (
             entry_result['entry_score'] * weights['entry'] +
@@ -1521,13 +1595,17 @@ class QualityScorer:
         if is_option and options_score is not None:
             overall_score += options_score * weights.get('options', 0.05)
 
+        # 添加新闻契合度评分
+        if news_alignment_score is not None and 'news_alignment' in weights:
+            overall_score += news_alignment_score * weights['news_alignment']
+
         grade = self._assign_grade(overall_score)
 
         # 构建完整结果
         result = {
             'overall_score': round(overall_score, 2),
             'grade': grade,
-            # 8维度评分
+            # 9维度评分
             'entry_score': entry_result['entry_score'],
             'exit_score': exit_result['exit_score'],
             'market_env_score': market_env_score,
@@ -1536,6 +1614,10 @@ class QualityScorer:
             'risk_score': risk_result['risk_score'],
             'execution_score': execution_score,
             'options_greeks_score': options_score,
+            'news_alignment_score': news_alignment_score,
+            # 新闻搜索结果 (用于保存到 NewsContext)
+            'news_search_result': news_search_result,
+            'news_alignment_result': news_alignment_result,
             # 详细信息
             'score_details': score_details,
             'behavior_warnings': behavior_warnings,
@@ -2545,6 +2627,20 @@ class QualityScorer:
                         position.execution_score = result.get('execution_score')
                         position.options_greeks_score = result.get('options_greeks_score')
 
+                        # 新闻契合度评分
+                        news_score = result.get('news_alignment_score')
+                        if news_score is not None:
+                            position.news_alignment_score = news_score
+
+                            # 保存 NewsContext 到数据库 (可选)
+                            news_search_result = result.get('news_search_result')
+                            news_alignment_result = result.get('news_alignment_result')
+                            if news_search_result and news_alignment_result:
+                                self._save_news_context(
+                                    session, position,
+                                    news_search_result, news_alignment_result
+                                )
+
                         # 保存详情为JSON
                         if result.get('score_details'):
                             position.score_details = json.dumps(
@@ -2581,6 +2677,94 @@ class QualityScorer:
             logger.info(f"Updated {stats['scored']} positions in database")
 
         return stats
+
+    def _save_news_context(
+        self,
+        session: Session,
+        position: Position,
+        news_search_result,
+        news_alignment_result
+    ):
+        """
+        保存新闻上下文到数据库
+
+        Args:
+            session: Database session
+            position: Position对象
+            news_search_result: NewsSearchResult
+            news_alignment_result: NewsAlignmentScore
+        """
+        try:
+            # 检查是否已存在
+            existing = session.query(NewsContext).filter(
+                NewsContext.position_id == position.id
+            ).first()
+
+            if existing:
+                # 更新现有记录
+                news_context = existing
+            else:
+                # 创建新记录
+                news_context = NewsContext(position_id=position.id)
+                session.add(news_context)
+
+            # 填充数据
+            news_context.symbol = news_search_result.symbol
+            news_context.underlying_symbol = (
+                position.underlying_symbol if position.is_option else None
+            )
+            news_context.search_date = news_search_result.search_date
+            news_context.search_range_days = news_search_result.search_range_days
+            news_context.search_source = news_search_result.search_source
+
+            # 类别标记
+            news_context.has_earnings = news_search_result.has_earnings
+            news_context.has_product_news = news_search_result.has_product_news
+            news_context.has_analyst_rating = news_search_result.has_analyst_rating
+            news_context.has_sector_news = news_search_result.has_sector_news
+            news_context.has_macro_news = news_search_result.has_macro_news
+            news_context.has_geopolitical = news_search_result.has_geopolitical
+
+            # 情感分析
+            news_context.overall_sentiment = news_search_result.overall_sentiment
+            news_context.sentiment_score = news_search_result.sentiment_score
+            news_context.news_impact_level = news_search_result.news_impact_level
+
+            # 新闻数据
+            news_context.news_items = [
+                {
+                    'title': item.title,
+                    'source': item.source,
+                    'date': str(item.date) if item.date else None,
+                    'url': item.url,
+                    'snippet': item.snippet,
+                    'category': item.category,
+                    'sentiment': item.sentiment,
+                    'relevance': item.relevance,
+                }
+                for item in news_search_result.news_items
+            ]
+            news_context.search_queries = news_search_result.search_queries
+            news_context.news_count = news_search_result.news_count
+
+            # 评分结果
+            news_context.news_alignment_score = news_alignment_result.overall_score
+            news_context.score_breakdown = news_alignment_result.breakdown
+            news_context.scoring_warnings = news_alignment_result.warnings
+
+            # Flush to get the news_context.id
+            session.flush()
+
+            # 更新 Position 的关联
+            position.news_context_id = news_context.id
+
+            logger.debug(
+                f"Saved NewsContext for position {position.id}: "
+                f"score={news_alignment_result.overall_score:.1f}"
+            )
+
+        except Exception as e:
+            logger.warning(f"Failed to save NewsContext for position {position.id}: {e}")
 
     def __repr__(self) -> str:
         """字符串表示"""

@@ -11,10 +11,12 @@ from src.data_sources.base_client import (
     DataNotFoundError
 )
 from src.data_sources.yfinance_client import YFinanceClient
+from src.data_sources.akshare_client import AKShareClient
 from src.data_sources.options_client import OptionsClient, get_options_client
 from src.data_sources.cache_manager import CacheManager
 from src.data_sources.batch_fetcher import BatchFetcher
 from src.data_sources.market_env_fetcher import MarketEnvironmentFetcher
+from src.data_sources.data_router import DataRouter, get_data_router
 
 __all__ = [
     # Base
@@ -25,6 +27,7 @@ __all__ = [
 
     # Clients
     'YFinanceClient',
+    'AKShareClient',
     'OptionsClient',
     'get_options_client',
 
@@ -36,4 +39,8 @@ __all__ = [
 
     # Market Environment
     'MarketEnvironmentFetcher',
+
+    # Router
+    'DataRouter',
+    'get_data_router',
 ]

@@ -188,11 +188,11 @@ class TestDirectionMapping:
         assert '卖空' in DIRECTION_MAPPING
 
     def test_mapped_directions(self):
-        """测试映射后的方向"""
-        assert DIRECTION_MAPPING['买入'] == 'buy'
-        assert DIRECTION_MAPPING['卖出'] == 'sell'
-        assert DIRECTION_MAPPING['卖空'] == 'sell_short'
-        assert DIRECTION_MAPPING['买券还券'] == 'buy_to_cover'
+        """测试映射后的方向 - 标准化为大写"""
+        assert DIRECTION_MAPPING['买入'] == 'BUY'
+        assert DIRECTION_MAPPING['卖出'] == 'SELL'
+        assert DIRECTION_MAPPING['卖空'] == 'SELL_SHORT'
+        assert DIRECTION_MAPPING['买券还券'] == 'BUY_TO_COVER'
 
 
 class TestInvalidStatuses:

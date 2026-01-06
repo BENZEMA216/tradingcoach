@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 # 中文字段名到英文字段名的映射
 FIELD_MAPPING = {
+    # === 富途格式 ===
     '方向': 'direction',
     '代码': 'symbol',
     '名称': 'symbol_name',
@@ -56,6 +57,14 @@ FIELD_MAPPING = {
     '交易系统使用费': 'trading_system_fee',
     '综合审计跟踪监管费': 'audit_trail_fee',
     '合计费用': 'total_fee',
+    # === A股格式 ===
+    '证券代码': 'symbol',
+    '证券名称': 'symbol_name',
+    '买卖标志': 'direction',
+    '成交日期': 'trade_date',
+    '过户费': 'transfer_fee',
+    '交易所': 'exchange',
+    '股东代码': 'shareholder_code',
 }
 
 

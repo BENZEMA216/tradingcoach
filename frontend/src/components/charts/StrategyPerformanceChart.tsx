@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart,
@@ -11,8 +12,12 @@ import {
   LabelList,
 } from 'recharts';
 import type { StrategyBreakdownItem } from '@/types';
-import { formatCurrency } from '@/utils/format';
+import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
+import { useResponsiveChart } from '@/hooks/useResponsiveChart';
+import { usePrivacyStore } from '@/store/usePrivacyStore';
+import { ChartSkeleton } from '@/components/common/ChartSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface StrategyPerformanceChartProps {
   data: StrategyBreakdownItem[];
@@ -24,27 +29,30 @@ interface StrategyPerformanceChartProps {
 export function StrategyPerformanceChart({ data, isLoading, onBarClick, bare = false }: StrategyPerformanceChartProps) {
   const { t } = useTranslation();
   const colors = useChartColors();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const chartConfig = useResponsiveChart(containerRef, { layout: 'horizontal' });
+
+  // Subscribe to privacy state for re-renders
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  const { formatCurrency: _formatCurrency, formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
-    if (bare) return <div className="h-64 bg-neutral-100 dark:bg-neutral-800 rounded animate-pulse" />;
+    if (bare) return <ChartSkeleton height="h-64" showTitle={false} />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4 animate-pulse" />
-        <div className="h-64 bg-gray-100 dark:bg-gray-700/50 rounded animate-pulse" />
+        <ChartSkeleton height="h-64" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    if (bare) return <div className="h-64 flex items-center justify-center text-neutral-500">{t('common.noData')}</div>;
+    if (bare) return <EmptyState icon="chart" height="h-64" size="sm" />;
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('charts.strategyPerformance')}
         </h3>
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          {t('common.noData')}
-        </div>
+        <EmptyState icon="chart" height="h-64" size="sm" />
       </div>
     );
   }
@@ -62,28 +70,28 @@ export function StrategyPerformanceChart({ data, isLoading, onBarClick, bare = f
   const bestStrategy = chartData[0];
 
   const chartContent = (
-    <div className="h-64">
+    <div ref={containerRef} className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 10, right: 70, left: 100, bottom: 5 }}
+            margin={chartConfig.margin}
           >
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} horizontal={true} vertical={false} />
             <XAxis
               type="number"
-              tick={{ fontSize: 11, fill: colors.text }}
+              tick={{ fontSize: chartConfig.fontSize, fill: colors.text }}
               tickLine={false}
               axisLine={{ stroke: colors.axis }}
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={formatAxis}
             />
             <YAxis
               type="category"
               dataKey="name"
-              tick={{ fontSize: 11, fill: colors.text }}
+              tick={{ fontSize: chartConfig.fontSize, fill: colors.text }}
               tickLine={false}
               axisLine={{ stroke: colors.axis }}
-              width={90}
+              width={chartConfig.yAxisWidth}
             />
             <Tooltip
               content={({ active, payload }) => {
@@ -94,7 +102,7 @@ export function StrategyPerformanceChart({ data, isLoading, onBarClick, bare = f
                       <p className="font-semibold text-gray-900 dark:text-white">{data.name}</p>
                       <div className="mt-1 space-y-0.5 text-sm">
                         <p style={{ color: data.pnl >= 0 ? colors.profit : colors.loss }}>
-                          {t('statistics.totalPnl')}: {formatCurrency(data.pnl)}
+                          {t('statistics.totalPnl')}: {formatPnL(data.pnl)}
                         </p>
                         <p className="text-gray-600 dark:text-gray-400">
                           {t('charts.tradeCount')}: {data.count}
@@ -127,12 +135,14 @@ export function StrategyPerformanceChart({ data, isLoading, onBarClick, bare = f
                   fillOpacity={0.8}
                 />
               ))}
-              <LabelList
-                dataKey="pnl"
-                position="right"
-                formatter={(value) => formatCurrency(value as number)}
-                style={{ fontSize: 11, fill: colors.text }}
-              />
+              {chartConfig.showLabels && (
+                <LabelList
+                  dataKey="pnl"
+                  position="right"
+                  formatter={(value) => formatPnL(value as number)}
+                  style={{ fontSize: chartConfig.fontSize, fill: colors.text }}
+                />
+              )}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -145,7 +155,7 @@ export function StrategyPerformanceChart({ data, isLoading, onBarClick, bare = f
         <div key={item.strategy} className="p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
           <div className="text-xs text-gray-500 dark:text-gray-400">{item.name}</div>
           <div className={`text-sm font-semibold ${item.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {formatCurrency(item.pnl)}
+            {formatPnL(item.pnl)}
           </div>
           <div className="text-xs text-gray-400 dark:text-gray-500">
             {item.count} {t('common.trades')} · {item.winRate.toFixed(0)}%

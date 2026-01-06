@@ -3,7 +3,11 @@
 
 input: CSV文件路径
 output: 导入结果(新增数/跳过数/错误), 导入历史记录
-pos: 数据导入层控制器 - 自动检测语言、指纹去重、增量导入
+pos: 数据导入层控制器 - 自动检测券商格式、指纹去重、增量导入
+
+支持两种模式:
+1. 适配器模式（推荐）: 使用 AdapterRegistry 自动检测券商格式
+2. 兼容模式: 回退到旧的 CSVParser/EnglishCSVParser
 
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
@@ -12,6 +16,7 @@ import sys
 from pathlib import Path
 import hashlib
 import logging
+import uuid
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
 import pandas as pd
@@ -24,6 +29,15 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import config
 from src.models.base import init_database, get_session, create_all_tables
 from src.models.trade import Trade, TradeDirection, TradeStatus, MarketType
+
+# 新适配器系统
+try:
+    from src.importers.core.adapter_registry import AdapterRegistry
+    ADAPTER_SYSTEM_AVAILABLE = True
+except ImportError:
+    ADAPTER_SYSTEM_AVAILABLE = False
+
+# 旧解析器（兼容模式）
 from src.importers.csv_parser import CSVParser
 from src.importers.english_csv_parser import (
     EnglishCSVParser,
@@ -60,6 +74,11 @@ class ImportResult:
         self.date_range_end = None
         self.processing_time_ms = 0
         self.error_messages = []
+        # 新增字段
+        self.broker_id = None
+        self.broker_name = None
+        self.detection_confidence = 0.0
+        self.import_batch_id = None
 
     def to_dict(self):
         return {
@@ -71,28 +90,47 @@ class ImportResult:
             'date_range_start': str(self.date_range_start) if self.date_range_start else None,
             'date_range_end': str(self.date_range_end) if self.date_range_end else None,
             'processing_time_ms': self.processing_time_ms,
+            'broker_id': self.broker_id,
+            'broker_name': self.broker_name,
+            'detection_confidence': self.detection_confidence,
+            'import_batch_id': self.import_batch_id,
         }
 
 
 class IncrementalImporter:
     """增量导入器"""
 
-    def __init__(self, csv_path: str, dry_run: bool = False):
+    def __init__(
+        self,
+        csv_path: str,
+        dry_run: bool = False,
+        use_adapter: bool = True,
+        broker_id: Optional[str] = None
+    ):
         """
         初始化导入器
 
         Args:
             csv_path: CSV文件路径
             dry_run: 是否为测试运行（不写入数据库）
+            use_adapter: 是否使用新适配器系统（默认True）
+            broker_id: 强制指定券商ID（可选，默认自动检测）
         """
         self.csv_path = Path(csv_path)
         self.dry_run = dry_run
+        self.use_adapter = use_adapter and ADAPTER_SYSTEM_AVAILABLE
+        self.forced_broker_id = broker_id
         self.session = None
         self.result = ImportResult()
 
+        # 生成导入批次ID
+        self.import_batch_id = str(uuid.uuid4())[:8]
+        self.result.import_batch_id = self.import_batch_id
+
         # 文件信息
         self.file_hash = None
-        self.file_language = None
+        self.file_language = None  # 兼容模式使用
+        self.adapter = None  # 适配器模式使用
 
     def run(self) -> ImportResult:
         """执行增量导入"""
@@ -111,9 +149,10 @@ class IncrementalImporter:
             # 2. 检测语言并解析
             df = self._parse_csv()
 
-            # 3. 清洗数据（仅中文格式需要）
+            # 3. 清洗数据（仅兼容模式中文格式需要）
             if self.file_language == 'chinese':
                 df = self._clean_chinese_data(df)
+            # 适配器模式已自动清洗和添加指纹，无需额外处理
 
             # 4. 增量导入
             self._incremental_import(df)
@@ -149,7 +188,65 @@ class IncrementalImporter:
 
     def _parse_csv(self) -> pd.DataFrame:
         """解析CSV文件"""
-        logger.info("\n[Step 1] Detecting language and parsing CSV...")
+        logger.info("\n[Step 1] Detecting format and parsing CSV...")
+
+        # 优先尝试适配器模式
+        if self.use_adapter:
+            try:
+                return self._parse_csv_with_adapter()
+            except Exception as e:
+                logger.warning(f"Adapter mode failed, falling back to legacy: {e}")
+                # 回退到兼容模式
+
+        # 兼容模式：使用旧的解析器
+        return self._parse_csv_legacy()
+
+    def _parse_csv_with_adapter(self) -> pd.DataFrame:
+        """使用适配器系统解析CSV"""
+        logger.info("Using adapter system...")
+
+        registry = AdapterRegistry()
+
+        # 如果指定了broker_id，直接获取对应适配器
+        if self.forced_broker_id:
+            self.adapter = registry.get_adapter(self.forced_broker_id)
+            if self.adapter is None:
+                raise ValueError(f"Unknown broker_id: {self.forced_broker_id}")
+            confidence = 1.0
+            logger.info(f"Using forced adapter: {self.forced_broker_id}")
+        else:
+            # 自动检测券商格式
+            self.adapter, confidence = registry.detect_and_get_adapter(str(self.csv_path))
+            if self.adapter is None:
+                raise ValueError("Could not detect CSV format")
+
+        # 更新结果信息
+        self.result.broker_id = self.adapter.config.broker_id
+        self.result.broker_name = self.adapter.config.broker_name_cn
+        self.result.detection_confidence = confidence
+        self.file_language = 'adapter'  # 标记使用适配器模式
+
+        logger.info(f"Detected broker: {self.result.broker_name} (confidence: {confidence:.2%})")
+
+        # 设置导入批次ID
+        self.adapter.set_import_batch_id(self.import_batch_id)
+
+        # 解析CSV
+        df = self.adapter.parse(str(self.csv_path))
+        self.result.total_rows = len(df)
+
+        # 筛选已成交交易
+        completed_df = self.adapter.filter_completed_trades()
+        self.result.completed_trades = len(completed_df)
+
+        logger.info(f"Total rows: {self.result.total_rows}")
+        logger.info(f"Completed trades: {self.result.completed_trades}")
+
+        return completed_df
+
+    def _parse_csv_legacy(self) -> pd.DataFrame:
+        """兼容模式：使用旧的解析器"""
+        logger.info("Using legacy parser...")
 
         # 检测语言
         self.file_language = detect_csv_language(str(self.csv_path))
@@ -253,7 +350,9 @@ class IncrementalImporter:
             return
 
         # 获取日期范围
-        if self.file_language == 'english':
+        if self.file_language == 'adapter':
+            time_col = 'filled_time'  # 适配器模式使用标准列名
+        elif self.file_language == 'english':
             time_col = 'filled_time_parsed'
         else:
             time_col = 'filled_time_utc'
@@ -318,11 +417,132 @@ class IncrementalImporter:
 
     def _row_to_trade(self, row) -> Optional[Trade]:
         """将行转换为Trade对象"""
-        # 确定时间列名
-        if self.file_language == 'english':
-            time_col = 'filled_time_parsed'
+        # 根据模式确定列名
+        if self.file_language == 'adapter':
+            return self._row_to_trade_adapter(row)
+        elif self.file_language == 'english':
+            return self._row_to_trade_english(row)
         else:
-            time_col = 'filled_time_utc'
+            return self._row_to_trade_chinese(row)
+
+    def _row_to_trade_adapter(self, row) -> Optional[Trade]:
+        """适配器模式：将行转换为Trade对象"""
+        # 验证必填字段
+        symbol = clean_value(row.get('symbol'))
+        direction_str = clean_value(row.get('direction'))
+        filled_qty = clean_value(row.get('filled_quantity'))
+        filled_time = clean_value(row.get('filled_time'))
+
+        if not symbol or not direction_str or not filled_qty or not filled_time:
+            return None
+
+        # 适配器已经将方向转换为标准值 (buy/sell/sell_short/buy_to_cover)
+        direction_mapping = {
+            'buy': TradeDirection.BUY,
+            'sell': TradeDirection.SELL,
+            'sell_short': TradeDirection.SELL_SHORT,
+            'buy_to_cover': TradeDirection.BUY_TO_COVER,
+        }
+        direction_enum = direction_mapping.get(direction_str.lower() if direction_str else '')
+        if not direction_enum:
+            logger.warning(f"Unknown direction: {direction_str}")
+            return None
+
+        # 适配器已经将市场转换为标准值 (us/hk/cn)
+        market_str = clean_value(row.get('market')) or 'us'
+        market_mapping = {
+            'us': MarketType.US_STOCK,
+            'hk': MarketType.HK_STOCK,
+            'cn': MarketType.CN_STOCK,
+        }
+        market_enum = market_mapping.get(market_str.lower(), MarketType.US_STOCK)
+
+        # 创建Trade对象
+        trade = Trade(
+            symbol=symbol,
+            symbol_name=clean_value(row.get('symbol_name')),
+            direction=direction_enum,
+            market=market_enum,
+            currency=clean_value(row.get('currency')) or 'USD',
+        )
+
+        # 订单信息
+        trade.order_price = clean_value(row.get('order_price'))
+        trade.order_quantity = clean_value(row.get('order_quantity'))
+        trade.order_amount = clean_value(row.get('order_amount'))
+        trade.order_type = clean_value(row.get('order_type'))
+        trade.order_time = clean_value(row.get('order_time'))
+
+        # 成交信息
+        trade.filled_price = clean_value(row.get('filled_price'))
+        trade.filled_quantity = filled_qty
+        trade.filled_amount = clean_value(row.get('filled_amount'))
+        trade.filled_time = filled_time
+
+        # 交易日期
+        if trade.filled_time:
+            if hasattr(trade.filled_time, 'date'):
+                trade.trade_date = trade.filled_time.date()
+            else:
+                trade.trade_date = trade.filled_time
+
+        # 费用信息
+        trade.commission = clean_value(row.get('commission'))
+        trade.platform_fee = clean_value(row.get('platform_fee'))
+        trade.clearing_fee = clean_value(row.get('clearing_fee'))
+        trade.stamp_duty = clean_value(row.get('stamp_duty'))
+        trade.transaction_fee = clean_value(row.get('transaction_fee'))
+        trade.sec_fee = clean_value(row.get('sec_fee'))
+        trade.option_regulatory_fee = clean_value(row.get('option_regulatory_fee'))
+        trade.option_clearing_fee = clean_value(row.get('option_clearing_fee'))
+        trade.total_fee = clean_value(row.get('total_fee')) or 0
+
+        # A股特有字段
+        trade.exchange = clean_value(row.get('exchange'))
+        trade.seat_code = clean_value(row.get('seat_code'))
+        trade.shareholder_code = clean_value(row.get('shareholder_code'))
+        trade.transfer_fee = clean_value(row.get('transfer_fee'))
+        trade.handling_fee = clean_value(row.get('handling_fee'))
+        trade.regulation_fee = clean_value(row.get('regulation_fee'))
+        trade.other_fees = clean_value(row.get('other_fees'))
+
+        # 期权信息
+        trade.is_option = 1 if row.get('is_option', False) else 0
+        trade.underlying_symbol = clean_value(row.get('underlying_symbol'))
+        trade.option_type = clean_value(row.get('option_type'))
+        trade.strike_price = clean_value(row.get('strike_price'))
+        exp_date = clean_value(row.get('expiration_date'))
+
+        # 处理到期日
+        if exp_date is not None and hasattr(exp_date, 'date'):
+            trade.expiration_date = exp_date.date() if callable(getattr(exp_date, 'date', None)) else exp_date
+        else:
+            trade.expiration_date = exp_date
+
+        # 交易指纹和导入追踪
+        trade.trade_fingerprint = clean_value(row.get('trade_fingerprint'))
+        trade.broker_id = clean_value(row.get('broker_id'))
+        trade.import_batch_id = clean_value(row.get('import_batch_id'))
+        trade.source_row_number = clean_value(row.get('source_row_number'))
+
+        # 其他
+        trade.notes = clean_value(row.get('notes'))
+
+        # 适配器已经将状态转换为标准值 (filled/cancelled/partially_filled/pending)
+        raw_status = clean_value(row.get('status')) or 'filled'
+        status_mapping = {
+            'filled': TradeStatus.FILLED,
+            'cancelled': TradeStatus.CANCELLED,
+            'partially_filled': TradeStatus.PARTIALLY_FILLED,
+            'pending': TradeStatus.PENDING,
+        }
+        trade.status = status_mapping.get(raw_status.lower(), TradeStatus.FILLED)
+
+        return trade
+
+    def _row_to_trade_english(self, row) -> Optional[Trade]:
+        """英文格式：将行转换为Trade对象"""
+        time_col = 'filled_time_parsed'
 
         # 验证必填字段
         symbol = clean_value(row.get('symbol'))
@@ -339,7 +559,113 @@ class IncrementalImporter:
             'sell': TradeDirection.SELL,
             'sell_short': TradeDirection.SELL_SHORT,
             'buy_to_cover': TradeDirection.BUY_TO_COVER,
-            # 中文格式
+        }
+        direction_enum = direction_mapping.get(direction_str.lower() if direction_str else '')
+        if not direction_enum:
+            logger.warning(f"Unknown direction: {direction_str}")
+            return None
+
+        # 转换市场为枚举
+        market_str = clean_value(row.get('market')) or 'US'
+        market_mapping = {
+            'US': MarketType.US_STOCK,
+            'HK': MarketType.HK_STOCK,
+            'CN': MarketType.CN_STOCK,
+        }
+        market_enum = market_mapping.get(market_str, MarketType.US_STOCK)
+
+        # 创建Trade对象
+        trade = Trade(
+            symbol=symbol,
+            symbol_name=clean_value(row.get('symbol_name')),
+            direction=direction_enum,
+            market=market_enum,
+            currency=clean_value(row.get('currency')) or 'USD',
+        )
+
+        # 订单信息
+        trade.order_price = clean_value(row.get('order_price'))
+        trade.order_quantity = clean_value(row.get('order_quantity'))
+        trade.order_amount = clean_value(row.get('order_amount'))
+        trade.order_type = clean_value(row.get('order_type'))
+        trade.order_time = clean_value(row.get('order_time_parsed'))
+
+        # 成交信息
+        trade.filled_price = clean_value(row.get('filled_price'))
+        trade.filled_quantity = filled_qty
+        trade.filled_amount = clean_value(row.get('filled_amount'))
+        trade.filled_time = filled_time
+
+        # 交易日期
+        if trade.filled_time:
+            if hasattr(trade.filled_time, 'date'):
+                trade.trade_date = trade.filled_time.date()
+            else:
+                trade.trade_date = trade.filled_time
+
+        # 费用信息
+        trade.commission = clean_value(row.get('commission'))
+        trade.platform_fee = clean_value(row.get('platform_fee'))
+        trade.clearing_fee = clean_value(row.get('clearing_fee'))
+        trade.stamp_duty = clean_value(row.get('stamp_duty'))
+        trade.transaction_fee = clean_value(row.get('transaction_fee'))
+        trade.sec_fee = clean_value(row.get('sec_fee'))
+        trade.option_regulatory_fee = clean_value(row.get('option_regulatory_fee'))
+        trade.option_clearing_fee = clean_value(row.get('option_clearing_fee'))
+        trade.total_fee = clean_value(row.get('total_fee')) or 0
+
+        # 期权信息
+        trade.is_option = 1 if row.get('is_option', False) else 0
+        trade.underlying_symbol = clean_value(row.get('underlying_symbol'))
+        trade.option_type = clean_value(row.get('option_type'))
+        trade.strike_price = clean_value(row.get('strike_price'))
+        exp_date = clean_value(row.get('expiry_date'))
+
+        # 处理到期日
+        if exp_date is not None and hasattr(exp_date, 'date'):
+            trade.expiration_date = exp_date.date() if callable(getattr(exp_date, 'date', None)) else exp_date
+        else:
+            trade.expiration_date = exp_date
+
+        # 交易指纹
+        trade.trade_fingerprint = clean_value(row.get('trade_fingerprint'))
+
+        # 其他
+        trade.notes = clean_value(row.get('notes'))
+
+        # 转换状态为枚举
+        raw_status = clean_value(row.get('status')) or 'filled'
+        status_mapping = {
+            'Filled': TradeStatus.FILLED,
+            'Cancelled': TradeStatus.CANCELLED,
+            'filled': TradeStatus.FILLED,
+            'cancelled': TradeStatus.CANCELLED,
+            'partially_filled': TradeStatus.PARTIALLY_FILLED,
+            'pending': TradeStatus.PENDING,
+        }
+        trade.status = status_mapping.get(raw_status, TradeStatus.FILLED)
+
+        return trade
+
+    def _row_to_trade_chinese(self, row) -> Optional[Trade]:
+        """中文格式：将行转换为Trade对象"""
+        time_col = 'filled_time_utc'
+
+        # 验证必填字段
+        symbol = clean_value(row.get('symbol'))
+        direction_str = clean_value(row.get('direction'))
+        filled_qty = clean_value(row.get('filled_quantity'))
+        filled_time = clean_value(row.get(time_col))
+
+        if not symbol or not direction_str or not filled_qty or not filled_time:
+            return None
+
+        # 转换方向为枚举
+        direction_mapping = {
+            'buy': TradeDirection.BUY,
+            'sell': TradeDirection.SELL,
+            'sell_short': TradeDirection.SELL_SHORT,
+            'buy_to_cover': TradeDirection.BUY_TO_COVER,
             '买入': TradeDirection.BUY,
             '卖出': TradeDirection.SELL,
         }
@@ -374,11 +700,7 @@ class IncrementalImporter:
         trade.order_quantity = clean_value(row.get('order_quantity'))
         trade.order_amount = clean_value(row.get('order_amount'))
         trade.order_type = clean_value(row.get('order_type'))
-
-        if self.file_language == 'english':
-            trade.order_time = clean_value(row.get('order_time_parsed'))
-        else:
-            trade.order_time = clean_value(row.get('order_time_utc'))
+        trade.order_time = clean_value(row.get('order_time_utc'))
 
         # 成交信息
         trade.filled_price = clean_value(row.get('filled_price'))
@@ -405,18 +727,11 @@ class IncrementalImporter:
         trade.total_fee = clean_value(row.get('total_fee')) or 0
 
         # 期权信息
-        if self.file_language == 'english':
-            trade.is_option = 1 if row.get('is_option', False) else 0
-            trade.underlying_symbol = clean_value(row.get('underlying_symbol'))
-            trade.option_type = clean_value(row.get('option_type'))
-            trade.strike_price = clean_value(row.get('strike_price'))
-            exp_date = clean_value(row.get('expiry_date'))
-        else:
-            trade.is_option = 1 if clean_value(row.get('parsed_is_option')) else 0
-            trade.underlying_symbol = clean_value(row.get('parsed_underlying_symbol'))
-            trade.option_type = clean_value(row.get('parsed_option_type'))
-            trade.strike_price = clean_value(row.get('parsed_strike_price'))
-            exp_date = clean_value(row.get('parsed_expiration_date'))
+        trade.is_option = 1 if clean_value(row.get('parsed_is_option')) else 0
+        trade.underlying_symbol = clean_value(row.get('parsed_underlying_symbol'))
+        trade.option_type = clean_value(row.get('parsed_option_type'))
+        trade.strike_price = clean_value(row.get('parsed_strike_price'))
+        exp_date = clean_value(row.get('parsed_expiration_date'))
 
         # 处理到期日
         if exp_date is not None and hasattr(exp_date, 'date'):
@@ -433,15 +748,10 @@ class IncrementalImporter:
         # 转换状态为枚举
         raw_status = clean_value(row.get('status')) or 'filled'
         status_mapping = {
-            # 中文格式
             '全部成交': TradeStatus.FILLED,
             '已撤单': TradeStatus.CANCELLED,
             '部分成交': TradeStatus.PARTIALLY_FILLED,
             '待成交': TradeStatus.PENDING,
-            # 英文格式（直接从CSV）
-            'Filled': TradeStatus.FILLED,
-            'Cancelled': TradeStatus.CANCELLED,
-            # 已转换的枚举值字符串
             'filled': TradeStatus.FILLED,
             'cancelled': TradeStatus.CANCELLED,
             'partially_filled': TradeStatus.PARTIALLY_FILLED,
@@ -504,7 +814,13 @@ class IncrementalImporter:
         logger.info("IMPORT SUMMARY")
         logger.info("=" * 60)
         logger.info(f"File:                 {self.csv_path.name}")
-        logger.info(f"Language:             {self.file_language}")
+        if self.file_language == 'adapter':
+            logger.info(f"Mode:                 Adapter")
+            logger.info(f"Broker:               {self.result.broker_name} ({self.result.broker_id})")
+            logger.info(f"Detection confidence: {self.result.detection_confidence:.1%}")
+        else:
+            logger.info(f"Mode:                 Legacy ({self.file_language})")
+        logger.info(f"Import batch:         {self.result.import_batch_id}")
         logger.info(f"Total rows:           {self.result.total_rows}")
         logger.info(f"Completed trades:     {self.result.completed_trades}")
         logger.info(f"New trades:           {self.result.new_trades}")
@@ -606,8 +922,28 @@ def main():
         action='store_true',
         help='Backfill fingerprints for existing trades'
     )
+    parser.add_argument(
+        '--broker-id',
+        type=str,
+        default=None,
+        help='Force specific broker ID (e.g., futu_cn, futu_en, citic)'
+    )
+    parser.add_argument(
+        '--no-adapter',
+        action='store_true',
+        help='Disable adapter system, use legacy parser'
+    )
+    parser.add_argument(
+        '--list-brokers',
+        action='store_true',
+        help='List available broker adapters'
+    )
 
     args = parser.parse_args()
+
+    if args.list_brokers:
+        _list_brokers()
+        return
 
     if args.backfill:
         backfill_fingerprints()
@@ -624,12 +960,31 @@ def main():
 
     importer = IncrementalImporter(
         csv_path=str(csv_path),
-        dry_run=args.dry_run
+        dry_run=args.dry_run,
+        use_adapter=not args.no_adapter,
+        broker_id=args.broker_id
     )
     result = importer.run()
 
     # 返回码
     sys.exit(0 if result.errors == 0 else 1)
+
+
+def _list_brokers():
+    """列出可用的券商适配器"""
+    if not ADAPTER_SYSTEM_AVAILABLE:
+        print("Adapter system not available")
+        return
+
+    registry = AdapterRegistry()
+    brokers = registry.list_brokers()
+
+    print("\nAvailable broker adapters:")
+    print("-" * 50)
+    for broker in brokers:
+        print(f"  {broker['broker_id']:15} - {broker['broker_name_cn']} ({broker['broker_name']})")
+    print("-" * 50)
+    print(f"Total: {len(brokers)} adapters\n")
 
 
 if __name__ == '__main__':

@@ -45,8 +45,25 @@ TIINGO_API_KEY = os.getenv("TIINGO_API_KEY", "1eefe51e4f11ec58626799e90e809abcd4
 # NewsAPI (可选 - 新闻数据)
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "b898425538174d088544fee3691e626b")
 
+# Tavily (备用 - LLM友好的新闻搜索)
+# 注册: https://tavily.com
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "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")
+
 # IEX Cloud (可选)
 IEX_CLOUD_TOKEN = os.getenv("IEX_CLOUD_TOKEN", "")
+
+# ==================== LLM 配置 (AI Coach) ====================
+
+# Anthropic Claude (推荐)
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+ANTHROPIC_MODEL = "claude-3-haiku-20240307"  # 快速且经济
+
+# OpenAI GPT (备选)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = "gpt-4o-mini"  # 快速且经济
+
+# LLM 选择策略: 优先使用 Anthropic，如无可用则使用 OpenAI
+LLM_PROVIDER = "anthropic" if ANTHROPIC_API_KEY else ("openai" if OPENAI_API_KEY else None)
 
 
 # ==================== 数据源配置 ====================
@@ -167,6 +184,22 @@ SCORE_WEIGHT_EXIT = 0.25   # 出场质量权重
 SCORE_WEIGHT_TREND = 0.25  # 趋势质量权重
 SCORE_WEIGHT_RISK = 0.20   # 风险管理权重
 
+# 新闻契合度评分配置
+NEWS_SEARCH_ENABLED = True               # 是否启用新闻搜索
+NEWS_SEARCH_RANGE_DAYS = 3               # 搜索交易日前后天数
+NEWS_SEARCH_CACHE_TTL_DAYS = 7           # 新闻缓存有效期
+SCORE_WEIGHT_NEWS_ALIGNMENT = 0.07       # 新闻契合度权重 (7%)
+
+# 新闻搜索网络区域配置
+# "international" - 国际网络 (使用 DDGS/Tavily)
+# "china" - 中国网络 (使用 DDGS/Polygon)
+# "auto" - 自动检测 (尝试访问 google.com 判断)
+NEWS_NETWORK_REGION = os.getenv("NEWS_NETWORK_REGION", "auto")
+
+# 新闻搜索提供商优先级 (DDGS 免费无需配置，为默认首选)
+NEWS_PROVIDERS_INTERNATIONAL = ["ddgs", "tavily", "polygon"]  # 国际网络
+NEWS_PROVIDERS_CHINA = ["ddgs", "polygon"]                    # 中国网络
+
 # RSI阈值
 RSI_OVERSOLD = 30
 RSI_OVERBOUGHT = 70
@@ -177,8 +210,46 @@ BBANDS_STD = 2.0
 # ATR周期
 ATR_PERIOD = 14
 
-# ADX阈值
-ADX_STRONG_TREND = 25
+# ADX趋势强度阈值
+ADX_WEAK_TREND = 15       # 弱趋势/震荡
+ADX_MODERATE_TREND = 25   # 中等趋势
+ADX_STRONG_TREND = 40     # 强趋势
+
+# Stochastic阈值
+STOCH_OVERSOLD = 20       # 超卖区域
+STOCH_OVERBOUGHT = 80     # 超买区域
+
+# BB Width阈值 (波动率压缩/扩张)
+BB_WIDTH_LOW = 4.0        # 低波动率（压缩，可能即将突破）
+BB_WIDTH_HIGH = 10.0      # 高波动率（扩张）
+
+# VIX阈值 (市场恐慌指数)
+VIX_LOW = 15        # 低波动率阈值 - 市场平静
+VIX_HIGH = 25       # 高波动率阈值 - 市场紧张
+VIX_EXTREME = 35    # 极端恐慌阈值 - 市场恐慌
+
+
+# ==================== 邮件配置 ====================
+
+# SMTP 服务器配置
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", "noreply@tradingcoach.com")
+SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "TradingCoach")
+
+# 邮件功能是否启用（需要配置 SMTP_USER 和 SMTP_PASSWORD）
+EMAIL_ENABLED = bool(SMTP_USER and SMTP_PASSWORD)
+
+
+# ==================== 任务配置 ====================
+
+# 异步任务最大并发数
+TASK_MAX_CONCURRENT = int(os.getenv("TASK_MAX_CONCURRENT", "3"))
+
+# 任务超时时间（秒）
+TASK_TIMEOUT_SECONDS = int(os.getenv("TASK_TIMEOUT_SECONDS", "600"))
 
 
 # ==================== 调试配置 ====================

@@ -20,3 +20,4 @@ export { TradingHeatmap } from './TradingHeatmap';
 export { HourlyPerformanceChart } from './HourlyPerformanceChart';
 export { AssetTypeChart } from './AssetTypeChart';
 export { StrategyPerformanceChart } from './StrategyPerformanceChart';
+export { EventTimelineChart } from './EventTimelineChart';

@@ -17,6 +17,9 @@ from .position import Position, PositionStatus
 from .market_data import MarketData
 from .market_environment import MarketEnvironment
 from .stock_classification import StockClassification
+from .news_context import NewsContext, NewsSentiment, NewsImpactLevel, NewsCategory
+from .event_context import EventContext, EventType, EventImpact
+from .task import Task, TaskStatus, TaskType
 
 # 导出所有模型和工具函数
 __all__ = [
@@ -35,10 +38,20 @@ __all__ = [
     'MarketData',
     'MarketEnvironment',
     'StockClassification',
+    'NewsContext',
+    'EventContext',
+    'Task',
 
     # 枚举类型
     'TradeDirection',
     'TradeStatus',
     'MarketType',
     'PositionStatus',
+    'NewsSentiment',
+    'NewsImpactLevel',
+    'NewsCategory',
+    'EventType',
+    'EventImpact',
+    'TaskStatus',
+    'TaskType',
 ]

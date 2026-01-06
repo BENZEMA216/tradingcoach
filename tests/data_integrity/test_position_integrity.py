@@ -106,17 +106,30 @@ class TestPositionIntegrity:
         assert count == 0, f"发现 {count} 条持仓总评分超出范围"
 
     def test_di_pos_011_grade_matches_score(self, db_session):
-        """DI-POS-011: 评分等级与分数匹配"""
+        """DI-POS-011: 评分等级与分数匹配
+
+        等级划分（支持细分等级）：
+        A+: 95-100, A: 90-94, A-: 85-89
+        B+: 80-84, B: 75-79, B-: 70-74
+        C+: 65-69, C: 60-64, C-: 55-59
+        D: 50-54, F: 0-49
+        """
         count = execute_check(db_session, """
             SELECT COUNT(*) FROM positions
             WHERE overall_score IS NOT NULL
               AND score_grade IS NOT NULL
               AND NOT (
-                (overall_score >= 90 AND score_grade = 'A') OR
-                (overall_score >= 80 AND overall_score < 90 AND score_grade = 'B') OR
-                (overall_score >= 70 AND overall_score < 80 AND score_grade = 'C') OR
-                (overall_score >= 60 AND overall_score < 70 AND score_grade = 'D') OR
-                (overall_score < 60 AND score_grade = 'F')
+                (overall_score >= 95 AND score_grade = 'A+') OR
+                (overall_score >= 90 AND overall_score < 95 AND score_grade = 'A') OR
+                (overall_score >= 85 AND overall_score < 90 AND score_grade = 'A-') OR
+                (overall_score >= 80 AND overall_score < 85 AND score_grade = 'B+') OR
+                (overall_score >= 75 AND overall_score < 80 AND score_grade = 'B') OR
+                (overall_score >= 70 AND overall_score < 75 AND score_grade = 'B-') OR
+                (overall_score >= 65 AND overall_score < 70 AND score_grade = 'C+') OR
+                (overall_score >= 60 AND overall_score < 65 AND score_grade = 'C') OR
+                (overall_score >= 55 AND overall_score < 60 AND score_grade = 'C-') OR
+                (overall_score >= 50 AND overall_score < 55 AND score_grade = 'D') OR
+                (overall_score < 50 AND score_grade = 'F')
               )
         """)
         assert count == 0, f"发现 {count} 条持仓评分等级与分数不匹配"
