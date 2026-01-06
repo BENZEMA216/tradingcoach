@@ -271,6 +271,21 @@ outputs/
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+frontend/test-results/
+frontend/screenshots/
+
+# ==================== Playwright/Testing ====================
+.playwright-mcp/
+playwright-report/
+test-results/
+
+# ==================== Database backups ====================
+data/*.backup*
+*.backup*
+
+# ==================== Trading Data (敏感) ====================
+# 取消注释以下行来忽略交易数据
+original_data/
 
 # Chrome DevTools MCP (not needed in repo)
 visualization/chrome-devtools-mcp/
@@ -278,3 +293,4 @@ visualization/chrome-devtools-mcp/
 # Temporary fix guides
 cursor_fix_guide.md
 cursor_proxy_fix.md
+GEMINI_FIX_GUIDE.md
