@@ -12,7 +12,7 @@ FIFO交易配对引擎，将原子交易记录配对为完整持仓周期。支�
 | 文件名 | 角色 | 功能 |
 |--------|------|------|
 | `__init__.py` | 模块入口 | 导出配对器类 |
-| `fifo_matcher.py` | 总协调器 | 按标的分组、调度SymbolMatcher、汇总结果 |
+| `fifo_matcher.py` | 总协调器 | 按标的分组、调度SymbolMatcher、汇总结果，add_all批量插入优化 |
 | `symbol_matcher.py` | 单标的配对器 | FIFO核心算法实现，处理做多/做空 |
 | `trade_quantity.py` | 数量追踪器 | 追踪交易剩余数量，支持部分配对 |
 

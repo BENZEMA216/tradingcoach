@@ -18,7 +18,7 @@
 | `data_router.py` | 智能路由器 | 根据代码自动选择数据源 |
 | `options_client.py` | 期权数据客户端 | 获取期权链和Greeks数据 |
 | `cache_manager.py` | 缓存管理器 | 三级缓存：L1内存/L2数据库/L3文件 |
-| `batch_fetcher.py` | 批量获取器 | 并发控制、进度显示、断点续传 |
+| `batch_fetcher.py` | 批量获取器 | 并发控制（ThreadPoolExecutor, max_workers=4）、进度显示、断点续传 |
 | `market_env_fetcher.py` | 市场环境获取器 | 获取VIX、指数等市场环境数据 |
 
 ---

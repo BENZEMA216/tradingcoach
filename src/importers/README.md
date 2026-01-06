@@ -52,7 +52,7 @@ importers/
 | `configs/*.yaml` | 券商配置 | 字段映射、枚举映射、验证规则 |
 | `adapters/generic_adapter.py` | 通用适配器 | 纯 YAML 驱动的解析器 |
 | `adapters/futu_adapter.py` | 富途适配器 | 期权符号解析等专有逻辑 |
-| `incremental_importer.py` | 导入控制器 | 增量导入、去重、历史记录 |
+| `incremental_importer.py` | 导入控制器 | 增量导入、去重、历史记录，批量插入优化（batch_size=500） |
 | `csv_parser.py` | [兼容] 中文解析 | 旧版富途中文 CSV 解析 |
 | `english_csv_parser.py` | [兼容] 英文解析 | 旧版富途英文 CSV 解析 |
 | `data_cleaner.py` | [兼容] 数据清洗 | 时区转换、枚举映射、期权解析 |
