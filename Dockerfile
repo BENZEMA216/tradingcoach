@@ -40,13 +40,10 @@ RUN mkdir -p /app/data /app/logs /app/cache
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
+ENV PORT=8000
 
-# 暴露端口
-EXPOSE 8000
+# 暴露端口（Railway 会覆盖）
+EXPOSE ${PORT}
 
-# 健康检查
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
-
-# 启动命令
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 启动命令 - 使用 shell 形式以支持环境变量
+CMD uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT}
