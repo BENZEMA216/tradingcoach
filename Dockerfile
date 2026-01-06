@@ -30,7 +30,7 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # 复制应用代码
-COPY config.py .
+COPY config_template.py ./config.py
 COPY backend/ ./backend/
 COPY src/ ./src/
 
