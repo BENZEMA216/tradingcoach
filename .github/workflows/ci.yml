@@ -1,0 +1,322 @@
+# CI/CD Pipeline for TradingCoach
+# 一旦我被更新，务必更新所属文件夹的 README.md
+
+name: CI
+
+on:
+  push:
+    branches: [main, dev/*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ==================== 单元测试 ====================
+  test:
+    runs-on: ubuntu-latest
+    name: Unit Tests & Coverage
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-benchmark allure-pytest
+
+      - name: Run unit tests with coverage
+        run: |
+          python -m pytest tests/unit/ -v \
+            --cov=src --cov=backend \
+            --cov-report=xml \
+            --cov-report=html \
+            --cov-fail-under=75 \
+            --alluredir=allure-results
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results
+          path: allure-results
+          retention-days: 7
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-html
+          path: htmlcov
+          retention-days: 7
+
+  # ==================== 集成测试 ====================
+  integration:
+    runs-on: ubuntu-latest
+    name: Integration Tests
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest httpx
+
+      - name: Run integration tests
+        run: |
+          python -m pytest tests/integration/ -v --tb=short
+        continue-on-error: true
+
+  # ==================== 契约测试 ====================
+  contract:
+    runs-on: ubuntu-latest
+    name: Contract Tests
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run contract tests
+        run: |
+          python -m pytest tests/contract/ -v --tb=short
+
+  # ==================== 数据完整性测试 ====================
+  data-integrity:
+    runs-on: ubuntu-latest
+    name: Data Integrity Tests
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run data integrity tests
+        run: |
+          python -m pytest tests/data_integrity/ -v --tb=short
+        continue-on-error: true
+
+  # ==================== 代码检查 ====================
+  lint:
+    runs-on: ubuntu-latest
+    name: Code Quality
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install linters
+        run: |
+          pip install ruff black mypy
+
+      - name: Run Ruff
+        run: |
+          ruff check src/ backend/ --output-format=github || true
+
+      - name: Check Black formatting
+        run: |
+          black --check src/ backend/ || true
+
+      - name: Run MyPy
+        run: |
+          mypy src/ --ignore-missing-imports || true
+
+  # ==================== 前端测试 ====================
+  frontend:
+    runs-on: ubuntu-latest
+    name: Frontend Tests
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck || npx tsc --noEmit
+
+      - name: Run unit tests
+        run: npm run test:unit || true
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+
+  # ==================== E2E 测试 ====================
+  e2e:
+    runs-on: ubuntu-latest
+    name: E2E Tests
+    needs: [test, frontend]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install uvicorn
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend && npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Start backend
+        run: |
+          cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+
+      - name: Start frontend
+        run: |
+          cd frontend && npm run dev &
+          sleep 10
+
+      - name: Run E2E tests
+        run: |
+          cd frontend && npx playwright test --project=chromium
+        continue-on-error: true
+
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          retention-days: 7
+
+  # ==================== 性能基准测试 ====================
+  benchmark:
+    runs-on: ubuntu-latest
+    name: Performance Benchmarks
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-benchmark
+
+      - name: Run benchmarks
+        run: |
+          python -m pytest tests/benchmark/ -v --benchmark-only --benchmark-json=benchmark.json
+        continue-on-error: true
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-results
+          path: benchmark.json
+          retention-days: 30
+
+  # ==================== Allure 报告 ====================
+  allure-report:
+    runs-on: ubuntu-latest
+    name: Generate Allure Report
+    needs: [test, integration, contract]
+    if: always()
+
+    steps:
+      - name: Download Allure results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+        continue-on-error: true
+
+      - name: Generate Allure Report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          allure_history: allure-history
+          keep_reports: 10
+
+      - name: Publish Allure Report
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history

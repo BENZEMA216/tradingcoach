@@ -1,5 +1,21 @@
 """
 Trade model - 交易记录表
+
+input: base.py (Base类)
+output: Trade ORM模型, TradeDirection/TradeStatus/MarketType枚举
+pos: 数据模型层基础 - 原子交易记录，被Position引用
+
+字段分组:
+- 基本信息: symbol, direction, status
+- 订单信息: order_price, order_quantity, order_time
+- 成交信息: filled_price, filled_quantity, filled_time
+- 市场信息: market, currency, exchange
+- 费用明细: commission, total_fee, transfer_fee(A股), handling_fee(A股)
+- A股特有: exchange, seat_code, shareholder_code
+- 期权信息: underlying_symbol, option_type, strike_price, expiration_date
+- 导入追踪: broker_id, import_batch_id, source_row_number, trade_fingerprint
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 from sqlalchemy import (
@@ -88,6 +104,11 @@ class Trade(Base):
     )
     currency = Column(String(10), default="USD", comment="币种")
 
+    # ==================== A股特有字段 ====================
+    exchange = Column(String(10), comment="交易所代码（sse=上交所, szse=深交所）")
+    seat_code = Column(String(20), comment="席位代码/营业部代码")
+    shareholder_code = Column(String(30), comment="股东代码/证券账号")
+
     # ==================== 费用明细 ====================
     commission = Column(Numeric(10, 2), comment="佣金")
     platform_fee = Column(Numeric(10, 2), comment="平台使用费")
@@ -98,6 +119,12 @@ class Trade(Base):
     option_regulatory_fee = Column(Numeric(10, 2), comment="期权监管费")
     option_clearing_fee = Column(Numeric(10, 2), comment="期权清算费")
     total_fee = Column(Numeric(10, 2), nullable=False, comment="合计费用")
+
+    # ==================== A股特有费用 ====================
+    transfer_fee = Column(Numeric(10, 4), comment="过户费（A股，万分之0.1）")
+    handling_fee = Column(Numeric(10, 4), comment="经手费（交易所收取）")
+    regulation_fee = Column(Numeric(10, 4), comment="证管费（证监会收取）")
+    other_fees = Column(Numeric(10, 4), comment="其他费用")
 
     # ==================== 期权/衍生品信息 ====================
     underlying_symbol = Column(String(50), index=True, comment="标的股票代码（期权/窝轮）")
@@ -126,6 +153,29 @@ class Trade(Base):
         Integer,
         ForeignKey('market_environment.id'),
         comment="关联的市场环境ID"
+    )
+
+    # ==================== 去重和导入 ====================
+    trade_fingerprint = Column(
+        String(64),
+        unique=True,
+        index=True,
+        nullable=True,
+        comment="交易唯一指纹（用于去重）"
+    )
+    broker_id = Column(
+        String(50),
+        index=True,
+        comment="券商ID（futu_cn, citic, huatai等）"
+    )
+    import_batch_id = Column(
+        String(64),
+        index=True,
+        comment="导入批次ID（用于追踪导入来源）"
+    )
+    source_row_number = Column(
+        Integer,
+        comment="原始CSV行号（用于问题追溯）"
     )
 
     # ==================== 元数据和备注 ====================
@@ -193,6 +243,10 @@ class Trade(Base):
 
         # 市场类型查询
         Index('idx_market_trade_date', 'market', 'trade_date'),
+
+        # 券商和导入批次查询
+        Index('idx_broker_trade_date', 'broker_id', 'trade_date'),
+        Index('idx_import_batch', 'import_batch_id'),
     )
 
     def __repr__(self):
@@ -252,4 +306,15 @@ class Trade(Base):
             'underlying_symbol': self.underlying_symbol,
             'is_option': bool(self.is_option),
             'position_id': self.position_id,
+            # A股特有字段
+            'exchange': self.exchange,
+            'seat_code': self.seat_code,
+            'shareholder_code': self.shareholder_code,
+            'transfer_fee': float(self.transfer_fee) if self.transfer_fee else None,
+            'handling_fee': float(self.handling_fee) if self.handling_fee else None,
+            'regulation_fee': float(self.regulation_fee) if self.regulation_fee else None,
+            'other_fees': float(self.other_fees) if self.other_fees else None,
+            # 导入信息
+            'broker_id': self.broker_id,
+            'import_batch_id': self.import_batch_id,
         }

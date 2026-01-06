@@ -265,4 +265,16 @@ Thumbs.db
 
 # Data analysis outputs
 outputs/
-reports/
+# Note: reports/ here means output reports, not src/reports/ code directory
+
+# ==================== Frontend (React/Vite) ====================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Chrome DevTools MCP (not needed in repo)
+visualization/chrome-devtools-mcp/
+
+# Temporary fix guides
+cursor_fix_guide.md
+cursor_proxy_fix.md

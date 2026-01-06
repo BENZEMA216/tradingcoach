@@ -81,6 +81,88 @@ class MarketData(Base):
     stoch_k = Column(Numeric(6, 2), comment="Stochastic %K")
     stoch_d = Column(Numeric(6, 2), comment="Stochastic %D")
 
+    # ==================== 成交量分析指标 ====================
+    # OBV (On Balance Volume)
+    obv = Column(Numeric(20, 2), comment="OBV能量潮")
+
+    # VWAP (Volume Weighted Average Price)
+    vwap = Column(Numeric(15, 4), comment="成交量加权平均价")
+
+    # MFI (Money Flow Index)
+    mfi_14 = Column(Numeric(6, 2), comment="MFI资金流量指标(14)")
+
+    # A/D Line (Accumulation/Distribution)
+    ad_line = Column(Numeric(20, 2), comment="A/D累积分布线")
+
+    # CMF (Chaikin Money Flow)
+    cmf_20 = Column(Numeric(8, 4), comment="CMF蔡金资金流(20)")
+
+    # Volume Ratio
+    volume_ratio = Column(Numeric(8, 2), comment="成交量比率")
+
+    # ==================== 动量指标补充 ====================
+    # CCI (Commodity Channel Index)
+    cci_20 = Column(Numeric(8, 2), comment="CCI商品通道指数(20)")
+
+    # Williams %R
+    willr_14 = Column(Numeric(8, 2), comment="威廉指标(14)")
+
+    # ROC (Rate of Change)
+    roc_12 = Column(Numeric(10, 4), comment="变动率(12)")
+
+    # Momentum
+    mom_10 = Column(Numeric(10, 4), comment="动量指标(10)")
+
+    # Ultimate Oscillator
+    uo = Column(Numeric(6, 2), comment="终极震荡指标")
+
+    # RSI Divergence Signal (-1, 0, 1)
+    rsi_div = Column(Integer, comment="RSI背离信号(-1熊/0无/1牛)")
+
+    # ==================== 波动率指标补充 ====================
+    # Keltner Channel
+    kc_upper = Column(Numeric(15, 4), comment="肯特纳通道上轨")
+    kc_middle = Column(Numeric(15, 4), comment="肯特纳通道中轨")
+    kc_lower = Column(Numeric(15, 4), comment="肯特纳通道下轨")
+
+    # Donchian Channel
+    dc_upper = Column(Numeric(15, 4), comment="唐奇安通道上轨(20)")
+    dc_lower = Column(Numeric(15, 4), comment="唐奇安通道下轨(20)")
+
+    # Historical Volatility
+    hvol_20 = Column(Numeric(8, 4), comment="20日历史波动率")
+
+    # ATR Percentage
+    atr_pct = Column(Numeric(8, 4), comment="ATR百分比")
+
+    # Bollinger Squeeze
+    bb_squeeze = Column(Integer, comment="布林挤压信号(1=挤压中/0=释放)")
+
+    # Volatility Rank (0-100)
+    vol_rank = Column(Numeric(6, 2), comment="波动率排名(0-100)")
+
+    # ==================== 趋势指标补充 ====================
+    # Ichimoku Cloud (一目均衡图)
+    ichi_tenkan = Column(Numeric(15, 4), comment="转换线(9)")
+    ichi_kijun = Column(Numeric(15, 4), comment="基准线(26)")
+    ichi_senkou_a = Column(Numeric(15, 4), comment="先行带A")
+    ichi_senkou_b = Column(Numeric(15, 4), comment="先行带B")
+    ichi_chikou = Column(Numeric(15, 4), comment="迟行线")
+
+    # Parabolic SAR
+    psar = Column(Numeric(15, 4), comment="抛物线SAR")
+    psar_dir = Column(Integer, comment="SAR方向(1多/-1空)")
+
+    # SuperTrend
+    supertrend = Column(Numeric(15, 4), comment="超级趋势")
+    supertrend_dir = Column(Integer, comment="SuperTrend方向(1多/-1空)")
+
+    # TRIX
+    trix = Column(Numeric(10, 4), comment="TRIX三重指数平滑")
+
+    # DPO (Detrended Price Oscillator)
+    dpo = Column(Numeric(10, 4), comment="去趋势价格振荡器")
+
     # ==================== 期权相关数据 ====================
     # Greeks (如果是期权)
     delta = Column(Numeric(8, 6), comment="Delta")
@@ -91,6 +173,13 @@ class MarketData(Base):
 
     # 隐含波动率
     implied_volatility = Column(Numeric(8, 4), comment="隐含波动率")
+
+    # IV Rank / IV Percentile
+    iv_rank = Column(Numeric(6, 2), comment="IV排名(0-100)")
+    iv_percentile = Column(Numeric(6, 2), comment="IV百分位(0-100)")
+
+    # Put/Call Ratio
+    pcr = Column(Numeric(8, 4), comment="看跌/看涨比率")
 
     # ==================== 元数据 ====================
     data_source = Column(
@@ -159,24 +248,88 @@ class MarketData(Base):
 
     def to_dict(self):
         """转换为字典"""
+        def safe_float(val):
+            return float(val) if val is not None else None
+
         return {
             'id': self.id,
             'symbol': self.symbol,
             'timestamp': self.timestamp.isoformat() if self.timestamp else None,
             'date': self.date.isoformat() if self.date else None,
-            'open': float(self.open) if self.open else None,
-            'high': float(self.high) if self.high else None,
-            'low': float(self.low) if self.low else None,
-            'close': float(self.close) if self.close else None,
+            # OHLCV
+            'open': safe_float(self.open),
+            'high': safe_float(self.high),
+            'low': safe_float(self.low),
+            'close': safe_float(self.close),
             'volume': self.volume,
-            'rsi_14': float(self.rsi_14) if self.rsi_14 else None,
-            'macd': float(self.macd) if self.macd else None,
-            'bb_upper': float(self.bb_upper) if self.bb_upper else None,
-            'bb_middle': float(self.bb_middle) if self.bb_middle else None,
-            'bb_lower': float(self.bb_lower) if self.bb_lower else None,
-            'atr_14': float(self.atr_14) if self.atr_14 else None,
-            'ma_20': float(self.ma_20) if self.ma_20 else None,
-            'ma_50': float(self.ma_50) if self.ma_50 else None,
-            'adx': float(self.adx) if self.adx else None,
+            # 原有指标
+            'rsi_14': safe_float(self.rsi_14),
+            'macd': safe_float(self.macd),
+            'macd_signal': safe_float(self.macd_signal),
+            'macd_hist': safe_float(self.macd_hist),
+            'bb_upper': safe_float(self.bb_upper),
+            'bb_middle': safe_float(self.bb_middle),
+            'bb_lower': safe_float(self.bb_lower),
+            'bb_width': safe_float(self.bb_width),
+            'atr_14': safe_float(self.atr_14),
+            'ma_5': safe_float(self.ma_5),
+            'ma_10': safe_float(self.ma_10),
+            'ma_20': safe_float(self.ma_20),
+            'ma_50': safe_float(self.ma_50),
+            'ma_200': safe_float(self.ma_200),
+            'ema_12': safe_float(self.ema_12),
+            'ema_26': safe_float(self.ema_26),
+            'adx': safe_float(self.adx),
+            'plus_di': safe_float(self.plus_di),
+            'minus_di': safe_float(self.minus_di),
+            'stoch_k': safe_float(self.stoch_k),
+            'stoch_d': safe_float(self.stoch_d),
+            'volume_sma_20': safe_float(self.volume_sma_20),
+            # 成交量指标
+            'obv': safe_float(self.obv),
+            'vwap': safe_float(self.vwap),
+            'mfi_14': safe_float(self.mfi_14),
+            'ad_line': safe_float(self.ad_line),
+            'cmf_20': safe_float(self.cmf_20),
+            'volume_ratio': safe_float(self.volume_ratio),
+            # 动量指标
+            'cci_20': safe_float(self.cci_20),
+            'willr_14': safe_float(self.willr_14),
+            'roc_12': safe_float(self.roc_12),
+            'mom_10': safe_float(self.mom_10),
+            'uo': safe_float(self.uo),
+            'rsi_div': self.rsi_div,
+            # 波动率指标
+            'kc_upper': safe_float(self.kc_upper),
+            'kc_middle': safe_float(self.kc_middle),
+            'kc_lower': safe_float(self.kc_lower),
+            'dc_upper': safe_float(self.dc_upper),
+            'dc_lower': safe_float(self.dc_lower),
+            'hvol_20': safe_float(self.hvol_20),
+            'atr_pct': safe_float(self.atr_pct),
+            'bb_squeeze': self.bb_squeeze,
+            'vol_rank': safe_float(self.vol_rank),
+            # 趋势指标
+            'ichi_tenkan': safe_float(self.ichi_tenkan),
+            'ichi_kijun': safe_float(self.ichi_kijun),
+            'ichi_senkou_a': safe_float(self.ichi_senkou_a),
+            'ichi_senkou_b': safe_float(self.ichi_senkou_b),
+            'ichi_chikou': safe_float(self.ichi_chikou),
+            'psar': safe_float(self.psar),
+            'psar_dir': self.psar_dir,
+            'supertrend': safe_float(self.supertrend),
+            'supertrend_dir': self.supertrend_dir,
+            'trix': safe_float(self.trix),
+            'dpo': safe_float(self.dpo),
+            # 期权指标
+            'delta': safe_float(self.delta),
+            'gamma': safe_float(self.gamma),
+            'theta': safe_float(self.theta),
+            'vega': safe_float(self.vega),
+            'implied_volatility': safe_float(self.implied_volatility),
+            'iv_rank': safe_float(self.iv_rank),
+            'iv_percentile': safe_float(self.iv_percentile),
+            'pcr': safe_float(self.pcr),
+            # 元数据
             'data_source': self.data_source,
         }

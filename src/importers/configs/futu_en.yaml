@@ -1,0 +1,181 @@
+# 富途证券英文版 CSV 配置
+# 一旦我被更新，务必更新所属文件夹的 README.md
+
+broker_id: futu_en
+broker_name: Futu Securities (English)
+broker_name_cn: 富途证券(英文)
+version: "1.0"
+
+# 文件格式
+encoding: utf-8-sig
+delimiter: ","
+quote_char: '"'
+header_row: 0
+
+# 自动检测规则
+detection:
+  columns:
+    - "Side"
+    - "Symbol"
+    - "Fill Time"
+    - "Markets"
+    - "Status"
+  unique_columns:
+    - "Platform Fees"
+    - "Counterparty"
+    - "SFC Levy"
+  encoding_hint: utf-8-sig
+  confidence_threshold: 0.8
+
+# 支持的市场
+markets: [us, hk, cn]
+default_market: us
+
+# 字段映射
+field_mappings:
+  # === 基本信息 ===
+  - source: "Side"
+    target: direction
+    required: true
+
+  - source: "Symbol"
+    target: symbol
+    required: true
+    transform:
+      type: string
+      strip: true
+
+  - source: "Name"
+    target: symbol_name
+    transform:
+      type: string
+
+  # === 订单信息 ===
+  - source: "Order Price"
+    target: order_price
+    transform:
+      type: number
+
+  - source: "Order Qty"
+    target: order_quantity
+    transform:
+      type: integer
+
+  - source: "Order Amount"
+    target: order_amount
+    transform:
+      type: number
+
+  - source: "Order Time"
+    target: order_time
+    transform:
+      type: datetime
+
+  - source: "Order Type"
+    target: order_type
+    transform:
+      type: string
+
+  # === 成交信息 ===
+  - source: "Fill Price"
+    target: filled_price
+    required: true
+    transform:
+      type: number
+
+  - source: "Fill Qty"
+    target: filled_quantity
+    required: true
+    transform:
+      type: integer
+
+  - source: "Fill Amount"
+    target: filled_amount
+    transform:
+      type: number
+
+  - source: "Fill Time"
+    target: filled_time
+    required: true
+    transform:
+      type: datetime
+
+  # === 市场信息 ===
+  - source: "Markets"
+    target: market
+    required: true
+
+  - source: "Currency"
+    target: currency
+    transform:
+      type: string
+      default: "USD"
+
+  # === 交易状态 ===
+  - source: "Status"
+    target: status
+
+  # === 备注 ===
+  - source: "Remarks"
+    target: notes
+    transform:
+      type: string
+
+# 状态映射
+status_mapping:
+  Filled: filled
+  Partially Filled: partially_filled
+  Cancelled: cancelled
+  Failed: cancelled
+  Pending: pending
+
+# 方向映射
+direction_mapping:
+  Buy: buy
+  Sell: sell
+  Sell Short: sell_short
+  Buy to Cover: buy_to_cover
+
+# 市场映射
+market_mapping:
+  US: us
+  HK: hk
+  CN: cn
+  "US Stock": us
+  "HK Stock": hk
+
+# 费用配置
+fees:
+  fields:
+    - Commission
+    - Platform Fees
+    - Settlement Fees
+    - Stamp Duty
+    - Trading Fees
+    - SFC Levy
+    - FRC Levy
+    - Options Regulatory Fees
+    - OCC Fees
+    - Option Settlement Fees
+    - SEC Fees
+    - Trading Activity Fees
+    - Trading Tariff
+    - Consolidated Audit Trail Fees
+  total_field: "Total"
+  calculate_total: false
+
+# 验证规则
+validations:
+  - field: filled_quantity
+    rule: range
+    params:
+      min: 1
+    error_message: "Fill quantity must be greater than 0"
+    level: error
+
+  - field: filled_price
+    rule: range
+    params:
+      min: 0.0001
+    error_message: "Fill price must be greater than 0"
+    level: error

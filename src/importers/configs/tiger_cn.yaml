@@ -1,0 +1,162 @@
+# 老虎证券中文版 CSV 配置
+# 一旦我被更新，务必更新所属文件夹的 README.md
+
+broker_id: tiger_cn
+broker_name: Tiger Brokers (Chinese)
+broker_name_cn: 老虎证券(中文)
+version: "1.0"
+
+# 文件格式
+encoding: utf-8
+delimiter: ","
+quote_char: '"'
+header_row: 0
+
+# 自动检测规则
+detection:
+  columns:
+    - "交易方向"
+    - "证券代码"
+    - "成交时间"
+    - "市场"
+    - "订单状态"
+  unique_columns:
+    - "老虎佣金"
+    - "交易所费用"
+  encoding_hint: utf-8
+  confidence_threshold: 0.8
+
+# 支持的市场
+markets: [us, hk, cn]
+default_market: us
+
+# 字段映射
+field_mappings:
+  # === 基本信息 ===
+  - source: "交易方向"
+    target: direction
+    required: true
+
+  - source: "证券代码"
+    target: symbol
+    required: true
+    transform:
+      type: string
+      strip: true
+
+  - source: "证券名称"
+    target: symbol_name
+    transform:
+      type: string
+
+  # === 订单信息 ===
+  - source: "委托价格"
+    target: order_price
+    transform:
+      type: number
+
+  - source: "委托数量"
+    target: order_quantity
+    transform:
+      type: integer
+
+  - source: "委托时间"
+    target: order_time
+    transform:
+      type: datetime
+      format: "%Y-%m-%d %H:%M:%S"
+
+  - source: "订单类型"
+    target: order_type
+    transform:
+      type: string
+
+  # === 成交信息 ===
+  - source: "成交价格"
+    target: filled_price
+    required: true
+    transform:
+      type: number
+
+  - source: "成交数量"
+    target: filled_quantity
+    required: true
+    transform:
+      type: integer
+
+  - source: "成交金额"
+    target: filled_amount
+    transform:
+      type: number
+
+  - source: "成交时间"
+    target: filled_time
+    required: true
+    transform:
+      type: datetime
+      format: "%Y-%m-%d %H:%M:%S"
+
+  # === 市场信息 ===
+  - source: "市场"
+    target: market
+    required: true
+
+  - source: "币种"
+    target: currency
+    transform:
+      type: string
+      default: "USD"
+
+  # === 交易状态 ===
+  - source: "订单状态"
+    target: status
+
+# 状态映射
+status_mapping:
+  已成交: filled
+  全部成交: filled
+  部分成交: partially_filled
+  已撤销: cancelled
+  待成交: pending
+
+# 方向映射
+direction_mapping:
+  买入: buy
+  卖出: sell
+  卖空: sell_short
+  买入平仓: buy_to_cover
+
+# 市场映射
+market_mapping:
+  美股: us
+  港股: hk
+  A股: cn
+  沪深: cn
+
+# 费用配置
+fees:
+  fields:
+    - 老虎佣金
+    - 交易所费用
+    - 证监会规费
+    - 交易活动费
+    - 印花税
+    - 结算费
+  total_field: "总费用"
+  calculate_total: true
+
+# 验证规则
+validations:
+  - field: filled_quantity
+    rule: range
+    params:
+      min: 1
+    error_message: "成交数量必须大于0"
+    level: error
+
+  - field: filled_price
+    rule: range
+    params:
+      min: 0.0001
+    error_message: "成交价格必须大于0"
+    level: error

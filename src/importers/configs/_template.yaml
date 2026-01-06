@@ -1,0 +1,167 @@
+# 券商配置模板
+# 复制此文件并重命名为 <broker_id>.yaml
+# 一旦我被更新，务必更新所属文件夹的 README.md
+
+broker_id: your_broker_id        # 唯一标识，小写字母+下划线
+broker_name: Your Broker Name    # 英文名称
+broker_name_cn: 你的券商名称      # 中文名称
+version: "1.0"
+
+# === 文件格式 ===
+encoding: utf-8-sig              # 编码: utf-8, utf-8-sig, gb18030, gbk
+delimiter: ","                   # 分隔符
+quote_char: '"'                  # 引号字符
+header_row: 0                    # 表头行号 (0-based)
+skip_rows: []                    # 跳过的行号列表
+
+# === 自动检测规则 ===
+detection:
+  columns:                       # 用于识别此格式的特征列
+    - "列名1"
+    - "列名2"
+    - "列名3"
+  unique_columns:                # 此券商特有的列 (加分项)
+    - "特有列1"
+  encoding_hint: utf-8-sig       # 建议的编码
+  confidence_threshold: 0.8      # 最低置信度阈值
+
+# === 市场支持 ===
+markets: [us, hk, cn]            # 支持的市场类型
+default_market: us               # 默认市场
+
+# === 字段映射 ===
+# 将 CSV 列名映射到 Trade 模型字段
+field_mappings:
+  # 必填字段
+  - source: "方向列"              # CSV 列名
+    target: direction            # Trade 字段名
+    required: true
+    aliases: ["备选列名1", "备选列名2"]  # 备选列名
+
+  - source: "代码列"
+    target: symbol
+    required: true
+    transform:
+      type: string
+      strip: true
+
+  - source: "成交价格列"
+    target: filled_price
+    required: true
+    transform:
+      type: number
+
+  - source: "成交数量列"
+    target: filled_quantity
+    required: true
+    transform:
+      type: integer
+
+  - source: "成交时间列"
+    target: filled_time
+    required: true
+    transform:
+      type: datetime
+      format: "%Y-%m-%d %H:%M:%S"  # 日期格式
+
+  - source: "市场列"
+    target: market
+    required: true
+
+  # 可选字段
+  - source: "状态列"
+    target: status
+
+  - source: "订单价格列"
+    target: order_price
+    transform:
+      type: number
+
+  - source: "订单数量列"
+    target: order_quantity
+    transform:
+      type: integer
+
+  - source: "币种列"
+    target: currency
+    transform:
+      type: string
+      default: "USD"
+
+  # A股特有字段
+  - source: "交易所"
+    target: exchange
+    transform:
+      type: enum
+      mapping:
+        上交所: sse
+        深交所: szse
+
+  - source: "股东代码"
+    target: shareholder_code
+
+  - source: "席位代码"
+    target: seat_code
+
+# === 状态映射 ===
+status_mapping:
+  全部成交: filled
+  部分成交: partially_filled
+  已撤单: cancelled
+  # 添加更多映射...
+
+# === 方向映射 ===
+direction_mapping:
+  买入: buy
+  卖出: sell
+  卖空: sell_short
+  买券还券: buy_to_cover
+  # 添加更多映射...
+
+# === 市场映射 ===
+market_mapping:
+  美股: us
+  港股: hk
+  沪深: cn
+  上海A: cn
+  深圳A: cn
+  # 添加更多映射...
+
+# === 费用配置 ===
+fees:
+  fields:                        # 费用列名列表
+    - 佣金
+    - 印花税
+    - 过户费
+    - 经手费
+    - 证管费
+  total_field: "合计费用"         # 预计算的总费用列 (可选)
+  calculate_total: true          # 是否重新计算总费用
+
+# === 验证规则 ===
+validations:
+  - field: filled_quantity
+    rule: range
+    params:
+      min: 1
+    error_message: "成交数量必须大于0"
+    level: error                 # error 或 warning
+
+  - field: filled_price
+    rule: range
+    params:
+      min: 0.0001
+    error_message: "成交价格必须大于0"
+    level: error
+
+  # A股代码格式验证
+  # - field: symbol
+  #   rule: regex
+  #   params:
+  #     pattern: "^[036]\\d{5}$"
+  #   error_message: "A股代码必须是6位数字"
+  #   level: warning
+
+# === 钩子函数 (可选) ===
+# pre_process_hook: "your_module.pre_process"
+# post_process_hook: "your_module.post_process"

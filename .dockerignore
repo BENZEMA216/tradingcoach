@@ -1,0 +1,56 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache
+.mypy_cache
+.ruff_cache
+htmlcov
+.coverage
+*.egg-info
+.eggs
+venv
+.venv
+env
+
+# Node.js
+node_modules
+.npm
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# 本地数据（使用 volume 挂载）
+data/
+logs/
+cache/
+original_data/
+
+# 测试
+tests/
+**/tests/
+test-results/
+playwright-report/
+.playwright-mcp/
+
+# 文档
+*.md
+!README.md
+project_docs/
+
+# 其他
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
