@@ -1,3 +1,4 @@
+import os
 from pydantic_settings import BaseSettings
 from typing import List
 
@@ -12,11 +13,14 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://127.0.0.1:8501",
         "http://127.0.0.1:8502",
+        "*",  # 允许所有来源（Railway 部署需要）
     ]
-    DATABASE_URL: str = "sqlite:////Users/bytedance/trading/tradingcoach/data/tradingcoach.db"
+    # 从环境变量读取，默认使用容器内路径
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:////app/data/tradingcoach.db")
     DEBUG: bool = False
 
     class Config:
         case_sensitive = True
+        env_file = ".env"
 
 settings = Settings()
