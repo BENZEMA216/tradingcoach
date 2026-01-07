@@ -141,9 +141,9 @@ export function AICoachPanel({ dateStart, dateEnd, limit = 20 }: AICoachPanelPro
   const use2ColumnLayout = problemCount > 0 && strengthCount > 0;
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800">
+    <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 transition-colors">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-white/10">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg">
             <SparklesIcon className="w-4 h-4 text-white" />

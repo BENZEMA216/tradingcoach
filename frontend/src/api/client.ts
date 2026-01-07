@@ -21,6 +21,7 @@ import type {
   RiskMetrics,
   DrawdownPeriod,
   TradingInsight,
+  PositionSummary,
   // Advanced Visualization
   EquityDrawdownItem,
   PnLDistributionBin,
@@ -99,8 +100,8 @@ export const positionsApi = {
     return data;
   },
 
-  getSummary: async (params?: { date_start?: string; date_end?: string }) => {
-    const { data } = await api.get('/positions/summary', { params });
+  getSummary: async (filters?: PositionFilters) => {
+    const { data } = await api.get<PositionSummary>('/positions/summary', { params: filters });
     return data;
   },
 

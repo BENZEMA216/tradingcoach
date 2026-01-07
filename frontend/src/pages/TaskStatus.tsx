@@ -15,6 +15,18 @@ import {
   XCircle,
 } from 'lucide-react';
 import { formatNumber } from '@/utils/format';
+import clsx from 'clsx';
+
+// Dynamic processing messages
+const LOADING_MESSAGES = [
+  'Initializing environment...',
+  'Reading trade data...',
+  'Matching opening and closing trades...',
+  'Calculating P&L metrics...',
+  'Analyzing risk factors...',
+  'Generating performance insights...',
+  'Finalizing report...',
+];
 
 // Progress step data
 const STEPS = [
@@ -32,6 +44,15 @@ export function TaskStatus() {
   const queryClient = useQueryClient();
 
   const [showLogs, setShowLogs] = useState(false);
+  const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+
+  // Cycle loading messages
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadingMsgIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Fetch task status with auto-refresh
   const { data: task, isLoading, isError, error } = useQuery({
@@ -41,8 +62,8 @@ export function TaskStatus() {
     refetchInterval: (data) => {
       // Stop polling when task is complete
       if (data?.state?.data?.status === 'completed' ||
-          data?.state?.data?.status === 'failed' ||
-          data?.state?.data?.status === 'cancelled') {
+        data?.state?.data?.status === 'failed' ||
+        data?.state?.data?.status === 'cancelled') {
         return false;
       }
       return 1000; // Poll every 1 second
@@ -169,7 +190,7 @@ export function TaskStatus() {
       </div>
 
       {/* File Info Card */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <div className="glass-card p-6">
         <div className="flex items-center space-x-4">
           <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
             <FileSpreadsheet className="w-8 h-8 text-blue-600" />
@@ -189,22 +210,33 @@ export function TaskStatus() {
       </div>
 
       {/* Progress Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <div className="glass-card p-8">
         <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
           {t('task.progress', 'Progress')}
         </h3>
 
         {/* Progress Bar */}
-        <div className="relative mb-6">
-          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="relative mb-8 pt-2">
+          <div className="h-3 bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
             <div
-              className="h-full bg-blue-600 rounded-full transition-all duration-500"
+              className={`h-full bg-gradient-to-r from-blue-600 via-purple-500 to-blue-600 bg-[length:200%_100%] animate-shimmer rounded-full transition-all duration-500 relative ${task.status === 'failed' ? 'from-red-600 to-red-500' : ''
+                }`}
               style={{ width: `${task.progress}%` }}
-            />
+            >
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-white/30 blur-sm"></div>
+            </div>
           </div>
-          <div className="absolute right-0 top-4 text-sm font-medium text-gray-600 dark:text-gray-400">
+          <div className="absolute right-0 -top-6 text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent filter drop-shadow-sm">
             {task.progress.toFixed(0)}%
           </div>
+
+          {/* Dynamic Message */}
+          {task.status === 'running' && (
+            <div className="absolute left-0 -top-6 text-sm font-medium text-blue-600 dark:text-blue-400 animate-pulse">
+              {LOADING_MESSAGES[loadingMsgIndex]}
+            </div>
+          )}
         </div>
 
         {/* Steps */}
@@ -212,15 +244,14 @@ export function TaskStatus() {
           {STEPS.map((step, index) => (
             <div key={step.key} className="flex flex-col items-center">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 transition-colors ${
-                  index < currentStepIndex
+                className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 transition-colors ${index < currentStepIndex
                     ? 'bg-green-500 text-white'
                     : index === currentStepIndex && task.status === 'running'
-                    ? 'bg-blue-500 text-white'
-                    : index === currentStepIndex && task.status === 'completed'
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
-                }`}
+                      ? 'bg-blue-500 text-white'
+                      : index === currentStepIndex && task.status === 'completed'
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                  }`}
               >
                 {index < currentStepIndex || (index === currentStepIndex && task.status === 'completed') ? (
                   <CheckCircle className="w-5 h-5" />
@@ -231,17 +262,19 @@ export function TaskStatus() {
                 )}
               </div>
               <span
-                className={`text-xs text-center ${
-                  index <= currentStepIndex
+                className={`text-xs text-center ${index <= currentStepIndex
                     ? 'text-gray-900 dark:text-white font-medium'
                     : 'text-gray-500 dark:text-gray-400'
-                }`}
+                  }`}
               >
                 {step.label}
               </span>
             </div>
           ))}
         </div>
+
+        {/* Step Connector Line Background */}
+        <div className="absolute top-[8.5rem] left-[15%] right-[15%] h-0.5 bg-gray-100 dark:bg-gray-800 -z-10 hidden md:block" />
 
         {/* Current Step Message */}
         {task.current_step && task.status === 'running' && (
@@ -360,11 +393,10 @@ export function TaskStatus() {
               {task.logs.map((log, index) => (
                 <div
                   key={index}
-                  className={`text-sm font-mono p-2 rounded ${
-                    log.level === 'error'
+                  className={`text-sm font-mono p-2 rounded ${log.level === 'error'
                       ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
                       : 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400'
-                  }`}
+                    }`}
                 >
                   <span className="text-gray-400 dark:text-gray-500 mr-2">
                     {new Date(log.time).toLocaleTimeString()}

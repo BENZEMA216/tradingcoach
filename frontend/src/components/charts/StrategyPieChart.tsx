@@ -44,24 +44,24 @@ export function StrategyPieChart({ data, title, onDrillDown, bare = false, isLoa
 
   if (isLoading) {
     return (
-      <div className={bare ? '' : 'bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700'}>
+      <div className={bare ? '' : 'bg-white dark:bg-black rounded-sm p-6 shadow-sm border border-neutral-200 dark:border-white/10 transition-colors'}>
         {!bare && (
-          <div className="h-6 w-32 bg-neutral-200 dark:bg-neutral-700 rounded mb-4 animate-pulse" />
+          <div className="h-6 w-32 bg-neutral-200 dark:bg-white/10 rounded-sm mb-4 animate-pulse" />
         )}
-        <div className="h-64 bg-neutral-100 dark:bg-neutral-800 rounded-lg animate-pulse" />
+        <div className="h-64 bg-neutral-100 dark:bg-white/5 rounded-sm animate-pulse" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className={bare ? '' : 'bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700'}>
+      <div className={bare ? '' : 'bg-white dark:bg-black rounded-sm p-6 shadow-sm border border-neutral-200 dark:border-white/10 transition-colors'}>
         {!bare && (
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <h3 className="text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-[0.2em] mb-4">
             {displayTitle}
           </h3>
         )}
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+        <div className="h-64 flex items-center justify-center text-slate-400 dark:text-white/30 font-mono text-xs">
           {t('common.noData')}
         </div>
       </div>
@@ -115,14 +115,14 @@ export function StrategyPieChart({ data, title, onDrillDown, bare = false, isLoa
               if (active && payload && payload.length > 0) {
                 const data = payload[0].payload as ChartDataItem;
                 return (
-                  <div className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3 shadow-lg">
-                    <p className="font-medium text-neutral-900 dark:text-neutral-100">{data.name}</p>
-                    <div className="text-sm mt-1 space-y-0.5">
-                      <p className="text-neutral-600 dark:text-neutral-400">{t('common.trades')}: {data.value}</p>
+                  <div className="bg-white dark:bg-black border border-neutral-200 dark:border-white/20 rounded-sm p-3 shadow-xl backdrop-blur-sm">
+                    <p className="font-mono font-bold text-slate-900 dark:text-white text-xs">{data.name}</p>
+                    <div className="text-xs mt-1 space-y-0.5 font-mono">
+                      <p className="text-slate-500 dark:text-white/60">{t('common.trades')}: {data.value}</p>
                       <p style={{ color: data.pnl >= 0 ? colors.profit : colors.loss }}>
                         {t('common.pnl')}: {formatCurrency(data.pnl)}
                       </p>
-                      <p className="text-neutral-600 dark:text-neutral-400">{t('common.winRate')}: {data.winRate.toFixed(1)}%</p>
+                      <p className="text-slate-500 dark:text-white/60">{t('common.winRate')}: {data.winRate.toFixed(1)}%</p>
                     </div>
                   </div>
                 );
@@ -141,8 +141,8 @@ export function StrategyPieChart({ data, title, onDrillDown, bare = false, isLoa
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="bg-white dark:bg-black rounded-sm p-6 shadow-sm border border-neutral-200 dark:border-white/10 transition-colors">
+      <h3 className="text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-[0.2em] mb-4">
         {displayTitle}
       </h3>
       {chartContent}

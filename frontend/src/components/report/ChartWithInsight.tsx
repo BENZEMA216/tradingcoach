@@ -19,32 +19,31 @@ export function ChartWithInsight({ title, chart, insight, className, fullWidth =
   return (
     <div
       className={clsx(
-        'bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800',
-        'transition-all duration-300 ease-out',
-        'hover:shadow-lg hover:shadow-neutral-200/50 dark:hover:shadow-neutral-950/50',
-        'hover:border-neutral-300 dark:hover:border-neutral-700',
+        'bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 transition-colors',
+        'transition-colors duration-300',
+        'hover:border-neutral-300 dark:hover:border-white/20',
         fullWidth ? 'col-span-2' : '',
         className
       )}
     >
       {/* Chart Title */}
       {title && (
-        <div className="px-7 pt-6 pb-3">
-          <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 transition-colors duration-200">
+        <div className="px-6 pt-5 pb-2 border-b border-neutral-100 dark:border-white/5 mb-4">
+          <h3 className="text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest">
             {title}
           </h3>
         </div>
       )}
 
       {/* Chart */}
-      <div className="px-5 pb-3">
+      <div className="px-5 pb-5">
         {chartWithBare}
       </div>
 
       {/* Insight */}
       {insight && (
-        <div className="px-7 pb-6">
-          <p className="text-[13px] text-neutral-500 dark:text-neutral-400 leading-relaxed border-l-2 border-neutral-200 dark:border-neutral-700 pl-4 mt-3 transition-colors duration-200">
+        <div className="px-6 pb-6 pt-2 border-t border-neutral-100 dark:border-white/5">
+          <p className="text-xs font-mono text-slate-500 dark:text-white/50 leading-relaxed pl-2 border-l border-neutral-300 dark:border-white/20">
             {insight}
           </p>
         </div>

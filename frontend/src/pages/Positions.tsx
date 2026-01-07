@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronUp, ChevronDown, Filter, X, Search } from 'lucide-react';
 import { positionsApi } from '@/api/client';
 import { formatCurrency, formatPercent, formatDate, getPnLColorClass, getGradeBadgeClass, formatHoldingDays } from '@/utils/format';
 import clsx from 'clsx';
+import type { PositionSummary } from '@/types';
 
 type SortField = 'symbol' | 'direction' | 'open_date' | 'close_date' | 'quantity' | 'net_pnl' | 'net_pnl_pct' | 'score_grade' | 'holding_period_days';
 type SortOrder = 'asc' | 'desc';
@@ -43,8 +44,19 @@ export function Positions() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   // Filter state
-  const [filters, setFilters] = useState<Filters>(defaultFilters);
-  const [showFilters, setShowFilters] = useState(false);
+  // Initialize from URL params if present
+  const [filters, setFilters] = useState<Filters>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      ...defaultFilters,
+      date_start: params.get('date_start') || '',
+      date_end: params.get('date_end') || '',
+    };
+  });
+  const [showFilters, setShowFilters] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return !!(params.get('date_start') || params.get('date_end'));
+  });
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -67,6 +79,13 @@ export function Positions() {
   const { data, isLoading } = useQuery({
     queryKey: ['positions', page, pageSize, queryParams],
     queryFn: () => positionsApi.list(page, pageSize, queryParams),
+  });
+
+  // Fetch summary stats based on SAME filters
+  const { data: summaryData } = useQuery<PositionSummary>({
+    queryKey: ['positions', 'summary', queryParams],
+    queryFn: () => positionsApi.getSummary(queryParams),
+    placeholderData: keepPreviousData,
   });
 
   // Handle sort
@@ -109,7 +128,7 @@ export function Positions() {
   const SortableHeader = ({ field, children, align = 'left' }: { field: SortField; children: React.ReactNode; align?: 'left' | 'right' | 'center' }) => (
     <th
       className={clsx(
-        'px-4 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors select-none',
+        'px-4 py-3 text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest cursor-pointer hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors select-none',
         align === 'left' && 'text-left',
         align === 'right' && 'text-right',
         align === 'center' && 'text-center'
@@ -122,32 +141,58 @@ export function Positions() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-16">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-mono font-bold text-white tracking-tight uppercase">
             {t('positions.title')}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            {data?.total || 0} {isZh ? '条持仓记录' : 'total positions'}
+          <p className="text-xs font-mono text-white/50 mt-1">
+            // TRACKING_ID: {data?.total || 0} // {isZh ? '持仓记录' : 'POSITIONS_FOUND'}
           </p>
         </div>
+
+        {/* Dynamic Summary Stats - Industrial */}
+        {summaryData && (
+          <div className="hidden lg:flex items-center gap-8 px-6 py-3 bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 transition-colors">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-[0.2em]">{t('positions.pnl')}</span>
+              <span className={clsx("text-xl font-mono font-medium tracking-tight", summaryData.total_pnl >= 0 ? "text-green-600 dark:text-green-500" : "text-red-600 dark:text-red-500")}>
+                {formatCurrency(summaryData.total_pnl)}
+              </span>
+            </div>
+            <div className="w-px h-8 bg-neutral-200 dark:bg-white/10" />
+            <div className="flex flex-col">
+              <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-[0.2em]">{isZh ? '胜率' : 'WIN_RATE'}</span>
+              <span className="text-xl font-mono font-medium tracking-tight text-slate-900 dark:text-white">
+                {formatPercent(summaryData.win_rate)}
+              </span>
+            </div>
+            <div className="w-px h-8 bg-neutral-200 dark:bg-white/10" />
+            <div className="flex flex-col">
+              <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-[0.2em]">{isZh ? '盈亏比' : 'PROFIT_FACTOR'}</span>
+              <span className="text-xl font-mono font-medium tracking-tight text-slate-900 dark:text-white">
+                {summaryData.profit_factor?.toFixed(2) || '-'}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Filter Toggle Button */}
         <button
           onClick={() => setShowFilters(!showFilters)}
           className={clsx(
-            'flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors',
+            'flex items-center gap-2 px-4 py-2 rounded-sm border transition-all font-mono text-xs uppercase tracking-wide',
             showFilters || hasActiveFilters
-              ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
-              : 'bg-white border-gray-200 text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
+              ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-black dark:border-white'
+              : 'bg-white dark:bg-black text-slate-900 dark:text-white border-neutral-200 dark:border-white/20 hover:border-neutral-300 dark:hover:border-white/50'
           )}
         >
-          <Filter className="w-4 h-4" />
-          {isZh ? '筛选' : 'Filter'}
+          <Filter className="w-3 h-3" />
+          {isZh ? '筛选' : 'FILTER'}
           {hasActiveFilters && (
-            <span className="px-1.5 py-0.5 text-xs bg-blue-500 text-white rounded-full">
+            <span className="px-1.5 py-0.5 text-[9px] bg-red-500 text-white rounded-sm">
               {Object.values(filters).filter(v => v !== '').length}
             </span>
           )}
@@ -156,99 +201,99 @@ export function Positions() {
 
       {/* Filter Panel */}
       {showFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium text-gray-900 dark:text-white">
-              {isZh ? '筛选条件' : 'Filters'}
+        <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 p-6 animate-in slide-in-from-top-2 duration-200 transition-colors">
+          <div className="flex items-center justify-between mb-6 border-b border-neutral-200 dark:border-white/10 pb-4">
+            <h3 className="text-xs font-mono font-bold text-slate-900 dark:text-white uppercase tracking-[0.2em]">
+              {isZh ? '筛选条件' : 'SEARCH_PARAMETERS'}
             </h3>
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center gap-1"
+                className="text-xs font-mono text-slate-500 dark:text-white/50 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 uppercase tracking-wide transition-colors"
               >
-                <X className="w-4 h-4" />
-                {isZh ? '清除全部' : 'Clear all'}
+                <X className="w-3 h-3" />
+                {isZh ? '清除全部' : 'RESET_ALL'}
               </button>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Symbol Search */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {isZh ? '股票代码' : 'Symbol'}
+              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+                {isZh ? '股票代码' : 'SYMBOL'}
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-white/30" />
                 <input
                   type="text"
                   value={filters.symbol}
                   onChange={(e) => handleFilterChange('symbol', e.target.value)}
-                  placeholder={isZh ? '搜索代码...' : 'Search symbol...'}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                  placeholder={isZh ? '搜索代码...' : 'ENTER_SYMBOL...'}
+                  className="w-full pl-10 pr-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/20 focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 font-mono text-sm uppercase transition-colors"
                 />
               </div>
             </div>
 
             {/* Direction Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {isZh ? '方向' : 'Direction'}
+              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+                {isZh ? '方向' : 'DIRECTION'}
               </label>
               <select
                 value={filters.direction}
                 onChange={(e) => handleFilterChange('direction', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors"
               >
-                <option value="">{isZh ? '全部' : 'All'}</option>
-                <option value="long">{isZh ? '做多' : 'Long'}</option>
-                <option value="short">{isZh ? '做空' : 'Short'}</option>
+                <option value="">{isZh ? '全部' : 'ALL_DIRECTIONS'}</option>
+                <option value="long">{isZh ? '做多' : 'LONG'}</option>
+                <option value="short">{isZh ? '做空' : 'SHORT'}</option>
               </select>
             </div>
 
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {isZh ? '状态' : 'Status'}
+              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+                {isZh ? '状态' : 'STATUS'}
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors"
               >
-                <option value="">{isZh ? '全部' : 'All'}</option>
-                <option value="CLOSED">{isZh ? '已平仓' : 'Closed'}</option>
-                <option value="OPEN">{isZh ? '持仓中' : 'Open'}</option>
+                <option value="">{isZh ? '全部' : 'ALL_STATUS'}</option>
+                <option value="CLOSED">{isZh ? '已平仓' : 'CLOSED'}</option>
+                <option value="OPEN">{isZh ? '持仓中' : 'OPEN'}</option>
               </select>
             </div>
 
             {/* Winner/Loser Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {isZh ? '盈亏' : 'Result'}
+              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+                {isZh ? '盈亏' : 'RESULT'}
               </label>
               <select
                 value={filters.is_winner}
                 onChange={(e) => handleFilterChange('is_winner', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors"
               >
-                <option value="">{isZh ? '全部' : 'All'}</option>
-                <option value="true">{isZh ? '盈利' : 'Winners'}</option>
-                <option value="false">{isZh ? '亏损' : 'Losers'}</option>
+                <option value="">{isZh ? '全部' : 'ALL_RESULTS'}</option>
+                <option value="true">{isZh ? '盈利' : 'WINNERS'}</option>
+                <option value="false">{isZh ? '亏损' : 'LOSERS'}</option>
               </select>
             </div>
 
             {/* Grade Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {isZh ? '评分等级' : 'Grade'}
+              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+                {isZh ? '评分等级' : 'GRADE'}
               </label>
               <select
                 value={filters.score_grade}
                 onChange={(e) => handleFilterChange('score_grade', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors"
               >
-                <option value="">{isZh ? '全部' : 'All'}</option>
+                <option value="">{isZh ? '全部' : 'ALL_GRADES'}</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
@@ -259,27 +304,27 @@ export function Positions() {
 
             {/* Date Start */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {isZh ? '开始日期' : 'Start Date'}
+              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+                {isZh ? '开始日期' : 'START_DATE'}
               </label>
               <input
                 type="date"
                 value={filters.date_start}
                 onChange={(e) => handleFilterChange('date_start', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 transition-colors"
               />
             </div>
 
             {/* Date End */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {isZh ? '结束日期' : 'End Date'}
+              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+                {isZh ? '结束日期' : 'END_DATE'}
               </label>
               <input
                 type="date"
                 value={filters.date_end}
                 onChange={(e) => handleFilterChange('date_end', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 transition-colors"
               />
             </div>
           </div>
@@ -287,10 +332,10 @@ export function Positions() {
       )}
 
       {/* Positions Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-900/50">
+            <thead className="bg-neutral-50 dark:bg-black border-b border-neutral-200 dark:border-white/10">
               <tr>
                 <SortableHeader field="symbol">
                   {t('positions.symbol')}
@@ -305,7 +350,7 @@ export function Positions() {
                   {t('positions.closeDate')}
                 </SortableHeader>
                 <SortableHeader field="quantity" align="right">
-                  {isZh ? '数量' : 'Quantity'}
+                  {isZh ? '数量' : 'SIZE'}
                 </SortableHeader>
                 <SortableHeader field="net_pnl" align="right">
                   {t('positions.pnl')}
@@ -319,21 +364,22 @@ export function Positions() {
                 <SortableHeader field="holding_period_days" align="right">
                   {t('positions.holdingDays')}
                 </SortableHeader>
+                <th className="px-4 py-3 text-left w-24"></th> {/* Visual Bar */}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+            <tbody className="divide-y divide-white/5">
               {isLoading ? (
                 Array.from({ length: 10 }).map((_, i) => (
                   <tr key={i}>
-                    <td colSpan={9} className="px-4 py-4">
-                      <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <td colSpan={10} className="px-4 py-4">
+                      <div className="h-4 bg-neutral-100 dark:bg-white/5 rounded animate-pulse"></div>
                     </td>
                   </tr>
                 ))
               ) : data?.items.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-gray-500">
-                    {isZh ? '没有找到匹配的记录' : 'No positions found'}
+                  <td colSpan={10} className="px-4 py-12 text-center text-slate-400 dark:text-white/40 font-mono">
+                    // {isZh ? '没有找到匹配的记录' : 'NO_DATA_FOUND'}
                   </td>
                 </tr>
               ) : (
@@ -341,15 +387,15 @@ export function Positions() {
                   <tr
                     key={position.id}
                     onClick={() => navigate(`/positions/${position.id}`)}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                    className="hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
                   >
                     <td className="px-4 py-3">
                       <div>
-                        <span className="font-medium text-gray-900 dark:text-white">
+                        <span className="font-mono font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {position.symbol}
                         </span>
                         {position.symbol_name && (
-                          <span className="block text-xs text-gray-500">
+                          <span className="block text-[10px] text-white/30 truncate max-w-[120px]">
                             {position.symbol_name}
                           </span>
                         )}
@@ -358,36 +404,36 @@ export function Positions() {
                     <td className="px-4 py-3">
                       <span
                         className={clsx(
-                          'px-2 py-1 text-xs rounded',
+                          'px-1 py-0.5 text-[10px] font-bold rounded-sm uppercase tracking-wider',
                           position.direction === 'long'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
+                            : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20'
                         )}
                       >
-                        {t(`direction.${position.direction}`)}
+                        {position.direction === 'long' ? 'LONG' : 'SHORT'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-xs font-mono text-slate-500 dark:text-white/50">
                       {formatDate(position.open_date)}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-xs font-mono text-slate-500 dark:text-white/50">
                       {formatDate(position.close_date)}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">
+                    <td className="px-4 py-3 text-sm font-mono text-right text-slate-700 dark:text-white/80">
                       {position.quantity}
                     </td>
                     <td
                       className={clsx(
-                        'px-4 py-3 text-sm text-right font-medium',
-                        getPnLColorClass(position.net_pnl)
+                        'px-4 py-3 text-sm font-mono font-bold text-right tracking-tight',
+                        (position.net_pnl || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
                       )}
                     >
                       {formatCurrency(position.net_pnl)}
                     </td>
                     <td
                       className={clsx(
-                        'px-4 py-3 text-sm text-right font-medium',
-                        getPnLColorClass(position.net_pnl_pct)
+                        'px-4 py-3 text-sm font-mono font-bold text-right tracking-tight',
+                        (position.net_pnl_pct || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
                       )}
                     >
                       {formatPercent(position.net_pnl_pct)}
@@ -395,15 +441,32 @@ export function Positions() {
                     <td className="px-4 py-3 text-center">
                       <span
                         className={clsx(
-                          'px-2 py-1 text-xs font-medium rounded',
-                          getGradeBadgeClass(position.score_grade)
+                          'px-2 py-0.5 text-[10px] font-bold rounded-sm border',
+                          position.score_grade === 'A' || position.score_grade === 'A+' ? 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-500/30' :
+                            position.score_grade === 'B' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30' :
+                              position.score_grade === 'C' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/30' :
+                                'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30'
                         )}
                       >
                         {position.score_grade || '-'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-500">
-                      {formatHoldingDays(position.holding_period_days, isZh)}
+                    <td className="px-4 py-3 text-xs font-mono text-right text-slate-500 dark:text-white/50">
+                      {position.holding_period_days}D
+                    </td>
+                    <td className="px-4 py-3 align-middle">
+                      {/* Visual PnL Bar - Industrial */}
+                      <div className="flex items-center justify-start h-full w-24 opacity-30 group-hover:opacity-100 transition-opacity">
+                        <div
+                          className={clsx(
+                            "h-1",
+                            position.net_pnl && position.net_pnl > 0 ? "bg-green-500" : "bg-red-500"
+                          )}
+                          style={{
+                            width: `${Math.min(Math.abs(position.net_pnl_pct || 0) * 10, 100)}%`,
+                          }}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -412,31 +475,31 @@ export function Positions() {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Pagination - Industrial */}
         {data && (
-          <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-            <p className="text-sm text-gray-500">
+          <div className="px-6 py-4 border-t border-neutral-200 dark:border-white/10 flex items-center justify-between bg-neutral-50 dark:bg-black transition-colors">
+            <p className="text-xs font-mono text-slate-500 dark:text-white/40 uppercase tracking-wide">
               {isZh
-                ? `显示 ${(page - 1) * pageSize + 1} 到 ${Math.min(page * pageSize, data.total)} 条，共 ${data.total} 条`
-                : `Showing ${(page - 1) * pageSize + 1} to ${Math.min(page * pageSize, data.total)} of ${data.total}`}
+                ? `显示 ${(page - 1) * pageSize + 1} - ${Math.min(page * pageSize, data.total)} / ${data.total}`
+                : `SHOWING ${(page - 1) * pageSize + 1} - ${Math.min(page * pageSize, data.total)} OF ${data.total}`}
             </p>
-            <div className="flex space-x-2">
+            <div className="flex space-x-px">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded disabled:opacity-50 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 text-xs font-mono bg-white dark:bg-black text-slate-600 dark:text-white/70 border border-neutral-200 dark:border-white/10 hover:bg-neutral-100 dark:hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors uppercase tracking-wider"
               >
-                {isZh ? '上一页' : 'Previous'}
+                {isZh ? '上一页' : 'PREV'}
               </button>
-              <span className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400">
+              <div className="px-4 py-2 text-xs font-mono bg-neutral-100 dark:bg-white/5 text-slate-900 dark:text-white border-y border-neutral-200 dark:border-white/10 flex items-center">
                 {page} / {data.total_pages || 1}
-              </span>
+              </div>
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= data.total_pages}
-                className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded disabled:opacity-50 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 text-xs font-mono bg-white dark:bg-black text-slate-600 dark:text-white/70 border border-neutral-200 dark:border-white/10 hover:bg-neutral-100 dark:hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors uppercase tracking-wider"
               >
-                {isZh ? '下一页' : 'Next'}
+                {isZh ? '下一页' : 'NEXT'}
               </button>
             </div>
           </div>

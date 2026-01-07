@@ -17,7 +17,7 @@ from src.models.trade import Trade
 from src.models.position import Position, PositionStatus
 from src.models.market_data import MarketData
 
-from .config import settings
+from .configuration import settings
 
 # Create engine with SQLite settings
 engine = create_engine(

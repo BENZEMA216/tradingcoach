@@ -53,31 +53,30 @@ export function PrivacyModeToggle() {
         <button
           onClick={handleToggle}
           className={`
-            flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all duration-200
-            ${
-              isPrivacyMode
-                ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+            flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider rounded-sm transition-all duration-200
+            ${isPrivacyMode
+              ? 'bg-white text-black border border-white'
+              : 'bg-black text-white border border-white/10 hover:border-white/30'
             }
           `}
           aria-label={isZh ? '切换隐私模式' : 'Toggle privacy mode'}
         >
           {isPrivacyMode ? (
-            <EyeOff className="w-4 h-4" />
+            <EyeOff className="w-3 h-3" />
           ) : (
-            <Eye className="w-4 h-4" />
+            <Eye className="w-3 h-3 text-white/50" />
           )}
-          <span className="hidden sm:inline font-medium">
+          <span className="hidden sm:inline">
             {isPrivacyMode
               ? isZh
                 ? '隐私模式'
-                : 'Privacy'
+                : 'PRIVACY: ON'
               : isZh
                 ? '显示金额'
-                : 'Show $'}
+                : 'PRIVACY: OFF'}
           </span>
           {isPrivacyMode && initialCapital && (
-            <span className="hidden lg:inline text-xs opacity-70">
+            <span className="hidden lg:inline text-[9px] opacity-70 ml-1">
               ({formatCapitalDisplay(initialCapital)})
             </span>
           )}
@@ -85,10 +84,10 @@ export function PrivacyModeToggle() {
         {isPrivacyMode && initialCapital && (
           <button
             onClick={handleSettingsClick}
-            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-500 dark:text-gray-400"
+            className="p-1.5 hover:bg-white/10 rounded-sm transition-colors text-white/50 hover:text-white"
             title={isZh ? '修改初始资本' : 'Change initial capital'}
           >
-            <Settings className="w-4 h-4" />
+            <Settings className="w-3 h-3" />
           </button>
         )}
       </div>

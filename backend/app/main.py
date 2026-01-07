@@ -11,7 +11,7 @@ pos: 后端服务入口 - 创建应用实例，挂载路由和中间件
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config import settings
+from .configuration import settings
 from .api.v1.router import api_router
 
 # Create FastAPI app

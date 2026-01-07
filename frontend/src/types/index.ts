@@ -67,6 +67,24 @@ export interface PositionListItem {
   reviewed_at: string | null;
 }
 
+export interface PositionSummary {
+  total_positions: number;
+  closed_positions: number;
+  open_positions: number;
+  total_pnl: number;
+  total_realized_pnl: number;
+  total_fees: number;
+  winners: number;
+  losers: number;
+  win_rate: number;
+  avg_pnl: number;
+  avg_winner: number;
+  avg_loser: number;
+  profit_factor: number | null;
+  avg_score: number | null;
+  avg_holding_days: number;
+}
+
 export interface PositionScoreDetail {
   entry_quality_score: number | null;
   exit_quality_score: number | null;

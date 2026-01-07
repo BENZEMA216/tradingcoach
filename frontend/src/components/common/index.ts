@@ -1,6 +1,6 @@
 export { LanguageSwitcher } from './LanguageSwitcher';
 export { InfoTooltip, TermWithInfo } from './InfoTooltip';
-export { DrillDownModal } from './DrillDownModal';
+export { ThemeToggle } from './ThemeToggle';
 export { FullscreenModal } from './FullscreenModal';
 export { PrivacyModeToggle } from './PrivacyModeToggle';
 export { InitialCapitalModal } from './InitialCapitalModal';

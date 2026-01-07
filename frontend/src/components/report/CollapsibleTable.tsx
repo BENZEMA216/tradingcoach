@@ -23,34 +23,34 @@ export function CollapsibleTable({
   return (
     <div
       className={clsx(
-        'bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 overflow-hidden',
+        'bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 overflow-hidden transition-colors',
         className
       )}
     >
       {/* Header - Clickable */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+        className="w-full px-6 py-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors group"
       >
         <div className="flex items-center gap-3">
           {isCollapsed ? (
-            <ChevronRight className="w-4 h-4 text-neutral-400" />
+            <ChevronRight className="w-4 h-4 text-slate-400 dark:text-white/40 group-hover:text-slate-600 dark:group-hover:text-white" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-neutral-400" />
+            <ChevronDown className="w-4 h-4 text-slate-400 dark:text-white/40 group-hover:text-slate-600 dark:group-hover:text-white" />
           )}
           <div className="text-left">
-            <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-[10px] font-mono font-bold tracking-[0.2em] uppercase text-slate-700 dark:text-white/80 group-hover:text-slate-900 dark:group-hover:text-white">
               {title}
             </h3>
             {subtitle && (
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+              <p className="text-[10px] font-mono text-slate-400 dark:text-white/40 mt-1 uppercase tracking-wider">
                 {subtitle}
               </p>
             )}
           </div>
         </div>
-        <span className="text-xs text-neutral-400 dark:text-neutral-500">
-          {isCollapsed ? 'Show' : 'Hide'}
+        <span className="text-[9px] font-mono text-slate-300 dark:text-white/20 uppercase tracking-widest group-hover:text-slate-500 dark:group-hover:text-white/60">
+          {isCollapsed ? '[ SHOW ]' : '[ HIDE ]'}
         </span>
       </button>
 
@@ -61,7 +61,7 @@ export function CollapsibleTable({
           isCollapsed ? 'max-h-0' : 'max-h-[2000px]'
         )}
       >
-        <div className="border-t border-neutral-200 dark:border-neutral-800">
+        <div className="border-t border-neutral-200 dark:border-white/10">
           {children}
         </div>
       </div>

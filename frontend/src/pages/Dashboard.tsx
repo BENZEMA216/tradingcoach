@@ -8,40 +8,20 @@ import { RecentTradesTable } from '@/components/dashboard/RecentTradesTable';
 import { EquityCurveChart } from '@/components/charts/EquityCurveChart';
 import { StrategyPieChart } from '@/components/charts/StrategyPieChart';
 import { formatCurrency, formatPercent } from '@/utils/format';
-import { InfoTooltip, DrillDownModal } from '@/components/common';
+import { InfoTooltip } from '@/components/common';
 import type { PositionFilters } from '@/types';
 
 // Drill-down filter state type
-interface DrillDownState {
-  isOpen: boolean;
-  title: string;
-  subtitle?: string;
-  filters: PositionFilters;
-}
 
 export function Dashboard() {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
 
-  // Drill-down modal state
-  const [drillDown, setDrillDown] = useState<DrillDownState>({
-    isOpen: false,
-    title: '',
-    filters: {},
-  });
-
   // Handle strategy drill-down
   const handleStrategyDrillDown = (strategyType: string, strategyName: string) => {
-    setDrillDown({
-      isOpen: true,
-      title: isZh ? `${strategyName} 策略交易` : `${strategyName} Trades`,
-      filters: { strategy_type: strategyType },
-    });
-  };
-
-  // Close drill-down modal
-  const closeDrillDown = () => {
-    setDrillDown({ isOpen: false, title: '', filters: {} });
+    const params = new URLSearchParams();
+    params.set('strategy', strategyType);
+    window.location.href = `/positions?${params.toString()}`;
   };
 
   // Fetch KPIs
@@ -146,13 +126,6 @@ export function Dashboard() {
       <RecentTradesTable trades={recentTrades || []} isLoading={tradesLoading} title={t('dashboard.recentTrades')} />
 
       {/* Drill-Down Modal */}
-      <DrillDownModal
-        isOpen={drillDown.isOpen}
-        onClose={closeDrillDown}
-        title={drillDown.title}
-        subtitle={drillDown.subtitle}
-        filters={drillDown.filters}
-      />
     </div>
   );
 }

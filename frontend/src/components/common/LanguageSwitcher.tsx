@@ -30,37 +30,36 @@ export function LanguageSwitcher() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg
-                   bg-gray-100 dark:bg-gray-700
-                   hover:bg-gray-200 dark:hover:bg-gray-600
-                   text-gray-700 dark:text-gray-200
+        className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider rounded-sm
+                   bg-black hover:bg-white/10
+                   text-white border border-white/10
                    transition-colors"
         aria-label="Select language"
       >
-        <Globe className="w-4 h-4" />
+        <Globe className="w-3 h-3 text-white/50" />
         <span className="hidden sm:inline">{currentLanguage.flag}</span>
         <span className="hidden md:inline">{currentLanguage.name}</span>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 bottom-full mb-2 w-40 py-1
-                        bg-white dark:bg-gray-800
-                        rounded-lg shadow-lg border border-gray-200 dark:border-gray-700
-                        z-50">
+        <div className="absolute right-0 bottom-full mb-2 w-40
+                        bg-black
+                        rounded-sm shadow-none border border-white/20
+                        z-50 py-1">
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
-              className={`w-full px-4 py-2 text-left text-sm flex items-center gap-3
-                         hover:bg-gray-100 dark:hover:bg-gray-700
+              className={`w-full px-4 py-2 text-left text-xs font-mono uppercase tracking-wide flex items-center gap-3
+                         hover:bg-white/10
                          ${i18n.language === lang.code
-                           ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                           : 'text-gray-700 dark:text-gray-200'}`}
+                  ? 'text-white bg-white/5'
+                  : 'text-white/50'}`}
             >
-              <span className="text-lg">{lang.flag}</span>
+              <span className="text-base">{lang.flag}</span>
               <span>{lang.name}</span>
               {i18n.language === lang.code && (
-                <span className="ml-auto text-blue-600 dark:text-blue-400">✓</span>
+                <span className="ml-auto text-green-500">✓</span>
               )}
             </button>
           ))}

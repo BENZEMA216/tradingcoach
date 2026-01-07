@@ -40,7 +40,7 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
       return <ChartSkeleton height="h-64" showTitle={false} />;
     }
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <div className="bg-white dark:bg-black rounded-sm p-6 shadow-sm border border-neutral-200 dark:border-white/10 transition-colors">
         <ChartSkeleton height="h-64" />
       </div>
     );
@@ -51,8 +51,8 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
       return <EmptyState icon="chart" height="h-64" size="sm" />;
     }
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-white dark:bg-black rounded-sm p-6 shadow-sm border border-neutral-200 dark:border-white/10 transition-colors">
+        <h3 className="text-lg font-mono font-bold text-slate-900 dark:text-white mb-4 uppercase tracking-widest text-xs">
           {displayTitle}
         </h3>
         <EmptyState icon="chart" height="h-64" size="sm" />
@@ -72,17 +72,17 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
   const lineColor = totalPnL >= 0 ? colors.profit : colors.loss;
 
   return (
-    <div className={bare ? '' : 'bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700'}>
+    <div className={bare ? '' : 'bg-white dark:bg-black rounded-sm p-6 shadow-sm dark:shadow-none border border-neutral-200 dark:border-white/10 transition-colors'}>
       {!bare && (
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-[0.2em]">
             {displayTitle}
           </h3>
           <div className="flex items-center space-x-4">
             <div className="text-sm">
               <span className="text-gray-500 dark:text-gray-400">Total: </span>
               <span
-                className={`font-medium ${totalPnL >= 0 ? 'text-profit' : 'text-loss'}`}
+                className={`font-mono font-medium ${totalPnL >= 0 ? 'text-profit' : 'text-loss'}`}
               >
                 {formatPnL(totalPnL)}
               </span>
@@ -90,7 +90,7 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
             {maxDrawdown && maxDrawdown > 0 && (
               <div className="text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Max DD: </span>
-                <span className="font-medium text-loss">
+                <span className="font-mono font-medium text-loss">
                   {formatPnL(-maxDrawdown)}
                 </span>
               </div>
@@ -131,9 +131,9 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3 shadow-xl backdrop-blur-sm">
-                      <p className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm">{data.date}</p>
-                      <p className="text-sm mt-1.5 font-semibold" style={{ color: data.pnl >= 0 ? colors.profit : colors.loss }}>
+                    <div className="bg-white dark:bg-black border border-neutral-200 dark:border-white/20 rounded-sm p-3 shadow-xl backdrop-blur-sm">
+                      <p className="font-mono font-bold text-slate-900 dark:text-white text-xs">{data.date}</p>
+                      <p className="text-xs mt-1.5 font-mono" style={{ color: data.pnl >= 0 ? colors.profit : colors.loss }}>
                         {t('common.pnl')}: {formatPnL(data.pnl)}
                       </p>
                     </div>

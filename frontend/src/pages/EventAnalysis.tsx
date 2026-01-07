@@ -88,76 +88,75 @@ export function EventAnalysis() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-neutral-900 rounded-xl p-5 border border-neutral-200 dark:border-neutral-800">
+        <div className="bg-white dark:bg-black rounded-sm p-5 border border-neutral-200 dark:border-white/10 transition-colors">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">
+            <span className="text-sm text-neutral-500 dark:text-white/40 font-mono uppercase tracking-wider">
               {t('events.totalEvents', '总事件数')}
             </span>
-            <Calendar className="w-5 h-5 text-blue-500" />
+            <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-500" />
           </div>
-          <p className="text-2xl font-bold text-neutral-900 dark:text-white">
+          <p className="text-2xl font-mono font-bold text-slate-900 dark:text-white">
             {isLoading ? '-' : totalEvents}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-xl p-5 border border-neutral-200 dark:border-neutral-800">
+        <div className="bg-white dark:bg-black rounded-sm p-5 border border-neutral-200 dark:border-white/10 transition-colors">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">
+            <span className="text-sm text-neutral-500 dark:text-white/40 font-mono uppercase tracking-wider">
               {t('events.keyEvents', '关键事件')}
             </span>
             <Target className="w-5 h-5 text-amber-500" />
           </div>
-          <p className="text-2xl font-bold text-neutral-900 dark:text-white">
+          <p className="text-2xl font-mono font-bold text-slate-900 dark:text-white">
             {isLoading ? '-' : keyEventsCount}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-xl p-5 border border-neutral-200 dark:border-neutral-800">
+        <div className="bg-white dark:bg-black rounded-sm p-5 border border-neutral-200 dark:border-white/10 transition-colors">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">
+            <span className="text-sm text-neutral-500 dark:text-white/40 font-mono uppercase tracking-wider">
               {t('events.eventPnL', '事件盈亏')}
             </span>
-            <DollarSign className={`w-5 h-5 ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+            <DollarSign className={`w-5 h-5 ${totalPnL >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`} />
           </div>
-          <p className={`text-2xl font-bold ${totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`text-2xl font-mono font-bold ${totalPnL >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
             {isLoading ? '-' : formatCurrency(totalPnL)}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-xl p-5 border border-neutral-200 dark:border-neutral-800">
+        <div className="bg-white dark:bg-black rounded-sm p-5 border border-neutral-200 dark:border-white/10 transition-colors">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">
+            <span className="text-sm text-neutral-500 dark:text-white/40 font-mono uppercase tracking-wider">
               {t('events.avgPriceChange', '平均价格变动')}
             </span>
             {avgPriceChange >= 0 ? (
-              <TrendingUp className="w-5 h-5 text-green-500" />
+              <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-500" />
             ) : (
-              <TrendingDown className="w-5 h-5 text-red-500" />
+              <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-500" />
             )}
           </div>
-          <p className={`text-2xl font-bold ${avgPriceChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`text-2xl font-mono font-bold ${avgPriceChange >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
             {isLoading ? '-' : formatPercent(avgPriceChange / 100)}
           </p>
         </div>
       </div>
 
       {/* Event Type Filter */}
-      <div className="bg-white dark:bg-neutral-900 rounded-xl p-4 border border-neutral-200 dark:border-neutral-800">
+      <div className="bg-white dark:bg-black rounded-sm p-4 border border-neutral-200 dark:border-white/10 transition-colors">
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-400">
+          <div className="flex items-center gap-2 text-neutral-500 dark:text-white/40">
             <Filter className="w-4 h-4" />
-            <span className="text-sm font-medium">{t('events.filterBy', '筛选')}:</span>
+            <span className="text-sm font-mono font-medium uppercase">{t('events.filterBy', '筛选')}:</span>
           </div>
           <div className="flex gap-2 flex-wrap">
             {EVENT_TYPES.map((type) => (
               <button
                 key={type.key}
                 onClick={() => setEventTypeFilter(type.key)}
-                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                  eventTypeFilter === type.key
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                }`}
+                className={`px-3 py-1.5 text-xs font-mono uppercase rounded-sm transition-colors ${eventTypeFilter === type.key
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'bg-neutral-100 dark:bg-white/5 text-slate-700 dark:text-white/60 hover:bg-neutral-200 dark:hover:bg-white/10'
+                  }`}
               >
                 {t(type.labelKey, type.key)}
               </button>
@@ -167,24 +166,24 @@ export function EventAnalysis() {
       </div>
 
       {/* Event Timeline Section */}
-      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 overflow-hidden transition-colors">
         <button
           onClick={() => toggleSection('timeline')}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors group"
         >
           <div className="flex items-center gap-3">
-            <Activity className="w-5 h-5 text-blue-500" />
-            <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
+            <Activity className="w-5 h-5 text-blue-600 dark:text-blue-500" />
+            <h2 className="text-lg font-mono font-bold text-slate-900 dark:text-white uppercase tracking-wider">
               {t('events.timeline', '事件时间线')}
             </h2>
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">
+            <span className="text-xs font-mono text-slate-500 dark:text-white/40 group-hover:text-slate-900 dark:group-hover:text-white/60">
               ({events.length} {t('events.events', '事件')})
             </span>
           </div>
           {expandedSection === 'timeline' ? (
-            <ChevronUp className="w-5 h-5 text-neutral-400" />
+            <ChevronUp className="w-5 h-5 text-slate-400 dark:text-white/40" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-neutral-400" />
+            <ChevronDown className="w-5 h-5 text-slate-400 dark:text-white/40" />
           )}
         </button>
         {expandedSection === 'timeline' && (
@@ -199,21 +198,21 @@ export function EventAnalysis() {
       </div>
 
       {/* Event List Section */}
-      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 overflow-hidden transition-colors">
         <button
           onClick={() => toggleSection('list')}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <BarChart2 className="w-5 h-5 text-purple-500" />
-            <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
+            <BarChart2 className="w-5 h-5 text-purple-600 dark:text-purple-500" />
+            <h2 className="text-lg font-mono font-bold text-slate-900 dark:text-white uppercase tracking-wider">
               {t('events.eventList', '事件列表')}
             </h2>
           </div>
           {expandedSection === 'list' ? (
-            <ChevronUp className="w-5 h-5 text-neutral-400" />
+            <ChevronUp className="w-5 h-5 text-slate-400 dark:text-white/40" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-neutral-400" />
+            <ChevronDown className="w-5 h-5 text-slate-400 dark:text-white/40" />
           )}
         </button>
         {expandedSection === 'list' && (
@@ -231,7 +230,7 @@ export function EventAnalysis() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-left text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wider border-b border-neutral-200 dark:border-neutral-700">
+                    <tr className="text-left text-xs font-mono font-medium text-slate-500 dark:text-white/40 uppercase tracking-wider border-b border-neutral-200 dark:border-white/10">
                       <th className="pb-3 pr-4">{t('events.date', '日期')}</th>
                       <th className="pb-3 pr-4">{t('events.type', '类型')}</th>
                       <th className="pb-3 pr-4">{t('events.event', '事件')}</th>
@@ -240,44 +239,41 @@ export function EventAnalysis() {
                       <th className="pb-3 text-right">{t('events.pnl', '盈亏')}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                  <tbody className="divide-y divide-neutral-100 dark:divide-white/5">
                     {events.slice(0, 20).map((event) => (
-                      <tr key={event.id} className="text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800/30">
-                        <td className="py-3 pr-4 text-neutral-500 dark:text-neutral-400 whitespace-nowrap">
+                      <tr key={event.id} className="text-sm hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">
+                        <td className="py-3 pr-4 text-slate-500 dark:text-white/60 whitespace-nowrap font-mono">
                           {new Date(event.event_date).toLocaleDateString()}
                         </td>
                         <td className="py-3 pr-4">
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            event.event_type === 'earnings'
-                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                              : event.event_type === 'macro' || event.event_type === 'fed'
+                          <span className={`px-2 py-1 text-xs font-mono rounded-sm ${event.event_type === 'earnings'
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                            : event.event_type === 'macro' || event.event_type === 'fed'
                               ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
                               : event.event_type === 'price_anomaly'
-                              ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                              : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300'
-                          }`}>
+                                ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                : 'bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-white/60'
+                            }`}>
                             {event.event_type}
                           </span>
                           {event.is_key_event && (
                             <span className="ml-1 text-amber-500">★</span>
                           )}
                         </td>
-                        <td className="py-3 pr-4 text-neutral-900 dark:text-white max-w-[200px] truncate">
+                        <td className="py-3 pr-4 text-slate-900 dark:text-white max-w-[200px] truncate font-medium">
                           {event.event_title}
                         </td>
-                        <td className="py-3 pr-4 font-medium text-neutral-900 dark:text-white">
+                        <td className="py-3 pr-4 font-mono font-medium text-slate-900 dark:text-white">
                           {event.symbol}
                         </td>
-                        <td className={`py-3 pr-4 text-right font-medium ${
-                          (event.price_change_pct || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
+                        <td className={`py-3 pr-4 text-right font-mono font-bold ${(event.price_change_pct || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
+                          }`}>
                           {event.price_change_pct !== null
                             ? `${event.price_change_pct >= 0 ? '+' : ''}${event.price_change_pct.toFixed(1)}%`
                             : '-'}
                         </td>
-                        <td className={`py-3 text-right font-medium ${
-                          (event.position_pnl_on_event || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
+                        <td className={`py-3 text-right font-mono font-bold ${(event.position_pnl_on_event || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
+                          }`}>
                           {event.position_pnl_on_event !== null
                             ? formatCurrency(event.position_pnl_on_event)
                             : '-'}
@@ -287,7 +283,7 @@ export function EventAnalysis() {
                   </tbody>
                 </table>
                 {events.length > 20 && (
-                  <p className="mt-4 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                  <p className="mt-4 text-center text-xs font-mono text-slate-500 dark:text-white/40">
                     {t('events.showingFirst', '显示前 20 条，共')} {events.length} {t('events.records', '条记录')}
                   </p>
                 )}

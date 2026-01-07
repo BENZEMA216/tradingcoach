@@ -34,15 +34,15 @@ export function ChartTooltip({
   return (
     <div
       className={clsx(
-        'bg-white dark:bg-neutral-800 rounded-lg shadow-lg',
-        'border border-neutral-200 dark:border-neutral-700',
-        'px-3 py-2.5 text-sm',
+        'bg-white dark:bg-black rounded-sm shadow-sm dark:shadow-none',
+        'border border-neutral-200 dark:border-white/20',
+        'px-3 py-2 text-xs font-mono transition-colors',
         className
       )}
     >
       {/* Title */}
       {title && (
-        <p className="font-medium text-neutral-900 dark:text-neutral-100 mb-1.5 text-xs uppercase tracking-wide">
+        <p className="font-bold text-slate-900 dark:text-white mb-2 text-[10px] uppercase tracking-widest border-b border-neutral-100 dark:border-white/10 pb-1">
           {title}
         </p>
       )}
@@ -54,15 +54,15 @@ export function ChartTooltip({
             <div className="flex items-center gap-2">
               {item.color && (
                 <span
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  className="w-1.5 h-1.5 rounded-none flex-shrink-0"
                   style={{ backgroundColor: item.color }}
                 />
               )}
-              <span className="text-neutral-600 dark:text-neutral-400">
+              <span className="text-slate-500 dark:text-white/60 uppercase tracking-wider text-[10px]">
                 {item.label}
               </span>
             </div>
-            <span className="font-medium text-neutral-900 dark:text-neutral-100 tabular-nums">
+            <span className="font-bold text-slate-900 dark:text-white tabular-nums tracking-tight">
               {item.prefix}
               {typeof item.value === 'number' ? item.value.toLocaleString() : item.value}
               {item.suffix}

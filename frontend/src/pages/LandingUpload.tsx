@@ -24,7 +24,12 @@ import {
   Mail,
   Bell,
   X,
+  Zap,
+  Target,
+  Shield,
+  BrainCircuit,
 } from 'lucide-react';
+import { BackgroundEffects } from '@/components/landing/BackgroundEffects';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { useNotification, getNotificationPreference, setNotificationPreference } from '@/hooks/useNotification';
 import { useTaskStorage } from '@/hooks/useTaskStorage';
@@ -203,18 +208,21 @@ export function LandingUpload() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 flex flex-col">
-      {/* Top Bar */}
-      <header className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center space-x-2">
-          <div className="p-2 bg-blue-600 rounded-lg">
-            <TrendingUp className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-black text-white flex flex-col relative overflow-hidden font-sans selection:bg-white selection:text-black">
+      {/* Precision Grid Background */}
+      <BackgroundEffects />
+
+      {/* Top Bar - Industrial */}
+      <header className="flex items-center justify-between px-8 py-8 relative z-10 border-b border-white/5 bg-black/50 backdrop-blur-sm">
+        <div className="flex items-center space-x-4">
+          <div className="w-8 h-8 bg-white text-black flex items-center justify-center rounded-sm">
+            <TrendingUp className="w-5 h-5" />
           </div>
-          <span className="text-lg font-semibold text-neutral-900 dark:text-white">
-            TradingCoach
+          <span className="text-sm font-mono tracking-widest uppercase text-white/60">
+            TC_TERMINAL_v1
           </span>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-6">
           <LanguageSwitcher />
           <button
             onClick={toggleDarkMode}
@@ -245,8 +253,8 @@ export function LandingUpload() {
                       {hasActiveTask
                         ? t('landing.taskInProgress', '有一个分析任务正在进行中...')
                         : recoveredTask?.status === 'completed'
-                        ? t('landing.taskCompleted', '上次的分析已完成')
-                        : t('landing.taskFailed', '上次的分析失败了')}
+                          ? t('landing.taskCompleted', '上次的分析已完成')
+                          : t('landing.taskFailed', '上次的分析失败了')}
                     </p>
                     <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">
                       {storedTask.fileName}
@@ -285,295 +293,316 @@ export function LandingUpload() {
             </div>
           )}
 
-          {/* Title */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-neutral-900 dark:text-white mb-3">
-              {t('landing.title', '智能交易复盘分析')}
+          {/* Hero - The "Monolith" */}
+          <div className="text-center mb-24 relative z-10 pt-10">
+            <div className="inline-block border border-white/20 px-4 py-1.5 rounded-full mb-10 bg-black/50 backdrop-blur">
+              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">System Operational • v0.9.2</span>
+            </div>
+
+            <h1 className="text-7xl md:text-9xl font-bold text-white mb-8 tracking-tighter leading-[0.9]">
+              PURE<br />
+              ALPHA.
             </h1>
-            <p className="text-lg text-neutral-500 dark:text-neutral-400">
-              {t('landing.subtitle', '上传交易数据，获取专业分析报告')}
+
+            <p className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
+              Construct your edge with institutional-grade <span className="text-white">precision metrics</span> and <span className="text-white">psychological profiling</span>.
             </p>
           </div>
 
-          {/* Upload State */}
-          {pageState === 'upload' && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Hidden file input */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xls,.xlsx"
-                onChange={handleFileChange}
-                className="hidden"
-              />
+          <div className="max-w-4xl mx-auto w-full relative z-10 px-6 pb-24">
+            {/* Main Upload Area - Solid Industrial Block */}
+            <div className="bg-[#050505] border border-white/10 rounded-sm p-1 shadow-2xl">
+              <div className="border border-white/5 border-dashed rounded-sm p-12 md:p-16 text-center bg-black relative overflow-hidden group">
 
-              {/* Dropzone */}
-              <div
-                className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer ${
-                  dragActive
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-[1.02]'
-                    : selectedFile
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                    : 'border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 bg-white dark:bg-neutral-900/50'
-                }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <div className="flex flex-col items-center space-y-4">
-                  {selectedFile ? (
-                    <>
-                      <div className="p-4 bg-green-100 dark:bg-green-900/50 rounded-full">
-                        <FileSpreadsheet className="w-10 h-10 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-lg font-medium text-neutral-900 dark:text-white">
-                          {selectedFile.name}
-                        </p>
-                        <p className="text-sm text-neutral-500 mt-1">
-                          {(selectedFile.size / 1024).toFixed(1)} KB
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className={`p-4 rounded-full ${
-                        dragActive ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-neutral-100 dark:bg-neutral-800'
-                      }`}>
-                        <UploadIcon className={`w-10 h-10 ${
-                          dragActive ? 'text-blue-600' : 'text-neutral-400'
-                        }`} />
-                      </div>
-                      <div>
-                        <p className="text-lg font-medium text-neutral-900 dark:text-white">
-                          {t('landing.dropzone', '拖拽 CSV 文件到此处')}
-                        </p>
-                        <p className="text-neutral-500 mt-1">
-                          {t('landing.or', '或')} <span className="text-blue-600 hover:underline">{t('landing.selectFile', '点击选择文件')}</span>
-                        </p>
-                      </div>
-                      <p className="text-sm text-neutral-400">
-                        {t('landing.supportedFormats', '支持富途中文/英文导出格式、A股对账单')}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
+                {/* Scanline Effect on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000 ease-in-out pointer-events-none" />
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.xls,.xlsx"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
 
-              {/* Notification Options (shown when file is selected) */}
-              {selectedFile && (
-                <div className="bg-white dark:bg-neutral-900 rounded-xl p-5 border border-neutral-200 dark:border-neutral-800 space-y-4">
-                  {/* Email Input */}
-                  <div>
-                    <label className="flex items-center text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
-                      <Mail className="w-4 h-4 mr-2" />
-                      {t('landing.emailLabel', '邮箱通知（可选）')}
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t('landing.emailPlaceholder', 'your@email.com')}
-                      className={`w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 ${
-                        email && !isValidEmail(email)
-                          ? 'border-red-300 dark:border-red-700 focus:ring-red-500'
-                          : 'border-neutral-300 dark:border-neutral-700 focus:ring-blue-500'
-                      }`}
-                    />
-                    <p className="text-xs text-neutral-500 mt-1.5">
-                      {t('landing.emailHint', '分析完成后，我们会发送邮件通知您')}
-                    </p>
-                  </div>
-
-                  {/* Browser Notification Toggle */}
-                  {notification.isSupported && (
-                    <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-700">
-                      <div className="flex items-center">
-                        <Bell className="w-4 h-4 text-neutral-500 mr-2" />
+                {/* Dropzone - Industrial */}
+                <div
+                  className={`relative transition-all duration-300 ${dragActive ? 'scale-[1.01]' : ''}`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className="flex flex-col items-center space-y-4">
+                    {selectedFile ? (
+                      <>
+                        <div className="p-4 bg-green-100 dark:bg-green-900/50 rounded-full">
+                          <FileSpreadsheet className="w-10 h-10 text-green-600" />
+                        </div>
                         <div>
-                          <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                            {t('notification.enableNotification', '启用桌面通知')}
+                          <p className="text-lg font-medium text-neutral-900 dark:text-white">
+                            {selectedFile.name}
                           </p>
-                          <p className="text-xs text-neutral-500">
-                            {t('notification.notificationHint', '分析完成时提醒您')}
+                          <p className="text-sm text-neutral-500 mt-1">
+                            {(selectedFile.size / 1024).toFixed(1)} KB
                           </p>
                         </div>
-                      </div>
-                      <button
-                        onClick={handleNotificationToggle}
-                        className={`relative w-11 h-6 rounded-full transition-colors ${
-                          enableNotification && notification.isGranted
+                      </>
+                    ) : (
+                      <>
+                        <div className="mb-8">
+                          <UploadIcon className="w-10 h-10 text-white mx-auto mb-4" />
+                          <h3 className="text-2xl font-bold text-white tracking-tight uppercase">
+                            Upload Protocol
+                          </h3>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-white/40 font-mono text-sm">
+                            DRAG BINARY CSV HERE
+                          </p>
+                          <div className="flex items-center justify-center space-x-4">
+                            <span className="h-px w-8 bg-white/20"></span>
+                            <span className="text-white/20 text-xs uppercase tracking-widest">OR</span>
+                            <span className="h-px w-8 bg-white/20"></span>
+                          </div>
+                          <button className="text-white border-b border-white hover:border-transparent transition-colors text-sm uppercase tracking-wide pt-2">
+                            Browse Data Source
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Notification Options (shown when file is selected) */}
+                {selectedFile && (
+                  <div className="bg-white dark:bg-neutral-900 rounded-xl p-5 border border-neutral-200 dark:border-neutral-800 space-y-4 mt-8">
+                    {/* Email Input */}
+                    <div>
+                      <label className="flex items-center text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                        <Mail className="w-4 h-4 mr-2" />
+                        {t('landing.emailLabel', '邮箱通知（可选）')}
+                      </label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={t('landing.emailPlaceholder', 'your@email.com')}
+                        className={`w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 ${email && !isValidEmail(email)
+                          ? 'border-red-300 dark:border-red-700 focus:ring-red-500'
+                          : 'border-neutral-300 dark:border-neutral-700 focus:ring-blue-500'
+                          }`}
+                      />
+                    </div>
+
+                    {/* Browser Notification Toggle */}
+                    {notification.isSupported && (
+                      <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-700">
+                        <div className="flex items-center">
+                          <Bell className="w-4 h-4 text-neutral-500 mr-2" />
+                          <div>
+                            <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                              {t('notification.enableNotification', '启用桌面通知')}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleNotificationToggle}
+                          className={`relative w-11 h-6 rounded-full transition-colors ${enableNotification && notification.isGranted
                             ? 'bg-blue-600'
                             : 'bg-neutral-300 dark:bg-neutral-600'
-                        }`}
-                      >
-                        <span
-                          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
-                            enableNotification && notification.isGranted ? 'translate-x-5' : ''
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  )}
-
-                  {notification.isDenied && (
-                    <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center">
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                      {t('notification.permissionDenied', '浏览器通知权限被拒绝，请在浏览器设置中开启')}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Upload Button */}
-              {selectedFile && (
-                <button
-                  onClick={handleUpload}
-                  disabled={createTaskMutation.isPending || (email !== '' && !isValidEmail(email))}
-                  className="w-full px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 font-medium text-lg transition-colors"
-                >
-                  {createTaskMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>{t('landing.uploading', '上传中...')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <UploadIcon className="w-5 h-5" />
-                      <span>{t('landing.startAnalysis', '开始分析')}</span>
-                    </>
-                  )}
-                </button>
-              )}
-
-              {/* Has Data Link */}
-              {hasData && (
-                <div className="text-center pt-6 border-t border-neutral-200 dark:border-neutral-800">
-                  <p className="text-neutral-500 dark:text-neutral-400">
-                    {t('landing.hasData', '已有数据？')}{' '}
-                    <button
-                      onClick={() => navigate('/statistics')}
-                      className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
-                    >
-                      {t('landing.viewResults', '查看分析结果')}
-                      <ArrowRight className="w-4 h-4 ml-1" />
-                    </button>
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Processing State - 使用 ProcessingLogPanel */}
-          {pageState === 'processing' && taskId && (
-            <ProcessingLogPanel
-              taskId={taskId}
-              fileName={selectedFile?.name || ''}
-              onComplete={() => {
-                setPageState('complete');
-                queryClient.invalidateQueries({ queryKey: ['positions'] });
-                queryClient.invalidateQueries({ queryKey: ['statistics'] });
-                queryClient.invalidateQueries({ queryKey: ['system'] });
-                updateTaskStatus('completed', 100);
-                // Auto redirect after 2 seconds
-                setTimeout(() => navigate('/statistics'), 2000);
-              }}
-              onError={() => {
-                setPageState('error');
-                updateTaskStatus('failed');
-              }}
-              onCancel={() => {
-                setPageState('upload');
-                setSelectedFile(null);
-                setTaskId(null);
-              }}
-            />
-          )}
-
-          {/* Complete State */}
-          {pageState === 'complete' && (
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-8 shadow-lg border border-green-200 dark:border-green-800 animate-fade-in">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
-                </div>
-                <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
-                  {t('task.analysisComplete', '分析完成！')}
-                </h2>
-                <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-                  {t('landing.redirecting', '正在跳转到分析结果...')}
-                </p>
-
-                {task?.result && (
-                  <div className="grid grid-cols-3 gap-4 mt-6">
-                    <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
-                      <p className="text-2xl font-bold text-green-600">
-                        {task.result.new_trades || 0}
-                      </p>
-                      <p className="text-xs text-neutral-500">{t('task.newTrades', '新交易')}</p>
-                    </div>
-                    <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">
-                        {task.result.positions_matched || 0}
-                      </p>
-                      <p className="text-xs text-neutral-500">{t('task.positions', '持仓')}</p>
-                    </div>
-                    <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
-                      <p className="text-2xl font-bold text-purple-600">
-                        {task.result.positions_scored || 0}
-                      </p>
-                      <p className="text-xs text-neutral-500">{t('task.scored', '已评分')}</p>
-                    </div>
+                            }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${enableNotification && notification.isGranted ? 'translate-x-5' : ''
+                              }`}
+                          />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
+                {/* Upload Button */}
                 <button
-                  onClick={() => navigate('/statistics')}
-                  className="mt-6 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 flex items-center justify-center space-x-2 mx-auto"
+                  onClick={handleUpload}
+                  disabled={createTaskMutation.isPending || (email !== '' && !isValidEmail(email))}
+                  className="w-full mt-8 py-4 bg-white text-black hover:bg-gray-200 disabled:bg-gray-800 disabled:text-gray-500 rounded-sm font-bold text-sm uppercase tracking-widest flex items-center justify-center space-x-3 transition-colors"
                 >
-                  <BarChart3 className="w-5 h-5" />
-                  <span>{t('landing.viewStatistics', '查看统计分析')}</span>
+                  {createTaskMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>INITIALIZING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>EXECUTE ANALYSIS</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </button>
+
+                {/* Has Data Link */}
+                {hasData && (
+                  <div className="text-center pt-6 border-t border-neutral-200 dark:border-neutral-800 mt-6">
+                    <p className="text-neutral-500 dark:text-neutral-400">
+                      {t('landing.hasData', '已有数据？')}{' '}
+                      <button
+                        onClick={() => navigate('/statistics')}
+                        className="text-white border-b border-white hover:border-transparent transition-colors font-mono uppercase tracking-wide ml-2"
+                      >
+                        {t('landing.viewResults', '查看分析结果')}
+                      </button>
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
+
+
+          {/* Industrial Features Grid */}
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10 relative z-10">
+            <div className="bg-black p-10 hover:bg-[#050505] transition-colors group">
+              <BrainCircuit className="w-6 h-6 text-white mb-6" />
+              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">Neural Pysch</h3>
+              <p className="text-sm text-gray-500 font-mono leading-relaxed group-hover:text-gray-400 transition-colors">
+                [MODULE_A] Decoding behavioral patterns using advanced algorithmic sequencing.
+              </p>
+            </div>
+
+            <div className="bg-black p-10 hover:bg-[#050505] transition-colors group">
+              <Target className="w-6 h-6 text-white mb-6" />
+              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">Precision Metric</h3>
+              <p className="text-sm text-gray-500 font-mono leading-relaxed group-hover:text-gray-400 transition-colors">
+                [MODULE_B] Objective trade grading system based on pre-defined strategy constraints.
+              </p>
+            </div>
+
+            <div className="bg-black p-10 hover:bg-[#050505] transition-colors group">
+              <Shield className="w-6 h-6 text-white mb-6" />
+              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">Risk Struct</h3>
+              <p className="text-sm text-gray-500 font-mono leading-relaxed group-hover:text-gray-400 transition-colors">
+                [MODULE_C] Real-time visualization of MAE/MFE and drawdown probabilities.
+              </p>
+            </div>
+          </div>
+
+          {/* Processing State - 使用 ProcessingLogPanel */}
+          {
+            pageState === 'processing' && taskId && (
+              <ProcessingLogPanel
+                taskId={taskId}
+                fileName={selectedFile?.name || ''}
+                onComplete={() => {
+                  setPageState('complete');
+                  queryClient.invalidateQueries({ queryKey: ['positions'] });
+                  queryClient.invalidateQueries({ queryKey: ['statistics'] });
+                  queryClient.invalidateQueries({ queryKey: ['system'] });
+                  updateTaskStatus('completed', 100);
+                  // Auto redirect after 2 seconds
+                  setTimeout(() => navigate('/statistics'), 2000);
+                }}
+                onError={() => {
+                  setPageState('error');
+                  updateTaskStatus('failed');
+                }}
+                onCancel={() => {
+                  setPageState('upload');
+                  setSelectedFile(null);
+                  setTaskId(null);
+                }}
+              />
+            )
+          }
+
+          {/* Complete State */}
+          {
+            pageState === 'complete' && (
+              <div className="bg-white dark:bg-neutral-900 rounded-2xl p-8 shadow-lg border border-green-200 dark:border-green-800 animate-fade-in">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
+                    {t('task.analysisComplete', '分析完成！')}
+                  </h2>
+                  <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+                    {t('landing.redirecting', '正在跳转到分析结果...')}
+                  </p>
+
+                  {task?.result && (
+                    <div className="grid grid-cols-3 gap-4 mt-6">
+                      <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
+                        <p className="text-2xl font-bold text-green-600">
+                          {task.result.new_trades || 0}
+                        </p>
+                        <p className="text-xs text-neutral-500">{t('task.newTrades', '新交易')}</p>
+                      </div>
+                      <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
+                        <p className="text-2xl font-bold text-blue-600">
+                          {task.result.positions_matched || 0}
+                        </p>
+                        <p className="text-xs text-neutral-500">{t('task.positions', '持仓')}</p>
+                      </div>
+                      <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
+                        <p className="text-2xl font-bold text-purple-600">
+                          {task.result.positions_scored || 0}
+                        </p>
+                        <p className="text-xs text-neutral-500">{t('task.scored', '已评分')}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => navigate('/statistics')}
+                    className="mt-6 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 flex items-center justify-center space-x-2 mx-auto"
+                  >
+                    <BarChart3 className="w-5 h-5" />
+                    <span>{t('landing.viewStatistics', '查看统计分析')}</span>
+                  </button>
+                </div>
+              </div>
+            )
+          }
 
           {/* Error State */}
-          {pageState === 'error' && (
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-8 shadow-lg border border-red-200 dark:border-red-800 animate-fade-in">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
-                  <AlertCircle className="w-8 h-8 text-red-600" />
+          {
+            pageState === 'error' && (
+              <div className="bg-white dark:bg-neutral-900 rounded-2xl p-8 shadow-lg border border-red-200 dark:border-red-800 animate-fade-in">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
+                    <AlertCircle className="w-8 h-8 text-red-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
+                    {t('task.analysisFailed', '分析失败')}
+                  </h2>
+                  <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+                    {task?.error_message || createTaskMutation.error?.message || t('common.unknownError', '未知错误')}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setPageState('upload');
+                      setSelectedFile(null);
+                      setTaskId(null);
+                      hasNotified.current = false;
+                    }}
+                    className="mt-6 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700"
+                  >
+                    {t('task.tryAgain', '重试')}
+                  </button>
                 </div>
-                <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
-                  {t('task.analysisFailed', '分析失败')}
-                </h2>
-                <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-                  {task?.error_message || createTaskMutation.error?.message || t('common.unknownError', '未知错误')}
-                </p>
-                <button
-                  onClick={() => {
-                    setPageState('upload');
-                    setSelectedFile(null);
-                    setTaskId(null);
-                    hasNotified.current = false;
-                  }}
-                  className="mt-6 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700"
-                >
-                  {t('task.tryAgain', '重试')}
-                </button>
               </div>
-            </div>
-          )}
-        </div>
-      </main>
+            )
+          }
+        </div >
+      </main >
 
       {/* Footer */}
-      <footer className="px-6 py-4 text-center text-sm text-neutral-400">
+      < footer className="px-6 py-4 text-center text-sm text-neutral-400" >
         <p>TradingCoach © 2024-2026</p>
-      </footer>
-    </div>
+      </footer >
+    </div >
   );
 }

@@ -98,50 +98,50 @@ export function PositionDetail() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/positions')}
-            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/10 rounded-sm transition-colors text-white/50 hover:text-white border border-transparent hover:border-white/10"
             aria-label="Back"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
+              <h1 className="text-2xl font-mono font-bold text-white tracking-tight uppercase">
                 {position.symbol}
               </h1>
               <span
                 className={clsx(
-                  'px-2 py-1 text-sm font-medium rounded',
+                  'px-2 py-0.5 text-[10px] font-bold rounded-sm uppercase tracking-wider border',
                   position.direction === 'long'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                    ? 'bg-blue-900/30 text-blue-400 border-blue-500/20'
+                    : 'bg-purple-900/30 text-purple-400 border-purple-500/20'
                 )}
               >
-                {t(`direction.${position.direction}`)}
+                {position.direction === 'long' ? 'LONG' : 'SHORT'}
               </span>
               {position.is_option && (
-                <span className="px-2 py-1 text-sm font-medium rounded bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
-                  {t('positionDetail.option')}
+                <span className="px-2 py-0.5 text-[10px] font-bold rounded-sm uppercase tracking-wider bg-white/10 text-white/70 border border-white/20">
+                  {isZh ? '期权' : 'OPTION'}
                 </span>
               )}
             </div>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+            <p className="text-xs font-mono text-white/50 mt-1 uppercase tracking-wider">
               {position.symbol_name || position.symbol}
-              {position.underlying_symbol && ` (${t('positionDetail.underlying')}: ${position.underlying_symbol})`}
+              {position.underlying_symbol && ` // UNDERLYING: ${position.underlying_symbol}`}
             </p>
           </div>
           <div className="text-right">
             <div
               className={clsx(
-                'text-2xl font-bold',
-                getPnLColorClass(position.net_pnl)
+                'text-3xl font-mono font-bold tracking-tight',
+                (position.net_pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'
               )}
             >
               {formatCurrency(position.net_pnl)}
             </div>
             <div
               className={clsx(
-                'text-sm',
-                getPnLColorClass(position.net_pnl_pct)
+                'text-sm font-mono font-bold tracking-tight',
+                (position.net_pnl_pct || 0) >= 0 ? 'text-green-500' : 'text-red-500'
               )}
             >
               {formatPercent(position.net_pnl_pct)}

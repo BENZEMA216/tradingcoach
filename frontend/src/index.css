@@ -20,786 +20,216 @@
   --surface-tertiary: #f3f4f6;
   --border-primary: #e5e7eb;
   --border-secondary: #f3f4f6;
+
+  /* Glassmorphism settings */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-blur: 12px;
 }
 
-/* Dark mode variables - Neutral gray palette */
+/* Premium Dark Mode - Industrial Black Palette */
 .dark {
-  /* Surfaces - pure neutral grays */
-  --surface-primary: #121212;
-  --surface-secondary: #1a1a1a;
-  --surface-tertiary: #242424;
-  --surface-elevated: #2d2d2d;
+  /* Surfaces - Pure Black */
+  --surface-primary: #000000;
+  --surface-secondary: #000000;
+  --surface-tertiary: #000000;
+  --surface-elevated: #111111;
 
-  /* Borders - subtle */
-  --border-primary: #333333;
-  --border-secondary: rgba(255, 255, 255, 0.06);
+  /* Borders - Sharp White/10 */
+  --border-primary: rgba(255, 255, 255, 0.15);
+  --border-secondary: rgba(255, 255, 255, 0.08);
 
-  /* Trading colors - TradingView style */
-  --color-profit: #26a69a;
-  --color-loss: #ef5350;
+  /* Trading colors - Vibrant for dark mode */
+  --color-profit: #34d399;
+  /* Emerald 400 */
+  --color-loss: #f87171;
+  /* Red 400 */
 
   /* Accent blue */
-  --color-accent: #2962ff;
+  --color-accent: #3b82f6;
+  /* Blue 500 */
+
+  /* Glassmorphism settings */
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
 }
 
 /* Base styles */
 body {
   @apply bg-neutral-50 text-neutral-900;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.011em;
+  /* Tighter tracking for modern feel */
 }
 
 .dark body,
 body.dark {
   background: var(--surface-primary);
-  color: #d1d4dc;
+  color: #e2e8f0;
+  /* Slate 200 */
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - Industrial */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-neutral-100;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: var(--surface-primary);
+  background: #000000;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-neutral-300 rounded-full;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 0;
+  /* Square edges */
+  border: 1px solid black;
+  /* Contrast separation */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-neutral-400;
+  background: rgba(255, 255, 255, 0.3);
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #444444;
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) #000000;
 }
 
-/* Utility classes */
-.text-profit {
-  color: var(--color-profit);
+/* ==================== Glassmorphism Utilities ==================== */
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.text-loss {
-  color: var(--color-loss);
-}
-
-.bg-profit {
-  background-color: var(--color-profit);
-}
-
-.bg-loss {
-  background-color: var(--color-loss);
-}
-
-/* Grade badge colors - refined for dark mode */
-.grade-a { @apply bg-green-100 text-green-800; }
-.grade-b { @apply bg-lime-100 text-lime-800; }
-.grade-c { @apply bg-yellow-100 text-yellow-800; }
-.grade-d { @apply bg-orange-100 text-orange-800; }
-.grade-f { @apply bg-red-100 text-red-800; }
-
-.dark .grade-a { background: rgba(38, 166, 154, 0.2); color: #26a69a; }
-.dark .grade-b { background: rgba(102, 187, 106, 0.2); color: #66bb6a; }
-.dark .grade-c { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
-.dark .grade-d { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
-.dark .grade-f { background: rgba(239, 83, 80, 0.2); color: #ef5350; }
-
-/* Report Section Styles */
-.report-section {
-  @apply mb-20;
-}
-
-.report-section:last-child {
-  @apply mb-10;
-}
-
-/* Hero number styling - 72px desktop, 48px mobile */
-.hero-number {
-  @apply text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight;
-  letter-spacing: -0.025em;
-  line-height: 1;
-}
-
-/* Section header typography */
-.section-number {
-  @apply text-xs font-medium tracking-widest text-neutral-400 dark:text-neutral-500;
-}
-
-.section-title {
-  @apply text-xs font-semibold tracking-widest uppercase text-neutral-900 dark:text-neutral-100;
-}
-
-/* Insight text styling - enhanced */
-.insight-text {
-  @apply text-sm text-neutral-600 italic;
-  @apply border-l-[3px] border-neutral-300 pl-5 py-1 mt-4;
-}
-
-.dark .insight-text {
-  color: #9598a1;
-  border-color: #333333;
-}
-
-/* Insight quote with icon */
-.insight-quote {
-  @apply flex items-start gap-3 text-sm text-neutral-600;
-  @apply bg-neutral-50 rounded-lg p-4 mt-4;
-}
-
-.dark .insight-quote {
-  background: var(--surface-tertiary);
-  color: #9598a1;
-}
-
-.insight-quote-icon {
-  @apply w-4 h-4 mt-0.5 flex-shrink-0;
-}
-
-.insight-quote-text {
-  @apply leading-relaxed;
-}
-
-/* Highlight numbers in insight text */
-.insight-highlight {
-  @apply font-semibold text-neutral-900 not-italic;
-}
-
-.dark .insight-highlight {
-  color: #d1d4dc;
-}
-
-/* Chart grid layouts - responsive */
-.chart-grid-2 {
-  @apply grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6;
-}
-
-.chart-grid-3 {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6;
-}
-
-.chart-grid-4 {
-  @apply grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6;
-}
-
-/* Large screen: support 3-column layout */
-@media (min-width: 1440px) {
-  .chart-grid-2 {
-    @apply gap-8;
-  }
-  .chart-grid-3 {
-    @apply gap-8;
-  }
-}
-
-/* Metric card in report style */
-.metric-card {
-  @apply bg-white rounded-xl border border-neutral-200;
-  @apply p-5 md:p-6 transition-all;
-}
-
-.dark .metric-card {
-  background: var(--surface-secondary);
-  border-color: var(--border-primary);
-}
-
-.dark .metric-card:hover {
-  background: var(--surface-tertiary);
-}
-
-.metric-value {
-  @apply text-xl md:text-2xl font-semibold text-neutral-900 tracking-tight;
-}
-
-.dark .metric-value {
-  color: #d1d4dc;
-}
-
-.metric-label {
-  @apply text-[10px] md:text-xs font-medium tracking-wide uppercase text-neutral-400 mt-1;
-}
-
-.dark .metric-label {
-  color: #787b86;
-}
-
-/* Chart height adjustments for mobile */
-.chart-container-mobile {
-  @apply h-48 sm:h-56 md:h-64;
-}
-
-/* Report page specific background */
-.report-page {
-  @apply min-h-screen bg-neutral-50;
-}
-
-.dark .report-page {
+.glass-card {
+  @apply transition-all duration-300 ease-out;
   background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
 }
 
-/* Period selector styling */
-.period-selector {
-  @apply flex items-center gap-2 bg-white;
-  @apply border border-neutral-200 rounded-lg px-4 py-2;
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.6) !important;
+  /* Semi-transparent Slate 800 */
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
-.dark .period-selector {
-  background: var(--surface-secondary);
-  border-color: var(--border-primary);
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: rgba(59, 130, 246, 0.3);
+  /* Blue hint on hover */
 }
 
-.period-button {
-  @apply px-3 py-1.5 text-sm font-medium rounded-md transition-colors;
-  @apply text-neutral-500;
-  @apply hover:text-neutral-900 hover:bg-neutral-100;
+.dark .glass-card:hover {
+  box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.4);
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(30, 41, 59, 0.8);
 }
 
-.dark .period-button {
-  color: #787b86;
+/* ==================== Gradients & Glows ==================== */
+
+.text-gradient-primary {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600;
 }
 
-.dark .period-button:hover {
-  color: #d1d4dc;
-  background: var(--surface-tertiary);
+.dark .text-gradient-primary {
+  @apply from-blue-400 to-indigo-400;
 }
 
-.period-button.active {
-  @apply bg-neutral-900 text-white;
+.bg-gradient-soft {
+  background: linear-gradient(135deg, var(--surface-primary) 0%, var(--surface-secondary) 100%);
 }
 
-.dark .period-button.active {
-  background: #2962ff;
-  color: #ffffff;
+.glow-effect {
+  position: relative;
+  isolation: isolate;
 }
 
-/* Animation for collapsible sections */
-.collapsible-content {
-  @apply transition-all duration-200 ease-in-out overflow-hidden;
-}
-
-/* Summary quote styling */
-.summary-quote {
-  @apply text-base text-neutral-600;
-  @apply max-w-2xl leading-relaxed;
-}
-
-.dark .summary-quote {
-  color: #9598a1;
-}
-
-.summary-quote::before {
-  content: '"';
-}
-
-.summary-quote::after {
-  content: '"';
-}
-
-/* ===== Dark Mode Global Overrides ===== */
-
-/* Cards and surfaces */
-.dark .bg-white {
-  background: var(--surface-secondary) !important;
-}
-
-.dark .bg-gray-50,
-.dark .bg-neutral-50 {
-  background: var(--surface-primary) !important;
-}
-
-.dark .bg-gray-100,
-.dark .bg-neutral-100 {
-  background: var(--surface-tertiary) !important;
-}
-
-/* Borders */
-.dark .border-gray-100,
-.dark .border-gray-200,
-.dark .border-neutral-100,
-.dark .border-neutral-200 {
-  border-color: var(--border-primary) !important;
-}
-
-.dark .border-gray-700,
-.dark .border-gray-800,
-.dark .border-neutral-700,
-.dark .border-neutral-800 {
-  border-color: var(--border-primary) !important;
-}
-
-/* Text colors - TradingView style */
-.dark .text-gray-900,
-.dark .text-neutral-900 {
-  color: #d1d4dc !important;
-}
-
-.dark .text-gray-800,
-.dark .text-neutral-800 {
-  color: #c3c5cb !important;
-}
-
-.dark .text-gray-700,
-.dark .text-neutral-700 {
-  color: #b2b5be !important;
-}
-
-.dark .text-gray-600,
-.dark .text-neutral-600 {
-  color: #9598a1 !important;
-}
-
-.dark .text-gray-500,
-.dark .text-neutral-500 {
-  color: #787b86 !important;
-}
-
-.dark .text-gray-400,
-.dark .text-neutral-400 {
-  color: #5d606b !important;
-}
-
-/* Chart and graph specific */
-.dark .recharts-cartesian-grid line {
-  stroke: #333333 !important;
-}
-
-.dark .recharts-text {
-  fill: #787b86 !important;
-}
-
-/* Sidebar and surface overrides - pure neutral grays */
-.dark .bg-gray-800 {
-  background: #1a1a1a !important;
-}
-
-.dark .bg-gray-900 {
-  background: #121212 !important;
-}
-
-.dark .bg-gray-700 {
-  background: #242424 !important;
-}
-
-.dark .hover\:bg-gray-700:hover {
-  background: #2d2d2d !important;
-}
-
-.dark .bg-blue-900\/50 {
-  background: rgba(45, 45, 45, 0.8) !important;
-}
-
-.dark .dark\:bg-blue-900\/50 {
-  background: rgba(45, 45, 45, 0.8) !important;
-}
-
-.dark .border-gray-700 {
-  border-color: #333333 !important;
-}
-
-/* Neutral colors override */
-.dark .bg-neutral-800 {
-  background: #262626 !important;
-}
-
-.dark .dark\:bg-neutral-800 {
-  background: #262626 !important;
-}
-
-.dark .hover\:bg-neutral-800:hover,
-.dark .dark\:hover\:bg-neutral-800:hover {
-  background: #2d2d2d !important;
-}
-
-/* Hover states */
-.dark .hover\:bg-gray-100:hover,
-.dark .hover\:bg-neutral-100:hover {
-  background: var(--surface-tertiary) !important;
-}
-
-.dark .hover\:bg-gray-700:hover,
-.dark .hover\:bg-neutral-800:hover {
-  background: var(--surface-elevated) !important;
-}
-
-/* Focus rings */
-.dark .focus\:ring-gray-500:focus {
-  --tw-ring-color: #3f3f46 !important;
-}
-
-/* Trading colors - TradingView style (teal green & coral red) */
-.dark .text-green-500,
-.dark .text-green-600,
-.dark .text-green-400 {
-  color: #26a69a !important;
-}
-
-.dark .text-red-500,
-.dark .text-red-600,
-.dark .text-red-400 {
-  color: #ef5350 !important;
-}
-
-.dark .bg-green-500 {
-  background-color: #26a69a !important;
-}
-
-.dark .bg-green-400 {
-  background-color: #4db6ac !important;
-}
-
-.dark .bg-green-300 {
-  background-color: #80cbc4 !important;
-}
-
-.dark .bg-green-200 {
-  background-color: #b2dfdb !important;
-}
-
-.dark .bg-red-500 {
-  background-color: #ef5350 !important;
-}
-
-.dark .bg-red-400 {
-  background-color: #e57373 !important;
-}
-
-.dark .bg-red-300 {
-  background-color: #ef9a9a !important;
-}
-
-.dark .bg-red-200 {
-  background-color: #ffcdd2 !important;
-}
-
-/* Subtle backgrounds for badges - TradingView style */
-.dark .bg-green-100 {
-  background: rgba(38, 166, 154, 0.15) !important;
-}
-
-.dark .bg-red-100 {
-  background: rgba(239, 83, 80, 0.15) !important;
-}
-
-.dark .bg-amber-100,
-.dark .bg-yellow-100 {
-  background: rgba(255, 193, 7, 0.15) !important;
-}
-
-.dark .bg-blue-100 {
-  background: rgba(41, 98, 255, 0.15) !important;
-}
-
-/* Dividers */
-.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
-.dark .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) {
-  border-color: var(--border-primary) !important;
-}
-
-/* ===== Responsive Chart Styles ===== */
-
-/* Ensure chart containers have minimum dimensions to prevent ResponsiveContainer warnings */
-.h-64 .recharts-responsive-container,
-.h-72 .recharts-responsive-container {
-  min-width: 100px;
-  min-height: 100px;
-}
-
-/* Prevent chart label overflow */
-.recharts-wrapper {
-  overflow: visible;
-}
-
-/* Ensure label list text doesn't cause layout issues */
-.recharts-label-list text {
+/* Softened outer glow */
+.glow-effect::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  /* Reducer radius and opacity to avoid "vignette" look */
+  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04), transparent 60%);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
   pointer-events: none;
 }
 
-/* Chart container with proper overflow handling */
-.chart-responsive-container {
-  position: relative;
-  overflow: hidden;
+.glow-effect:hover::after {
+  opacity: 1;
 }
 
-/* Hide labels on very small containers via CSS fallback */
-@container (max-width: 350px) {
-  .recharts-label-list {
+/* ==================== Sidebar Premium Styles ==================== */
+
+.sidebar-glass {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  border-right: 1px solid var(--border-primary);
+}
+
+.dark .sidebar-glass {
+  background: rgba(15, 23, 42, 0.85);
+  /* Darker glass for sidebar */
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-item-active {
+  @apply relative overflow-hidden;
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+  border-left: 3px solid #3b82f6;
+  color: #2563eb;
+}
+
+.dark .nav-item-active {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, transparent 100%);
+  color: #60a5fa;
+  border-left-color: #60a5fa;
+}
+
+/* ==================== Animations ==================== */
+
+.animate-enter {
+  animation: enter 0.4s ease-out forwards;
+}
+
+@keyframes enter {
+  from {
     opacity: 0;
+    transform: translateY(10px);
   }
-}
 
-/* Smooth transition for responsive chart updates */
-.recharts-surface {
-  transition: none;
-}
-
-/* Ensure Y-axis labels don't get clipped */
-.recharts-yAxis .recharts-cartesian-axis-tick-value {
-  text-anchor: end;
-}
-
-/* ============================================
-   Phase 4: Enhanced Animations & Interactions
-   ============================================ */
-
-/* Shimmer animation for loading skeletons */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite;
-}
-
-/* Fade in animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-/* Staggered fade in for lists */
-.stagger-fade-in > * {
-  opacity: 0;
-  animation: fadeIn 0.3s ease-out forwards;
-}
-
-.stagger-fade-in > *:nth-child(1) { animation-delay: 0ms; }
-.stagger-fade-in > *:nth-child(2) { animation-delay: 50ms; }
-.stagger-fade-in > *:nth-child(3) { animation-delay: 100ms; }
-.stagger-fade-in > *:nth-child(4) { animation-delay: 150ms; }
-.stagger-fade-in > *:nth-child(5) { animation-delay: 200ms; }
-.stagger-fade-in > *:nth-child(6) { animation-delay: 250ms; }
-
-/* Scale pulse animation for emphasis */
-@keyframes scalePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-.animate-scale-pulse {
-  animation: scalePulse 2s ease-in-out infinite;
-}
-
-/* Smooth hover lift effect for cards */
-.hover-lift {
-  @apply transition-all duration-200 ease-out;
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.dark .hover-lift:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Interactive table row */
-.interactive-row {
-  @apply transition-colors duration-150 cursor-pointer;
-}
-
-.interactive-row:hover {
-  @apply bg-neutral-50;
-}
-
-.dark .interactive-row:hover {
-  background: var(--surface-tertiary);
-}
-
-/* Button press effect */
-.btn-press {
-  @apply transition-transform duration-100;
-}
-
-.btn-press:active {
-  transform: scale(0.98);
-}
-
-/* Chart tooltip animation */
-.recharts-tooltip-wrapper {
-  transition: left 0.1s ease-out, top 0.1s ease-out;
-}
-
-/* Enhanced focus states */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
-}
-
-.dark .focus-ring {
-  @apply focus:ring-offset-neutral-900;
-}
-
-/* Glow effect for important elements */
-.glow-profit {
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
-}
-
-.dark .glow-profit {
-  box-shadow: 0 0 20px rgba(38, 166, 154, 0.3);
-}
-
-.glow-loss {
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
-}
-
-.dark .glow-loss {
-  box-shadow: 0 0 20px rgba(239, 83, 80, 0.3);
-}
-
-/* Number counting animation */
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-count {
-  animation: countUp 0.5s ease-out;
-}
-
-/* Chart line drawing animation */
-@keyframes drawLine {
-  to { stroke-dashoffset: 0; }
-}
-
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Badge hover animation */
-.badge-animated {
-  @apply transition-all duration-200;
-}
-
-.badge-animated:hover {
-  transform: scale(1.05);
-}
-
-/* Dropdown menu animation */
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-slide-down {
-  animation: slideDown 0.15s ease-out;
-}
-
-/* Card border glow on hover */
-.card-glow {
-  @apply transition-all duration-300;
-  position: relative;
-}
-
-.card-glow::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, transparent, transparent);
-  z-index: -1;
-  transition: background 0.3s ease;
-}
-
-.card-glow:hover::before {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
-}
-
-/* ============================================
-   Processing Log Panel - Enhanced Animations
-   ============================================ */
-
-/* Log entry slide-in animation - more dramatic */
-@keyframes slideInFromTop {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-  60% {
+  to {
     opacity: 1;
-    transform: translateY(3px) scale(1.01);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
-.animate-slide-in-from-top {
-  animation: slideInFromTop 0.35s ease-out;
+/* ==================== Chart Specifics ==================== */
+.dark .recharts-cartesian-grid line {
+  stroke: #334155;
 }
 
-/* Log entry highlight flash */
-@keyframes highlightFlash {
-  0% { background-color: transparent; }
-  30% { background-color: rgba(59, 130, 246, 0.15); }
-  100% { background-color: transparent; }
+.dark .recharts-text {
+  fill: #94a3b8;
 }
 
-.log-entry-new {
-  animation: slideInFromTop 0.35s ease-out, highlightFlash 1.5s ease-out;
+.dark .recharts-tooltip-cursor {
+  fill: rgba(255, 255, 255, 0.05);
 }
 
-/* Pulsing loader for processing state */
-@keyframes processingPulse {
-  0%, 100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-}
-
-.animate-processing-pulse {
-  animation: processingPulse 1.5s ease-in-out infinite;
-}
-
-/* Scanning line effect for log container */
-@keyframes scanLine {
-  0% {
-    top: 0;
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.5;
-  }
-  90% {
-    opacity: 0.5;
-  }
-  100% {
-    top: 100%;
-    opacity: 0;
-  }
-}
 
 .log-container-scanning::before {
   content: '';
@@ -815,8 +245,16 @@ html {
 
 /* Typing cursor effect */
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .typing-cursor::after {
@@ -828,9 +266,12 @@ html {
 
 /* Progress bar glow */
 @keyframes progressGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
   }
+
   50% {
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
   }
@@ -842,8 +283,15 @@ html {
 
 /* Step indicator bounce */
 @keyframes stepBounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
 }
 
 .step-indicator-active {
@@ -852,10 +300,14 @@ html {
 
 /* Dot loading animation */
 @keyframes dotPulse {
-  0%, 80%, 100% {
+
+  0%,
+  80%,
+  100% {
     transform: scale(0.6);
     opacity: 0.5;
   }
+
   40% {
     transform: scale(1);
     opacity: 1;
@@ -875,9 +327,17 @@ html {
   animation: dotPulse 1.4s ease-in-out infinite;
 }
 
-.loading-dots span:nth-child(1) { animation-delay: 0s; }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+.loading-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 /* Matrix-style rain effect (optional, for fun) */
 @keyframes matrixRain {
@@ -885,6 +345,7 @@ html {
     transform: translateY(-100%);
     opacity: 1;
   }
+
   100% {
     transform: translateY(100vh);
     opacity: 0;
@@ -896,6 +357,7 @@ html {
   0% {
     stroke-dashoffset: 50;
   }
+
   100% {
     stroke-dashoffset: 0;
   }
@@ -912,14 +374,17 @@ html {
     transform: translateY(0);
     opacity: 1;
   }
+
   50% {
     transform: translateY(-8px);
     opacity: 0;
   }
+
   51% {
     transform: translateY(8px);
     opacity: 0;
   }
+
   100% {
     transform: translateY(0);
     opacity: 1;
@@ -932,18 +397,39 @@ html {
 
 /* Log level color pulses */
 @keyframes successPulse {
-  0%, 100% { color: #22c55e; }
-  50% { color: #4ade80; }
+
+  0%,
+  100% {
+    color: #22c55e;
+  }
+
+  50% {
+    color: #4ade80;
+  }
 }
 
 @keyframes errorPulse {
-  0%, 100% { color: #ef4444; }
-  50% { color: #f87171; }
+
+  0%,
+  100% {
+    color: #ef4444;
+  }
+
+  50% {
+    color: #f87171;
+  }
 }
 
 @keyframes warningPulse {
-  0%, 100% { color: #f59e0b; }
-  50% { color: #fbbf24; }
+
+  0%,
+  100% {
+    color: #f59e0b;
+  }
+
+  50% {
+    color: #fbbf24;
+  }
 }
 
 .log-success-icon {
@@ -989,9 +475,12 @@ html {
 
 /* Processing status bar animation */
 @keyframes statusBarPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }

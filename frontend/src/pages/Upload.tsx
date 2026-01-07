@@ -130,15 +130,17 @@ export function Upload() {
 
       {/* Data Reset Section */}
       {(systemStats?.database?.positions?.count ?? 0) > 0 && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+        <div className="glass-card bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-800/30 p-5 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600" />
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-500" />
+              </div>
               <div>
-                <p className="font-medium text-amber-800 dark:text-amber-200">
+                <p className="font-semibold text-amber-900 dark:text-amber-100">
                   {t('upload.existingData', 'You have existing data')}
                 </p>
-                <p className="text-sm text-amber-600 dark:text-amber-300">
+                <p className="text-sm text-amber-700 dark:text-amber-300/80 mt-0.5">
                   {t('upload.existingDataDesc', '{{positions}} positions, {{trades}} trades', {
                     positions: systemStats?.database?.positions?.count || 0,
                     trades: systemStats?.database?.trades?.count || 0,
@@ -148,7 +150,7 @@ export function Upload() {
             </div>
             <button
               onClick={() => setShowResetModal(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center space-x-2 text-sm font-medium"
+              className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg border border-red-200/50 dark:border-red-800/50 transition-all duration-200 flex items-center space-x-2 text-sm font-medium backdrop-blur-sm"
             >
               <Trash2 className="w-4 h-4" />
               <span>{t('upload.resetData', 'Reset All Data')}</span>
@@ -247,7 +249,8 @@ export function Upload() {
       )}
 
       {/* Upload Area */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <div className="glass-card p-8 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none transition-opacity duration-500 opacity-0 group-hover:opacity-100" />
         {/* Hidden file input - outside the clickable area */}
         <input
           ref={fileInputRef}
@@ -258,11 +261,10 @@ export function Upload() {
         />
 
         <div
-          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer ${
-            dragActive
-              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-              : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/30'
-          }`}
+          className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-300 cursor-pointer ${dragActive
+              ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10 scale-[1.02] shadow-lg shadow-blue-500/10'
+              : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-gray-50/50 dark:hover:bg-gray-700/30'
+            }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
@@ -270,12 +272,10 @@ export function Upload() {
           onClick={handleClick}
         >
           <div className="flex flex-col items-center space-y-4">
-            <div className={`p-4 rounded-full ${
-              dragActive ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-gray-100 dark:bg-gray-700'
-            }`}>
-              <UploadIcon className={`w-8 h-8 ${
-                dragActive ? 'text-blue-600' : 'text-gray-500'
-              }`} />
+            <div className={`p-5 rounded-full transition-transform duration-300 ${dragActive ? 'bg-blue-100 dark:bg-blue-900/40 scale-110' : 'bg-gray-100 dark:bg-gray-800 group-hover:scale-110'
+              }`}>
+              <UploadIcon className={`w-10 h-10 transition-colors duration-300 ${dragActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400'
+                }`} />
             </div>
 
             <div>
@@ -297,7 +297,7 @@ export function Upload() {
         {selectedFile && (
           <div className="mt-6 space-y-4">
             {/* File Info */}
-            <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex items-center justify-between">
+            <div className="p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl flex items-center justify-between border border-gray-100 dark:border-gray-700/50 backdrop-blur-sm">
               <div className="flex items-center space-x-3">
                 <FileSpreadsheet className="w-8 h-8 text-green-600" />
                 <div>
@@ -328,11 +328,10 @@ export function Upload() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('upload.emailPlaceholder', 'your@email.com')}
-                className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isValidEmail(email)
+                className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${!isValidEmail(email)
                     ? 'border-red-300 dark:border-red-600'
                     : 'border-gray-300 dark:border-gray-600'
-                }`}
+                  }`}
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 {t('upload.emailHint', 'We will notify you when analysis is complete')}
@@ -357,7 +356,7 @@ export function Upload() {
             <button
               onClick={handleUpload}
               disabled={createTaskMutation.isPending || !isValidEmail(email)}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 font-medium"
+              className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center space-x-2 font-semibold text-lg transition-all duration-200 active:scale-[0.98]"
             >
               {createTaskMutation.isPending ? (
                 <>
@@ -393,7 +392,7 @@ export function Upload() {
       </div>
 
       {/* Upload History */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <div className="glass-card p-6">
         <div className="flex items-center space-x-3 mb-4">
           <History className="w-5 h-5 text-gray-500" />
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -431,11 +430,10 @@ export function Upload() {
                       {item.file_name}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        item.file_type === 'english'
+                      <span className={`px-2 py-1 text-xs rounded-full ${item.file_type === 'english'
                           ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
                           : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                      }`}>
+                        }`}>
                         {item.file_type === 'english' ? 'EN' : 'CN'}
                       </span>
                     </td>
@@ -446,11 +444,10 @@ export function Upload() {
                       {item.duplicates_skipped}
                     </td>
                     <td className="py-3">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        item.status === 'success'
+                      <span className={`px-2 py-1 text-xs rounded-full ${item.status === 'success'
                           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
                           : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
-                      }`}>
+                        }`}>
                         {item.status}
                       </span>
                     </td>
@@ -468,7 +465,7 @@ export function Upload() {
       </div>
 
       {/* Help Section */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800">
+      <div className="glass-card border-blue-200/50 dark:border-blue-800/30 bg-blue-50/30 dark:bg-blue-900/10 p-6">
         <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
           {t('upload.howTo', 'How to export from Futu')}
         </h3>

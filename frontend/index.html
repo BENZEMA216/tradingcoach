@@ -7,6 +7,19 @@
     <title>TradingCoach</title>
   </head>
   <body>
+    <script>
+      // Initialize theme before React loads to prevent flash
+      (function() {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else {
+          // Default to dark mode (Industrial Theme)
+          document.documentElement.classList.add('dark');
+          if (!theme) localStorage.setItem('theme', 'dark');
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

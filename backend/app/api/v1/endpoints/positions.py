@@ -147,20 +147,62 @@ async def list_positions(
 
 @router.get("/summary", response_model=PositionSummary)
 async def get_position_summary(
+    # Filters matching list_positions
     date_start: Optional[date] = Query(None, description="Start date"),
     date_end: Optional[date] = Query(None, description="End date"),
+    symbol: Optional[str] = Query(None, description="Filter by symbol"),
+    direction: Optional[str] = Query(None, description="Filter by direction: long/short"),
+    status: Optional[str] = Query(None, description="Filter by status: open/closed"),
+    pnl_min: Optional[float] = Query(None, description="Minimum P&L"),
+    pnl_max: Optional[float] = Query(None, description="Maximum P&L"),
+    is_winner: Optional[bool] = Query(None, description="Filter winners/losers"),
+    score_min: Optional[float] = Query(None, description="Minimum score"),
+    score_max: Optional[float] = Query(None, description="Maximum score"),
+    score_grade: Optional[str] = Query(None, description="Filter by grade: A/B/C/D/F"),
+    strategy_type: Optional[str] = Query(None, description="Filter by strategy type"),
+    is_reviewed: Optional[bool] = Query(None, description="Filter by review status"),
     db: Session = Depends(get_db),
 ) -> PositionSummary:
     """
-    Get position summary statistics.
+    Get position summary statistics with filtering.
     """
     # Query all positions
     query = db.query(Position)
 
+    # Apply same filters as list_positions
+    if symbol:
+        query = query.filter(Position.symbol.ilike(f"%{symbol}%"))
+    if direction:
+        query = query.filter(Position.direction == direction)
+    if status:
+        status_enum = PositionStatus(status)
+        query = query.filter(Position.status == status_enum)
     if date_start:
         query = query.filter(Position.close_date >= date_start)
     if date_end:
         query = query.filter(Position.close_date <= date_end)
+    if pnl_min is not None:
+        query = query.filter(Position.net_pnl >= pnl_min)
+    if pnl_max is not None:
+        query = query.filter(Position.net_pnl <= pnl_max)
+    if is_winner is not None:
+        if is_winner:
+            query = query.filter(Position.net_pnl > 0)
+        else:
+            query = query.filter(Position.net_pnl <= 0)
+    if score_min is not None:
+        query = query.filter(Position.overall_score >= score_min)
+    if score_max is not None:
+        query = query.filter(Position.overall_score <= score_max)
+    if score_grade:
+        query = query.filter(Position.score_grade == score_grade.upper())
+    if strategy_type:
+        query = query.filter(Position.strategy_type == strategy_type)
+    if is_reviewed is not None:
+        if is_reviewed:
+            query = query.filter(Position.reviewed_at.isnot(None))
+        else:
+            query = query.filter(Position.reviewed_at.is_(None))
 
     positions = query.all()
 
