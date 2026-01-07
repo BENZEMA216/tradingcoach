@@ -28,5 +28,5 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PORT=8000
 
-# 启动命令
-CMD uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT}
+# 启动命令 - 使用 sh -c 确保环境变量被正确解析
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"]
