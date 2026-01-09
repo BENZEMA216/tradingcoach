@@ -1,289 +1,386 @@
-# Trading Coach - 交易复盘系统
+# Trading Coach
 
-AI驱动的个人交易复盘工具，帮助分析交易质量、识别模式、提升交易表现。
+<div align="center">
 
-## 功能特性
+![Trading Coach Logo](https://img.shields.io/badge/Trading-Coach-blue?style=for-the-badge&logo=chart.js)
 
-- ✅ **交易数据导入**: 支持多券商CSV导入（富途/老虎/中信/华泰），自动检测格式
-- ✅ **交易配对**: FIFO算法，支持部分成交、做空、期权
-- ✅ **期权策略识别**: 自动识别 Covered Call/Collar/Iron Condor 等18种策略
-- ✅ **技术指标分析**: RSI, MACD, 布林带, ATR, MA等 50+ 指标
-- ✅ **质量评分系统**: 四维度评分（入场、出场、趋势、风险管理）
-- ✅ **市场环境分析**: 大盘背景、波动率、行业强弱
-- ✅ **前后端分离架构**: FastAPI + React 现代化架构
-- ✅ **多语言支持**: 中文/英文界面切换
-- ✅ **暗色模式**: 支持亮色/暗色主题，图表使用 TradingView 配色
-- ✅ **丰富图表**: 权益曲线、热力图、策略分析、风险象限等
-- 🔜 **AI增强分析**: 模式识别、建议生成（开发中）
+**AI-Powered Trading Analytics & Performance Review Platform**
 
-## 系统架构
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
+[![React](https://img.shields.io/badge/React-18-61DAFB.svg)](https://reactjs.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)](https://fastapi.tiangolo.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6.svg)](https://typescriptlang.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Frontend                              │
-│              React 18 + Vite 5 + TypeScript                 │
-│          Tailwind CSS + Recharts + Lightweight Charts       │
-│                    http://localhost:5173                     │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              │ REST API
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                         Backend                              │
-│              FastAPI + Pydantic v2 + SQLAlchemy             │
-│                    http://localhost:8000                     │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        Database                              │
-│                   SQLite (tradingcoach.db)                  │
-└─────────────────────────────────────────────────────────────┘
-```
+[English](#features) | [中文](#功能特性)
 
-## 快速开始
-
-### 1. 环境准备
-
-```bash
-# 克隆仓库
-git clone https://github.com/BENZEMA216/tradingcoach.git
-cd tradingcoach
-
-# 创建虚拟环境（推荐）
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 安装Python依赖
-pip install -r requirements.txt
-```
-
-### 2. 配置设置
-
-```bash
-# 复制配置模板
-cp config_template.py config.py
-
-# 编辑config.py，填入API Keys（可选，用于市场数据获取）
-```
-
-### 3. 初始化数据库
-
-```bash
-python scripts/init_db.py
-```
-
-### 4. 导入交易数据
-
-```bash
-python scripts/import_trades.py --file original_data/历史-保证金综合账户*.csv
-```
-
-## 启动服务
-
-### 前后端分离模式（推荐）
-
-```bash
-# 终端1 - 启动后端
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-
-# 终端2 - 启动前端
-cd frontend
-npm install
-npm run dev
-```
-
-访问地址：
-- **前端**: http://localhost:5173
-- **后端 API**: http://localhost:8000
-- **API 文档**: http://localhost:8000/docs
-
-## 项目结构
-
-```
-tradingcoach/
-├── backend/                    # FastAPI 后端
-│   ├── app/
-│   │   ├── api/v1/endpoints/  # API 端点
-│   │   ├── schemas/           # Pydantic 模型
-│   │   ├── services/          # 业务逻辑
-│   │   ├── main.py            # 应用入口
-│   │   └── database.py        # 数据库连接
-│   └── requirements.txt       # Python 依赖
-│
-├── frontend/                   # React 前端
-│   ├── src/
-│   │   ├── api/               # API 客户端
-│   │   ├── components/
-│   │   │   ├── charts/        # 图表组件 (12+)
-│   │   │   ├── common/        # 通用组件
-│   │   │   ├── dashboard/     # Dashboard 组件
-│   │   │   ├── insights/      # AI 洞察组件
-│   │   │   ├── layout/        # 布局组件
-│   │   │   └── report/        # 报告组件
-│   │   ├── hooks/             # 自定义 Hooks
-│   │   ├── i18n/              # 国际化 (zh/en)
-│   │   ├── pages/             # 页面组件
-│   │   ├── types/             # TypeScript 类型
-│   │   └── utils/             # 工具函数
-│   ├── package.json           # npm 依赖
-│   └── vite.config.ts         # Vite 配置
-│
-├── src/                        # 核心业务逻辑
-│   ├── models/                # SQLAlchemy 模型
-│   ├── data_sources/          # 数据获取和缓存
-│   ├── indicators/            # 技术指标计算
-│   ├── importers/             # CSV 导入
-│   ├── matchers/              # FIFO 配对
-│   ├── analyzers/             # 质量评分
-│   └── utils/                 # 工具函数
-│
-├── scripts/                    # 脚本工具
-├── tests/                      # 单元测试
-├── project_docs/               # 项目文档
-└── data/                       # 数据库文件
-```
-
-## 页面功能
-
-| 页面 | 功能 |
-|------|------|
-| **Dashboard** | KPI 概览、权益曲线、最近交易、策略分布 |
-| **Positions** | 持仓列表、筛选排序、详情查看 |
-| **Statistics** | 综合统计报告、多维度图表分析 |
-| **AI Coach** | AI 交易教练（开发中） |
-| **System** | 系统设置、数据统计 |
-
-## 图表组件
-
-| 图表 | 描述 |
-|------|------|
-| EquityCurveChart | 权益曲线 + 回撤 |
-| TradingHeatmap | 交易时间热力图 |
-| MonthlyPerformanceChart | 月度收益对比 |
-| HourlyPerformanceChart | 小时绩效分布 |
-| StrategyPieChart | 策略占比饼图 |
-| StrategyPerformanceChart | 策略绩效对比 |
-| SymbolRiskQuadrant | 标的风险象限 |
-| RollingWinRateChart | 滚动胜率曲线 |
-| PnLDistributionChart | 盈亏分布直方图 |
-| DurationPnLChart | 持仓时长 vs 收益 |
-| PriceChart | K线图 + 技术指标 |
-
-## API 端点
-
-### Dashboard
-- `GET /api/v1/dashboard/kpis` - KPI 指标
-- `GET /api/v1/dashboard/equity-curve` - 权益曲线
-- `GET /api/v1/dashboard/recent-trades` - 最近交易
-- `GET /api/v1/dashboard/strategy-breakdown` - 策略分布
-
-### Positions
-- `GET /api/v1/positions` - 持仓列表（分页）
-- `GET /api/v1/positions/{id}` - 持仓详情
-- `GET /api/v1/positions/{id}/market-data` - 持仓市场数据
-
-### Statistics
-- `GET /api/v1/statistics/overview` - 绩效概览
-- `GET /api/v1/statistics/by-symbol` - 按标的统计
-- `GET /api/v1/statistics/by-strategy` - 按策略统计
-- `GET /api/v1/statistics/by-direction` - 按方向统计
-- `GET /api/v1/statistics/monthly-performance` - 月度绩效
-- `GET /api/v1/statistics/hourly-performance` - 小时绩效
-- `GET /api/v1/statistics/trading-heatmap` - 交易热力图
-- `GET /api/v1/statistics/rolling-metrics` - 滚动指标
-- `GET /api/v1/statistics/symbol-risk` - 标的风险
-
-### System
-- `GET /api/v1/system/health` - 健康检查
-- `GET /api/v1/system/stats` - 系统统计
-
-完整 API 文档：http://localhost:8000/docs
-
-## 支持的券商
-
-| 券商 | 配置文件 | 市场 | 说明 |
-|------|---------|------|------|
-| 富途证券 (中文) | `futu_cn.yaml` | 美股/港股/A股 | 中文版历史成交 CSV |
-| 富途证券 (英文) | `futu_en.yaml` | 美股/港股/A股 | 英文版历史成交 CSV |
-| 老虎证券 | `tiger_cn.yaml` | 美股/港股/A股 | 中文版历史成交 CSV |
-| 中信证券 | `citic_cn.yaml` | A股 | 对账单/成交明细 CSV |
-| 华泰证券 | `huatai_cn.yaml` | A股 | 对账单/成交明细 CSV |
-
-导入时自动检测券商格式，无需手动指定。
-
-## 技术栈
-
-| 类别 | 技术 |
-|------|------|
-| **后端** | |
-| 语言 | Python 3.10+ |
-| Web框架 | FastAPI |
-| 数据验证 | Pydantic v2 |
-| ORM | SQLAlchemy 2.0+ |
-| 数据库 | SQLite |
-| **前端** | |
-| 框架 | React 18 |
-| 构建工具 | Vite 5 |
-| 语言 | TypeScript |
-| 样式 | Tailwind CSS |
-| 状态管理 | React Query (TanStack) |
-| 图表 | Recharts, Lightweight Charts |
-| 国际化 | react-i18next |
-| HTTP客户端 | Axios |
-| **数据处理** | |
-| 数据处理 | pandas, numpy |
-| 技术指标 | 纯 pandas 实现 (50+ 指标) |
-| 市场数据 | yfinance |
-
-## 开发进度
-
-### ✅ 已完成
-
-**Phase 1-7: 核心功能**
-- 数据库架构（5个表，30+索引）
-- CSV导入系统（88个测试）
-- FIFO配对算法
-- 市场数据获取和三级缓存
-- 技术指标计算（50+ 指标）
-- 质量评分系统
-
-**Phase 8: 前后端分离架构**
-- FastAPI REST API（40+ 端点）
-- Pydantic v2 数据验证
-- React + TypeScript 前端
-- Tailwind CSS 设计系统
-- 暗色模式支持
-- 中英文国际化
-- 丰富的图表组件
-
-### 🚧 进行中
-
-- AI Coach 功能
-- 期权分析增强
-- 移动端适配
-
-## 项目文档
-
-详细文档位于 `project_docs/` 目录:
-
-1. **PRD.md** - 产品需求文档
-2. **DEVELOPER_GUIDE.md** - 开发者指南
-3. **technical_indicators_research.md** - 技术指标研究
-4. **data_extensibility_design.md** - 数据扩展性设计
-5. **api_keys_guide.md** - API申请指南
-
-## 许可证
-
-MIT License
-
-## 联系方式
-
-- GitHub: [@BENZEMA216](https://github.com/BENZEMA216)
-- 项目链接: https://github.com/BENZEMA216/tradingcoach
+</div>
 
 ---
 
-**版本**: v0.5.0 | **最后更新**: 2025-12-18 | **前端 QA 完善** ✅
+## Overview
+
+Trading Coach is a comprehensive trading analytics platform that helps traders analyze their performance, identify patterns, and improve their trading decisions. It combines institutional-grade metrics with behavioral analysis to provide actionable insights.
+
+### Key Highlights
+
+- **Multi-Broker Support**: Import trades from Futu, Tiger, CITIC, Huatai and more
+- **Smart Position Matching**: FIFO algorithm handles partial fills, shorts, and options
+- **Quality Scoring System**: 8-dimension scoring (Entry, Exit, Trend, Risk Management, Behavior, etc.)
+- **AI Trading Coach**: Rule-based insights with pattern detection across 10 dimensions
+- **Rich Visualizations**: 15+ chart types including equity curves, heatmaps, and risk quadrants
+- **Bilingual Support**: Full Chinese/English interface with real-time switching
+
+---
+
+## Features
+
+### Data Import & Processing
+- **CSV Auto-Detection**: Automatically identifies broker format (Futu CN/EN, Tiger, CITIC, Huatai)
+- **Incremental Import**: Deduplication and merge with existing data
+- **Options Support**: Parse complex option symbols (e.g., `NVDA260618C205`)
+- **Real-time Progress**: Live processing logs with step-by-step feedback
+
+### Position Analysis
+- **FIFO Matching**: Accurate open/close pairing with partial fill support
+- **MAE/MFE Tracking**: Maximum Adverse/Favorable Excursion analysis
+- **Post-Exit Analysis**: Track what happened 5/10/20 days after exit
+- **Options Strategy Detection**: Recognize 18+ options strategies (Covered Call, Iron Condor, etc.)
+
+### Quality Scoring (V2 System)
+| Dimension | Weight | Description |
+|-----------|--------|-------------|
+| Entry | 20% | Entry timing vs technical indicators |
+| Exit | 20% | Profit capture efficiency |
+| Trend | 15% | Alignment with market trend |
+| Risk Management | 15% | Stop-loss execution, position sizing |
+| Behavior | 10% | Emotional control, discipline |
+| Market Environment | 10% | Context awareness |
+| Execution | 5% | Slippage, fill quality |
+| News Alignment | 5% | News context awareness |
+
+### AI Coach Insights
+Analyzes trading patterns across 10 dimensions:
+- **Time**: Weekday/hour performance patterns
+- **Holding Period**: Optimal holding duration
+- **Symbol**: Best/worst performers, concentration risk
+- **Direction**: Long vs short effectiveness
+- **Risk**: Win/loss ratio, consecutive losses
+- **Behavior**: Revenge trading, overconfidence detection
+- **Fees**: Fee erosion analysis
+- **Options**: Call vs Put preference
+- **Trends**: Performance improvement/deterioration
+
+### Visualizations
+| Chart | Description |
+|-------|-------------|
+| Equity Curve | Cumulative P&L with drawdown overlay |
+| Trading Heatmap | Performance by day-of-week and hour |
+| Monthly Performance | Bar chart comparison by month |
+| Symbol Risk Quadrant | Avg win vs avg loss scatter plot |
+| Rolling Win Rate | Moving window win rate trend |
+| P&L Distribution | Histogram of trade outcomes |
+| Duration vs P&L | Holding period correlation |
+| Strategy Performance | Breakdown by trading strategy |
+| Price Chart | K-line with technical indicators |
+
+---
+
+## 功能特性
+
+### 数据导入与处理
+- **CSV 自动检测**: 自动识别券商格式（富途中英文、老虎、中信、华泰）
+- **增量导入**: 去重合并现有数据
+- **期权支持**: 解析复杂期权代码（如 `NVDA260618C205`）
+- **实时进度**: 步骤式处理日志反馈
+
+### 持仓分析
+- **FIFO 配对**: 支持部分成交的精确开平仓配对
+- **MAE/MFE 追踪**: 最大不利/有利偏移分析
+- **出场后分析**: 追踪出场后 5/10/20 天的表现
+- **期权策略识别**: 识别 18+ 种期权策略
+
+### AI 教练洞察
+跨 10 个维度分析交易模式：
+- **时间**: 星期/小时表现模式
+- **持仓周期**: 最优持仓时长
+- **标的**: 最佳/最差表现、集中度风险
+- **方向**: 做多 vs 做空效果
+- **风险**: 盈亏比、连续亏损
+- **行为**: 报复性交易、过度自信检测
+- **费用**: 费用侵蚀分析
+- **期权**: Call vs Put 偏好
+- **趋势**: 表现提升/下滑
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Frontend                                 │
+│           React 18 + Vite 5 + TypeScript + Tailwind             │
+│              Recharts + Lightweight Charts + i18n               │
+│                    http://localhost:5173                         │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ REST API (40+ endpoints)
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                          Backend                                 │
+│           FastAPI + Pydantic v2 + SQLAlchemy 2.0                │
+│        Task Manager + Insight Engine + Batch Fetcher            │
+│                    http://localhost:8000                         │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              ▼               ▼               ▼
+┌──────────────────┐ ┌──────────────┐ ┌──────────────────┐
+│     SQLite       │ │   yfinance   │ │   3-Level Cache  │
+│ (tradingcoach.db)│ │ Market Data  │ │  Memory/File/DB  │
+└──────────────────┘ └──────────────┘ └──────────────────┘
+```
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/BENZEMA216/tradingcoach.git
+cd tradingcoach
+
+# Setup Python environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+# Setup Frontend
+cd frontend
+npm install
+cd ..
+
+# Copy config template
+cp config_template.py config.py
+```
+
+### Running the Application
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+uvicorn app.main:app --reload --port 8000
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+npm run dev
+```
+
+**Access:**
+- Frontend: http://localhost:5173
+- API Docs: http://localhost:8000/docs
+
+---
+
+## Project Structure
+
+```
+tradingcoach/
+├── backend/                    # FastAPI Backend
+│   ├── app/
+│   │   ├── api/v1/            # REST API Endpoints
+│   │   │   └── endpoints/     # Dashboard, Positions, Statistics, etc.
+│   │   ├── schemas/           # Pydantic Models
+│   │   ├── services/          # Business Logic
+│   │   │   ├── task_manager.py    # Async task processing
+│   │   │   └── insight_engine.py  # AI insights generation
+│   │   └── database.py        # DB Connection & Models
+│   └── requirements.txt
+│
+├── frontend/                   # React Frontend
+│   ├── src/
+│   │   ├── api/               # API Client (Axios)
+│   │   ├── components/
+│   │   │   ├── charts/        # 15+ Chart Components
+│   │   │   ├── common/        # Shared Components
+│   │   │   ├── insights/      # AI Coach Components
+│   │   │   ├── layout/        # App Layout
+│   │   │   └── loading/       # Loading Page Components
+│   │   ├── i18n/              # Internationalization (zh/en)
+│   │   ├── pages/             # Page Components
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Positions.tsx
+│   │   │   ├── Statistics.tsx
+│   │   │   ├── AICoach.tsx
+│   │   │   └── Events.tsx
+│   │   └── types/             # TypeScript Definitions
+│   └── vite.config.ts
+│
+├── src/                        # Core Business Logic
+│   ├── models/                # SQLAlchemy Models
+│   ├── data_sources/          # Market Data & Caching
+│   ├── indicators/            # 50+ Technical Indicators
+│   ├── importers/             # CSV Parsers
+│   ├── matchers/              # FIFO Position Matching
+│   └── analyzers/             # Quality Scoring
+│
+├── scripts/                    # Utility Scripts
+├── tests/                      # Test Suite
+├── data/                       # SQLite Database
+└── project_docs/              # Documentation
+```
+
+---
+
+## API Reference
+
+### Dashboard
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/v1/dashboard/kpis` | Key performance indicators |
+| `GET /api/v1/dashboard/equity-curve` | Equity curve data |
+| `GET /api/v1/dashboard/recent-trades` | Recent closed positions |
+
+### Positions
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/v1/positions` | Paginated position list |
+| `GET /api/v1/positions/{id}` | Position detail with scores |
+| `GET /api/v1/positions/{id}/market-data` | K-line data for position |
+
+### Statistics
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/v1/statistics/overview` | Performance overview |
+| `GET /api/v1/statistics/monthly-performance` | Monthly breakdown |
+| `GET /api/v1/statistics/trading-heatmap` | Day/hour heatmap |
+| `GET /api/v1/statistics/rolling-metrics` | Rolling win rate |
+
+### AI Coach
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/v1/ai-coach/proactive-insights` | Generated insights |
+| `POST /api/v1/ai-coach/chat` | Chat with AI coach |
+
+### Upload
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/v1/upload` | Upload CSV for processing |
+| `GET /api/v1/upload/task/{task_id}` | Task status polling |
+
+Full API documentation: http://localhost:8000/docs
+
+---
+
+## Technology Stack
+
+| Category | Technology |
+|----------|------------|
+| **Backend** | Python 3.10+, FastAPI, Pydantic v2, SQLAlchemy 2.0 |
+| **Frontend** | React 18, Vite 5, TypeScript 5, Tailwind CSS |
+| **State Management** | TanStack Query (React Query) |
+| **Charts** | Recharts, Lightweight Charts |
+| **Internationalization** | react-i18next |
+| **Database** | SQLite |
+| **Market Data** | yfinance with 3-level caching |
+| **Technical Indicators** | Custom pandas implementation (50+ indicators) |
+
+---
+
+## Supported Brokers
+
+| Broker | Format | Markets | Status |
+|--------|--------|---------|--------|
+| Futu Securities (CN) | CSV | US/HK/A-Share | ✅ |
+| Futu Securities (EN) | CSV | US/HK/A-Share | ✅ |
+| Tiger Brokers | CSV | US/HK/A-Share | ✅ |
+| CITIC Securities | CSV | A-Share | ✅ |
+| Huatai Securities | CSV | A-Share | ✅ |
+
+---
+
+## Development Progress
+
+### Completed
+- [x] Database schema (5 tables, 30+ indexes)
+- [x] CSV import system with auto-detection
+- [x] FIFO position matching algorithm
+- [x] Market data fetching with 3-level cache
+- [x] Technical indicators (50+ indicators)
+- [x] Quality scoring system (V2, 8 dimensions)
+- [x] FastAPI REST API (40+ endpoints)
+- [x] React frontend with TypeScript
+- [x] Dark mode support
+- [x] Bilingual UI (Chinese/English)
+- [x] AI Coach with rule-based insights
+- [x] Event analysis timeline
+- [x] Docker support
+- [x] Railway deployment config
+
+### In Progress
+- [ ] AI-powered chat with LLM integration
+- [ ] Advanced options analytics
+- [ ] Mobile responsive optimization
+- [ ] Real-time data streaming
+
+---
+
+## Deployment
+
+### Docker
+
+```bash
+docker build -t tradingcoach .
+docker run -p 8000:8000 tradingcoach
+```
+
+### Railway
+
+The project includes Railway configuration for one-click deployment:
+- `railway.json` - Build configuration
+- `Procfile` - Start command
+- Environment variables auto-configured
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Contact
+
+- GitHub: [@BENZEMA216](https://github.com/BENZEMA216)
+- Project: [https://github.com/BENZEMA216/tradingcoach](https://github.com/BENZEMA216/tradingcoach)
+
+---
+
+<div align="center">
+
+**Version**: v0.9.0 | **Last Updated**: 2025-01-10
+
+Made with dedication for traders who want to improve.
+
+</div>
