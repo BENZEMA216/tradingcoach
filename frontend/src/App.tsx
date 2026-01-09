@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { ToastContainer } from '@/components/common/Toast';
 import { LandingUpload } from '@/pages/LandingUpload';
+import { AnalysisLoading } from '@/pages/AnalysisLoading';
 import { Dashboard } from '@/pages/Dashboard';
 import { Positions } from '@/pages/Positions';
 import { PositionDetail } from '@/pages/PositionDetail';
@@ -18,6 +19,9 @@ function App() {
       <Routes>
         {/* Landing Page - No Layout */}
         <Route path="/" element={<LandingUpload />} />
+
+        {/* Analysis Loading Page - No Layout */}
+        <Route path="/analysis/:taskId" element={<AnalysisLoading />} />
 
         {/* Main App with Layout */}
         <Route element={<Layout />}>

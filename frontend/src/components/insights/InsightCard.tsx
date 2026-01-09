@@ -36,10 +36,51 @@ const TYPE_CONFIG: Record<InsightType, {
 };
 
 export function InsightCard({ insight, compact = false }: InsightCardProps) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const config = TYPE_CONFIG[insight.type];
   const isZh = i18n.language === 'zh';
+
+  // Extract base rule ID (e.g., "B01-AAPL" → "B01", "T01-Monday" → "T01")
+  const getBaseRuleId = (id: string): string => {
+    // Match pattern like "T01", "B01", "H04", "S01-AAPL", "T01-Monday", etc.
+    const match = id.match(/^([A-Z]\d+)/);
+    return match ? match[1] : id;
+  };
+
+  const baseRuleId = getBaseRuleId(insight.id);
+
+  // Get translated content with fallback to original
+  const getTranslatedTitle = (): string => {
+    const translationKey = `insightRules.${baseRuleId}.title`;
+    const translated = t(translationKey, {
+      defaultValue: '',
+      ...insight.data_points
+    });
+    return translated || insight.title;
+  };
+
+  const getTranslatedDescription = (): string => {
+    const translationKey = `insightRules.${baseRuleId}.description`;
+    const translated = t(translationKey, {
+      defaultValue: '',
+      ...insight.data_points
+    });
+    return translated || insight.description;
+  };
+
+  const getTranslatedSuggestion = (): string => {
+    const translationKey = `insightRules.${baseRuleId}.suggestion`;
+    const translated = t(translationKey, {
+      defaultValue: '',
+      ...insight.data_points
+    });
+    return translated || insight.suggestion;
+  };
+
+  const translatedTitle = getTranslatedTitle();
+  const translatedDescription = getTranslatedDescription();
+  const translatedSuggestion = getTranslatedSuggestion();
 
   const formatDataPoint = (key: string, value: unknown): string => {
     if (typeof value === 'number') {
@@ -80,7 +121,7 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
       >
         <span className={clsx('w-2 h-2 rounded-full flex-shrink-0', config.dotColor)} />
         <span className="text-sm text-neutral-900 dark:text-neutral-100 truncate flex-1">
-          {insight.title}
+          {translatedTitle}
         </span>
         {keyMetrics.length > 0 && (
           <span className="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:inline">
@@ -120,7 +161,7 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
               {isZh ? config.label.zh : config.label.en}
             </span>
             <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-              {insight.title}
+              {translatedTitle}
             </span>
             {/* Inline metrics */}
             {keyMetrics.length > 0 && !expanded && (
@@ -135,7 +176,7 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
             'text-sm text-neutral-500 dark:text-neutral-400 mt-1',
             !expanded && 'line-clamp-1'
           )}>
-            {insight.description}
+            {translatedDescription}
           </p>
 
           {/* Expanded content */}
@@ -145,7 +186,7 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
               <div className="flex items-start gap-2 p-2.5 bg-neutral-100 dark:bg-neutral-800 rounded-md">
                 <LightBulbIcon className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-neutral-600 dark:text-neutral-300">
-                  {insight.suggestion}
+                  {translatedSuggestion}
                 </p>
               </div>
 

@@ -362,7 +362,7 @@ export function Statistics() {
           {/* Right side: Privacy Toggle + Period Tabs */}
           <div className="flex items-center gap-4">
             <PrivacyModeToggle />
-            <div className="flex gap-px bg-white/10 p-0.5 rounded-sm">
+            <div className="flex gap-px bg-neutral-200 dark:bg-white/10 p-0.5 rounded-sm">
               {periodTabs.map((tab) => (
                 <button
                   key={tab.type}
@@ -370,8 +370,8 @@ export function Statistics() {
                   className={clsx(
                     'px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-wider transition-all rounded-sm',
                     periodType === tab.type
-                      ? 'bg-white text-black'
-                      : 'text-white/50 hover:text-white hover:bg-white/5'
+                      ? 'bg-white dark:bg-white text-black'
+                      : 'text-slate-500 dark:text-white/50 hover:text-slate-700 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5'
                   )}
                 >
                   {tab.label}
@@ -650,7 +650,7 @@ export function Statistics() {
           <ReportSection number="06" title="DETAILED DATA" subtitle={isZh ? '详细数据' : 'Detailed Data'}>
             {/* By Symbol - Collapsible */}
             <CollapsibleTable
-              title={isZh ? 'Top 10 标的' : 'Top 10 Symbols'}
+              title={t('common.top10Symbols')}
               subtitle={isZh ? '按盈亏排序' : 'Sorted by P&L'}
               defaultCollapsed={false}
             >

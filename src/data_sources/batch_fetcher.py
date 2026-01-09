@@ -1,9 +1,16 @@
 """
 BatchFetcher - 批量数据获取器
 
-分析数据库中的交易记录，批量获取所需的市场数据
+input: 数据库会话, 数据源客户端, 缓存管理器
+output: 批量获取市场数据, 支持进度回调
+pos: 数据获取层 - 批量获取股票K线数据
 
-性能优化：支持并发获取（可配置 max_workers）
+功能:
+- 分析数据库中的交易记录，批量获取所需的市场数据
+- 支持并发获取（可配置 max_workers）
+- 支持进度回调函数，实时通知每个 symbol 的获取状态
+
+一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 
 import time
@@ -14,13 +21,13 @@ from typing import List, Dict, Set, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from tqdm import tqdm
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError as FuturesTimeoutError
 import threading
 
 from src.models.trade import Trade
 from src.data_sources.base_client import BaseDataClient, DataNotFoundError, InvalidSymbolError
 from src.data_sources.cache_manager import CacheManager
-from typing import Optional, Union
+from typing import Optional, Union, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -90,12 +97,21 @@ class BatchFetcher:
             f"max_workers={max_workers}"
         )
 
-    def fetch_required_data(self, session: Session) -> Dict[str, any]:
+    def fetch_required_data(
+        self,
+        session: Session,
+        progress_callback: Optional[Callable[[str, bool, int, str], None]] = None
+    ) -> Dict[str, any]:
         """
         分析数据库并批量获取所需数据
 
         Args:
             session: 数据库会话
+            progress_callback: 进度回调函数 (symbol, success, records, error_msg)
+                - symbol: 标的代码
+                - success: 是否成功
+                - records: 获取的记录数
+                - error_msg: 错误信息 (成功时为空字符串)
 
         Returns:
             dict with statistics:
@@ -123,7 +139,7 @@ class BatchFetcher:
 
         # Step 3: 批量获取
         logger.info("Step 3: Batch fetching data...")
-        result = self._batch_fetch(missing)
+        result = self._batch_fetch(missing, progress_callback)
 
         # Step 4: 统计
         stats = {
@@ -256,6 +272,14 @@ class BatchFetcher:
         start_date = req['start_date']
         end_date = req['end_date']
 
+        # 跳过期权代码（包含日期和P/C的格式如 AAPL250404C227500）
+        if self._parse_option_symbol(symbol):
+            print(f"  ⏭ 跳过期权: {symbol}")
+            logger.debug(f"Skipping option symbol: {symbol}")
+            return {'success': False, 'records': 0, 'symbol': symbol, 'error': '期权代码无K线数据'}
+
+        print(f"  → 获取中: {symbol}...", end='', flush=True)
+
         try:
             # 使用路由器或单个客户端
             if self.use_router and self._router:
@@ -273,15 +297,19 @@ class BatchFetcher:
                 # 缓存数据（线程安全）
                 if self.cache:
                     self.cache.set(symbol, df, data_source=source_name)
+                print(f" ✓ {len(df)}条")
                 return {'success': True, 'records': len(df), 'symbol': symbol}
 
+            print(f" ✗ 空数据")
             return {'success': False, 'records': 0, 'symbol': symbol, 'error': 'Empty data'}
 
         except (DataNotFoundError, InvalidSymbolError) as e:
+            print(f" ✗ {e}")
             logger.warning(f"Skipped {symbol}: {e}")
             return {'success': False, 'records': 0, 'symbol': symbol, 'error': str(e)}
 
         except Exception as e:
+            print(f" ✗ 错误: {e}")
             logger.error(f"Failed to fetch {symbol}: {e}")
             return {'success': False, 'records': 0, 'symbol': symbol, 'error': str(e)}
 
@@ -289,12 +317,17 @@ class BatchFetcher:
             # 限流延迟
             time.sleep(self.request_delay)
 
-    def _batch_fetch(self, requirements: List[Dict]) -> Dict:
+    def _batch_fetch(
+        self,
+        requirements: List[Dict],
+        progress_callback: Optional[Callable[[str, bool, int, str], None]] = None
+    ) -> Dict:
         """
         批量获取数据（支持并发）
 
         Args:
             requirements: 需求列表
+            progress_callback: 进度回调函数 (symbol, success, records, error_msg)
 
         Returns:
             dict with statistics
@@ -313,30 +346,63 @@ class BatchFetcher:
                 if result['success']:
                     success_count += 1
                     total_records += result['records']
+                    # 调用回调
+                    if progress_callback:
+                        progress_callback(result['symbol'], True, result['records'], "")
                 else:
                     failed.append({'symbol': result['symbol'], 'reason': result.get('error', 'Unknown')})
+                    # 调用回调
+                    if progress_callback:
+                        progress_callback(result['symbol'], False, 0, result.get('error', 'Unknown'))
                 pbar.set_postfix({'success': success_count, 'records': total_records})
             pbar.close()
         else:
             # 并发模式
             logger.info(f"Using {self.max_workers} concurrent workers")
+            FETCH_TIMEOUT = 30  # 单个 symbol 获取超时时间（秒）
+            MAX_TOTAL_TIMEOUT = 600  # 最大总超时10分钟（无论多少symbols）
+
+            # 计算合理的总超时时间
+            total_timeout = min(FETCH_TIMEOUT * len(requirements), MAX_TOTAL_TIMEOUT)
+            logger.info(f"Total timeout: {total_timeout}s for {len(requirements)} symbols")
+
             with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
                 futures = {executor.submit(self._fetch_single, req): req for req in requirements}
-                pbar = tqdm(as_completed(futures), total=len(requirements),
+                pbar = tqdm(as_completed(futures, timeout=total_timeout),
+                           total=len(requirements),
                            desc="Fetching market data", unit="symbol")
 
-                for future in pbar:
-                    result = future.result()
-                    if result['success']:
-                        with self._lock:
-                            success_count += 1
-                            total_records += result['records']
-                    else:
-                        with self._lock:
-                            failed.append({'symbol': result['symbol'], 'reason': result.get('error', 'Unknown')})
+                try:
+                    for future in pbar:
+                        req = futures[future]
+                        try:
+                            result = future.result(timeout=FETCH_TIMEOUT)
+                            if result['success']:
+                                with self._lock:
+                                    success_count += 1
+                                    total_records += result['records']
+                                # 调用回调（在锁外执行以避免阻塞）
+                                if progress_callback:
+                                    progress_callback(result['symbol'], True, result['records'], "")
+                            else:
+                                with self._lock:
+                                    failed.append({'symbol': result['symbol'], 'reason': result.get('error', 'Unknown')})
+                                # 调用回调
+                                if progress_callback:
+                                    progress_callback(result['symbol'], False, 0, result.get('error', 'Unknown'))
+                        except FuturesTimeoutError:
+                            symbol = req['symbol']
+                            logger.warning(f"Timeout fetching {symbol} (>{FETCH_TIMEOUT}s)")
+                            with self._lock:
+                                failed.append({'symbol': symbol, 'reason': f'超时 (>{FETCH_TIMEOUT}s)'})
+                            if progress_callback:
+                                progress_callback(symbol, False, 0, f'Timeout (>{FETCH_TIMEOUT}s)')
 
-                    pbar.set_postfix({'success': success_count, 'records': total_records})
-                pbar.close()
+                        pbar.set_postfix({'success': success_count, 'records': total_records})
+                except FuturesTimeoutError:
+                    logger.error("Global timeout reached, some symbols may not have been fetched")
+                finally:
+                    pbar.close()
 
         duration = time.time() - start_time
 

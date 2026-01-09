@@ -1,15 +1,15 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ComposedChart,
-  Line,
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
   Cell,
+  ReferenceLine,
+  Area,
 } from 'recharts';
 import type { EventListItem } from '@/types';
 import { useChartColors } from '@/hooks/useChartColors';
@@ -23,278 +23,385 @@ interface EventTimelineChartProps {
   isLoading?: boolean;
 }
 
-// Event type icons/emojis
-const EVENT_TYPE_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
-  earnings: { emoji: '📊', label: '财报', color: '#3B82F6' },
-  earnings_pre: { emoji: '📊', label: '财报(盘前)', color: '#3B82F6' },
-  earnings_post: { emoji: '📊', label: '财报(盘后)', color: '#3B82F6' },
-  dividend: { emoji: '💰', label: '分红', color: '#10B981' },
-  split: { emoji: '✂️', label: '拆分', color: '#8B5CF6' },
-  product: { emoji: '📦', label: '产品', color: '#F59E0B' },
-  guidance: { emoji: '🎯', label: '指引', color: '#6366F1' },
-  analyst: { emoji: '📝', label: '评级', color: '#EC4899' },
-  macro: { emoji: '🌍', label: '宏观', color: '#14B8A6' },
-  fed: { emoji: '🏛️', label: '美联储', color: '#EF4444' },
-  cpi: { emoji: '📈', label: 'CPI', color: '#F97316' },
-  nfp: { emoji: '👷', label: '非农', color: '#84CC16' },
-  geopolitical: { emoji: '🌐', label: '地缘', color: '#A855F7' },
-  price_anomaly: { emoji: '⚡', label: '价格异动', color: '#EF4444' },
-  volume_anomaly: { emoji: '📢', label: '量能异动', color: '#F59E0B' },
-  other: { emoji: '📌', label: '其他', color: '#6B7280' },
+// Event type configuration
+const EVENT_TYPE_CONFIG: Record<string, { emoji: string; label: string; labelEn: string; color: string }> = {
+  price_anomaly: { emoji: '⚡', label: '价格异动', labelEn: 'Price', color: '#EF4444' },
+  volume_anomaly: { emoji: '📊', label: '量能异动', labelEn: 'Volume', color: '#F59E0B' },
+  earnings: { emoji: '📈', label: '财报', labelEn: 'Earnings', color: '#3B82F6' },
+  analyst: { emoji: '📝', label: '评级', labelEn: 'Analyst', color: '#EC4899' },
+  product: { emoji: '📦', label: '产品', labelEn: 'Product', color: '#8B5CF6' },
+  sector: { emoji: '🏭', label: '行业', labelEn: 'Sector', color: '#6366F1' },
+  geopolitical: { emoji: '🌐', label: '地缘', labelEn: 'Geo', color: '#14B8A6' },
+  regulatory: { emoji: '⚖️', label: '监管', labelEn: 'Regulatory', color: '#0EA5E9' },
+  management: { emoji: '👔', label: '管理层', labelEn: 'Mgmt', color: '#A855F7' },
+  macro: { emoji: '🌍', label: '宏观', labelEn: 'Macro', color: '#10B981' },
+  fda: { emoji: '💊', label: 'FDA', labelEn: 'FDA', color: '#DC2626' },
+  other: { emoji: '📌', label: '其他', labelEn: 'Other', color: '#6B7280' },
 };
 
-// Impact color mapping
-const IMPACT_COLORS: Record<string, string> = {
+// Impact colors
+const IMPACT_COLORS = {
   positive: '#10B981',
   negative: '#EF4444',
-  neutral: '#6B7280',
   mixed: '#F59E0B',
-  unknown: '#9CA3AF',
+  neutral: '#64748B',
 };
 
 export function EventTimelineChart({
   events,
-  title,
-  showPnL = true,
   isLoading,
 }: EventTimelineChartProps) {
   const { t, i18n } = useTranslation();
   const colors = useChartColors();
-  const displayTitle = title || t('charts.eventTimeline', '事件时间线');
-  const locale = i18n.language === 'zh' ? 'zh-CN' : 'en-US';
+  const isZh = i18n.language === 'zh';
+
+  // Use events directly - filtering should be done at API level
+  const validEvents = useMemo(() => {
+    if (!events || events.length === 0) return [];
+    return events;
+  }, [events]);
+
+  // Aggregate events by date for timeline
+  const timelineData = useMemo(() => {
+    if (!validEvents || validEvents.length === 0) return [];
+
+    const dateMap = new Map<string, {
+      date: string;
+      dateLabel: string;
+      positive: number;
+      negative: number;
+      neutral: number;
+      mixed: number;
+      total: number;
+      negativeDisplay: number; // For display below x-axis
+    }>();
+
+    validEvents.forEach((event) => {
+      const dateStr = event.event_date.split('T')[0];
+
+      if (!dateMap.has(dateStr)) {
+        const d = new Date(dateStr);
+        dateMap.set(dateStr, {
+          date: dateStr,
+          dateLabel: d.toLocaleDateString(isZh ? 'zh-CN' : 'en-US', {
+            month: 'short',
+            day: 'numeric'
+          }),
+          positive: 0,
+          negative: 0,
+          neutral: 0,
+          mixed: 0,
+          total: 0,
+          negativeDisplay: 0,
+        });
+      }
+
+      const entry = dateMap.get(dateStr)!;
+      entry.total += 1;
+
+      const impact = event.event_impact || 'neutral';
+      if (impact === 'positive') entry.positive += 1;
+      else if (impact === 'negative') {
+        entry.negative += 1;
+        entry.negativeDisplay -= 1; // Negative for display below axis
+      }
+      else if (impact === 'mixed') entry.mixed += 1;
+      else entry.neutral += 1;
+    });
+
+    return Array.from(dateMap.values())
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }, [validEvents, isZh]);
+
+  // Event type summary
+  const typeSummary = useMemo(() => {
+    if (!validEvents || validEvents.length === 0) return [];
+
+    const typeMap = new Map<string, number>();
+    validEvents.forEach((event) => {
+      const type = event.event_type || 'other';
+      typeMap.set(type, (typeMap.get(type) || 0) + 1);
+    });
+
+    return Array.from(typeMap.entries())
+      .map(([type, count]) => {
+        const config = EVENT_TYPE_CONFIG[type] || EVENT_TYPE_CONFIG.other;
+        return {
+          type,
+          count,
+          label: isZh ? config.label : config.labelEn,
+          emoji: config.emoji,
+          color: config.color,
+          percent: ((count / validEvents.length) * 100).toFixed(0),
+        };
+      })
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, [validEvents, isZh]);
+
+  // Impact summary
+  const impactSummary = useMemo(() => {
+    if (!validEvents || validEvents.length === 0) return { positive: 0, negative: 0, neutral: 0, mixed: 0 };
+
+    const counts = { positive: 0, negative: 0, neutral: 0, mixed: 0 };
+    validEvents.forEach((event) => {
+      const impact = event.event_impact || 'neutral';
+      if (impact in counts) counts[impact as keyof typeof counts]++;
+      else counts.neutral++;
+    });
+
+    return counts;
+  }, [validEvents]);
 
   if (isLoading) {
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <ChartSkeleton height="h-80" />
-      </div>
-    );
+    return <ChartSkeleton height="h-80" />;
   }
 
-  if (!events || events.length === 0) {
+  if (!validEvents || validEvents.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {displayTitle}
-        </h3>
-        <EmptyState
-          icon="event"
-          height="h-80"
-          title={t('events.noEvents', '暂无事件')}
-          description={t('events.noEventsDescription', '该时间段内未检测到重大市场事件')}
-          size="md"
-        />
-      </div>
+      <EmptyState
+        icon="event"
+        height="h-64"
+        title={t('events.noEvents', '暂无事件')}
+        description={t('events.noEventsDescription', '该时间段内未检测到重大市场事件')}
+        size="md"
+      />
     );
   }
-
-  // Transform events for chart
-  const chartData = events.map((event) => {
-    const config = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
-    return {
-      date: new Date(event.event_date).toLocaleDateString(locale, {
-        month: 'short',
-        day: 'numeric',
-      }),
-      fullDate: event.event_date,
-      title: event.event_title,
-      type: event.event_type,
-      typeLabel: config.label,
-      emoji: config.emoji,
-      impact: event.event_impact || 'unknown',
-      importance: event.event_importance || 5,
-      priceChange: event.price_change_pct,
-      volumeSpike: event.volume_spike,
-      pnl: event.position_pnl_on_event,
-      isKeyEvent: event.is_key_event,
-      color: event.event_impact ? IMPACT_COLORS[event.event_impact] : config.color,
-    };
-  });
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: unknown[] }) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: unknown[]; label?: string }) => {
     if (!active || !payload || payload.length === 0) return null;
 
-    const data = (payload[0] as { payload: typeof chartData[0] }).payload;
-    const impactLabel = {
-      positive: t('events.impact.positive', '利好'),
-      negative: t('events.impact.negative', '利空'),
-      neutral: t('events.impact.neutral', '中性'),
-      mixed: t('events.impact.mixed', '混合'),
-      unknown: t('events.impact.unknown', '未知'),
-    }[data.impact];
+    const data = (payload[0] as { payload: typeof timelineData[0] }).payload;
 
     return (
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-w-xs">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">{data.emoji}</span>
-          <span className="font-medium text-gray-900 dark:text-white">
-            {data.typeLabel}
-          </span>
-          {data.isKeyEvent && (
-            <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-1.5 py-0.5 rounded">
-              {t('events.keyEvent', '关键')}
-            </span>
+      <div className="bg-white dark:bg-neutral-900 px-3 py-2 rounded-sm shadow-lg border border-neutral-200 dark:border-white/10 text-xs font-mono">
+        <div className="font-bold text-slate-900 dark:text-white mb-1.5">{data.dateLabel}</div>
+        <div className="space-y-0.5">
+          {data.positive > 0 && (
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-green-600 dark:text-green-500">▲ {isZh ? '利好' : 'Bullish'}</span>
+              <span className="text-slate-900 dark:text-white">{data.positive}</span>
+            </div>
           )}
-        </div>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
-          {data.title}
-        </p>
-        <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-          <div className="flex justify-between">
-            <span>{t('events.date', '日期')}:</span>
-            <span>{data.fullDate}</span>
+          {data.negative > 0 && (
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-red-600 dark:text-red-500">▼ {isZh ? '利空' : 'Bearish'}</span>
+              <span className="text-slate-900 dark:text-white">{data.negative}</span>
+            </div>
+          )}
+          {data.mixed > 0 && (
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-amber-600 dark:text-amber-500">◆ {isZh ? '混合' : 'Mixed'}</span>
+              <span className="text-slate-900 dark:text-white">{data.mixed}</span>
+            </div>
+          )}
+          {data.neutral > 0 && (
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-slate-500 dark:text-slate-400">○ {isZh ? '中性' : 'Neutral'}</span>
+              <span className="text-slate-900 dark:text-white">{data.neutral}</span>
+            </div>
+          )}
+          <div className="border-t border-neutral-200 dark:border-white/10 pt-1 mt-1 flex items-center justify-between">
+            <span className="text-slate-500 dark:text-white/40">{isZh ? '合计' : 'Total'}</span>
+            <span className="font-bold text-slate-900 dark:text-white">{data.total}</span>
           </div>
-          <div className="flex justify-between">
-            <span>{t('events.impact', '影响')}:</span>
-            <span style={{ color: IMPACT_COLORS[data.impact] }}>{impactLabel}</span>
-          </div>
-          {data.priceChange !== null && (
-            <div className="flex justify-between">
-              <span>{t('events.priceChange', '价格变动')}:</span>
-              <span className={data.priceChange >= 0 ? 'text-green-500' : 'text-red-500'}>
-                {data.priceChange >= 0 ? '+' : ''}{data.priceChange.toFixed(1)}%
-              </span>
-            </div>
-          )}
-          {data.volumeSpike !== null && data.volumeSpike > 1 && (
-            <div className="flex justify-between">
-              <span>{t('events.volumeSpike', '成交量')}:</span>
-              <span className="text-orange-500">{data.volumeSpike.toFixed(1)}x</span>
-            </div>
-          )}
-          {showPnL && data.pnl !== null && (
-            <div className="flex justify-between font-medium">
-              <span>{t('events.pnlOnEvent', '当日盈亏')}:</span>
-              <span className={data.pnl >= 0 ? 'text-green-500' : 'text-red-500'}>
-                ${data.pnl.toFixed(0)}
-              </span>
-            </div>
-          )}
         </div>
       </div>
     );
   };
 
+  const totalPositive = impactSummary.positive;
+  const totalNegative = impactSummary.negative;
+  const totalNeutralMixed = impactSummary.neutral + impactSummary.mixed;
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          {displayTitle}
-        </h3>
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
-            {t('events.impact.positive', '利好')}
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-red-500" />
-            {t('events.impact.negative', '利空')}
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-yellow-500" />
-            {t('events.impact.mixed', '混合')}
-          </span>
+    <div className="space-y-6">
+      {/* Summary Stats Row */}
+      <div className="grid grid-cols-4 gap-3">
+        <div className="text-center">
+          <div className="text-2xl font-mono font-bold text-slate-900 dark:text-white">
+            {validEvents.length}
+          </div>
+          <div className="text-[10px] font-mono text-slate-400 dark:text-white/30 uppercase tracking-wider">
+            {t('events.total', 'Total')}
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-mono font-bold text-green-600 dark:text-green-500">
+            {totalPositive}
+          </div>
+          <div className="text-[10px] font-mono text-slate-400 dark:text-white/30 uppercase tracking-wider">
+            {isZh ? '利好' : 'Bullish'}
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-mono font-bold text-red-600 dark:text-red-500">
+            {totalNegative}
+          </div>
+          <div className="text-[10px] font-mono text-slate-400 dark:text-white/30 uppercase tracking-wider">
+            {isZh ? '利空' : 'Bearish'}
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-mono font-bold text-slate-500 dark:text-slate-400">
+            {totalNeutralMixed}
+          </div>
+          <div className="text-[10px] font-mono text-slate-400 dark:text-white/30 uppercase tracking-wider">
+            {isZh ? '中性/混合' : 'Other'}
+          </div>
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={320}>
-        <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} opacity={0.5} />
-          <XAxis
-            dataKey="date"
-            tick={{ fill: colors.text, fontSize: 11 }}
-            tickLine={{ stroke: colors.grid }}
-            axisLine={{ stroke: colors.grid }}
-            angle={-45}
-            textAnchor="end"
-            height={60}
-          />
-          <YAxis
-            yAxisId="price"
-            orientation="left"
-            tick={{ fill: colors.text, fontSize: 11 }}
-            tickLine={{ stroke: colors.grid }}
-            axisLine={{ stroke: colors.grid }}
-            label={{
-              value: t('events.priceChange', '价格变动') + ' (%)',
-              angle: -90,
-              position: 'insideLeft',
-              fill: colors.text,
-              fontSize: 11,
-            }}
-          />
-          {showPnL && (
-            <YAxis
-              yAxisId="pnl"
-              orientation="right"
-              tick={{ fill: colors.text, fontSize: 11 }}
-              tickLine={{ stroke: colors.grid }}
-              axisLine={{ stroke: colors.grid }}
-              label={{
-                value: t('events.pnl', '盈亏') + ' ($)',
-                angle: 90,
-                position: 'insideRight',
-                fill: colors.text,
-                fontSize: 11,
-              }}
-            />
-          )}
-          <Tooltip content={<CustomTooltip />} />
-          <ReferenceLine yAxisId="price" y={0} stroke={colors.grid} strokeDasharray="3 3" />
-
-          {/* Price change bars */}
-          <Bar
-            yAxisId="price"
-            dataKey="priceChange"
-            name={t('events.priceChange', '价格变动')}
-            radius={[4, 4, 0, 0]}
-          >
-            {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.7} />
-            ))}
-          </Bar>
-
-          {/* PnL line */}
-          {showPnL && (
-            <Line
-              yAxisId="pnl"
-              type="monotone"
-              dataKey="pnl"
-              name={t('events.pnl', '盈亏')}
-              stroke={colors.primary}
-              strokeWidth={2}
-              dot={{
-                fill: colors.primary,
-                strokeWidth: 2,
-                r: 4,
-              }}
-              activeDot={{
-                r: 6,
-                fill: colors.primary,
-              }}
-              connectNulls
-            />
-          )}
-        </ComposedChart>
-      </ResponsiveContainer>
-
-      {/* Event type legend */}
-      <div className="mt-4 flex flex-wrap gap-2 justify-center">
-        {Array.from(new Set(events.map((e) => e.event_type))).map((type) => {
-          const config = EVENT_TYPE_CONFIG[type] || EVENT_TYPE_CONFIG.other;
-          const count = events.filter((e) => e.event_type === type).length;
-          return (
-            <span
-              key={type}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-            >
-              <span>{config.emoji}</span>
-              <span>{config.label}</span>
-              <span className="text-gray-500 dark:text-gray-400">({count})</span>
+      {/* Main Timeline Chart - Diverging Bar Chart */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h4 className="text-xs font-mono font-medium text-slate-400 dark:text-white/30 uppercase tracking-widest">
+            {t('events.timelineByImpact', '影响时间线')}
+          </h4>
+          <div className="flex items-center gap-3 text-[10px] font-mono">
+            <span className="flex items-center gap-1 text-green-600 dark:text-green-500">
+              <span className="w-2 h-2 rounded-sm bg-green-500" />
+              {isZh ? '利好' : 'Bullish'}
             </span>
-          );
-        })}
+            <span className="flex items-center gap-1 text-red-600 dark:text-red-500">
+              <span className="w-2 h-2 rounded-sm bg-red-500" />
+              {isZh ? '利空' : 'Bearish'}
+            </span>
+            <span className="flex items-center gap-1 text-slate-400">
+              <span className="w-2 h-2 rounded-sm bg-slate-400" />
+              {isZh ? '其他' : 'Other'}
+            </span>
+          </div>
+        </div>
+
+        <div className="h-56">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart
+              data={timelineData}
+              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+              stackOffset="sign"
+            >
+              <XAxis
+                dataKey="dateLabel"
+                tick={{ fill: colors.text, fontSize: 9, fontFamily: 'monospace' }}
+                tickLine={false}
+                axisLine={{ stroke: colors.grid, strokeOpacity: 0.3 }}
+                interval="preserveStartEnd"
+                minTickGap={30}
+              />
+              <YAxis
+                tick={{ fill: colors.text, fontSize: 9, fontFamily: 'monospace' }}
+                tickLine={false}
+                axisLine={false}
+                width={25}
+                tickFormatter={(v) => Math.abs(v).toString()}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <ReferenceLine y={0} stroke={colors.grid} strokeOpacity={0.5} />
+
+              {/* Positive events - above axis */}
+              <Bar
+                dataKey="positive"
+                stackId="stack"
+                fill={IMPACT_COLORS.positive}
+                radius={[2, 2, 0, 0]}
+              />
+
+              {/* Neutral + Mixed - above axis, stacked */}
+              <Bar
+                dataKey="neutral"
+                stackId="stack"
+                fill={IMPACT_COLORS.neutral}
+                fillOpacity={0.6}
+              />
+              <Bar
+                dataKey="mixed"
+                stackId="stack"
+                fill={IMPACT_COLORS.mixed}
+                fillOpacity={0.6}
+              />
+
+              {/* Negative events - below axis */}
+              <Bar
+                dataKey="negativeDisplay"
+                fill={IMPACT_COLORS.negative}
+                radius={[0, 0, 2, 2]}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Type Distribution - Compact Horizontal */}
+      <div className="space-y-2">
+        <h4 className="text-xs font-mono font-medium text-slate-400 dark:text-white/30 uppercase tracking-widest">
+          {t('events.typeBreakdown', '类型构成')}
+        </h4>
+
+        <div className="flex flex-wrap gap-2">
+          {typeSummary.map((item) => (
+            <div
+              key={item.type}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-sm bg-neutral-50 dark:bg-white/5"
+            >
+              <span className="text-sm">{item.emoji}</span>
+              <span className="text-xs font-mono text-slate-600 dark:text-white/60">
+                {item.label}
+              </span>
+              <span className="text-xs font-mono font-bold text-slate-900 dark:text-white">
+                {item.count}
+              </span>
+              <span className="text-[10px] font-mono text-slate-400 dark:text-white/30">
+                ({item.percent}%)
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Impact Distribution Bar */}
+      <div className="space-y-2">
+        <h4 className="text-xs font-mono font-medium text-slate-400 dark:text-white/30 uppercase tracking-widest">
+          {t('events.impactDistribution', '影响分布')}
+        </h4>
+
+        <div className="h-3 rounded-full overflow-hidden flex bg-neutral-100 dark:bg-white/5">
+          {impactSummary.positive > 0 && (
+            <div
+              className="h-full bg-green-500 transition-all"
+              style={{ width: `${(impactSummary.positive / validEvents.length) * 100}%` }}
+              title={`${isZh ? '利好' : 'Bullish'}: ${impactSummary.positive}`}
+            />
+          )}
+          {impactSummary.mixed > 0 && (
+            <div
+              className="h-full bg-amber-500 transition-all"
+              style={{ width: `${(impactSummary.mixed / validEvents.length) * 100}%` }}
+              title={`${isZh ? '混合' : 'Mixed'}: ${impactSummary.mixed}`}
+            />
+          )}
+          {impactSummary.neutral > 0 && (
+            <div
+              className="h-full bg-slate-400 transition-all"
+              style={{ width: `${(impactSummary.neutral / validEvents.length) * 100}%` }}
+              title={`${isZh ? '中性' : 'Neutral'}: ${impactSummary.neutral}`}
+            />
+          )}
+          {impactSummary.negative > 0 && (
+            <div
+              className="h-full bg-red-500 transition-all"
+              style={{ width: `${(impactSummary.negative / validEvents.length) * 100}%` }}
+              title={`${isZh ? '利空' : 'Bearish'}: ${impactSummary.negative}`}
+            />
+          )}
+        </div>
+
+        <div className="flex justify-between text-[10px] font-mono text-slate-400 dark:text-white/30">
+          <span>{((impactSummary.positive / validEvents.length) * 100).toFixed(0)}% {isZh ? '利好' : 'Bullish'}</span>
+          <span>{((impactSummary.negative / validEvents.length) * 100).toFixed(0)}% {isZh ? '利空' : 'Bearish'}</span>
+        </div>
       </div>
     </div>
   );

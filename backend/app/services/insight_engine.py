@@ -128,7 +128,7 @@ class InsightEngine:
                 # T01: Problem weekday
                 if wd_win_rate < self._win_rate - 20:
                     self._add_insight(TradingInsight(
-                        id="T01",
+                        id=f"T01-{weekday_names[wd]}",
                         type=InsightType.PROBLEM,
                         category=InsightCategory.TIME,
                         priority=85,
@@ -148,7 +148,7 @@ class InsightEngine:
                 # T02: Strong weekday
                 elif wd_win_rate > self._win_rate + 15:
                     self._add_insight(TradingInsight(
-                        id="T02",
+                        id=f"T02-{weekday_names[wd]}",
                         type=InsightType.STRENGTH,
                         category=InsightCategory.TIME,
                         priority=60,
@@ -397,7 +397,7 @@ class InsightEngine:
                 # S01: Strong symbol
                 if symbol_wr > 70:
                     self._add_insight(TradingInsight(
-                        id="S01",
+                        id=f"S01-{symbol}",
                         type=InsightType.STRENGTH,
                         category=InsightCategory.SYMBOL,
                         priority=70,
@@ -417,7 +417,7 @@ class InsightEngine:
                 # S02: Problem symbol
                 elif symbol_wr < 35:
                     self._add_insight(TradingInsight(
-                        id="S02",
+                        id=f"S02-{symbol}",
                         type=InsightType.PROBLEM,
                         category=InsightCategory.SYMBOL,
                         priority=75,
@@ -435,7 +435,7 @@ class InsightEngine:
                 # S03: Over-concentration
                 if concentration > 30:
                     self._add_insight(TradingInsight(
-                        id="S03",
+                        id=f"S03-{symbol}",
                         type=InsightType.REMINDER,
                         category=InsightCategory.SYMBOL,
                         priority=60,
@@ -453,7 +453,7 @@ class InsightEngine:
                 # S04: Repeated losses
                 if stats["max_consec_losses"] >= 3:
                     self._add_insight(TradingInsight(
-                        id="S04",
+                        id=f"S04-{symbol}",
                         type=InsightType.PROBLEM,
                         category=InsightCategory.SYMBOL,
                         priority=80,

@@ -6,9 +6,23 @@ import { useState, useRef, useEffect } from 'react';
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [expandUp, setExpandUp] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const currentLanguage = languages.find((l) => l.code === i18n.language) || languages[0];
+
+  // 检测是否应该向上展开
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - buttonRect.bottom;
+      const dropdownHeight = 120; // 大约高度
+
+      // 如果下方空间不足，向上展开
+      setExpandUp(spaceBelow < dropdownHeight);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -29,6 +43,7 @@ export function LanguageSwitcher() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider rounded-sm
                    bg-black hover:bg-white/10
@@ -42,10 +57,11 @@ export function LanguageSwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 bottom-full mb-2 w-40
+        <div className={`absolute right-0 w-40
                         bg-black
                         rounded-sm shadow-none border border-white/20
-                        z-50 py-1">
+                        z-50 py-1
+                        ${expandUp ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
           {languages.map((lang) => (
             <button
               key={lang.code}

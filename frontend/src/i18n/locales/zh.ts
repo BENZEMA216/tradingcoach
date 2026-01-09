@@ -11,6 +11,7 @@ export default {
     search: '搜索',
     filter: '筛选',
     reset: '重置',
+    refresh: '刷新',
     all: '全部',
     yes: '是',
     no: '否',
@@ -20,6 +21,16 @@ export default {
     days: '天',
     day: '天',
     sameDay: '当天',
+    show: '展开',
+    hide: '收起',
+    menu: '菜单',
+    back: '返回',
+    stock: '股票',
+    option: '期权',
+    top10Symbols: '优势标的 TOP 10',
+    infoAbout: '关于{{term}}的说明',
+    switchToDarkMode: '切换到深色模式',
+    switchToLightMode: '切换到浅色模式',
   },
 
   // Strategy types
@@ -38,6 +49,7 @@ export default {
     short: '做空',
     buy: '买入',
     sell: '卖出',
+    sell_short: '卖空',
   },
 
   // Navigation
@@ -82,6 +94,42 @@ export default {
     taskProgress: '进度: {{progress}}%',
     continueViewing: '继续查看',
     ignoreAndUpload: '上传新文件',
+    // Industrial style elements (P1-001)
+    heroTitle: '极致\n阿尔法',
+    heroSubtitle: '用机构级精准指标和交易心理分析，构建你的交易优势。',
+    systemStatus: '系统运行中',
+    version: '版本',
+    uploadProtocol: '上传协议',
+    dragCsvHere: '拖放 CSV 文件到此处',
+    browseDataSource: '浏览数据源',
+    executeAnalysis: '执行分析',
+    initializing: '初始化中...',
+    // Feature modules
+    neuralPsych: '神经心理',
+    neuralPsychDesc: '[模块A] 使用先进算法解码交易行为模式',
+    precisionMetric: '精准度量',
+    precisionMetricDesc: '[模块B] 基于预设策略约束的客观交易评分系统',
+    riskStruct: '风险结构',
+    riskStructDesc: '[模块C] MAE/MFE 和回撤概率的实时可视化',
+  },
+
+  // Loading Page
+  loading: {
+    statusComplete: '分析完成',
+    statusFailed: '分析失败',
+    statusCancelled: '分析已取消',
+    statusProcessing: '系统处理中',
+    connecting: '连接中...',
+    analyzing: '正在分析...',
+    analysisFailed: '分析失败',
+    analysisComplete: '分析完成',
+    tryAgain: '重试',
+    viewPositions: '查看持仓',
+    viewDashboard: '统计分析',
+    trades: '交易',
+    positions: '持仓',
+    symbols: '标的',
+    scored: '评分',
   },
 
   // Notifications
@@ -312,6 +360,10 @@ export default {
     amount: '金额',
     fees: '费用',
     slippage: '滑点',
+    // Execution tab
+    totalExecutions: '执行次数',
+    avgSlippage: '平均滑点',
+    slippageAnalysis: '滑点分析',
     // Post-exit
     days5: '5天后',
     days10: '10天后',
@@ -455,6 +507,19 @@ export default {
   insights: {
     aiCoach: 'AI 教练',
     subtitle: '基于您的交易数据智能分析',
+    chat: '问答对话',
+    insightsTab: '洞察分析',
+    aiSummary: 'AI 复盘总结',
+    keyMetrics: '关键指标',
+    insightsOverview: '洞察概览',
+    type: '类型',
+    category: '维度',
+    totalTrades: '总交易数',
+    problems: '待改进',
+    strengths: '优势',
+    reminders: '提醒',
+    loadFailed: '加载失败，请重试',
+    noMatchingInsights: '没有符合筛选条件的洞察',
     problem: '问题',
     strength: '优势',
     reminder: '提醒',
@@ -695,12 +760,31 @@ export default {
     filterFed: '美联储',
     filterSplit: '拆股',
     filterPriceAnomaly: '价格异动',
+    filterVolumeAnomaly: '成交量异动',
+    filterAnalyst: '分析师评级',
+    filterSector: '行业动态',
+    filterProduct: '产品发布',
     filterOther: '其他',
     // Performance
     performanceByType: '按事件类型统计',
     times: '次',
     totalPnL: '总盈亏',
     avgChange: '平均变动',
+    // Chart
+    monthlyDistribution: '月度事件分布',
+    typeDistribution: '事件类型分布',
+    total: '总计',
+    impactDistribution: '影响分布',
+    typeBreakdown: '类型构成',
+    timelineByImpact: '影响时间线',
+    priceChangeDistribution: '价格变动分布',
+    eventsWithData: '有数据',
+    count: '数量',
+    priceRange: '价格区间',
+    importanceVsChange: '重要性 vs 价格变动',
+    importance: '重要性',
+    up: '上涨',
+    down: '下跌',
     // Table
     showingFirst: '显示前 20 条，共',
     records: '条记录',
@@ -735,6 +819,199 @@ export default {
       total: '事件总数',
       highImpact: '高影响事件',
       avgPriceChange: '平均价格变动',
+    },
+  },
+
+  // Insight Rules - 洞察规则翻译
+  insightRules: {
+    // 时间维度 (T)
+    'T01': {
+      title: '{{weekday_zh}}胜率偏低',
+      description: '{{weekday_zh}}胜率仅{{weekday_win_rate}}%，远低于平均{{average_win_rate}}%',
+      suggestion: '建议减少{{weekday_zh}}的交易，或在这一天采取更保守的策略',
+    },
+    'T02': {
+      title: '{{weekday_zh}}表现优异',
+      description: '{{weekday_zh}}胜率高达{{weekday_win_rate}}%，明显高于平均{{average_win_rate}}%',
+      suggestion: '可以考虑在{{weekday_zh}}增加交易机会',
+    },
+    // 持仓时间 (H)
+    'H01': {
+      title: '最佳持仓周期: {{best_period}}',
+      description: '持仓{{best_period}}的交易胜率高达{{win_rate}}%（{{trade_count}}笔）',
+      suggestion: '可以优化交易计划，使持仓时间更集中在{{best_period}}这个区间',
+    },
+    'H02': {
+      title: '长持仓风险较高',
+      description: '持仓超过7天的交易中，{{long_loss_rate}}%是亏损的',
+      suggestion: '考虑缩短平均持仓时间，或对长期持仓设置更严格的风控',
+    },
+    'H03': {
+      title: '{{better}}交易更擅长',
+      description: '{{better}}交易胜率{{better_wr}}%，而{{worse}}交易仅{{worse_wr}}%',
+      suggestion: '可以考虑增加{{better}}交易的比重，减少{{worse}}交易',
+    },
+    'H04': {
+      title: '存在扛单倾向',
+      description: '亏损交易平均持仓{{avg_loser_holding_days}}天，而盈利交易仅{{avg_winner_holding_days}}天',
+      suggestion: '建议设置严格的止损规则，亏损交易不应持仓过久',
+    },
+    'H05': {
+      title: '可能存在过早止盈',
+      description: '{{continued_up_pct}}%的盈利交易在离场后5天内又涨了超过5%，平均再涨{{avg_missed_pct}}%',
+      suggestion: '考虑使用追踪止盈或分批止盈策略，让利润充分运行',
+    },
+    'H06': {
+      title: '短线交易质量更高',
+      description: '短线持仓平均评分{{short_avg_score}}分，长线仅{{long_avg_score}}分',
+      suggestion: '你可能更适合短线交易，长线持仓需要改进入场和出场策略',
+    },
+    // 标的 (S)
+    'S01': {
+      title: '{{symbol}}是优势标的',
+      description: '{{symbol}}胜率{{win_rate}}%（{{trade_count}}笔），总盈利${{total_pnl}}',
+      suggestion: '继续关注{{symbol}}的交易机会，这是你最擅长的标的之一',
+    },
+    'S02': {
+      title: '{{symbol}}表现不佳',
+      description: '{{symbol}}胜率仅{{win_rate}}%（{{trade_count}}笔），总亏损${{total_pnl}}',
+      suggestion: '建议暂停交易{{symbol}}，或深入分析为何在此标的上表现不佳',
+    },
+    'S03': {
+      title: '{{symbol}}交易过度集中',
+      description: '{{symbol}}占总交易的{{concentration_pct}}%，存在过度集中风险',
+      suggestion: '建议分散交易标的，降低单一标的依赖',
+    },
+    'S04': {
+      title: '{{symbol}}连续亏损',
+      description: '{{symbol}}曾出现连续{{max_consecutive_losses}}笔亏损',
+      suggestion: '在{{symbol}}连亏后应暂停交易，冷静分析后再考虑入场',
+    },
+    'S05': {
+      title: '新标的首次交易风险',
+      description: '首次交易新标的的胜率仅{{first_trade_win_rate}}%，低于平均{{average_win_rate}}%',
+      suggestion: '建议对新标的采取更保守的仓位，或先观察再入场',
+    },
+    'S06': {
+      title: '{{better}}交易更擅长',
+      description: '{{better}}胜率{{better_wr}}%，{{worse}}仅{{worse_wr}}%',
+      suggestion: '可以适当增加{{better}}交易的比重',
+    },
+    // 方向 (D)
+    'D01': {
+      title: '{{better}}更擅长',
+      description: '{{better}}胜率{{better_wr}}%，{{worse}}胜率仅{{worse_wr}}%',
+      suggestion: '可以考虑增加{{better}}交易的比重',
+    },
+    'D02': {
+      title: '{{strategy_name}}策略有效',
+      description: '{{strategy_name}}策略胜率{{win_rate}}%（{{trade_count}}笔）',
+      suggestion: '继续使用{{strategy_name}}策略，并优化相关参数',
+    },
+    // 风险管理 (R)
+    'R01': {
+      title: '盈亏比失衡',
+      description: '平均亏损${{avg_loss}}是平均盈利${{avg_win}}的{{ratio}}倍',
+      suggestion: '需要改进止损策略，减小平均亏损额，或提高盈利目标',
+    },
+    'R02': {
+      title: '止损执行不严格',
+      description: '{{high_mae_pct}}%的亏损交易MAE超过-10%，说明止损设置或执行有问题',
+      suggestion: '建议设置更严格的止损点，并严格执行',
+    },
+    'R03': {
+      title: '单笔风险过大',
+      description: '最大单笔亏损${{max_single_loss}}，占总盈利的{{pct_of_total}}%',
+      suggestion: '建议控制单笔交易的风险敞口，设置止损以限制最大亏损',
+    },
+    'R05': {
+      title: '出现过连续亏损',
+      description: '最长连续亏损{{max_consecutive_losses}}笔',
+      suggestion: '连亏时应暂停交易，分析原因后再继续',
+    },
+    'R06': {
+      title: '盈利捕获率偏低',
+      description: '盈利交易平均只捕获了最大浮盈的{{avg_capture_ratio}}%',
+      suggestion: '考虑使用追踪止盈或分批止盈，以获取更多利润',
+    },
+    'R07': {
+      title: '止损纪律需改进',
+      description: '{{deep_loss_pct}}%的亏损交易最大浮亏超过-15%，说明止损执行不及时',
+      suggestion: '建议在入场时就设定止损点，并严格执行',
+    },
+    'R08': {
+      title: '隔夜持仓风险较高',
+      description: '隔夜持仓亏损率{{overnight_loss_rate}}%，高于日内的{{intraday_loss_rate}}%',
+      suggestion: '建议减少隔夜持仓，或对隔夜仓位设置更严格的止损',
+    },
+    // 行为 (B)
+    'B01': {
+      title: '可能存在报复性交易',
+      description: '亏损后的下一笔交易仅{{win_rate_after_loss}}%盈利，低于平均水平',
+      suggestion: '亏损后建议暂停交易，避免情绪化操作',
+    },
+    'B02': {
+      title: '大赚后需警惕',
+      description: '大赚后的下一笔交易仅{{win_rate_after_big_win}}%盈利',
+      suggestion: '大赚后容易放松警惕，建议保持纪律性',
+    },
+    'B05': {
+      title: '连胜后需谨慎',
+      description: '连胜3次后的下一笔交易胜率仅{{win_rate_after_streak}}%',
+      suggestion: '连续盈利后可能过度自信，需保持谨慎',
+    },
+    'B06': {
+      title: '{{best_hour}}点交易表现最佳',
+      description: '{{best_hour}}点开仓的交易胜率{{best_hour_win_rate}}%，明显高于平均',
+      suggestion: '可以重点关注{{best_hour}}点左右的交易机会',
+    },
+    'B07': {
+      title: '{{worst_hour}}点交易需警惕',
+      description: '{{worst_hour}}点开仓的交易胜率仅{{worst_hour_win_rate}}%，远低于平均',
+      suggestion: '建议避免在{{worst_hour}}点左右进行交易',
+    },
+    'B08': {
+      title: '连续交易同一标的风险',
+      description: '短期内重复交易同一标的的胜率仅{{add_position_win_rate}}%，低于平均{{average_win_rate}}%',
+      suggestion: '避免在一个标的上反复操作，每次交易应该有独立的判断',
+    },
+    'B09': {
+      title: '纪律性影响表现',
+      description: '高纪律性交易胜率{{high_discipline_win_rate}}%，低纪律性仅{{low_discipline_win_rate}}%',
+      suggestion: '提高交易纪律性可以显著提升表现',
+    },
+    // 费用 (F)
+    'F01': {
+      title: '交易费用侵蚀利润',
+      description: '总费用${{total_fees}}占毛利润的{{fee_erosion_pct}}%',
+      suggestion: '考虑减少交易频率或选择费率更低的券商',
+    },
+    'F03': {
+      title: '存在较多无效交易',
+      description: '{{ineffective_pct}}%的交易盈亏在±$20以内',
+      suggestion: '这些交易主要为券商贡献费用，建议提高交易质量',
+    },
+    // 期权 (O)
+    'O03': {
+      title: '{{better}}期权更擅长',
+      description: '{{better}}期权胜率{{better_wr}}%，而{{worse}}期权表现较弱',
+      suggestion: '可以考虑增加{{better}}期权的交易比重',
+    },
+    // 趋势 (P)
+    'P01': {
+      title: '胜率正在提升',
+      description: '近期胜率{{recent_win_rate}}%，比早期的{{early_win_rate}}%提升了{{improvement}}个百分点',
+      suggestion: '继续保持，你正在进步！',
+    },
+    'P02': {
+      title: '近期表现下滑',
+      description: '近期胜率{{recent_win_rate}}%，比早期的{{early_win_rate}}%下降了{{decline}}个百分点',
+      suggestion: '建议暂停交易，复盘近期交易，找出问题所在',
+    },
+    'P02-weekly': {
+      title: '连续3周亏损',
+      description: '最近3周连续亏损，共亏损${{total_loss}}',
+      suggestion: '建议暂停交易，深入分析原因后再恢复',
     },
   },
 

@@ -21,27 +21,28 @@ import {
 } from 'lucide-react';
 
 // Event type filter options
+// Note: News-based events (analyst, sector, product) are unreliable for historical data
+// Only price_anomaly, volume_anomaly, and earnings have correct historical dates
 const EVENT_TYPES = [
   { key: 'all', labelKey: 'events.filterAll' },
-  { key: 'earnings', labelKey: 'events.filterEarnings' },
-  { key: 'macro', labelKey: 'events.filterMacro' },
-  { key: 'fed', labelKey: 'events.filterFed' },
-  { key: 'split', labelKey: 'events.filterSplit' },
   { key: 'price_anomaly', labelKey: 'events.filterPriceAnomaly' },
-  { key: 'other', labelKey: 'events.filterOther' },
+  { key: 'volume_anomaly', labelKey: 'events.filterVolumeAnomaly' },
+  { key: 'earnings', labelKey: 'events.filterEarnings' },
 ];
 
 export function EventAnalysis() {
   const { t } = useTranslation();
-  const [eventTypeFilter, setEventTypeFilter] = useState('all');
+  const [eventTypeFilter, setEventTypeFilter] = useState('price_anomaly');
   const [expandedSection, setExpandedSection] = useState<string | null>('timeline');
 
-  // Fetch events list
+  // Fetch all events for complete timeline visualization
+  // Performance: 3000 events = ~44ms backend, ~860KB transfer - acceptable
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
     queryKey: ['events', 'list', eventTypeFilter],
     queryFn: () =>
-      eventsApi.list(1, 100, {
+      eventsApi.list(1, 5000, {
         event_type: eventTypeFilter === 'all' ? undefined : eventTypeFilter,
+        sort_order: 'asc', // Chronological order for timeline visualization
       }),
   });
 
@@ -295,21 +296,21 @@ export function EventAnalysis() {
 
       {/* Performance by Event Type Section */}
       {performanceByType && performanceByType.length > 0 && (
-        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+        <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 overflow-hidden transition-colors">
           <button
             onClick={() => toggleSection('performance')}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+            className="w-full px-6 py-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
+              <h2 className="text-lg font-mono font-bold text-slate-900 dark:text-white uppercase tracking-wider">
                 {t('events.performanceByType', '按事件类型统计')}
               </h2>
             </div>
             {expandedSection === 'performance' ? (
-              <ChevronUp className="w-5 h-5 text-neutral-400" />
+              <ChevronUp className="w-5 h-5 text-slate-400 dark:text-white/40" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-neutral-400" />
+              <ChevronDown className="w-5 h-5 text-slate-400 dark:text-white/40" />
             )}
           </button>
           {expandedSection === 'performance' && (
@@ -320,25 +321,25 @@ export function EventAnalysis() {
                   return (
                     <div
                       key={perf.event_type}
-                      className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg"
+                      className="p-4 bg-neutral-50 dark:bg-white/5 rounded-sm"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-neutral-900 dark:text-white capitalize">
+                        <span className="font-mono font-medium text-slate-900 dark:text-white capitalize">
                           {perf.event_type}
                         </span>
-                        <span className="text-sm text-neutral-500">
+                        <span className="text-sm font-mono text-slate-500 dark:text-white/40">
                           {perf.event_count} {t('events.times', '次')}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-neutral-500">{t('events.totalPnL', '总盈亏')}</span>
-                        <span className={`font-medium ${perf.total_pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <span className="text-slate-500 dark:text-white/40">{t('events.totalPnL', '总盈亏')}</span>
+                        <span className={`font-mono font-medium ${perf.total_pnl >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
                           {formatCurrency(perf.total_pnl)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm mt-1">
-                        <span className="text-neutral-500">{t('events.avgChange', '平均变动')}</span>
-                        <span className={`font-medium ${avgChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <span className="text-slate-500 dark:text-white/40">{t('events.avgChange', '平均变动')}</span>
+                        <span className={`font-mono font-medium ${avgChange >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
                           {avgChange >= 0 ? '+' : ''}{avgChange.toFixed(1)}%
                         </span>
                       </div>

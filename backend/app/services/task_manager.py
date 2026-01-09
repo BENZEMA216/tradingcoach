@@ -1,14 +1,15 @@
 """
 任务管理器
 
-input: Task 模型, 配置
+input: Task 模型, 配置, EventDetector
 output: 任务创建、执行、状态追踪
 pos: 后端服务层 - 管理异步分析任务的执行
 
 功能:
 - 异步任务执行 (ThreadPoolExecutor)
-- 详细处理日志 (每条交易/持仓/评分)
+- 详细处理日志 (每条交易/持仓/评分/事件)
 - 进度追踪 (0-100%)
+- 事件检测 (财报/价格异常/成交量异常)
 - 完成通知 (邮件)
 
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
@@ -225,6 +226,9 @@ class TaskManager:
         finally:
             session.close()
 
+    # 日志写入锁（SQLite 不支持并发写入）
+    _log_lock = threading.Lock()
+
     def _add_log(
         self,
         task_id: str,
@@ -241,37 +245,38 @@ class TaskManager:
             level: 日志级别 (info/success/warning/error)
             category: 日志分类 (import/match/score/system)
         """
-        init_database(config.DATABASE_URL, echo=False)
-        session = get_session()
+        with self._log_lock:  # 串行化数据库写入
+            init_database(config.DATABASE_URL, echo=False)
+            session = get_session()
 
-        try:
-            task = session.query(Task).filter(Task.task_id == task_id).first()
-            if not task:
-                return
+            try:
+                task = session.query(Task).filter(Task.task_id == task_id).first()
+                if not task:
+                    return
 
-            log_entry = {
-                "time": datetime.utcnow().isoformat(),
-                "level": level,
-                "message": message,
-            }
-            if category:
-                log_entry["category"] = category
+                log_entry = {
+                    "time": datetime.utcnow().isoformat(),
+                    "level": level,
+                    "message": message,
+                }
+                if category:
+                    log_entry["category"] = category
 
-            if task.logs is None:
-                task.logs = []
+                if task.logs is None:
+                    task.logs = []
 
-            # 限制日志数量
-            if len(task.logs) >= MAX_LOGS:
-                task.logs = task.logs[-(MAX_LOGS - 1):]
+                # 限制日志数量
+                if len(task.logs) >= MAX_LOGS:
+                    task.logs = task.logs[-(MAX_LOGS - 1):]
 
-            task.logs = task.logs + [log_entry]  # 创建新列表触发SQLAlchemy更新
-            session.commit()
+                task.logs = task.logs + [log_entry]  # 创建新列表触发SQLAlchemy更新
+                session.commit()
 
-        except Exception as e:
-            logger.error(f"Failed to add log for task {task_id}: {e}")
-            session.rollback()
-        finally:
-            session.close()
+            except Exception as e:
+                logger.error(f"Failed to add log for task {task_id}: {e}")
+                session.rollback()
+            finally:
+                session.close()
 
     def _run_csv_analysis(self, task_id: str, file_path: str, replace_mode: bool):
         """
@@ -456,11 +461,54 @@ class TaskManager:
                         step=f"已配对 {positions_matched} 个持仓"
                     )
 
-                    # ==================== 阶段 3: 质量评分 (70-95%) ====================
+                    # ==================== 阶段 3: 市场数据获取 (70-82%) ====================
                     self._update_task_status(
                         task_id,
                         TaskStatus.RUNNING,
-                        progress=75.0,
+                        progress=70.0,
+                        step="正在获取市场数据..."
+                    )
+                    self._add_log(task_id, "开始获取市场数据...", "info", "data")
+
+                    # 获取股票数据
+                    market_data_result = self._fetch_market_data_with_logs(task_id, session)
+
+                    # 根据结果显示不同的日志
+                    symbols_fetched = market_data_result.get('symbols_fetched', 0)
+                    symbols_analyzed = market_data_result.get('symbols_analyzed', 0)
+                    failed_symbols = market_data_result.get('failed_symbols', [])
+
+                    if symbols_fetched == 0 and symbols_analyzed > 0:
+                        # 完全失败
+                        self._add_log(
+                            task_id,
+                            f"⚠ 市场数据获取失败，将使用有限数据完成评分",
+                            "warning",
+                            "data"
+                        )
+                    elif len(failed_symbols) > 0:
+                        # 部分失败
+                        failed_count = len(failed_symbols)
+                        self._add_log(
+                            task_id,
+                            f"⚠ 部分标的获取失败: {failed_count} 个 (已成功 {symbols_fetched} 个)",
+                            "warning",
+                            "data"
+                        )
+                    else:
+                        # 全部成功
+                        self._add_log(
+                            task_id,
+                            f"✓ 市场数据获取完成: {symbols_fetched} 个标的",
+                            "success",
+                            "data"
+                        )
+
+                    # ==================== 阶段 4: 质量评分 (82-95%) ====================
+                    self._update_task_status(
+                        task_id,
+                        TaskStatus.RUNNING,
+                        progress=85.0,
                         step="正在计算质量评分..."
                     )
                     self._add_log(task_id, "开始计算质量评分 (V2 九维度)...", "info", "score")
@@ -491,8 +539,27 @@ class TaskManager:
                     self._update_task_status(
                         task_id,
                         TaskStatus.RUNNING,
-                        progress=95.0,
+                        progress=90.0,
                         step=f"已评分 {positions_scored} 个持仓"
+                    )
+
+                    # ==================== 阶段 4.5: 事件检测 (90-95%) ====================
+                    self._update_task_status(
+                        task_id,
+                        TaskStatus.RUNNING,
+                        progress=90.0,
+                        step="正在检测市场事件..."
+                    )
+                    self._add_log(task_id, "开始检测市场事件 (财报/价格异常/成交量异常)...", "info", "events")
+                    time.sleep(0.05)
+
+                    events_detected = self._detect_events_with_logs(task_id, session)
+
+                    self._update_task_status(
+                        task_id,
+                        TaskStatus.RUNNING,
+                        progress=95.0,
+                        step=f"已检测 {events_detected} 个事件"
                     )
 
                 except Exception as e:
@@ -507,7 +574,13 @@ class TaskManager:
             else:
                 self._add_log(task_id, "无新交易，跳过配对和评分", "info", "system")
 
-            # ==================== 阶段 4: 完成 (100%) ====================
+            # ==================== 阶段 5: 完成 (100%) ====================
+            # 如果没有运行market_data_result，初始化为空
+            if 'market_data_result' not in locals():
+                market_data_result = {'symbols_fetched': 0, 'records_fetched': 0}
+            if 'events_detected' not in locals():
+                events_detected = 0
+
             result = {
                 "language": language,
                 "total_rows": import_result.total_rows,
@@ -516,6 +589,9 @@ class TaskManager:
                 "duplicates_skipped": import_result.duplicates_skipped,
                 "positions_matched": positions_matched,
                 "positions_scored": positions_scored,
+                "events_detected": events_detected,
+                "symbols_fetched": market_data_result.get('symbols_fetched', 0),
+                "market_data_records": market_data_result.get('records_fetched', 0),
                 "errors": import_result.errors,
                 "error_messages": import_result.error_messages[:10] if import_result.error_messages else [],
                 "broker_name": getattr(import_result, 'broker_name', format_name),
@@ -559,8 +635,8 @@ class TaskManager:
         session = get_session()
 
         try:
-            # 获取所有交易（按时间排序）
-            trades = session.query(Trade).order_by(Trade.trade_time.asc()).all()
+            # 获取所有交易（按日期排序）
+            trades = session.query(Trade).order_by(Trade.trade_date.asc()).all()
 
             if not trades:
                 return
@@ -599,7 +675,7 @@ class TaskManager:
 
         try:
             # 获取所有持仓
-            positions = session.query(Position).order_by(Position.entry_time.asc()).all()
+            positions = session.query(Position).order_by(Position.open_date.asc()).all()
 
             if not positions:
                 return
@@ -645,8 +721,8 @@ class TaskManager:
         try:
             # 获取所有已评分的持仓
             positions = session.query(Position).filter(
-                Position.quality_score.isnot(None)
-            ).order_by(Position.quality_score.desc()).all()
+                Position.overall_score.isnot(None)
+            ).order_by(Position.overall_score.desc()).all()
 
             if not positions:
                 return
@@ -655,8 +731,8 @@ class TaskManager:
             time.sleep(0.03)
 
             for i, pos in enumerate(positions, 1):
-                grade = pos.quality_grade or "?"
-                score = pos.quality_score or 0
+                grade = pos.score_grade or "?"
+                score = pos.overall_score or 0
 
                 # 根据等级选择图标
                 grade_icons = {
@@ -690,7 +766,7 @@ class TaskManager:
             # 统计各等级数量
             grade_counts = {}
             for pos in positions:
-                g = pos.quality_grade or "?"
+                g = pos.score_grade or "?"
                 grade_counts[g] = grade_counts.get(g, 0) + 1
 
             grade_summary = " | ".join([f"{g}级:{c}个" for g, c in sorted(grade_counts.items())])
@@ -698,6 +774,157 @@ class TaskManager:
 
         except Exception as e:
             logger.warning(f"Failed to log scores: {e}")
+
+    def _fetch_market_data_with_logs(self, task_id: str, session) -> dict:
+        """
+        获取市场数据并记录日志（逐 symbol 日志）
+
+        Args:
+            task_id: 任务ID
+            session: 数据库会话
+
+        Returns:
+            dict with fetch statistics
+        """
+        from src.data_sources.batch_fetcher import BatchFetcher
+        from src.data_sources.cache_manager import CacheManager
+        from src.models.trade import Trade
+        from sqlalchemy import func
+
+        try:
+            self._add_log(task_id, "初始化数据获取引擎...", "info", "data")
+            time.sleep(0.05)
+
+            # 获取所有交易标的
+            symbols = session.query(Trade.symbol).distinct().all()
+            symbol_list = [s[0] for s in symbols]
+
+            if not symbol_list:
+                self._add_log(task_id, "⚠ 没有找到需要获取数据的标的", "warning", "data")
+                return {'symbols_fetched': 0, 'records_fetched': 0}
+
+            self._add_log(task_id, f"发现 {len(symbol_list)} 个需要获取数据的标的", "info", "data")
+            time.sleep(0.03)
+
+            # 显示部分标的
+            sample_symbols = symbol_list[:5]
+            self._add_log(task_id, f"标的预览: {', '.join(sample_symbols)}...", "info", "data")
+            time.sleep(0.03)
+
+            # 初始化 BatchFetcher
+            self._add_log(task_id, "初始化数据路由器 (YFinance + AKShare)...", "info", "data")
+            time.sleep(0.05)
+
+            cache_manager = CacheManager(db_session=session)
+            fetcher = BatchFetcher(
+                cache_manager=cache_manager,
+                use_router=True,
+                max_workers=1,  # 串行模式避免线程挂起问题
+                request_delay=0.1
+            )
+
+            self._add_log(task_id, "开始批量获取市场数据...", "info", "data")
+            time.sleep(0.05)
+
+            # 更新进度
+            self._update_task_status(
+                task_id,
+                TaskStatus.RUNNING,
+                progress=72.0,
+                step="正在获取市场数据..."
+            )
+
+            # 创建逐 symbol 日志回调函数
+            # 注意：使用线程安全的列表收集日志，完成后批量写入
+            # 避免在多线程回调中直接写数据库导致 SQLite 死锁
+            from threading import Lock
+            fetch_count = [0]  # 使用列表以便在闭包中修改
+            total_symbols = len(symbol_list)
+            pending_logs = []  # 待写入的日志
+            log_collect_lock = Lock()  # 日志收集锁
+            last_progress_update = [0]  # 上次进度更新时的 count
+
+            def on_symbol_fetched(symbol: str, success: bool, records: int, error_msg: str):
+                """每个 symbol 获取完成后的回调 - 只收集日志，谨慎更新进度"""
+                # 在锁内快速收集日志
+                with log_collect_lock:
+                    fetch_count[0] += 1
+                    current_count = fetch_count[0]
+
+                    if success:
+                        pending_logs.append({
+                            "message": f"✓ {symbol} 获取成功 ({records}条K线)",
+                            "level": "success",
+                            "category": "data"
+                        })
+                    else:
+                        # 精简错误信息
+                        short_error = error_msg[:50] if len(error_msg) > 50 else error_msg
+                        pending_logs.append({
+                            "message": f"✗ {symbol} 获取失败: {short_error}",
+                            "level": "warning",
+                            "category": "data"
+                        })
+
+                # 每20个标的更新一次进度（在锁外执行，减少持锁时间）
+                # 使用 try/except 防止数据库错误阻塞主流程
+                if current_count % 20 == 0 or current_count == total_symbols:
+                    try:
+                        progress = 72.0 + (current_count / total_symbols) * 10.0
+                        self._update_task_status(
+                            task_id,
+                            TaskStatus.RUNNING,
+                            progress=min(progress, 82.0),
+                            step=f"正在获取市场数据 ({current_count}/{total_symbols})..."
+                        )
+                    except Exception as e:
+                        # 进度更新失败不影响主流程
+                        logger.warning(f"Progress update failed: {e}")
+
+            # 执行批量获取（传入回调）
+            print(f">>> 开始批量获取 {len(symbol_list)} 个标的...")
+            stats = fetcher.fetch_required_data(session, progress_callback=on_symbol_fetched)
+            print(f">>> 批量获取完成！成功: {stats.get('symbols_fetched', 0)}, 失败: {len(stats.get('failed_symbols', []))}")
+
+            # 批量写入收集的日志
+            print(f">>> 写入 {len(pending_logs)} 条日志...")
+            for log_entry in pending_logs:
+                self._add_log(task_id, log_entry["message"], log_entry["level"], log_entry["category"])
+
+            # 记录汇总结果
+            self._add_log(task_id, f"分析标的数: {stats.get('symbols_analyzed', 0)}", "info", "data")
+            time.sleep(0.02)
+            self._add_log(task_id, f"成功获取: {stats.get('symbols_fetched', 0)} 个标的", "info", "data")
+            time.sleep(0.02)
+            self._add_log(task_id, f"缓存命中: {stats.get('cached_symbols', 0)} 个标的", "info", "data")
+            time.sleep(0.02)
+            self._add_log(task_id, f"数据记录数: {stats.get('records_fetched', 0)}", "info", "data")
+            time.sleep(0.02)
+
+            duration = stats.get('duration_seconds', 0)
+            self._add_log(task_id, f"获取耗时: {duration:.1f} 秒", "info", "data")
+
+            # 更新进度
+            self._update_task_status(
+                task_id,
+                TaskStatus.RUNNING,
+                progress=82.0,
+                step=f"已获取 {stats.get('symbols_fetched', 0)} 个标的的市场数据"
+            )
+
+            return stats
+
+        except Exception as e:
+            logger.error(f"[{task_id}] Market data fetch error: {e}", exc_info=True)
+            self._add_log(task_id, f"⚠ 市场数据获取异常: {str(e)}", "error", "data")
+            # 不抛出异常，继续评分流程（返回详细信息供调用方判断）
+            return {
+                'symbols_fetched': 0,
+                'records_fetched': 0,
+                'symbols_analyzed': 0,
+                'failed_symbols': [],
+                'error': str(e)
+            }
 
     def _clear_all_trading_data(self):
         """清除所有交易数据"""
@@ -719,6 +946,94 @@ class TaskManager:
             session.commit()
         finally:
             session.close()
+
+    def _detect_events_with_logs(self, task_id: str, session) -> int:
+        """
+        为新配对的持仓检测市场事件
+
+        Args:
+            task_id: 任务ID
+            session: 数据库会话
+
+        Returns:
+            检测到的事件数量
+        """
+        from src.analyzers.event_detector import EventDetector
+        from src.models.position import Position, PositionStatus
+
+        try:
+            self._add_log(task_id, "初始化事件检测器...", "info", "events")
+            time.sleep(0.03)
+
+            detector = EventDetector(session)
+
+            # 获取需要检测事件的持仓（已平仓且没有关联事件的）
+            positions = session.query(Position).filter(
+                Position.status == PositionStatus.CLOSED
+            ).all()
+
+            if not positions:
+                self._add_log(task_id, "⚠ 没有需要检测事件的持仓", "warning", "events")
+                return 0
+
+            self._add_log(task_id, f"发现 {len(positions)} 个已平仓持仓需要检测事件", "info", "events")
+            time.sleep(0.03)
+
+            total_events = 0
+            symbols_processed = set()
+
+            for i, position in enumerate(positions, 1):
+                try:
+                    # 检测该持仓的事件
+                    events = detector.detect_events_for_position(
+                        position,
+                        include_earnings=True,
+                        include_anomalies=True
+                    )
+
+                    if events:
+                        saved = detector.save_events(events, deduplicate=True)
+                        total_events += saved
+
+                        if saved > 0:
+                            symbols_processed.add(position.symbol)
+                            self._add_log(
+                                task_id,
+                                f"📊 {position.symbol}: 检测到 {saved} 个事件",
+                                "info",
+                                "events"
+                            )
+
+                    # 每10个持仓更新一次进度
+                    if i % 10 == 0:
+                        progress = 90.0 + (i / len(positions)) * 5.0
+                        self._update_task_status(
+                            task_id,
+                            TaskStatus.RUNNING,
+                            progress=min(progress, 95.0),
+                            step=f"正在检测事件 ({i}/{len(positions)})..."
+                        )
+
+                except Exception as e:
+                    # 单个持仓检测失败不影响其他
+                    logger.warning(f"Event detection failed for position {position.id}: {e}")
+                    continue
+
+            # 汇总日志
+            self._add_log(
+                task_id,
+                f"✓ 事件检测完成: {total_events} 个事件，涉及 {len(symbols_processed)} 个标的",
+                "success",
+                "events"
+            )
+
+            return total_events
+
+        except Exception as e:
+            logger.error(f"[{task_id}] Event detection error: {e}", exc_info=True)
+            self._add_log(task_id, f"⚠ 事件检测异常: {str(e)}", "warning", "events")
+            # 不抛出异常，事件检测失败不影响整体流程
+            return 0
 
     def _send_completion_email(self, task_id: str, result: dict):
         """发送完成通知邮件"""

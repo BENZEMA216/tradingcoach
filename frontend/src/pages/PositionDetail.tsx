@@ -20,10 +20,11 @@ import { RelatedPositionsTab } from '@/components/position-detail/RelatedPositio
 import { EventTimelineChart } from '@/components/charts';
 
 export function PositionDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const positionId = parseInt(id || '0', 10);
+  const isZh = i18n.language === 'zh' || i18n.language.startsWith('zh-');
 
   // Fetch position detail
   const { data: position, isLoading: loadingPosition } = useQuery({
@@ -98,14 +99,14 @@ export function PositionDetail() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/positions')}
-            className="p-2 hover:bg-white/10 rounded-sm transition-colors text-white/50 hover:text-white border border-transparent hover:border-white/10"
-            aria-label="Back"
+            className="p-2 hover:bg-neutral-200 dark:hover:bg-white/10 rounded-sm transition-colors text-neutral-500 dark:text-white/50 hover:text-neutral-900 dark:hover:text-white border border-transparent hover:border-neutral-300 dark:hover:border-white/10"
+            aria-label={t('common.back')}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-mono font-bold text-white tracking-tight uppercase">
+              <h1 className="text-2xl font-mono font-bold text-neutral-900 dark:text-white tracking-tight uppercase">
                 {position.symbol}
               </h1>
               <span
@@ -116,7 +117,7 @@ export function PositionDetail() {
                     : 'bg-purple-900/30 text-purple-400 border-purple-500/20'
                 )}
               >
-                {position.direction === 'long' ? 'LONG' : 'SHORT'}
+                {position.direction === 'long' ? t('direction.long') : t('direction.short')}
               </span>
               {position.is_option && (
                 <span className="px-2 py-0.5 text-[10px] font-bold rounded-sm uppercase tracking-wider bg-white/10 text-white/70 border border-white/20">
@@ -124,7 +125,7 @@ export function PositionDetail() {
                 </span>
               )}
             </div>
-            <p className="text-xs font-mono text-white/50 mt-1 uppercase tracking-wider">
+            <p className="text-xs font-mono text-neutral-500 dark:text-white/50 mt-1 uppercase tracking-wider">
               {position.symbol_name || position.symbol}
               {position.underlying_symbol && ` // UNDERLYING: ${position.underlying_symbol}`}
             </p>

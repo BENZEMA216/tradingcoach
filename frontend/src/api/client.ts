@@ -45,7 +45,7 @@ const API_BASE = '/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE,
-  timeout: 30000,
+  timeout: 60000, // 60秒默认超时
 });
 
 // Dashboard API
@@ -495,7 +495,7 @@ export const taskApi = {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 30000,
+        timeout: 300000, // 5分钟超时（大文件上传）
       }
     );
     return data;

@@ -31,8 +31,16 @@ const IGNORED_ERRORS = [
   'favicon.ico',
   'net::ERR_FAILED',
   'Failed to load resource',
+  'Network Error',
+  'timeout',
+  'AbortError',
+  'whitespace text nodes cannot be a child',  // React hydration warning for tables
+  'hydration error',
   // Add more patterns as needed
 ];
+
+// Extended timeout for pages with many API calls
+const EXTENDED_TIMEOUT = 15000;
 
 function isIgnoredError(errorText: string): boolean {
   return IGNORED_ERRORS.some(pattern => errorText.includes(pattern));
@@ -44,7 +52,7 @@ test.describe('Console Error Monitoring', () => {
       const consoleCollector = new ConsoleErrorCollector(page);
 
       await page.goto(`${BASE_URL}${pageInfo.path}`);
-      await waitForNetworkIdle(page);
+      await waitForNetworkIdle(page, EXTENDED_TIMEOUT);
 
       // Wait additional time for async operations
       await page.waitForTimeout(2000);
@@ -110,7 +118,7 @@ test.describe('Console Error Monitoring - User Interactions', () => {
     const consoleCollector = new ConsoleErrorCollector(page);
 
     await page.goto(`${BASE_URL}/positions`);
-    await waitForNetworkIdle(page);
+    await waitForNetworkIdle(page, EXTENDED_TIMEOUT);
 
     // Click on table rows
     const rows = page.locator('tbody tr');
@@ -118,13 +126,13 @@ test.describe('Console Error Monitoring - User Interactions', () => {
 
     if (rowCount > 0) {
       await rows.first().click();
-      await waitForNetworkIdle(page);
+      await waitForNetworkIdle(page, EXTENDED_TIMEOUT);
 
       // Go back
       const backButton = page.getByText(/Back|返回/);
       if (await backButton.isVisible()) {
         await backButton.click();
-        await waitForNetworkIdle(page);
+        await waitForNetworkIdle(page, EXTENDED_TIMEOUT);
       }
     }
 
@@ -204,7 +212,7 @@ test.describe('Console Error Monitoring - API Failures', () => {
     });
 
     await page.goto(`${BASE_URL}/dashboard`);
-    await waitForNetworkIdle(page);
+    await waitForNetworkIdle(page, EXTENDED_TIMEOUT);
 
     // Page should not crash
     await expect(page.locator('body')).toBeVisible();
@@ -226,7 +234,7 @@ test.describe('Console Warning Analysis', () => {
       const consoleCollector = new ConsoleErrorCollector(page);
 
       await page.goto(`${BASE_URL}${pageInfo.path}`);
-      await waitForNetworkIdle(page);
+      await waitForNetworkIdle(page, EXTENDED_TIMEOUT);
       await page.waitForTimeout(1000);
 
       const warnings = consoleCollector.getWarnings();

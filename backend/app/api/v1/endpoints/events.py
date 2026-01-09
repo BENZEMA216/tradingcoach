@@ -199,7 +199,7 @@ def event_to_detail(e: EventContext) -> EventDetail:
 @router.get("", response_model=PaginatedEvents)
 async def list_events(
     page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    page_size: int = Query(20, ge=1, le=5000, description="Items per page (max 5000 for timeline)"),
     symbol: Optional[str] = Query(None, description="Filter by symbol"),
     event_type: Optional[str] = Query(None, description="Filter by event type"),
     event_impact: Optional[str] = Query(None, description="Filter by impact: positive/negative/neutral"),

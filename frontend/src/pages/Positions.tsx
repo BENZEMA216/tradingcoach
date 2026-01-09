@@ -145,11 +145,11 @@ export function Positions() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-mono font-bold text-white tracking-tight uppercase">
+          <h1 className="text-2xl font-mono font-bold text-neutral-900 dark:text-white tracking-tight uppercase">
             {t('positions.title')}
           </h1>
-          <p className="text-xs font-mono text-white/50 mt-1">
-            // TRACKING_ID: {data?.total || 0} // {isZh ? '持仓记录' : 'POSITIONS_FOUND'}
+          <p className="text-xs font-mono text-neutral-500 dark:text-white/50 mt-1">
+            {isZh ? `共 ${data?.total || 0} 条持仓记录` : `${data?.total || 0} Positions Found`}
           </p>
         </div>
 
@@ -220,7 +220,7 @@ export function Positions() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Symbol Search */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
                 {isZh ? '股票代码' : 'SYMBOL'}
               </label>
               <div className="relative">
@@ -237,74 +237,86 @@ export function Positions() {
 
             {/* Direction Filter */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
                 {isZh ? '方向' : 'DIRECTION'}
               </label>
-              <select
-                value={filters.direction}
-                onChange={(e) => handleFilterChange('direction', e.target.value)}
-                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors"
-              >
-                <option value="">{isZh ? '全部' : 'ALL_DIRECTIONS'}</option>
-                <option value="long">{isZh ? '做多' : 'LONG'}</option>
-                <option value="short">{isZh ? '做空' : 'SHORT'}</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={filters.direction}
+                  onChange={(e) => handleFilterChange('direction', e.target.value)}
+                  className="w-full px-4 py-2 pr-10 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors cursor-pointer"
+                >
+                  <option value="">{isZh ? '全部' : 'ALL_DIRECTIONS'}</option>
+                  <option value="long">{isZh ? '做多' : 'LONG'}</option>
+                  <option value="short">{isZh ? '做空' : 'SHORT'}</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-white/30 pointer-events-none" />
+              </div>
             </div>
 
             {/* Status Filter */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
                 {isZh ? '状态' : 'STATUS'}
               </label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors"
-              >
-                <option value="">{isZh ? '全部' : 'ALL_STATUS'}</option>
-                <option value="CLOSED">{isZh ? '已平仓' : 'CLOSED'}</option>
-                <option value="OPEN">{isZh ? '持仓中' : 'OPEN'}</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={filters.status}
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                  className="w-full px-4 py-2 pr-10 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors cursor-pointer"
+                >
+                  <option value="">{isZh ? '全部' : 'ALL_STATUS'}</option>
+                  <option value="CLOSED">{isZh ? '已平仓' : 'CLOSED'}</option>
+                  <option value="OPEN">{isZh ? '持仓中' : 'OPEN'}</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-white/30 pointer-events-none" />
+              </div>
             </div>
 
             {/* Winner/Loser Filter */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
                 {isZh ? '盈亏' : 'RESULT'}
               </label>
-              <select
-                value={filters.is_winner}
-                onChange={(e) => handleFilterChange('is_winner', e.target.value)}
-                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors"
-              >
-                <option value="">{isZh ? '全部' : 'ALL_RESULTS'}</option>
-                <option value="true">{isZh ? '盈利' : 'WINNERS'}</option>
-                <option value="false">{isZh ? '亏损' : 'LOSERS'}</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={filters.is_winner}
+                  onChange={(e) => handleFilterChange('is_winner', e.target.value)}
+                  className="w-full px-4 py-2 pr-10 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors cursor-pointer"
+                >
+                  <option value="">{isZh ? '全部' : 'ALL_RESULTS'}</option>
+                  <option value="true">{isZh ? '盈利' : 'WINNERS'}</option>
+                  <option value="false">{isZh ? '亏损' : 'LOSERS'}</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-white/30 pointer-events-none" />
+              </div>
             </div>
 
             {/* Grade Filter */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
                 {isZh ? '评分等级' : 'GRADE'}
               </label>
-              <select
-                value={filters.score_grade}
-                onChange={(e) => handleFilterChange('score_grade', e.target.value)}
-                className="w-full px-4 py-2 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors"
-              >
-                <option value="">{isZh ? '全部' : 'ALL_GRADES'}</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="F">F</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={filters.score_grade}
+                  onChange={(e) => handleFilterChange('score_grade', e.target.value)}
+                  className="w-full px-4 py-2 pr-10 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors cursor-pointer"
+                >
+                  <option value="">{isZh ? '全部' : 'ALL_GRADES'}</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="F">F</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-white/30 pointer-events-none" />
+              </div>
             </div>
 
             {/* Date Start */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
                 {isZh ? '开始日期' : 'START_DATE'}
               </label>
               <input
@@ -317,7 +329,7 @@ export function Positions() {
 
             {/* Date End */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-mono text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2">
                 {isZh ? '结束日期' : 'END_DATE'}
               </label>
               <input
@@ -395,7 +407,7 @@ export function Positions() {
                           {position.symbol}
                         </span>
                         {position.symbol_name && (
-                          <span className="block text-[10px] text-white/30 truncate max-w-[120px]">
+                          <span className="block text-[10px] text-neutral-400 dark:text-white/30 truncate max-w-[120px]">
                             {position.symbol_name}
                           </span>
                         )}
@@ -410,7 +422,7 @@ export function Positions() {
                             : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20'
                         )}
                       >
-                        {position.direction === 'long' ? 'LONG' : 'SHORT'}
+                        {position.direction === 'long' ? t('direction.long') : t('direction.short')}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs font-mono text-slate-500 dark:text-white/50">

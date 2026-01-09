@@ -33,16 +33,20 @@ const ASSET_TYPE_COLORS: Record<string, string> = {
   futures: '#ef4444',
 };
 
-const ASSET_TYPE_LABELS: Record<string, string> = {
-  stock: 'Stock',
-  option: 'Option',
-  crypto: 'Crypto',
-  forex: 'Forex',
-  futures: 'Futures',
-};
-
 export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: AssetTypeChartProps) {
   const { t } = useTranslation();
+
+  // Asset type labels with i18n support
+  const getAssetTypeLabel = (type: string): string => {
+    const labels: Record<string, string> = {
+      stock: t('common.stock'),
+      option: t('common.option'),
+      crypto: 'Crypto',
+      forex: 'Forex',
+      futures: 'Futures',
+    };
+    return labels[type] || type;
+  };
   const containerRef = useRef<HTMLDivElement>(null);
   const chartConfig = useResponsiveChart(containerRef, { layout: 'horizontal' });
 
@@ -72,7 +76,7 @@ export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: As
   }
 
   const chartData = data.map((item) => ({
-    type: ASSET_TYPE_LABELS[item.asset_type] || item.asset_type,
+    type: getAssetTypeLabel(item.asset_type),
     rawType: item.asset_type,
     pnl: item.total_pnl,
     count: item.count,

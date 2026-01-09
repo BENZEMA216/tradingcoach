@@ -90,12 +90,10 @@ export function AICoach() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
             <SparklesIcon className="w-8 h-8 text-purple-600" />
-            {isZh ? 'AI 交易教练' : 'AI Trading Coach'}
+            {t('aiCoach.chatTitle', 'AI Trading Coach')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            {isZh
-              ? '智能分析你的交易表现，提供个性化改进建议'
-              : 'Smart analysis of your trading performance with personalized suggestions'}
+            {t('insights.aiCoach', 'Smart analysis of your trading performance with personalized suggestions')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -114,9 +112,7 @@ export function AICoach() {
             />
             {status?.available
               ? `${status.provider} - ${status.model}`
-              : isZh
-              ? 'AI 服务不可用'
-              : 'AI Unavailable'}
+              : t('aiCoach.serviceUnavailable', 'AI Unavailable')}
           </div>
         </div>
       </div>
@@ -133,7 +129,7 @@ export function AICoach() {
             }`}
           >
             <LightBulbIcon className="w-5 h-5" />
-            {isZh ? '洞察分析' : 'Insights'}
+            {t('insights.insightsTab', 'Insights')}
             {proactiveData?.insights && (
               <span className="ml-1 px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 rounded-full">
                 {proactiveData.insights.length}
@@ -149,7 +145,7 @@ export function AICoach() {
             }`}
           >
             <ChatBubbleLeftRightIcon className="w-5 h-5" />
-            {isZh ? '问答对话' : 'Chat'}
+            {t('insights.chat', 'Chat')}
           </button>
         </nav>
       </div>
@@ -168,7 +164,7 @@ export function AICoach() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {isZh ? 'AI 复盘总结' : 'AI Summary'}
+                      {t('insights.aiSummary', 'AI Summary')}
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {proactiveData.date_range?.display || 'All time'}
@@ -178,7 +174,7 @@ export function AICoach() {
                     onClick={() => refetch()}
                     disabled={isFetching}
                     className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors"
-                    title={isZh ? '刷新' : 'Refresh'}
+                    title={t('common.refresh', 'Refresh')}
                   >
                     <ArrowPathIcon className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
                   </button>
@@ -196,7 +192,7 @@ export function AICoach() {
               {/* Type Filter */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {isZh ? '类型' : 'Type'}:
+                  {t('insights.type', 'Type')}:
                 </span>
                 <div className="flex gap-1">
                   {TYPE_FILTERS.map((filter) => (
@@ -224,7 +220,7 @@ export function AICoach() {
               {/* Category Filter */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {isZh ? '维度' : 'Category'}:
+                  {t('insights.category', 'Category')}:
                 </span>
                 <select
                   value={categoryFilter}
@@ -260,7 +256,7 @@ export function AICoach() {
                 ))
               ) : error ? (
                 <div className="text-center py-8 text-red-500">
-                  {isZh ? '加载失败，请重试' : 'Failed to load. Please try again.'}
+                  {t('insights.loadFailed', 'Failed to load. Please try again.')}
                 </div>
               ) : filteredInsights.length > 0 ? (
                 filteredInsights.map((insight: TradingInsight) => (
@@ -269,7 +265,7 @@ export function AICoach() {
               ) : (
                 <div className="text-center py-12 text-gray-500 dark:text-gray-400">
                   <LightBulbIcon className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>{isZh ? '没有符合筛选条件的洞察' : 'No insights match your filters'}</p>
+                  <p>{t('insights.noMatchingInsights', 'No insights match your filters')}</p>
                 </div>
               )}
             </div>
@@ -283,16 +279,16 @@ export function AICoach() {
                 <div className="flex items-center gap-2 mb-4">
                   <ChartBarIcon className="w-5 h-5 text-gray-400" />
                   <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {isZh ? '关键指标' : 'Key Metrics'}
+                    {t('insights.keyMetrics', 'Key Metrics')}
                   </h3>
                 </div>
                 <div className="space-y-4">
                   <MetricItem
-                    label={isZh ? '总交易数' : 'Total Trades'}
+                    label={t('insights.totalTrades', 'Total Trades')}
                     value={String(proactiveData.key_metrics.total_trades || 0)}
                   />
                   <MetricItem
-                    label={isZh ? '胜率' : 'Win Rate'}
+                    label={t('common.winRate', 'Win Rate')}
                     value={formatPercent(proactiveData.key_metrics.win_rate, 1)}
                     highlight={
                       proactiveData.key_metrics.win_rate !== undefined &&
@@ -300,7 +296,7 @@ export function AICoach() {
                     }
                   />
                   <MetricItem
-                    label={isZh ? '总盈亏' : 'Total P&L'}
+                    label={t('common.pnl', 'Total P&L')}
                     value={formatCurrency(proactiveData.key_metrics.total_pnl)}
                     highlight={
                       proactiveData.key_metrics.total_pnl !== undefined &&
@@ -309,12 +305,12 @@ export function AICoach() {
                   />
                   <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
                     <MetricItem
-                      label={isZh ? '平均盈利' : 'Avg Win'}
+                      label={t('statistics.avgWin', 'Avg Win')}
                       value={formatCurrency(proactiveData.key_metrics.avg_win)}
                       small
                     />
                     <MetricItem
-                      label={isZh ? '平均亏损' : 'Avg Loss'}
+                      label={t('statistics.avgLoss', 'Avg Loss')}
                       value={formatCurrency(proactiveData.key_metrics.avg_loss)}
                       small
                     />
@@ -326,24 +322,24 @@ export function AICoach() {
             {/* Insight Type Summary */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-                {isZh ? '洞察概览' : 'Insights Overview'}
+                {t('insights.insightsOverview', 'Insights Overview')}
               </h3>
               <div className="space-y-3">
                 <TypeSummaryItem
                   icon={<ExclamationTriangleIcon className="w-5 h-5" />}
-                  label={isZh ? '待改进' : 'Problems'}
+                  label={t('insights.problems', 'Problems')}
                   count={typeCounts.problem}
                   color="red"
                 />
                 <TypeSummaryItem
                   icon={<CheckCircleIcon className="w-5 h-5" />}
-                  label={isZh ? '优势' : 'Strengths'}
+                  label={t('insights.strengths', 'Strengths')}
                   count={typeCounts.strength}
                   color="green"
                 />
                 <TypeSummaryItem
                   icon={<InformationCircleIcon className="w-5 h-5" />}
-                  label={isZh ? '提醒' : 'Reminders'}
+                  label={t('insights.reminders', 'Reminders')}
                   count={typeCounts.reminder}
                   color="yellow"
                 />

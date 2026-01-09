@@ -104,12 +104,17 @@ class YFinanceClient(BaseDataClient):
         if not self.validate_date_range(start_date, end_date):
             raise ValueError(f"Invalid date range: {start_date} to {end_date}")
 
+        # 转换 symbol 格式（如港股 00700 -> 0700.HK）
+        converted_symbol = self.convert_symbol_for_yfinance(symbol)
+        if converted_symbol != symbol:
+            logger.debug(f"Symbol converted: {symbol} -> {converted_symbol}")
+
         # 限流检查
         self._check_rate_limit()
 
         # 获取数据（带重试）
         try:
-            df = self._fetch_with_retry(symbol, start_date, end_date, interval)
+            df = self._fetch_with_retry(converted_symbol, start_date, end_date, interval)
 
             if df is None or df.empty:
                 raise DataNotFoundError(f"No data found for {symbol} from {start_date} to {end_date}")
@@ -152,14 +157,25 @@ class YFinanceClient(BaseDataClient):
         # 创建 Ticker 对象
         ticker = yf.Ticker(symbol)
 
-        # 下载历史数据
-        df = ticker.history(
-            start=start_date,
-            end=end_date + timedelta(days=1),  # yfinance end是不包含的，所以+1天
-            interval=interval,
-            auto_adjust=False,  # 不自动调整，保留原始价格
-            actions=False  # 不包含分红、拆股等事件
-        )
+        # 下载历史数据（设置超时）
+        try:
+            df = ticker.history(
+                start=start_date,
+                end=end_date + timedelta(days=1),  # yfinance end是不包含的，所以+1天
+                interval=interval,
+                auto_adjust=False,  # 不自动调整，保留原始价格
+                actions=False,  # 不包含分红、拆股等事件
+                timeout=20  # 20秒超时（yfinance 0.2.28+ 支持）
+            )
+        except TypeError:
+            # 旧版本 yfinance 不支持 timeout 参数
+            df = ticker.history(
+                start=start_date,
+                end=end_date + timedelta(days=1),
+                interval=interval,
+                auto_adjust=False,
+                actions=False
+            )
 
         return df
 

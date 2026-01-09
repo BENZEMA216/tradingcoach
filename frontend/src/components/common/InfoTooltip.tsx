@@ -54,7 +54,7 @@ export function InfoTooltip({ termKey, size = 'sm' }: InfoTooltipProps) {
                    transition-colors rounded-full
                    hover:bg-gray-100 dark:hover:bg-gray-700
                    p-0.5`}
-        aria-label={`Info about ${term}`}
+        aria-label={t('common.infoAbout', { term, defaultValue: `Info about ${term}` })}
       >
         <Info className={iconSize} />
       </button>

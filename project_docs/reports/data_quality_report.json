@@ -1,0 +1,347 @@
+{
+  "timestamp": "2026-01-07T19:15:05.614171",
+  "db_path": "/Users/benzema/Desktop/Desktop - DONGZHE的MacBook Pro/tradingcoach/data/tradingcoach.db",
+  "checks": {
+    "database_quality": {
+      "status": "passed",
+      "health_status": "HEALTHY",
+      "overall_score": 100.0,
+      "total_records": 1050,
+      "anomalies": 616,
+      "critical_issues": 0,
+      "tables": {
+        "trades": {
+          "total_records": 606,
+          "quality_level": "excellent",
+          "overall_score": 100.0,
+          "completeness": 100.0,
+          "accuracy": 100.0,
+          "consistency": 100.0,
+          "freshness_hours": 1569.6,
+          "null_counts": {
+            "symbol": 0,
+            "direction": 0,
+            "filled_quantity": 0,
+            "filled_price": 0,
+            "filled_time": 0
+          },
+          "duplicates": 0,
+          "outliers": 0
+        },
+        "positions": {
+          "total_records": 444,
+          "quality_level": "excellent",
+          "overall_score": 100.0,
+          "completeness": 100.0,
+          "accuracy": 100.0,
+          "consistency": 100.0,
+          "freshness_hours": 8.2,
+          "null_counts": {
+            "symbol": 0,
+            "direction": 0,
+            "status": 0,
+            "open_price": 0,
+            "open_time": 0,
+            "quantity": 0
+          },
+          "outliers": 0
+        }
+      },
+      "recommendations": []
+    },
+    "database": {
+      "status": "passed",
+      "health_status": "HEALTHY",
+      "overall_score": 100.0,
+      "total_records": 1050,
+      "anomalies": 616,
+      "critical_issues": 0,
+      "tables": {
+        "trades": {
+          "total_records": 606,
+          "quality_level": "excellent",
+          "overall_score": 100.0,
+          "completeness": 100.0,
+          "accuracy": 100.0,
+          "consistency": 100.0,
+          "freshness_hours": 1569.6,
+          "null_counts": {
+            "symbol": 0,
+            "direction": 0,
+            "filled_quantity": 0,
+            "filled_price": 0,
+            "filled_time": 0
+          },
+          "duplicates": 0,
+          "outliers": 0
+        },
+        "positions": {
+          "total_records": 444,
+          "quality_level": "excellent",
+          "overall_score": 100.0,
+          "completeness": 100.0,
+          "accuracy": 100.0,
+          "consistency": 100.0,
+          "freshness_hours": 8.2,
+          "null_counts": {
+            "symbol": 0,
+            "direction": 0,
+            "status": 0,
+            "open_price": 0,
+            "open_time": 0,
+            "quantity": 0
+          },
+          "outliers": 0
+        }
+      },
+      "recommendations": []
+    },
+    "fifo_matching": {
+      "status": "passed",
+      "trades": {
+        "total": 606,
+        "matched": 599,
+        "unmatched": 7,
+        "match_rate": 98.8
+      },
+      "positions": {
+        "total": 444,
+        "closed": 403,
+        "open": 41
+      },
+      "performance": {
+        "wins": 190,
+        "losses": 213,
+        "win_rate": 47.1,
+        "total_pnl": 76282.4,
+        "avg_pnl": 189.29
+      },
+      "top_symbols": [
+        {
+          "symbol": "TSLL",
+          "count": 64
+        },
+        {
+          "symbol": "01810",
+          "count": 20
+        },
+        {
+          "symbol": "FIG",
+          "count": 19
+        },
+        {
+          "symbol": "CONL",
+          "count": 18
+        },
+        {
+          "symbol": "INOD",
+          "count": 17
+        },
+        {
+          "symbol": "NVDL",
+          "count": 17
+        },
+        {
+          "symbol": "09988",
+          "count": 15
+        },
+        {
+          "symbol": "HIMS",
+          "count": 15
+        },
+        {
+          "symbol": "NVDA",
+          "count": 13
+        },
+        {
+          "symbol": "PLTR",
+          "count": 13
+        }
+      ],
+      "issues": {
+        "inconsistent_positions": 248
+      }
+    },
+    "fifo": {
+      "status": "passed",
+      "trades": {
+        "total": 606,
+        "matched": 599,
+        "unmatched": 7,
+        "match_rate": 98.8
+      },
+      "positions": {
+        "total": 444,
+        "closed": 403,
+        "open": 41
+      },
+      "performance": {
+        "wins": 190,
+        "losses": 213,
+        "win_rate": 47.1,
+        "total_pnl": 76282.4,
+        "avg_pnl": 189.29
+      },
+      "top_symbols": [
+        {
+          "symbol": "TSLL",
+          "count": 64
+        },
+        {
+          "symbol": "01810",
+          "count": 20
+        },
+        {
+          "symbol": "FIG",
+          "count": 19
+        },
+        {
+          "symbol": "CONL",
+          "count": 18
+        },
+        {
+          "symbol": "INOD",
+          "count": 17
+        },
+        {
+          "symbol": "NVDL",
+          "count": 17
+        },
+        {
+          "symbol": "09988",
+          "count": 15
+        },
+        {
+          "symbol": "HIMS",
+          "count": 15
+        },
+        {
+          "symbol": "NVDA",
+          "count": 13
+        },
+        {
+          "symbol": "PLTR",
+          "count": 13
+        }
+      ],
+      "issues": {
+        "inconsistent_positions": 248
+      }
+    },
+    "news_fetcher": {
+      "status": "passed",
+      "is_available": true,
+      "adapter": "DDGS",
+      "query": "AAPL stock news",
+      "results_count": 10,
+      "sample_results": [
+        {
+          "title": "Dear Apple Stock Fans, Mark Your Calendars for January 12",
+          "snippet": "More News from Barchart Apple Stock Performance AAPL stock trades 8% below its 52-week high of $288....",
+          "source": "Barchart",
+          "url": "https://finance.yahoo.com/news/dear-apple-stock-fans-mark-155536480.html",
+          "date": "2026-01-06"
+        },
+        {
+          "title": "Apple Stock Starts 2026 With a Downgrade. Why Investors Shouldn’t Make Too Much ...",
+          "snippet": "For Apple (NASDAQ: AAPL ) shareholders, it feels like Groundhog Day (the start of 2025 all over...",
+          "source": "24/7 Wall St.",
+          "url": "https://finance.yahoo.com/news/apple-stock-starts-2026-downgrade-154205170.html",
+          "date": "2026-01-06"
+        },
+        {
+          "title": "This Stock Is One of Warren Buffett’s ‘Crown Jewels.’ Should You Buy It for 2026...",
+          "snippet": "More News from Barchart Berkshire's initial $40 billion stake in Apple has generated more than $100...",
+          "source": "Barchart",
+          "url": "https://finance.yahoo.com/news/stock-one-warren-buffett-crown-175526912.html",
+          "date": "2026-01-02"
+        }
+      ]
+    },
+    "news": {
+      "status": "passed",
+      "is_available": true,
+      "adapter": "DDGS",
+      "query": "AAPL stock news",
+      "results_count": 10,
+      "sample_results": [
+        {
+          "title": "Dear Apple Stock Fans, Mark Your Calendars for January 12",
+          "snippet": "More News from Barchart Apple Stock Performance AAPL stock trades 8% below its 52-week high of $288....",
+          "source": "Barchart",
+          "url": "https://finance.yahoo.com/news/dear-apple-stock-fans-mark-155536480.html",
+          "date": "2026-01-06"
+        },
+        {
+          "title": "Apple Stock Starts 2026 With a Downgrade. Why Investors Shouldn’t Make Too Much ...",
+          "snippet": "For Apple (NASDAQ: AAPL ) shareholders, it feels like Groundhog Day (the start of 2025 all over...",
+          "source": "24/7 Wall St.",
+          "url": "https://finance.yahoo.com/news/apple-stock-starts-2026-downgrade-154205170.html",
+          "date": "2026-01-06"
+        },
+        {
+          "title": "This Stock Is One of Warren Buffett’s ‘Crown Jewels.’ Should You Buy It for 2026...",
+          "snippet": "More News from Barchart Berkshire's initial $40 billion stake in Apple has generated more than $100...",
+          "source": "Barchart",
+          "url": "https://finance.yahoo.com/news/stock-one-warren-buffett-crown-175526912.html",
+          "date": "2026-01-02"
+        }
+      ]
+    },
+    "stock_data_fetcher": {
+      "status": "passed",
+      "is_available": true,
+      "data_source": "YFinance",
+      "symbol": "AAPL",
+      "ohlcv": {
+        "success": true,
+        "rows": 20,
+        "columns": [
+          "Open",
+          "High",
+          "Low",
+          "Close",
+          "Volume",
+          "Adj Close"
+        ],
+        "date_range": "2025-12-08 to 2026-01-07"
+      },
+      "stock_info": {
+        "success": true,
+        "name": "Apple Inc.",
+        "current_price": 262.36
+      }
+    },
+    "stock": {
+      "status": "passed",
+      "is_available": true,
+      "data_source": "YFinance",
+      "symbol": "AAPL",
+      "ohlcv": {
+        "success": true,
+        "rows": 20,
+        "columns": [
+          "Open",
+          "High",
+          "Low",
+          "Close",
+          "Volume",
+          "Adj Close"
+        ],
+        "date_range": "2025-12-08 to 2026-01-07"
+      },
+      "stock_info": {
+        "success": true,
+        "name": "Apple Inc.",
+        "current_price": 262.36
+      }
+    }
+  },
+  "summary": {
+    "total_checks": 4,
+    "passed": 4,
+    "failed": 0,
+    "warnings": 0
+  },
+  "overall_status": "PASSED"
+}

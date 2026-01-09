@@ -1,8 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { uploadApi, taskApi, systemApi } from '@/api/client';
-import type { UploadHistoryItem } from '@/api/client';
+import type { UploadHistoryItem, TaskStatus } from '@/api/client';
 import {
   Upload as UploadIcon,
   FileText,
@@ -15,12 +15,38 @@ import {
   Trash2,
   AlertTriangle,
   X,
+  CheckCircle,
+  ArrowRight,
+  RefreshCw,
 } from 'lucide-react';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatNumber } from '@/utils/format';
 import { useNavigate } from 'react-router-dom';
 
+// 动态处理消息
+const LOADING_MESSAGES = [
+  'Initializing environment...',
+  'Reading trade data...',
+  'Matching opening and closing trades...',
+  'Fetching market data from YFinance...',
+  'Analyzing stock price trends...',
+  'Calculating technical indicators...',
+  'Analyzing risk factors...',
+  'Generating performance insights...',
+  'Finalizing report...',
+];
+
+// 进度步骤 (包含市场数据获取)
+const STEPS = [
+  { key: 'upload', label: '上传文件', labelEn: 'Upload', progress: 0 },
+  { key: 'import', label: '导入数据', labelEn: 'Import', progress: 20 },
+  { key: 'match', label: '持仓配对', labelEn: 'Match', progress: 45 },
+  { key: 'data', label: '获取行情', labelEn: 'Fetch Data', progress: 70 },
+  { key: 'score', label: '质量评分', labelEn: 'Score', progress: 85 },
+  { key: 'complete', label: '完成', labelEn: 'Done', progress: 100 },
+];
+
 export function Upload() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -30,6 +56,65 @@ export function Upload() {
   const [replaceMode, setReplaceMode] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 任务状态管理
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+  const [showLogs, setShowLogs] = useState(false);
+
+  // 循环显示动态消息
+  useEffect(() => {
+    if (!isProcessing) return;
+    const interval = setInterval(() => {
+      setLoadingMsgIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [isProcessing]);
+
+  // 任务状态轮询
+  const { data: task } = useQuery({
+    queryKey: ['task', taskId],
+    queryFn: () => taskApi.getStatus(taskId!),
+    enabled: !!taskId && isProcessing,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      if (data?.status === 'completed' || data?.status === 'failed' || data?.status === 'cancelled') {
+        return false;
+      }
+      return 1000; // 每秒轮询
+    },
+  });
+
+  // 任务完成时刷新缓存
+  useEffect(() => {
+    if (task?.status === 'completed') {
+      queryClient.invalidateQueries({ queryKey: ['positions'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['statistics'] });
+      queryClient.invalidateQueries({ queryKey: ['upload', 'history'] });
+    }
+  }, [task?.status, queryClient]);
+
+  // 计算当前步骤
+  const getCurrentStepIndex = () => {
+    if (!task) return 0;
+    const progress = task.progress;
+    for (let i = STEPS.length - 1; i >= 0; i--) {
+      if (progress >= STEPS[i].progress) {
+        return i;
+      }
+    }
+    return 0;
+  };
+
+  // 重置上传状态
+  const resetUpload = () => {
+    setTaskId(null);
+    setIsProcessing(false);
+    setSelectedFile(null);
+    setShowLogs(false);
+  };
 
   // Handle click to open file dialog
   const handleClick = useCallback(() => {
@@ -63,8 +148,9 @@ export function Upload() {
     mutationFn: ({ file, email }: { file: File; email?: string }) =>
       taskApi.create(file, email, replaceMode),
     onSuccess: (data) => {
-      // Navigate to task status page
-      navigate(`/tasks/${data.task_id}`);
+      // 不再跳转，在当前页面显示进度
+      setTaskId(data.task_id);
+      setIsProcessing(true);
     },
   });
 
@@ -248,9 +334,248 @@ export function Upload() {
         </div>
       )}
 
-      {/* Upload Area */}
+      {/* Upload Area / Processing Progress */}
       <div className="glass-card p-8 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none transition-opacity duration-500 opacity-0 group-hover:opacity-100" />
+
+        {/* 处理中 - 显示进度 */}
+        {(isProcessing || task?.status === 'completed' || task?.status === 'failed') && task ? (
+          <div className="space-y-6">
+            {/* 进度头部 */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                {task.status === 'running' || task.status === 'pending' ? (
+                  <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                    <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                  </div>
+                ) : task.status === 'completed' ? (
+                  <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
+                    <CheckCircle className="w-6 h-6 text-green-600" />
+                  </div>
+                ) : (
+                  <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
+                    <AlertCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                    {task.status === 'completed'
+                      ? t('upload.analysisComplete', 'Analysis Complete!')
+                      : task.status === 'failed'
+                      ? t('upload.analysisFailed', 'Analysis Failed')
+                      : t('upload.analyzing', 'Analyzing Trade Data...')}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {task.file_name}
+                  </p>
+                </div>
+              </div>
+              {task.status !== 'running' && task.status !== 'pending' && (
+                <button
+                  onClick={resetUpload}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+
+            {/* 进度条 */}
+            <div className="relative pt-2">
+              <div className="h-3 bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    task.status === 'failed'
+                      ? 'bg-red-500'
+                      : task.status === 'completed'
+                      ? 'bg-green-500'
+                      : 'bg-gradient-to-r from-blue-600 via-purple-500 to-blue-600 bg-[length:200%_100%] animate-pulse'
+                  }`}
+                  style={{ width: `${task.progress}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {task.status === 'running' && LOADING_MESSAGES[loadingMsgIndex]}
+                </span>
+                <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                  {task.progress.toFixed(0)}%
+                </span>
+              </div>
+            </div>
+
+            {/* 步骤指示器 */}
+            <div className="flex justify-between px-4">
+              {STEPS.map((step, index) => {
+                const currentStepIndex = getCurrentStepIndex();
+                const isCompleted = index < currentStepIndex || (index === currentStepIndex && task.status === 'completed');
+                const isCurrent = index === currentStepIndex && (task.status === 'running' || task.status === 'pending');
+
+                return (
+                  <div key={step.key} className="flex flex-col items-center">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 transition-colors ${
+                        isCompleted
+                          ? 'bg-green-500 text-white'
+                          : isCurrent
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : isCurrent ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <span className="text-sm">{index + 1}</span>
+                      )}
+                    </div>
+                    <span className={`text-xs text-center ${
+                      isCompleted || isCurrent
+                        ? 'text-gray-900 dark:text-white font-medium'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}>
+                      {i18n.language === 'zh' ? step.label : step.labelEn}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 当前步骤消息 */}
+            {task.current_step && (task.status === 'running' || task.status === 'pending') && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  {task.current_step}
+                </p>
+              </div>
+            )}
+
+            {/* 完成结果 */}
+            {task.status === 'completed' && task.result && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('task.newTrades', 'New Trades')}
+                    </p>
+                    <p className="text-xl font-bold text-green-600">
+                      {formatNumber(task.result.new_trades || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('task.positions', 'Positions')}
+                    </p>
+                    <p className="text-xl font-bold text-blue-600">
+                      {formatNumber(task.result.positions_matched || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('task.symbols', 'Symbols')}
+                    </p>
+                    <p className="text-xl font-bold text-orange-600">
+                      {formatNumber(task.result.symbols_fetched || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('task.scored', 'Scored')}
+                    </p>
+                    <p className="text-xl font-bold text-purple-600">
+                      {formatNumber(task.result.positions_scored || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('task.language', 'Format')}
+                    </p>
+                    <p className="text-xl font-bold text-gray-600 dark:text-gray-300">
+                      {task.result.language === 'english' ? 'EN' : 'CN'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => navigate('/positions')}
+                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center space-x-2"
+                  >
+                    <span>{t('task.viewPositions', 'View Positions')}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => navigate('/')}
+                    className="px-4 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    {t('task.viewDashboard', 'Dashboard')}
+                  </button>
+                  <button
+                    onClick={resetUpload}
+                    className="px-4 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span>{t('upload.uploadMore', 'Upload More')}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* 失败信息 */}
+            {task.status === 'failed' && (
+              <div className="space-y-4">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                  <p className="text-red-700 dark:text-red-300">
+                    {task.error_message || 'An unknown error occurred'}
+                  </p>
+                </div>
+                <button
+                  onClick={resetUpload}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center space-x-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span>{t('task.tryAgain', 'Try Again')}</span>
+                </button>
+              </div>
+            )}
+
+            {/* 处理日志 */}
+            {task.logs && task.logs.length > 0 && (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <button
+                  onClick={() => setShowLogs(!showLogs)}
+                  className="flex items-center justify-between w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <span>{t('task.logs', 'Processing Logs')} ({task.logs.length})</span>
+                  <span>{showLogs ? '▲' : '▼'}</span>
+                </button>
+
+                {showLogs && (
+                  <div className="mt-3 space-y-1 max-h-40 overflow-y-auto">
+                    {task.logs.slice(-20).map((log, index) => (
+                      <div
+                        key={index}
+                        className={`text-xs font-mono p-2 rounded ${
+                          log.level === 'error'
+                            ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                            : 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        <span className="text-gray-400 dark:text-gray-500 mr-2">
+                          {new Date(log.time).toLocaleTimeString()}
+                        </span>
+                        {log.message}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* 上传区域 - 未处理时显示 */
+          <>
         {/* Hidden file input - outside the clickable area */}
         <input
           ref={fileInputRef}
@@ -388,6 +713,8 @@ export function Upload() {
               </div>
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
 

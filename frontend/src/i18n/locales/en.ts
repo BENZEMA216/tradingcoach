@@ -11,6 +11,7 @@ export default {
     search: 'Search',
     filter: 'Filter',
     reset: 'Reset',
+    refresh: 'Refresh',
     all: 'All',
     yes: 'Yes',
     no: 'No',
@@ -20,6 +21,16 @@ export default {
     days: 'days',
     day: 'day',
     sameDay: 'Same day',
+    show: 'Show',
+    hide: 'Hide',
+    menu: 'Menu',
+    back: 'Back',
+    stock: 'Stock',
+    option: 'Option',
+    top10Symbols: 'Top 10 Symbols',
+    infoAbout: 'Info about {{term}}',
+    switchToDarkMode: 'Switch to Dark Mode',
+    switchToLightMode: 'Switch to Light Mode',
   },
 
   // Strategy types
@@ -38,6 +49,7 @@ export default {
     short: 'Short',
     buy: 'Buy',
     sell: 'Sell',
+    sell_short: 'Sell Short',
   },
 
   // Navigation
@@ -82,6 +94,42 @@ export default {
     taskProgress: 'Progress: {{progress}}%',
     continueViewing: 'Continue',
     ignoreAndUpload: 'Upload New File',
+    // Industrial style elements
+    heroTitle: 'PURE\nALPHA.',
+    heroSubtitle: 'Construct your edge with institutional-grade precision metrics and psychological profiling.',
+    systemStatus: 'System Operational',
+    version: 'v',
+    uploadProtocol: 'Upload Protocol',
+    dragCsvHere: 'Drag Binary CSV Here',
+    browseDataSource: 'Browse Data Source',
+    executeAnalysis: 'Execute Analysis',
+    initializing: 'Initializing...',
+    // Feature modules
+    neuralPsych: 'Neural Psych',
+    neuralPsychDesc: '[MODULE_A] Decoding behavioral patterns using advanced algorithmic sequencing.',
+    precisionMetric: 'Precision Metric',
+    precisionMetricDesc: '[MODULE_B] Objective trade grading system based on pre-defined strategy constraints.',
+    riskStruct: 'Risk Struct',
+    riskStructDesc: '[MODULE_C] Real-time visualization of MAE/MFE and drawdown probabilities.',
+  },
+
+  // Loading Page
+  loading: {
+    statusComplete: 'ANALYSIS COMPLETE',
+    statusFailed: 'ANALYSIS FAILED',
+    statusCancelled: 'ANALYSIS CANCELLED',
+    statusProcessing: 'SYSTEM PROCESSING',
+    connecting: 'CONNECTING...',
+    analyzing: 'Analyzing...',
+    analysisFailed: 'Analysis Failed',
+    analysisComplete: 'Analysis Complete',
+    tryAgain: 'Try Again',
+    viewPositions: 'View Positions',
+    viewDashboard: 'Dashboard',
+    trades: 'Trades',
+    positions: 'Positions',
+    symbols: 'Symbols',
+    scored: 'Scored',
   },
 
   // Notifications
@@ -312,6 +360,10 @@ export default {
     amount: 'Amount',
     fees: 'Fees',
     slippage: 'Slippage',
+    // Execution tab
+    totalExecutions: 'Total Executions',
+    avgSlippage: 'Avg Slippage',
+    slippageAnalysis: 'Slippage Analysis',
     // Post-exit
     days5: '5 Days',
     days10: '10 Days',
@@ -455,6 +507,19 @@ export default {
   insights: {
     aiCoach: 'AI Coach',
     subtitle: 'Smart analysis based on your trading data',
+    chat: 'Chat',
+    insightsTab: 'Insights',
+    aiSummary: 'AI Summary',
+    keyMetrics: 'Key Metrics',
+    insightsOverview: 'Insights Overview',
+    type: 'Type',
+    category: 'Category',
+    totalTrades: 'Total Trades',
+    problems: 'Problems',
+    strengths: 'Strengths',
+    reminders: 'Reminders',
+    loadFailed: 'Failed to load. Please try again.',
+    noMatchingInsights: 'No insights match your filters',
     problem: 'Issue',
     strength: 'Strength',
     reminder: 'Note',
@@ -699,12 +764,31 @@ export default {
     filterFed: 'Fed',
     filterSplit: 'Split',
     filterPriceAnomaly: 'Price Anomaly',
+    filterVolumeAnomaly: 'Volume Anomaly',
+    filterAnalyst: 'Analyst Ratings',
+    filterSector: 'Sector News',
+    filterProduct: 'Product Launch',
     filterOther: 'Other',
     // Performance
     performanceByType: 'Performance by Type',
     times: 'times',
     totalPnL: 'Total P&L',
     avgChange: 'Avg Change',
+    // Chart
+    monthlyDistribution: 'Monthly Distribution',
+    typeDistribution: 'Event Type Distribution',
+    total: 'Total',
+    impactDistribution: 'Impact Distribution',
+    typeBreakdown: 'Type Breakdown',
+    timelineByImpact: 'Impact Timeline',
+    priceChangeDistribution: 'Price Change Distribution',
+    eventsWithData: 'with data',
+    count: 'Count',
+    priceRange: 'Price Range',
+    importanceVsChange: 'Importance vs Price Change',
+    importance: 'Importance',
+    up: 'Up',
+    down: 'Down',
     // Table
     showingFirst: 'Showing first 20 of',
     records: 'records',
@@ -745,6 +829,199 @@ export default {
       avgPnlOnEvent: 'Avg P&L on Event',
       eventsByType: 'Events by Type',
       performanceByType: 'Performance by Type',
+    },
+  },
+
+  // Insight Rules - translations for backend-generated insights
+  insightRules: {
+    // Time dimension (T)
+    'T01': {
+      title: 'Low win rate on {{weekday}}',
+      description: 'Win rate on {{weekday}} is only {{weekday_win_rate}}%, well below average {{average_win_rate}}%',
+      suggestion: 'Consider reducing trades on {{weekday}} or adopting more conservative strategies on this day',
+    },
+    'T02': {
+      title: 'Strong performance on {{weekday}}',
+      description: 'Win rate on {{weekday}} is {{weekday_win_rate}}%, significantly above average {{average_win_rate}}%',
+      suggestion: 'Consider increasing trading opportunities on {{weekday}}',
+    },
+    // Holding period (H)
+    'H01': {
+      title: 'Best holding period: {{best_period}}',
+      description: 'Trades held for {{best_period}} have a {{win_rate}}% win rate ({{trade_count}} trades)',
+      suggestion: 'Optimize your trading plan to focus on the {{best_period}} holding period',
+    },
+    'H02': {
+      title: 'Higher risk in long holdings',
+      description: '{{long_loss_rate}}% of trades held over 7 days are losses',
+      suggestion: 'Consider shortening average holding time or setting stricter risk controls for long-term positions',
+    },
+    'H03': {
+      title: 'Better at {{better_style}} trading',
+      description: '{{better_style}} trading has {{better_wr}}% win rate, while {{worse_style}} has only {{worse_wr}}%',
+      suggestion: 'Consider increasing {{better_style}} trades and reducing {{worse_style}} trades',
+    },
+    'H04': {
+      title: 'Tendency to hold losers',
+      description: 'Losing trades are held for {{avg_loser_holding_days}} days on average, while winners only {{avg_winner_holding_days}} days',
+      suggestion: 'Set strict stop-loss rules - losing trades should not be held too long',
+    },
+    'H05': {
+      title: 'Possible premature profit-taking',
+      description: '{{continued_up_pct}}% of winning trades continued up more than 5% within 5 days after exit, averaging {{avg_missed_pct}}% more',
+      suggestion: 'Consider using trailing stops or partial exits to let profits run',
+    },
+    'H06': {
+      title: 'Short-term trades have higher quality',
+      description: 'Short-term trades average score {{short_avg_score}}, long-term only {{long_avg_score}}',
+      suggestion: 'You may be better suited for short-term trading; improve entry and exit strategies for longer holds',
+    },
+    // Symbol (S)
+    'S01': {
+      title: '{{symbol}} is your strength',
+      description: '{{symbol}} has {{win_rate}}% win rate ({{trade_count}} trades), total profit ${{total_pnl}}',
+      suggestion: 'Continue focusing on {{symbol}} trading opportunities - one of your best performers',
+    },
+    'S02': {
+      title: '{{symbol}} underperforming',
+      description: '{{symbol}} has only {{win_rate}}% win rate ({{trade_count}} trades), total loss ${{total_pnl}}',
+      suggestion: 'Consider pausing {{symbol}} trades or analyze why performance is poor on this symbol',
+    },
+    'S03': {
+      title: 'Over-concentrated on {{symbol}}',
+      description: '{{symbol}} accounts for {{concentration_pct}}% of all trades - concentration risk',
+      suggestion: 'Diversify across more symbols to reduce single-symbol dependency',
+    },
+    'S04': {
+      title: 'Consecutive losses on {{symbol}}',
+      description: '{{symbol}} had {{max_consecutive_losses}} consecutive losing trades',
+      suggestion: 'Pause trading {{symbol}} after consecutive losses; analyze before re-entering',
+    },
+    'S05': {
+      title: 'Risk with first trades on new symbols',
+      description: 'First trade win rate on new symbols is only {{first_trade_win_rate}}%, below average {{average_win_rate}}%',
+      suggestion: 'Use smaller position sizes on new symbols or observe before entering',
+    },
+    'S06': {
+      title: 'Better at {{better_type}} trading',
+      description: '{{better_type}} trading has {{better_wr}}% win rate, {{worse_type}} has only {{worse_wr}}%',
+      suggestion: 'Consider increasing {{better_type}} trading weight',
+    },
+    // Direction (D)
+    'D01': {
+      title: 'Better at going {{better_direction}}',
+      description: '{{better_direction}} has {{better_wr}}% win rate, {{worse_direction}} has only {{worse_wr}}%',
+      suggestion: 'Consider increasing {{better_direction}} trades',
+    },
+    'D02': {
+      title: '{{strategy_name}} strategy is effective',
+      description: '{{strategy_name}} strategy has {{win_rate}}% win rate ({{trade_count}} trades)',
+      suggestion: 'Continue using {{strategy_name}} strategy and optimize its parameters',
+    },
+    // Risk Management (R)
+    'R01': {
+      title: 'Win/loss ratio imbalance',
+      description: 'Average loss ${{avg_loss}} is {{ratio}}x the average win ${{avg_win}}',
+      suggestion: 'Improve stop-loss strategy to reduce average loss, or increase profit targets',
+    },
+    'R02': {
+      title: 'Stop-loss execution issues',
+      description: '{{high_mae_pct}}% of losing trades had MAE exceeding -10%, indicating stop-loss problems',
+      suggestion: 'Set tighter stop-losses and execute them strictly',
+    },
+    'R03': {
+      title: 'Single trade risk too high',
+      description: 'Largest single loss ${{max_single_loss}} is {{pct_of_total}}% of total profit',
+      suggestion: 'Control single trade risk exposure; use stop-losses to limit maximum loss',
+    },
+    'R05': {
+      title: 'Experienced consecutive losses',
+      description: 'Longest losing streak: {{max_consecutive_losses}} trades',
+      suggestion: 'Pause trading after consecutive losses; analyze the cause before continuing',
+    },
+    'R06': {
+      title: 'Low profit capture rate',
+      description: 'Winning trades capture only {{avg_capture_ratio}}% of maximum favorable excursion on average',
+      suggestion: 'Consider using trailing stops or partial exits to capture more profit',
+    },
+    'R07': {
+      title: 'Stop-loss discipline needs improvement',
+      description: '{{deep_loss_pct}}% of losing trades had MAE exceeding -15%, indicating delayed stop-loss execution',
+      suggestion: 'Set stop-loss points at entry and execute them strictly',
+    },
+    'R08': {
+      title: 'Higher overnight holding risk',
+      description: 'Overnight positions have {{overnight_loss_rate}}% loss rate, higher than intraday {{intraday_loss_rate}}%',
+      suggestion: 'Reduce overnight holdings or set stricter stop-losses for overnight positions',
+    },
+    // Behavior (B)
+    'B01': {
+      title: 'Possible revenge trading',
+      description: 'Only {{win_rate_after_loss}}% of trades after a loss are profitable, below average',
+      suggestion: 'Pause trading after losses to avoid emotional decisions',
+    },
+    'B02': {
+      title: 'Caution after big wins',
+      description: 'Only {{win_rate_after_big_win}}% of trades after a big win are profitable',
+      suggestion: 'Stay disciplined after big wins - overconfidence can lead to mistakes',
+    },
+    'B05': {
+      title: 'Caution after winning streaks',
+      description: 'Win rate after 3+ consecutive wins is only {{win_rate_after_streak}}%',
+      suggestion: 'Stay cautious after winning streaks - overconfidence may be building',
+    },
+    'B06': {
+      title: 'Best trading at {{best_hour}}:00',
+      description: 'Trades opened at {{best_hour}}:00 have {{best_hour_win_rate}}% win rate, significantly above average',
+      suggestion: 'Focus on trading opportunities around {{best_hour}}:00',
+    },
+    'B07': {
+      title: 'Avoid trading at {{worst_hour}}:00',
+      description: 'Trades opened at {{worst_hour}}:00 have only {{worst_hour_win_rate}}% win rate, well below average',
+      suggestion: 'Consider avoiding trades around {{worst_hour}}:00',
+    },
+    'B08': {
+      title: 'Risk of repeated trading on same symbol',
+      description: 'Short-term repeated trades on same symbol have {{add_position_win_rate}}% win rate, below average {{average_win_rate}}%',
+      suggestion: 'Avoid repeatedly trading the same symbol; each trade should have independent analysis',
+    },
+    'B09': {
+      title: 'Discipline affects performance',
+      description: 'High-discipline trades have {{high_discipline_win_rate}}% win rate, low-discipline only {{low_discipline_win_rate}}%',
+      suggestion: 'Improving trading discipline can significantly improve performance',
+    },
+    // Fees (F)
+    'F01': {
+      title: 'Fees eroding profits',
+      description: 'Total fees ${{total_fees}} are {{fee_erosion_pct}}% of gross profit',
+      suggestion: 'Consider reducing trading frequency or switching to a lower-fee broker',
+    },
+    'F03': {
+      title: 'Many ineffective trades',
+      description: '{{ineffective_pct}}% of trades have P&L within ±$20',
+      suggestion: 'These trades mainly generate fees for the broker; improve trade quality',
+    },
+    // Options (O)
+    'O03': {
+      title: 'Better at {{better_option}} options',
+      description: '{{better_option}} options have {{better_wr}}% win rate, {{worse_option}} options are weaker',
+      suggestion: 'Consider increasing {{better_option}} option trading weight',
+    },
+    // Trend (P)
+    'P01': {
+      title: 'Win rate improving',
+      description: 'Recent win rate {{recent_win_rate}}%, up {{improvement}} points from early period {{early_win_rate}}%',
+      suggestion: 'Keep it up - you are improving!',
+    },
+    'P02': {
+      title: 'Recent performance decline',
+      description: 'Recent win rate {{recent_win_rate}}%, down {{decline}} points from early period {{early_win_rate}}%',
+      suggestion: 'Consider pausing trading; review recent trades to identify issues',
+    },
+    'P02-weekly': {
+      title: '3 consecutive losing weeks',
+      description: 'Lost ${{total_loss}} over the past 3 weeks',
+      suggestion: 'Strongly recommend pausing trading; deeply analyze causes before resuming',
     },
   },
 

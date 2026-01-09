@@ -1,8 +1,8 @@
 """
 EventDetector - 事件检测器
 
-input: Position, MarketData, yfinance财报日历
-output: EventContext记录（财报/异常/宏观事件）
+input: Position, MarketData, yfinance财报日历, NewsSearcher
+output: EventContext记录（财报/异常/宏观事件/新闻事件）
 pos: 分析器层 - 检测持仓期间的重大事件并计算市场反应
 
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
@@ -10,8 +10,9 @@ pos: 分析器层 - 检测持仓期间的重大事件并计算市场反应
 功能:
 1. 从 yfinance 获取财报日历
 2. 检测价格/成交量异常作为未知事件代理
-3. 将持仓与事件按日期匹配
-4. 计算事件影响指标（价格变动、成交量激增等）
+3. 从新闻搜索中提取重大事件（产品发布/分析师评级/宏观/地缘政治等）
+4. 将持仓与事件按日期匹配
+5. 计算事件影响指标（价格变动、成交量激增等）
 """
 
 import logging
@@ -274,7 +275,8 @@ class EventDetector:
         self,
         position: Position,
         include_earnings: bool = True,
-        include_anomalies: bool = True
+        include_anomalies: bool = True,
+        include_news: bool = True
     ) -> list[dict]:
         """
         检测持仓期间的所有事件
@@ -283,6 +285,7 @@ class EventDetector:
             position: 持仓记录
             include_earnings: 是否包含财报事件
             include_anomalies: 是否包含异常事件
+            include_news: 是否包含新闻事件
 
         Returns:
             事件列表
@@ -307,6 +310,11 @@ class EventDetector:
             anomaly_events = self.detect_price_anomalies(symbol, start_date, end_date)
             all_events.extend(anomaly_events)
 
+        # 从新闻搜索中提取事件
+        if include_news:
+            news_events = self.detect_news_events(symbol, start_date, end_date)
+            all_events.extend(news_events)
+
         # 按日期排序
         all_events.sort(key=lambda x: x['event_date'])
 
@@ -319,6 +327,250 @@ class EventDetector:
             self._calculate_position_impact(position, event)
 
         return all_events
+
+    # ========================================================================
+    # 新闻事件检测
+    # ========================================================================
+
+    def detect_news_events(
+        self,
+        symbol: str,
+        start_date: date,
+        end_date: date
+    ) -> list[dict]:
+        """
+        从新闻搜索中提取重大事件
+
+        Args:
+            symbol: 股票代码
+            start_date: 开始日期
+            end_date: 结束日期
+
+        Returns:
+            新闻事件列表
+        """
+        try:
+            # 检查是否启用新闻搜索
+            import config
+            if not getattr(config, 'NEWS_SEARCH_ENABLED', False):
+                return []
+
+            # 延迟导入以避免循环依赖
+            from src.analyzers.news_adapters import create_search_func_from_config
+            from src.analyzers.news_searcher import NewsSearcher
+
+            search_func = create_search_func_from_config()
+            if not search_func:
+                logger.warning("新闻搜索功能未配置")
+                return []
+
+            searcher = NewsSearcher(search_func=search_func)
+
+            # 搜索持仓期间的新闻
+            range_days = (end_date - start_date).days + 3
+            result = searcher.search(
+                symbol=symbol,
+                trade_date=start_date,
+                range_days=range_days
+            )
+
+            if not result or result.news_count == 0:
+                return []
+
+            events = []
+
+            # 将高影响新闻转换为事件
+            for news_item in result.news_items:
+                event = self._news_to_event(news_item, symbol, result)
+                if event:
+                    events.append(event)
+
+            # 如果检测到特定类别的新闻，生成汇总事件
+            summary_events = self._generate_news_summary_events(result, symbol, start_date)
+            events.extend(summary_events)
+
+            logger.info(f"{symbol}: 从 {result.news_count} 条新闻中提取了 {len(events)} 个事件")
+            return events
+
+        except ImportError as e:
+            logger.debug(f"新闻搜索模块未安装: {e}")
+            return []
+        except Exception as e:
+            logger.warning(f"新闻事件检测失败 ({symbol}): {e}")
+            return []
+
+    def _news_to_event(self, news_item, symbol: str, search_result) -> Optional[dict]:
+        """
+        将单条新闻转换为事件
+
+        仅转换高影响的新闻（标题包含关键词或情感强烈）
+
+        Args:
+            news_item: NewsItem dataclass 或 dict
+            symbol: 股票代码
+            search_result: 搜索结果上下文
+        """
+        # 兼容 NewsItem dataclass 和 dict
+        if hasattr(news_item, 'title'):
+            # NewsItem dataclass
+            title = news_item.title or ''
+            source = news_item.source or ''
+            url = getattr(news_item, 'url', '') or ''
+            published = getattr(news_item, 'date', None)
+        else:
+            # dict
+            title = news_item.get('title', '')
+            source = news_item.get('source', '')
+            url = news_item.get('url', '')
+            published = news_item.get('published_date') or news_item.get('date')
+
+        # 解析发布日期
+        event_date = None
+        if published:
+            if isinstance(published, date):
+                event_date = published
+            elif isinstance(published, str):
+                try:
+                    # 尝试多种日期格式
+                    for fmt in ['%Y-%m-%d', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M:%SZ']:
+                        try:
+                            event_date = datetime.strptime(published[:19], fmt).date()
+                            break
+                        except ValueError:
+                            continue
+                except Exception:
+                    pass
+
+        if not event_date:
+            return None
+
+        # 确定事件类型和重要性
+        event_type, importance = self._classify_news(title, search_result)
+
+        # 过滤低重要性新闻
+        if importance < 5:
+            return None
+
+        # 确定事件影响方向
+        sentiment = search_result.overall_sentiment if search_result else 'neutral'
+        impact = self._sentiment_to_impact(sentiment)
+
+        return {
+            'event_type': event_type,
+            'event_date': event_date,
+            'event_title': title[:200],
+            'event_description': f"来源: {source}",
+            'event_impact': impact,
+            'event_importance': importance,
+            'source': 'news_search',
+            'source_url': url,
+            'confidence': 60,  # 新闻事件置信度较低
+        }
+
+    def _classify_news(self, title: str, search_result) -> tuple[str, int]:
+        """
+        根据标题和搜索结果分类新闻
+
+        Returns:
+            (event_type, importance)
+        """
+        title_lower = title.lower()
+
+        # 财报相关（高优先级）
+        if any(kw in title_lower for kw in ['earnings', 'revenue', 'eps', '财报', '业绩', 'beat', 'miss']):
+            return 'earnings', 8
+
+        # 分析师评级
+        if any(kw in title_lower for kw in ['upgrade', 'downgrade', 'rating', 'target', '评级', '目标价']):
+            return 'analyst', 7
+
+        # 产品/业务
+        if any(kw in title_lower for kw in ['launch', 'product', 'partnership', 'deal', 'contract', '发布', '合作', '合同']):
+            return 'product', 6
+
+        # 管理层变动
+        if any(kw in title_lower for kw in ['ceo', 'cfo', 'executive', 'resign', 'appoint', '任命', '离职']):
+            return 'management', 7
+
+        # 监管/法律
+        if any(kw in title_lower for kw in ['sec', 'lawsuit', 'fine', 'regulatory', '诉讼', '监管', '罚款']):
+            return 'regulatory', 7
+
+        # FDA（医药股）
+        if any(kw in title_lower for kw in ['fda', 'approval', 'trial', 'drug', '批准', '临床']):
+            return 'fda', 8
+
+        # 宏观经济
+        if search_result and search_result.has_macro_news:
+            return 'macro', 6
+
+        # 地缘政治
+        if search_result and search_result.has_geopolitical:
+            return 'geopolitical', 6
+
+        # 行业新闻
+        if search_result and search_result.has_sector_news:
+            return 'sector', 5
+
+        # 默认
+        return 'other', 4
+
+    def _sentiment_to_impact(self, sentiment: str) -> str:
+        """将情感转换为影响方向"""
+        mapping = {
+            'bullish': 'positive',
+            'bearish': 'negative',
+            'neutral': 'neutral',
+            'mixed': 'mixed',
+        }
+        return mapping.get(sentiment, 'unknown')
+
+    def _generate_news_summary_events(self, search_result, symbol: str, trade_date: date) -> list[dict]:
+        """
+        生成新闻汇总事件（如果检测到特定类别）
+        """
+        events = []
+
+        # 如果有财报相关新闻但没有从 yfinance 获取到
+        if search_result.has_earnings:
+            events.append({
+                'event_type': 'earnings',
+                'event_date': trade_date,
+                'event_title': f"{symbol} 财报相关新闻",
+                'event_description': f"从新闻中检测到财报相关内容，情绪: {search_result.overall_sentiment}",
+                'event_impact': self._sentiment_to_impact(search_result.overall_sentiment),
+                'event_importance': 7,
+                'source': 'news_search',
+                'confidence': 50,
+            })
+
+        # 如果有分析师评级
+        if search_result.has_analyst_rating:
+            events.append({
+                'event_type': 'analyst',
+                'event_date': trade_date,
+                'event_title': f"{symbol} 分析师评级/目标价变动",
+                'event_description': f"从新闻中检测到分析师观点变化",
+                'event_impact': self._sentiment_to_impact(search_result.overall_sentiment),
+                'event_importance': 6,
+                'source': 'news_search',
+                'confidence': 50,
+            })
+
+        # 如果有宏观新闻且影响显著
+        if search_result.has_macro_news and search_result.news_impact_level in ['high', 'medium']:
+            events.append({
+                'event_type': 'macro',
+                'event_date': trade_date,
+                'event_title': f"宏观经济新闻影响 {symbol}",
+                'event_description': f"影响级别: {search_result.news_impact_level}",
+                'event_impact': self._sentiment_to_impact(search_result.overall_sentiment),
+                'event_importance': 6,
+                'source': 'news_search',
+                'confidence': 50,
+            })
+
+        return events
 
     def _calculate_position_impact(self, position: Position, event: dict):
         """计算事件对持仓的影响"""

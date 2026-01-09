@@ -15,7 +15,6 @@ import {
   FileSpreadsheet,
   AlertCircle,
   Loader2,
-  CheckCircle,
   ArrowRight,
   TrendingUp,
   BarChart3,
@@ -24,7 +23,6 @@ import {
   Mail,
   Bell,
   X,
-  Zap,
   Target,
   Shield,
   BrainCircuit,
@@ -33,9 +31,8 @@ import { BackgroundEffects } from '@/components/landing/BackgroundEffects';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { useNotification, getNotificationPreference, setNotificationPreference } from '@/hooks/useNotification';
 import { useTaskStorage } from '@/hooks/useTaskStorage';
-import { ProcessingLogPanel } from '@/components/processing';
 
-type PageState = 'upload' | 'processing' | 'complete' | 'error';
+type PageState = 'upload' | 'error';
 
 export function LandingUpload() {
   const { t } = useTranslation();
@@ -94,25 +91,19 @@ export function LandingUpload() {
     }
   }, [recoveredTask?.status, recoveredTask?.progress]);
 
-  // Task status polling for current task (only for complete/error states that need task data)
+  // Task status polling for error state display
   const { data: task } = useQuery({
     queryKey: ['task', taskId],
     queryFn: () => taskApi.getStatus(taskId!),
-    enabled: !!taskId && (pageState === 'complete' || pageState === 'error'),
-    staleTime: Infinity, // Don't refetch after initial load
+    enabled: !!taskId && pageState === 'error',
+    staleTime: Infinity,
   });
-
-  // Note: Task completion handling is now done by ProcessingLogPanel
 
   // Create task mutation
   const createTaskMutation = useMutation({
     mutationFn: ({ file, userEmail }: { file: File; userEmail?: string }) =>
       taskApi.create(file, userEmail || undefined, true),
     onSuccess: (data) => {
-      setTaskId(data.task_id);
-      setPageState('processing');
-      hasNotified.current = false;
-
       // Save to localStorage
       saveTask({
         taskId: data.task_id,
@@ -120,6 +111,9 @@ export function LandingUpload() {
         createdAt: new Date().toISOString(),
         status: 'running',
       });
+
+      // Navigate to the new loading page
+      navigate(`/analysis/${data.task_id}`);
     },
     onError: () => {
       setPageState('error');
@@ -227,6 +221,7 @@ export function LandingUpload() {
           <button
             onClick={toggleDarkMode}
             className="p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+            aria-label={darkMode ? t('common.switchToLightMode') : t('common.switchToDarkMode')}
           >
             {darkMode ? (
               <Sun className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
@@ -296,16 +291,15 @@ export function LandingUpload() {
           {/* Hero - The "Monolith" */}
           <div className="text-center mb-24 relative z-10 pt-10">
             <div className="inline-block border border-white/20 px-4 py-1.5 rounded-full mb-10 bg-black/50 backdrop-blur">
-              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">System Operational • v0.9.2</span>
+              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">{t('landing.systemStatus')} • {t('landing.version')} 0.9.2</span>
             </div>
 
-            <h1 className="text-7xl md:text-9xl font-bold text-white mb-8 tracking-tighter leading-[0.9]">
-              PURE<br />
-              ALPHA.
+            <h1 className="text-7xl md:text-9xl font-bold text-white mb-8 tracking-tighter leading-[0.9] whitespace-pre-line">
+              {t('landing.heroTitle')}
             </h1>
 
             <p className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
-              Construct your edge with institutional-grade <span className="text-white">precision metrics</span> and <span className="text-white">psychological profiling</span>.
+              {t('landing.heroSubtitle')}
             </p>
           </div>
 
@@ -354,20 +348,20 @@ export function LandingUpload() {
                         <div className="mb-8">
                           <UploadIcon className="w-10 h-10 text-white mx-auto mb-4" />
                           <h3 className="text-2xl font-bold text-white tracking-tight uppercase">
-                            Upload Protocol
+                            {t('landing.uploadProtocol')}
                           </h3>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-white/40 font-mono text-sm">
-                            DRAG BINARY CSV HERE
+                          <p className="text-white/40 font-mono text-sm uppercase">
+                            {t('landing.dragCsvHere')}
                           </p>
                           <div className="flex items-center justify-center space-x-4">
                             <span className="h-px w-8 bg-white/20"></span>
-                            <span className="text-white/20 text-xs uppercase tracking-widest">OR</span>
+                            <span className="text-white/20 text-xs uppercase tracking-widest">{t('landing.or', 'OR')}</span>
                             <span className="h-px w-8 bg-white/20"></span>
                           </div>
                           <button className="text-white border-b border-white hover:border-transparent transition-colors text-sm uppercase tracking-wide pt-2">
-                            Browse Data Source
+                            {t('landing.browseDataSource')}
                           </button>
                         </div>
                       </>
@@ -427,17 +421,17 @@ export function LandingUpload() {
                 {/* Upload Button */}
                 <button
                   onClick={handleUpload}
-                  disabled={createTaskMutation.isPending || (email !== '' && !isValidEmail(email))}
+                  disabled={!selectedFile || createTaskMutation.isPending || (email !== '' && !isValidEmail(email))}
                   className="w-full mt-8 py-4 bg-white text-black hover:bg-gray-200 disabled:bg-gray-800 disabled:text-gray-500 rounded-sm font-bold text-sm uppercase tracking-widest flex items-center justify-center space-x-3 transition-colors"
                 >
-                  {createTaskMutation.isPending ? (
+  {createTaskMutation.isPending ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>INITIALIZING...</span>
+                      <span>{t('landing.initializing')}</span>
                     </>
                   ) : (
                     <>
-                      <span>EXECUTE ANALYSIS</span>
+                      <span>{t('landing.executeAnalysis')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -466,106 +460,28 @@ export function LandingUpload() {
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10 relative z-10">
             <div className="bg-black p-10 hover:bg-[#050505] transition-colors group">
               <BrainCircuit className="w-6 h-6 text-white mb-6" />
-              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">Neural Pysch</h3>
+              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">{t('landing.neuralPsych')}</h3>
               <p className="text-sm text-gray-500 font-mono leading-relaxed group-hover:text-gray-400 transition-colors">
-                [MODULE_A] Decoding behavioral patterns using advanced algorithmic sequencing.
+                {t('landing.neuralPsychDesc')}
               </p>
             </div>
 
             <div className="bg-black p-10 hover:bg-[#050505] transition-colors group">
               <Target className="w-6 h-6 text-white mb-6" />
-              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">Precision Metric</h3>
+              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">{t('landing.precisionMetric')}</h3>
               <p className="text-sm text-gray-500 font-mono leading-relaxed group-hover:text-gray-400 transition-colors">
-                [MODULE_B] Objective trade grading system based on pre-defined strategy constraints.
+                {t('landing.precisionMetricDesc')}
               </p>
             </div>
 
             <div className="bg-black p-10 hover:bg-[#050505] transition-colors group">
               <Shield className="w-6 h-6 text-white mb-6" />
-              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">Risk Struct</h3>
+              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wider">{t('landing.riskStruct')}</h3>
               <p className="text-sm text-gray-500 font-mono leading-relaxed group-hover:text-gray-400 transition-colors">
-                [MODULE_C] Real-time visualization of MAE/MFE and drawdown probabilities.
+                {t('landing.riskStructDesc')}
               </p>
             </div>
           </div>
-
-          {/* Processing State - 使用 ProcessingLogPanel */}
-          {
-            pageState === 'processing' && taskId && (
-              <ProcessingLogPanel
-                taskId={taskId}
-                fileName={selectedFile?.name || ''}
-                onComplete={() => {
-                  setPageState('complete');
-                  queryClient.invalidateQueries({ queryKey: ['positions'] });
-                  queryClient.invalidateQueries({ queryKey: ['statistics'] });
-                  queryClient.invalidateQueries({ queryKey: ['system'] });
-                  updateTaskStatus('completed', 100);
-                  // Auto redirect after 2 seconds
-                  setTimeout(() => navigate('/statistics'), 2000);
-                }}
-                onError={() => {
-                  setPageState('error');
-                  updateTaskStatus('failed');
-                }}
-                onCancel={() => {
-                  setPageState('upload');
-                  setSelectedFile(null);
-                  setTaskId(null);
-                }}
-              />
-            )
-          }
-
-          {/* Complete State */}
-          {
-            pageState === 'complete' && (
-              <div className="bg-white dark:bg-neutral-900 rounded-2xl p-8 shadow-lg border border-green-200 dark:border-green-800 animate-fade-in">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
-                    {t('task.analysisComplete', '分析完成！')}
-                  </h2>
-                  <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-                    {t('landing.redirecting', '正在跳转到分析结果...')}
-                  </p>
-
-                  {task?.result && (
-                    <div className="grid grid-cols-3 gap-4 mt-6">
-                      <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
-                        <p className="text-2xl font-bold text-green-600">
-                          {task.result.new_trades || 0}
-                        </p>
-                        <p className="text-xs text-neutral-500">{t('task.newTrades', '新交易')}</p>
-                      </div>
-                      <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
-                        <p className="text-2xl font-bold text-blue-600">
-                          {task.result.positions_matched || 0}
-                        </p>
-                        <p className="text-xs text-neutral-500">{t('task.positions', '持仓')}</p>
-                      </div>
-                      <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-lg">
-                        <p className="text-2xl font-bold text-purple-600">
-                          {task.result.positions_scored || 0}
-                        </p>
-                        <p className="text-xs text-neutral-500">{t('task.scored', '已评分')}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() => navigate('/statistics')}
-                    className="mt-6 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 flex items-center justify-center space-x-2 mx-auto"
-                  >
-                    <BarChart3 className="w-5 h-5" />
-                    <span>{t('landing.viewStatistics', '查看统计分析')}</span>
-                  </button>
-                </div>
-              </div>
-            )
-          }
 
           {/* Error State */}
           {
