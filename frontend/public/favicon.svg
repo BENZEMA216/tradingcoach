@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 背景 -->
+  <rect width="100" height="100" rx="16" fill="#0f172a"/>
+
+  <!-- 上涨曲线 - 更陡峭的走势 -->
+  <path
+    d="M 15 75 Q 35 70, 45 55 Q 55 40, 65 30 L 80 15"
+    stroke="#22c55e"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- 箭头 -->
+  <path
+    d="M 68 12 L 83 12 L 83 27"
+    stroke="#22c55e"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+</svg>
