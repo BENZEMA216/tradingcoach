@@ -2,15 +2,16 @@
  * 用户反馈按钮组件
  *
  * 浮动在页面右下角，点击打开反馈表单
- * 反馈会创建 GitHub Issue
+ * 反馈通过后端 API 自动创建 GitHub Issue
  */
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MessageSquarePlus, X, Send, Bug, Lightbulb, HelpCircle } from 'lucide-react';
-import { captureMessage } from '@/utils/sentry';
+import { MessageSquarePlus, X, Send, Bug, Lightbulb, HelpCircle, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import axios from 'axios';
 
 type FeedbackType = 'bug' | 'feature' | 'question';
+type SubmitStatus = 'idle' | 'submitting' | 'success' | 'error';
 
 const FEEDBACK_CONFIG: Record<FeedbackType, { icon: typeof Bug; label: string; labelZh: string; color: string }> = {
   bug: { icon: Bug, label: 'Bug Report', labelZh: '报告问题', color: 'text-red-500' },
@@ -18,48 +19,60 @@ const FEEDBACK_CONFIG: Record<FeedbackType, { icon: typeof Bug; label: string; l
   question: { icon: HelpCircle, label: 'Question', labelZh: '使用问题', color: 'text-blue-500' },
 };
 
-// GitHub Issue 创建 URL
-const GITHUB_REPO = 'BENZEMA216/tradingcoach';
-
-function createGitHubIssueUrl(type: FeedbackType, title: string, body: string): string {
-  const labels = type === 'bug' ? 'bug' : type === 'feature' ? 'enhancement' : 'question';
-  const params = new URLSearchParams({
-    title: `[${type.toUpperCase()}] ${title}`,
-    body: `## 反馈内容\n\n${body}\n\n---\n*通过应用内反馈提交*`,
-    labels,
-  });
-  return `https://github.com/${GITHUB_REPO}/issues/new?${params.toString()}`;
-}
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export function FeedbackButton() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
 
   const [isOpen, setIsOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState<FeedbackType>('feature');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim()) return;
 
-    setIsSubmitting(true);
+    setSubmitStatus('submitting');
+    setErrorMessage('');
 
-    // 记录反馈到 Sentry（用于统计）
-    captureMessage(`Feedback submitted: [${feedbackType}] ${title}`, 'info');
+    try {
+      const response = await axios.post(`${API_BASE}/feedback`, {
+        type: feedbackType,
+        title: title.trim(),
+        description: description.trim() || undefined,
+        page_url: window.location.href,
+        user_agent: navigator.userAgent,
+      });
 
-    // 打开 GitHub Issue 页面
-    const url = createGitHubIssueUrl(feedbackType, title, description);
-    window.open(url, '_blank');
+      if (response.data.success) {
+        setSubmitStatus('success');
+        // 3秒后关闭并重置
+        setTimeout(() => {
+          setTitle('');
+          setDescription('');
+          setIsOpen(false);
+          setSubmitStatus('idle');
+        }, 2000);
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      if (axios.isAxiosError(error) && error.response?.data?.detail) {
+        setErrorMessage(error.response.data.detail);
+      } else {
+        setErrorMessage(isZh ? '提交失败，请稍后重试' : 'Submission failed. Please try again.');
+      }
+    }
+  };
 
-    // 重置表单
-    setTimeout(() => {
-      setTitle('');
-      setDescription('');
+  const handleClose = () => {
+    if (submitStatus !== 'submitting') {
       setIsOpen(false);
-      setIsSubmitting(false);
-    }, 500);
+      setSubmitStatus('idle');
+      setErrorMessage('');
+    }
   };
 
   return (
@@ -82,7 +95,7 @@ export function FeedbackButton() {
           {/* 遮罩 */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
           />
 
           {/* 弹窗内容 */}
@@ -93,94 +106,124 @@ export function FeedbackButton() {
                 {isZh ? '反馈建议' : 'Send Feedback'}
               </h3>
               <button
-                onClick={() => setIsOpen(false)}
-                className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-white/10 text-slate-500"
+                onClick={handleClose}
+                disabled={submitStatus === 'submitting'}
+                className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-white/10 text-slate-500 disabled:opacity-50"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* 表单 */}
-            <div className="p-4 space-y-4">
-              {/* 反馈类型 */}
-              <div className="flex gap-2">
-                {(Object.keys(FEEDBACK_CONFIG) as FeedbackType[]).map((type) => {
-                  const config = FEEDBACK_CONFIG[type];
-                  const Icon = config.icon;
-                  const isActive = feedbackType === type;
-
-                  return (
-                    <button
-                      key={type}
-                      onClick={() => setFeedbackType(type)}
-                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all ${
-                        isActive
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10'
-                          : 'border-neutral-200 dark:border-white/10 hover:border-neutral-300 dark:hover:border-white/20'
-                      }`}
-                    >
-                      <Icon className={`w-4 h-4 ${isActive ? config.color : 'text-slate-400'}`} />
-                      <span className={`text-sm ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>
-                        {isZh ? config.labelZh : config.label}
-                      </span>
-                    </button>
-                  );
-                })}
+            {/* 成功状态 */}
+            {submitStatus === 'success' ? (
+              <div className="p-8 text-center">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                  {isZh ? '感谢你的反馈！' : 'Thank you for your feedback!'}
+                </h4>
+                <p className="text-sm text-slate-500 dark:text-white/60">
+                  {isZh ? '我们已收到你的反馈，会尽快处理。' : 'We have received your feedback and will review it soon.'}
+                </p>
               </div>
+            ) : (
+              <>
+                {/* 表单 */}
+                <div className="p-4 space-y-4">
+                  {/* 反馈类型 */}
+                  <div className="flex gap-2">
+                    {(Object.keys(FEEDBACK_CONFIG) as FeedbackType[]).map((type) => {
+                      const config = FEEDBACK_CONFIG[type];
+                      const Icon = config.icon;
+                      const isActive = feedbackType === type;
 
-              {/* 标题 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-white/70 mb-1">
-                  {isZh ? '标题' : 'Title'} <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={isZh ? '简短描述你的反馈' : 'Brief description'}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => setFeedbackType(type)}
+                          disabled={submitStatus === 'submitting'}
+                          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all ${
+                            isActive
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10'
+                              : 'border-neutral-200 dark:border-white/10 hover:border-neutral-300 dark:hover:border-white/20'
+                          } disabled:opacity-50`}
+                        >
+                          <Icon className={`w-4 h-4 ${isActive ? config.color : 'text-slate-400'}`} />
+                          <span className={`text-sm ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>
+                            {isZh ? config.labelZh : config.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
 
-              {/* 详细描述 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-white/70 mb-1">
-                  {isZh ? '详细描述' : 'Details'} ({isZh ? '可选' : 'optional'})
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder={isZh ? '提供更多细节帮助我们理解...' : 'Provide more details...'}
-                  rows={4}
-                  className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                />
-              </div>
+                  {/* 标题 */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-white/70 mb-1">
+                      {isZh ? '标题' : 'Title'} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      disabled={submitStatus === 'submitting'}
+                      placeholder={isZh ? '简短描述你的反馈' : 'Brief description'}
+                      className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    />
+                  </div>
 
-              {/* 提示 */}
-              <p className="text-xs text-slate-500 dark:text-white/40">
-                {isZh
-                  ? '点击提交将打开 GitHub Issue 页面，你可以在那里粘贴截图或拖拽图片。'
-                  : 'Clicking submit will open GitHub Issues where you can paste screenshots or drag images.'}
-              </p>
-            </div>
+                  {/* 详细描述 */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-white/70 mb-1">
+                      {isZh ? '详细描述' : 'Details'} ({isZh ? '可选' : 'optional'})
+                    </label>
+                    <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      disabled={submitStatus === 'submitting'}
+                      placeholder={isZh ? '提供更多细节帮助我们理解...' : 'Provide more details...'}
+                      rows={4}
+                      className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50"
+                    />
+                  </div>
 
-            {/* 底部 */}
-            <div className="flex justify-end gap-3 p-4 border-t border-neutral-200 dark:border-white/10">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="px-4 py-2 text-sm text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white"
-              >
-                {isZh ? '取消' : 'Cancel'}
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!title.trim() || isSubmitting}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
-              >
-                <Send className="w-4 h-4" />
-                {isZh ? '提交反馈' : 'Submit'}
-              </button>
-            </div>
+                  {/* 错误提示 */}
+                  {submitStatus === 'error' && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 底部 */}
+                <div className="flex justify-end gap-3 p-4 border-t border-neutral-200 dark:border-white/10">
+                  <button
+                    onClick={handleClose}
+                    disabled={submitStatus === 'submitting'}
+                    className="px-4 py-2 text-sm text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white disabled:opacity-50"
+                  >
+                    {isZh ? '取消' : 'Cancel'}
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!title.trim() || submitStatus === 'submitting'}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                  >
+                    {submitStatus === 'submitting' ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {isZh ? '提交中...' : 'Submitting...'}
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        {isZh ? '提交反馈' : 'Submit'}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
