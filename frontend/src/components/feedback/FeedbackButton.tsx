@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MessageSquarePlus, X, Send, Bug, Lightbulb, HelpCircle } from 'lucide-react';
-import { captureMessage } from '@/lib/sentry';
+import { captureMessage } from '@/utils/sentry';
 
 type FeedbackType = 'bug' | 'feature' | 'question';
 
