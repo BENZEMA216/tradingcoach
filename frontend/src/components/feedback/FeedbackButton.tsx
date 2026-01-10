@@ -159,8 +159,8 @@ export function FeedbackButton() {
               {/* 提示 */}
               <p className="text-xs text-slate-500 dark:text-white/40">
                 {isZh
-                  ? '点击提交将打开 GitHub Issue 页面，你可以在那里完成提交。'
-                  : 'Clicking submit will open GitHub Issues where you can complete the submission.'}
+                  ? '点击提交将打开 GitHub Issue 页面，你可以在那里粘贴截图或拖拽图片。'
+                  : 'Clicking submit will open GitHub Issues where you can paste screenshots or drag images.'}
               </p>
             </div>
 
