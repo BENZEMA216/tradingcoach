@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { ToastContainer } from '@/components/common/Toast';
+import { FeedbackButton } from '@/components/feedback/FeedbackButton';
 import { LandingUpload } from '@/pages/LandingUpload';
 import { AnalysisLoading } from '@/pages/AnalysisLoading';
 import { Dashboard } from '@/pages/Dashboard';
@@ -16,6 +17,7 @@ function App() {
   return (
     <BrowserRouter>
       <ToastContainer />
+      <FeedbackButton />
       <Routes>
         {/* Landing Page - No Layout */}
         <Route path="/" element={<LandingUpload />} />
