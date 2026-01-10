@@ -134,6 +134,48 @@ python scripts/score_positions.py
 
 ---
 
+## Git 工作流与部署
+
+### 分支策略
+- **main**: 生产分支，自动部署到生产环境
+- **develop**: 开发分支，日常开发在此进行
+- **feature/***: 功能分支，从 develop 创建
+
+### 开发流程
+```bash
+# 1. 在 develop 分支开发
+git checkout develop
+git pull origin develop
+
+# 2. 创建功能分支（可选）
+git checkout -b feature/my-feature
+
+# 3. 开发完成后合并到 develop
+git checkout develop
+git merge feature/my-feature
+git push origin develop
+
+# 4. 准备发布时，合并到 main
+git checkout main
+git merge develop
+git push origin main  # 自动部署到生产
+```
+
+### 部署环境
+
+| 环境 | 前端 | 后端 | 触发条件 |
+|------|------|------|----------|
+| **本地** | localhost:5173 | localhost:8000 | `npm run dev` |
+| **Preview** | Vercel 自动生成 | Railway | 推送到任意分支 |
+| **生产** | tradingcoach.vercel.app | Railway | 推送到 main |
+
+### 环境变量
+- 前端: 参考 `frontend/.env.example`
+- 后端: 在 Railway Dashboard 设置
+- Vercel: 在 Project Settings → Environment Variables 设置
+
+---
+
 ## Testing
 
 ```bash
@@ -144,5 +186,5 @@ python -m pytest tests/
 cd frontend && npx playwright test
 
 # 类型检查
-cd frontend && npx tsc --noEmit
+cd frontend && npm run typecheck
 ```
