@@ -1,0 +1,877 @@
+﻿Side,Symbol,Name,Order Price,Order Qty,Order Amount,Status,Filled@Avg Price,Order Time,Order Type,Time-in-Force,Allow Pre-Market,Session,Trigger price,Position Opening,Markets,Currency,Order Source,Fill Qty,Fill Price,Fill Amount,Fill Time,Markets.1,Currency.1,Counterparty,Remarks,Commission,Platform Fees,Settlement Fees,Options Regulatory Fees,OCC Fees,Option Settlement Fees,SEC Fees,Trading Activity Fees,Stamp Duty,Trading Fees,SFC Levy,FRC Levy,Trading Tariff,Consolidated Audit Trail Fees,Total
+Buy,TQQQ,ProShares UltraPro QQQ ETF,51.6,10,516.0,Filled,9@54.21,"Dec 17, 2025 12:05:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,53.76,537.6,"Dec 17, 2025 12:05:15 ET",US,USD,,,0.94,0.96,0.03,,,,,,,,,,,,1.93
+Buy,TQQQ,ProShares UltraPro QQQ ETF,45.31,11,498.41,Filled,11@48.38,"Dec 17, 2025 12:05:03 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,54.98,549.8,"Dec 17, 2025 12:05:45 ET",US,USD,,,0.95,1.08,0.03,,,,,,,,,,,,2.06
+Buy,NVDA260618C205/215,NVDA Vertical,2.1,3unit(s),,Cancelled,0unit(s)@0.00,"Dec 17, 2025 11:50:28 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,161.13,9,1450.17,Filled,9@169.22,"Dec 17, 2025 11:49:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,163.91,1803.01,"Dec 17, 2025 11:49:39 ET",US,USD,,,0.96,0.92,0.03,,,,,,,,,,,,1.91
+Buy,NVDA260618C205/215,NVDA Vertical,2.6,3unit(s),,Filled,3unit(s)@2.48,"Dec 17, 2025 09:50:54 ET",Limit,Day,,,,,US,USD,,,,,,,,,,4.14,1.86,,0.08,0.12,1.15,,0.01,,,,,,,7.36
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,3,12.14,36.42,"Dec 17, 2025 10:00:03 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,3,9.58,28.74,"Dec 17, 2025 10:00:03 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205/215,NVDA Vertical,2.28,3unit(s),,Cancelled,0unit(s)@0.00,"Dec 16, 2025 10:31:57 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS260618C45/50,HIMS Vertical,0.84,3unit(s),,Cancelled,0unit(s)@0.00,"Dec 15, 2025 10:10:33 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS260618C45000,HIMS 260618 45.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS260618C50000,HIMS 260618 50.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205/215,NVDA Vertical,2.2,3unit(s),,Cancelled,0unit(s)@0.00,"Dec 12, 2025 11:17:20 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,Market Price,9,,Filled,9@53.62,"Dec 12, 2025 11:16:18 ET",Market,Day,,Regular Trading Hours,,,US,USD,,9,55.38,498.42,"Dec 12, 2025 11:16:18 ET",US,USD,,,1.04,0.98,0.03,,,,,,,,,,,0.0,2.05
+Buy,NVDA260618C205/215,NVDA Vertical,2.36,3unit(s),,Cancelled,0unit(s)@0.00,"Dec 11, 2025 09:35:50 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205/215,NVDA Vertical,2.72,3unit(s),,Cancelled,0unit(s)@0.00,"Dec 10, 2025 10:41:39 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS260618C45/50,HIMS Vertical,0.94,6unit(s),,Cancelled,0unit(s)@0.00,"Dec 10, 2025 09:31:55 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS260618C45000,HIMS 260618 45.00C,,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS260618C50000,HIMS 260618 50.00C,,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205/215,NVDA Vertical,2.8,3unit(s),,Filled,3unit(s)@2.80,"Dec 8, 2025 13:23:57 ET",Limit,GTC,,,,,US,USD,,,,,,,,,,4.26,1.75,,0.07,0.13,1.02,,0.01,,,,,,0.02,7.26
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,3,15.63,46.89,"Dec 11, 2025 09:56:20 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,3,10.87,32.61,"Dec 11, 2025 09:56:20 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS260618C45/50,HIMS Vertical,0.91,6unit(s),,Cancelled,0unit(s)@0.00,"Dec 5, 2025 10:04:55 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS260618C45000,HIMS 260618 45.00C,,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS260618C50000,HIMS 260618 50.00C,,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS260618C45/50,HIMS Vertical,1.32,6unit(s),,Filled,6unit(s)@1.40,"Dec 4, 2025 10:45:52 ET",Limit,Day,,,,,US,USD,,,,,,,,,,8.05,3.47,,0.17,0.24,2.31,,0.02,,,,,,0.04,14.3
+Buy,HIMS260618C45000,HIMS 260618 45.00C,,6,,,,,,,,,,,,,,3,7.49,22.47,"Dec 4, 2025 11:55:28 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,3,8.21,24.63,"Dec 4, 2025 11:55:28 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS260618C50000,HIMS 260618 50.00C,,6,,,,,,,,,,,,,,3,6.1,18.3,"Dec 4, 2025 11:55:28 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,3,6.12,18.36,"Dec 4, 2025 11:55:28 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,ASTS,AST SpaceMobile,68.08,21,1429.68,Cancelled,0@0.0,"Dec 4, 2025 10:30:55 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205/215,NVDA Vertical,3.04,3unit(s),,Filled,3unit(s)@3.01,"Dec 3, 2025 09:32:21 ET",Limit,Day,,,,,US,USD,,,,,,,,,,4.18,1.83,,0.09,0.12,1.0,,0.01,,,,,,0.02,7.25
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,3,14.7,44.1,"Dec 3, 2025 10:04:11 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,3,11.75,35.25,"Dec 3, 2025 10:04:11 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,51.59,9,464.31,Filled,11@53.48,"Dec 2, 2025 11:46:29 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,54.09,594.99,"Dec 2, 2025 11:46:29 ET",US,USD,,,0.98,0.9,0.03,,,,,,,,,,,0.0,1.91
+Buy,TQQQ,ProShares UltraPro QQQ ETF,Market Price,29,,Cancelled,0@0.0,"Dec 2, 2025 11:33:53 ET",Market,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,55.43,32,1773.76,Filled,27@56.42,"Dec 2, 2025 11:28:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,32,55.45,1774.4,"Dec 2, 2025 11:28:02 ET",US,USD,,,1.03,0.96,0.1,,,,,,,,,,,0.0,2.09
+Buy,TQQQ,ProShares UltraPro QQQ ETF,57.77,30,1733.1,Filled,28@51.3,"Dec 2, 2025 11:26:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,30,52.13,1563.9,"Dec 2, 2025 11:26:19 ET",US,USD,,,0.92,1.1,0.1,,,,,,,,,,,0.0,2.12
+Sell,TQQQ,ProShares UltraPro QQQ ETF,Market Price,99,,Filled,89@52.12,"Dec 2, 2025 11:23:41 ET",Market,Day,,Regular Trading Hours,,,US,USD,,86,51.59,4436.74,"Dec 2, 2025 11:23:42 ET",US,USD,,,0.93,1.02,0.29,,,,,0.02,,,,,,0.0,2.26
+Buy,NVDA260618C205/215,NVDA Vertical,2.52,3unit(s),,Cancelled,0unit(s)@0.00,"Dec 2, 2025 11:17:27 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,59.09,29,1713.61,Filled,32@50.5,"Dec 2, 2025 11:04:01 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,33,57.98,1913.34,"Dec 2, 2025 11:04:02 ET",US,USD,,,0.97,1.1,0.08,,,,,,,,,,,0.0,2.15
+Buy,TQQQ,ProShares UltraPro QQQ ETF,55.57,5,277.85,Filled,5@50.73,"Dec 1, 2025 09:50:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,55.62,278.1,"Dec 1, 2025 09:52:25 ET",US,USD,,,0.96,0.99,0.02,,,,,,,,,,,0.0,1.97
+Buy,NVDA260618C205/215,NVDA Vertical,2.66,3unit(s),,Cancelled,0unit(s)@0.00,"Dec 1, 2025 09:39:20 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA260618C205/215,NVDA Vertical,2.84,4unit(s),,Filled,4unit(s)@3.05,"Nov 26, 2025 10:06:35 ET",Limit,Day,,,,,US,USD,,,,,,,,,,5.25,2.23,,0.09,0.17,1.36,,0.01,,,,,,0.02,9.13
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,4,,,,,,,,,,,,,,4,16.45,65.8,"Nov 26, 2025 10:09:34 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,4,,,,,,,,,,,,,,4,14.06,56.24,"Nov 26, 2025 10:09:34 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,Market Price,9,,Filled,10@51.82,"Nov 26, 2025 10:03:16 ET",Market,Day,,Regular Trading Hours,,,US,USD,,11,57.22,629.42,"Nov 26, 2025 10:03:16 ET",US,USD,,,1.03,0.91,0.03,,,,,,,,,,,0.0,1.97
+Buy,TQQQ,ProShares UltraPro QQQ ETF,57.52,11,632.72,Cancelled,0@0.0,"Nov 26, 2025 10:03:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,35.31,408,14406.48,Queued,0@0.0,"Nov 24, 2025 00:38:13 HKT",Limit,GTC,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,34.9,361,12598.9,Filled,404@34.66,"Nov 24, 2025 00:37:09 HKT",Limit,GTC,Allow,,,,HK,HKD,,417,40.19,16759.23,"Nov 24, 2025 10:06:10 HKT",HK,HKD,,,4.75,15.95,0.64,,,,,,16.67,0.83,0.44,0.02,,,39.3
+Buy,NVDA,NVIDIA,164.75,5,823.75,Filled,5@166.2,"Nov 21, 2025 11:32:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,183.68,918.4,"Nov 21, 2025 11:32:15 ET",US,USD,,,0.92,0.94,0.02,,,,,,,,,,,0.0,1.88
+Sell,IREN,IREN Ltd,45.67,47,2146.49,Filled,47@45.98,"Nov 20, 2025 22:59:36 ET",Limit,Day,,24 Hour Trading,,,US,USD,,46,44.08,2027.68,"Nov 20, 2025 22:59:37 ET",US,USD,,,1.08,0.97,0.16,,,,,0.01,,,,,,0.0,2.22
+Sell,09988,BABA-W,151.89,93,14125.77,Filled,101@152.79,"Nov 21, 2025 09:40:22 HKT",Limit,Day,Allow,,,,HK,HKD,,93,161.81,15048.33,"Nov 21, 2025 09:40:22 HKT",HK,HKD,,,4.03,15.77,0.58,,,,,,14.96,0.77,0.43,0.02,,,36.56
+Sell,09988,BABA-W,Market Price,99,,Filled,106@157.47,"Nov 21, 2025 09:40:08 HKT",Market,Day,Not Allowed,,,,HK,HKD,,95,146.47,13914.65,"Nov 21, 2025 09:40:08 HKT",HK,HKD,,,4.1,16.06,0.64,,,,,,14.98,0.77,0.4,0.02,,,36.97
+Buy,TQQQ,ProShares UltraPro QQQ ETF,Market Price,10,,Filled,11@50.77,"Nov 20, 2025 12:58:57 ET",Market,Day,,Regular Trading Hours,,,US,USD,,11,48.49,533.39,"Nov 20, 2025 12:58:57 ET",US,USD,,,0.92,0.92,0.03,,,,,,,,,,,0.0,1.87
+Buy,TQQQ,ProShares UltraPro QQQ ETF,50.99,9,458.91,Cancelled,0@0.0,"Nov 20, 2025 12:58:45 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,IREN,IREN Ltd,55.5,49,2719.5,Filled,49@53.32,"Nov 20, 2025 10:30:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,49,54.41,2666.09,"Nov 20, 2025 10:30:16 ET",US,USD,,,1.07,0.91,0.14,,,,,,,,,,,0.0,2.12
+Buy,NVDA260618C205/215,NVDA Vertical,3.93,6unit(s),,Filled,6unit(s)@3.86,"Nov 20, 2025 10:12:55 ET",Limit,Day,,,,,US,USD,,,,,,,,,,7.7,3.92,,0.15,0.26,2.0,,0.02,,,,,,0.04,14.09
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,6,,,,,,,,,,,,,,3,26.28,78.84,"Nov 20, 2025 10:12:56 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,3,25.89,77.67,"Nov 20, 2025 10:12:56 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,6,,,,,,,,,,,,,,3,18.69,56.07,"Nov 20, 2025 10:12:56 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,3,19.07,57.21,"Nov 20, 2025 10:12:56 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,41.03,219,8985.57,Filled,199@40.57,"Nov 20, 2025 14:14:22 HKT",Limit,Day,Allow,,,,HK,HKD,,220,36.04,7928.8,"Nov 20, 2025 14:14:23 HKT",HK,HKD,,,2.74,16.28,0.28,,,,,,8.55,0.46,0.19,0.01,,,28.51
+Buy,TQQQ,ProShares UltraPro QQQ ETF,98.06,5,490.3,Filled,5@98.15,"Nov 19, 2025 09:50:16 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,105.39,526.95,"Nov 19, 2025 09:50:17 ET",US,USD,,,0.93,1.07,0.02,,,,,,,,,,,0.0,2.02
+Sell,01810,XIAOMI-W,38.92,201,7822.92,Filled,187@37.12,"Nov 19, 2025 15:06:42 HKT",Limit,Day,Allow,,,,HK,HKD,,200,39.05,7810.0,"Nov 19, 2025 15:06:45 HKT",HK,HKD,,,2.75,15.96,0.34,,,,,,8.59,0.43,0.19,0.01,,,28.27
+Buy,01810,XIAOMI-W,41.04,401,16457.04,Filled,378@41.55,"Nov 19, 2025 14:56:24 HKT",Limit,Day,Allow,,,,HK,HKD,,438,36.87,16149.06,"Nov 19, 2025 14:56:33 HKT",HK,HKD,,,4.19,13.54,0.65,,,,,,14.8,0.85,0.38,0.02,,,34.43
+Buy,NVDA260618C205/215,NVDA Vertical,3.36,2unit(s),,Filled,2unit(s)@3.28,"Nov 18, 2025 11:40:58 ET",Limit,Day,,,,,US,USD,,,,,,,,,,3.89,1.25,,0.06,0.07,0.67,,0.01,,,,,,0.0,5.95
+Buy,NVDA260618C205000,NVDA 260618 205.00C,,2,,,,,,,,,,,,,,2,18.15,36.3,"Nov 18, 2025 11:41:06 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA260618C215000,NVDA 260618 215.00C,,2,,,,,,,,,,,,,,2,16.96,33.92,"Nov 18, 2025 11:41:06 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,TQQQ,ProShares UltraPro QQQ ETF,104.75,15,1571.25,Filled,16@89.06,"Nov 18, 2025 10:14:48 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,16,101.58,1625.28,"Nov 18, 2025 10:15:01 ET",US,USD,,,1.09,0.92,0.05,,,,,0.01,,,,,,0.0,2.07
+Buy,COIN260417P230000,COIN 260417 230.00P,26.66,1,26.66,Filled,1@26.4,"Nov 18, 2025 10:01:31 ET",Limit,Day,,,,,US,USD,,1,28.57,28.57,"Nov 18, 2025 10:01:31 ET",US,USD,,,2.04,0.3,,0.01,0.02,0.16,,,,,,,,0.0,2.53
+Buy,TSLA260417P290000,TSLA 260417 290.00P,14.16,1,14.16,Filled,1@14.94,"Nov 18, 2025 09:55:41 ET",Limit,Day,,,,,US,USD,,1,13.58,13.58,"Nov 18, 2025 09:55:42 ET",US,USD,,,2.0,0.27,,0.01,0.02,0.19,,,,,,,,0.0,2.49
+Buy,TSLA260417P290000,TSLA 260417 290.00P,Market Price,1,,Failed,0@0.0,"Nov 18, 2025 09:55:32 ET",Market,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Short Sell,COIN260417P230000,COIN 260417 230.00P,22.82,1,22.82,Filled,1@23.09,"Nov 17, 2025 10:36:55 ET",Limit,Day,,,,,US,USD,,1,25.07,25.07,"Nov 17, 2025 10:37:05 ET",US,USD,,,2.07,0.28,,0.01,0.02,0.19,,0.01,,,,,,0.0,2.58
+Sell,CONL,GraniteShares 2x Long COIN Daily ETF,Market Price,135,,Filled,155@20.63,"Nov 17, 2025 10:35:46 ET",Market,Day,,Regular Trading Hours,,,US,USD,,147,19.82,2913.54,"Nov 17, 2025 10:35:46 ET",US,USD,,,1.01,1.01,0.45,,,,,0.02,,,,,,0.0,2.49
+Sell,CONL,GraniteShares 2x Long COIN Daily ETF,20.44,159,3249.96,Cancelled,0@0.0,"Nov 17, 2025 10:33:40 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,98.33,15,1474.95,Filled,16@111.19,"Nov 14, 2025 09:55:27 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,16,93.18,1490.88,"Nov 14, 2025 09:55:28 ET",US,USD,,,1.08,0.94,0.05,,,,,,,,,,,0.0,2.07
+Sell,FIG,Figma Inc,36.6,58,2122.8,Filled,50@43.93,"Nov 14, 2025 09:48:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,50,39.42,1971.0,"Nov 14, 2025 09:48:02 ET",US,USD,,,1.05,1.0,0.17,,,,,0.01,,,,,,0.0,2.23
+Buy,CONL,GraniteShares 2x Long COIN Daily ETF,Market Price,154,,Filled,142@25.0,"Nov 14, 2025 09:46:18 ET",Market,Day,,Regular Trading Hours,,,US,USD,,143,22.55,3224.65,"Nov 14, 2025 09:46:19 ET",US,USD,,,1.02,0.95,0.49,,,,,,,,,,,0.0,2.46
+Buy,TQQQ,ProShares UltraPro QQQ ETF,Market Price,16,,Filled,16@98.56,"Nov 14, 2025 09:45:50 ET",Market,Day,,Regular Trading Hours,,,US,USD,,16,96.44,1543.04,"Nov 14, 2025 09:45:50 ET",US,USD,,,0.98,1.0,0.05,,,,,,,,,,,0.0,2.03
+Buy,TQQQ,ProShares UltraPro QQQ ETF,96.03,16,1536.48,Cancelled,0@0.0,"Nov 14, 2025 09:45:38 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,CONL,GraniteShares 2x Long COIN Daily ETF,20.97,19,398.43,Cancelled,0@0.0,"Nov 14, 2025 09:43:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Short Sell,TSLA260417P290000,TSLA 260417 290.00P,14.43,1,14.43,Filled,1@16.15,"Nov 14, 2025 09:36:35 ET",Limit,Day,,,,,US,USD,,1,13.87,13.87,"Nov 14, 2025 09:36:35 ET",US,USD,,,1.87,0.31,,0.01,0.02,0.16,,0.01,,,,,,0.0,2.38
+Sell,CONL,GraniteShares 2x Long COIN Daily ETF,23.11,172,3974.92,Filled,159@23.0,"Nov 14, 2025 09:34:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,19,24.65,468.35,"Nov 14, 2025 09:34:45 ET",US,USD,,,1.02,0.93,0.49,,,,,0.03,,,,,,0.0,2.47
+,,,,,,,,,,,,,,,,,,163,24.1,3928.3,"Nov 14, 2025 09:34:45 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,BMNR,Bitmine Immersion Technologies,33.61,43,1445.23,Filled,42@36.01,"Nov 14, 2025 09:34:29 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,39,35.16,1371.24,"Nov 14, 2025 09:34:30 ET",US,USD,,,1.05,1.04,0.11,,,,,0.01,,,,,,0.0,2.21
+Buy,TSLA,Tesla,341.01,23,7843.23,Cancelled,0@0.0,"Nov 14, 2025 06:23:05 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS,Hims & Hers Health,33.91,116,3933.56,Filled,119@32.63,"Nov 13, 2025 17:30:21 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,114,39.27,4476.78,"Nov 13, 2025 17:30:55 ET",US,USD,,,0.95,0.9,0.36,,,,,0.02,,,,,,0.0,2.23
+Buy,CONL,GraniteShares 2x Long COIN Daily ETF,26.74,70,1871.8,Filled,73@30.55,"Nov 7, 2025 13:06:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,72,30.84,2220.48,"Nov 7, 2025 13:06:15 ET",US,USD,,,0.9,1.02,0.22,,,,,,,,,,,0.0,2.14
+Sell,BRK.B,Berkshire Hathaway-B,540.4,5,2702.0,Filled,5@503.33,"Nov 7, 2025 13:04:54 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,514.19,2570.95,"Nov 7, 2025 13:05:24 ET",US,USD,,,1.01,1.03,0.02,,,,,0.01,,,,,,0.0,2.07
+Buy,CONL,GraniteShares 2x Long COIN Daily ETF,26.81,103,2761.43,Filled,94@28.58,"Nov 7, 2025 09:59:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,102,24.84,2533.68,"Nov 7, 2025 09:59:37 ET",US,USD,,,0.99,0.91,0.3,,,,,,,,,,,0.0,2.2
+Buy,FIG,Figma Inc,45.31,11,498.41,Filled,11@44.27,"Nov 6, 2025 11:09:21 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,40.26,442.86,"Nov 6, 2025 11:09:22 ET",US,USD,,,0.94,0.93,0.03,,,,,,,,,,,0.0,1.9
+Sell,AMZN,Amazon,230.82,9,2077.38,Filled,10@246.68,"Nov 6, 2025 10:03:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,259.82,2598.2,"Nov 6, 2025 10:03:13 ET",US,USD,,,0.92,0.96,0.03,,,,,0.01,,,,,,0.0,1.92
+Buy,BMNR,Bitmine Immersion Technologies,42.87,42,1800.54,Filled,37@38.8,"Nov 5, 2025 10:01:03 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,25,40.75,1018.75,"Nov 5, 2025 10:01:12 ET",US,USD,,,0.9,1.06,0.11,,,,,,,,,,,0.0,2.07
+,,,,,,,,,,,,,,,,,,2,42.23,84.46,"Nov 5, 2025 10:01:12 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,11,44.4,488.4,"Nov 5, 2025 10:01:12 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,39.92,198,7904.16,Filled,189@43.03,"Nov 5, 2025 11:25:28 HKT",Limit,Day,Allow,,,,HK,HKD,,205,40.07,8214.35,"Nov 5, 2025 11:25:45 HKT",HK,HKD,,,2.84,15.35,0.33,,,,,,8.27,0.45,0.21,0.01,,,27.46
+Buy,BRK.B,Berkshire Hathaway-B,466.13,5,2330.65,Filled,5@517.57,"Nov 3, 2025 11:08:18 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,485.8,2429.0,"Nov 3, 2025 11:08:21 ET",US,USD,,,0.89,0.91,0.02,,,,,,,,,,,0.0,1.82
+Buy,FIG,Figma Inc,53.01,36,1908.36,Filled,38@44.71,"Nov 3, 2025 11:01:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,39,49.58,1933.62,"Nov 3, 2025 11:01:11 ET",US,USD,,,0.92,1.03,0.13,,,,,,,,,,,0.0,2.08
+Buy,HIMS,Hims & Hers Health,46.26,19,878.94,Filled,21@48.77,"Nov 3, 2025 10:58:28 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,18,44.93,808.74,"Nov 3, 2025 10:58:29 ET",US,USD,,,1.09,0.9,0.06,,,,,,,,,,,0.0,2.05
+Buy,FIG,Figma Inc,48.59,5,242.95,Filled,5@46.35,"Nov 3, 2025 10:41:21 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,44.11,220.55,"Nov 3, 2025 10:41:30 ET",US,USD,,,1.05,0.98,0.02,,,,,,,,,,,0.0,2.05
+Sell,UNH,UnitedHealth,340.49,17,5788.33,Filled,14@334.08,"Nov 3, 2025 10:27:56 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,318.39,2865.51,"Nov 3, 2025 10:27:57 ET",US,USD,,,0.96,0.95,0.05,,,,,0.03,,,,,,0.0,1.99
+,,,,,,,,,,,,,,,,,,2,317.45,634.9,"Nov 3, 2025 10:27:57 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,5,339.6,1698.0,"Nov 3, 2025 10:27:57 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,AMZN260618P195000,AMZN 260618 195.00P,5.56,1,5.56,Filled,1@5.49,"Nov 3, 2025 09:38:46 ET",Limit,Day,,,,,US,USD,,1,5.57,5.57,"Nov 3, 2025 09:38:47 ET",US,USD,,,1.95,0.32,,0.01,0.02,0.19,,,,,,,,0.0,2.49
+Buy,AMZN260618P195000,AMZN 260618 195.00P,5.96,1,5.96,Filled,1@6.06,"Oct 31, 2025 09:44:35 ET",Limit,Day,,,,,US,USD,,1,5.46,5.46,"Oct 31, 2025 09:44:35 ET",US,USD,,,2.02,0.31,,0.02,0.02,0.19,,,,,,,,0.0,2.56
+Sell,AMZN,Amazon,214.86,5,1074.3,Filled,5@221.52,"Oct 30, 2025 10:22:53 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,236.07,1180.35,"Oct 30, 2025 10:22:53 ET",US,USD,,,0.99,1.07,0.02,,,,,0.01,,,,,,0.0,2.09
+Buy,HIMS,Hims & Hers Health,43.11,19,819.09,Filled,22@46.57,"Oct 29, 2025 10:23:00 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,20,45.55,911.0,"Oct 29, 2025 10:23:01 ET",US,USD,,,1.04,0.9,0.06,,,,,,,,,,,0.0,2.0
+Buy,HIMS,Hims & Hers Health,47.36,21,994.56,Filled,18@47.17,"Oct 24, 2025 15:36:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,20,53.49,1069.8,"Oct 24, 2025 15:36:37 ET",US,USD,,,0.9,1.07,0.06,,,,,,,,,,,0.0,2.03
+Buy,01810,XIAOMI-W,41.77,375,15663.75,Cancelled,0@0.0,"Oct 23, 2025 10:50:26 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,43.23,194,8386.62,Filled,185@42.74,"Oct 22, 2025 11:38:00 HKT",Limit,Day,Allow,,,,HK,HKD,,181,48.76,8825.56,"Oct 22, 2025 11:38:20 HKT",HK,HKD,,,2.75,15.45,0.36,,,,,,10.74,0.57,0.23,0.01,,,30.11
+Short Sell,AMZN260618P195000,AMZN 260618 195.00P,12.41,1,12.41,Filled,1@12.07,"Oct 21, 2025 09:32:44 ET",Limit,Day,,,,,US,USD,,1,11.51,11.51,"Oct 21, 2025 09:32:44 ET",US,USD,,,1.9,0.28,,0.02,0.02,0.16,,0.01,,,,,,0.0,2.39
+Buy,01810,XIAOMI-W,51.23,215,11014.45,Filled,218@49.06,"Oct 21, 2025 11:16:41 HKT",Limit,Day,Allow,,,,HK,HKD,,184,47.21,8686.64,"Oct 21, 2025 11:30:26 HKT",HK,HKD,,,3.2,14.64,0.38,,,,,,9.36,0.58,0.26,0.01,,,28.43
+Sell,HIMS,Hims & Hers Health,Market Price,19,,Filled,19@56.36,"Oct 20, 2025 10:04:57 ET",Market,Day,,Regular Trading Hours,,,US,USD,,20,49.62,992.4,"Oct 20, 2025 10:04:58 ET",US,USD,,,1.07,1.1,0.06,,,,,0.01,,,,,,0.0,2.24
+Sell,01810,XIAOMI-W,47.24,185,8739.4,Cancelled,0@0.0,"Oct 20, 2025 11:37:18 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,44.34,389,17248.26,Cancelled,0@0.0,"Oct 20, 2025 03:35:10 HKT",Limit,"Good Till Nov 20, 2025 HKT",Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,42.92,216,9270.72,Cancelled,0@0.0,"Oct 20, 2025 03:34:58 HKT",Limit,"Good Till Nov 20, 2025 HKT",Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,48.47,210,10178.7,Cancelled,0@0.0,"Oct 20, 2025 03:34:36 HKT",Limit,"Good Till Nov 20, 2025 HKT",Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,45.3,216,9784.8,Filled,208@49.6,"Oct 20, 2025 03:34:08 HKT",Limit,"Good Till Nov 20, 2025 HKT",Allow,,,,HK,HKD,,193,44.07,8505.51,"Oct 27, 2025 09:30:10 HKT",HK,HKD,,,2.91,13.8,0.34,,,,,,9.34,0.48,0.23,0.01,,,27.11
+Buy,IBIT,iShares Bitcoin Trust,57.84,10,578.4,Failed,0@0.0,"Oct 17, 2025 14:10:40 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS,Hims & Hers Health,50.63,18,911.34,Filled,17@50.36,"Oct 17, 2025 10:54:53 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,16,58.32,933.12,"Oct 17, 2025 10:54:54 ET",US,USD,,,1.08,0.96,0.05,,,,,,,,,,,0.0,2.09
+Sell,BMNR,Bitmine Immersion Technologies,49.54,40,1981.6,Filled,41@45.79,"Oct 17, 2025 10:42:24 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,38,48.03,1825.14,"Oct 17, 2025 10:42:24 ET",US,USD,,,0.95,1.07,0.11,,,,,0.01,,,,,,0.0,2.14
+Sell,09988,BABA-W,145.84,200,29168.0,Filled,192@158.87,"Oct 17, 2025 15:24:02 HKT",Limit,Day,Allow,,,,HK,HKD,,196,153.55,30095.8,"Oct 17, 2025 15:24:05 HKT",HK,HKD,,,9.39,15.09,1.31,,,,,,31.05,1.85,0.86,0.05,,,59.6
+Buy,01810,XIAOMI-W,46.45,434,20159.3,Cancelled,0@0.0,"Oct 17, 2025 13:46:38 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,01810,XIAOMI-W,50.33,201,10116.33,Filled,185@48.75,"Oct 17, 2025 10:45:34 HKT",Limit,Day,Allow,,,,HK,HKD,,183,51.17,9364.11,"Oct 17, 2025 10:45:34 HKT",HK,HKD,,,2.82,14.06,0.36,,,,,,9.55,0.49,0.25,0.01,,,27.54
+Sell,HIMS,Hims & Hers Health,Market Price,17,,Filled,17@65.29,"Oct 16, 2025 12:09:22 ET",Market,Day,,Regular Trading Hours,,,US,USD,,17,61.8,1050.6,"Oct 16, 2025 12:09:22 ET",US,USD,,,1.08,1.0,0.05,,,,,0.01,,,,,,0.0,2.14
+Sell,HIMS,Hims & Hers Health,58.74,17,998.58,Cancelled,0@0.0,"Oct 16, 2025 12:09:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS,Hims & Hers Health,Trigger MKT price,15,,Cancelled,0@0.0,"Oct 16, 2025 11:30:22 ET",Market-If-Touched,Day,,Regular Trading Hours,70.0,Allow,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BMNR,Bitmine Immersion Technologies,51.23,10,512.3,Filled,10@59.62,"Oct 14, 2025 12:27:26 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,54.72,601.92,"Oct 14, 2025 12:27:27 ET",US,USD,,,1.0,0.99,0.03,,,,,,,,,,,0.0,2.02
+Short Sell,AMZN260618P195000,AMZN 260618 195.00P,13.85,1,13.85,Filled,1@11.42,"Oct 14, 2025 11:56:24 ET",Limit,Day,,,,,US,USD,,1,12.38,12.38,"Oct 14, 2025 11:56:25 ET",US,USD,,,1.89,0.33,,0.02,0.02,0.17,,0.01,,,,,,0.0,2.44
+Sell,UNH,UnitedHealth,357.89,4,1431.56,Filled,4@387.29,"Oct 14, 2025 10:01:47 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,4,334.89,1339.56,"Oct 14, 2025 10:01:55 ET",US,USD,,,0.97,0.9,0.01,,,,,0.01,,,,,,0.0,1.89
+Sell,HIMS,Hims & Hers Health,47.64,19,905.16,Filled,22@48.98,"Oct 14, 2025 09:34:27 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,19,50.45,958.55,"Oct 14, 2025 09:34:28 ET",US,USD,,,0.91,0.95,0.06,,,,,0.01,,,,,,0.0,1.93
+Sell,AMZN,Amazon,194.33,6,1165.98,Filled,7@232.45,"Oct 14, 2025 09:31:40 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,7,224.74,1573.18,"Oct 14, 2025 09:31:41 ET",US,USD,,,0.91,1.01,0.02,,,,,0.01,,,,,,0.0,1.95
+Sell,AMZN260618C250000,AMZN 260618 250.00C,12.35,1,12.35,Filled,1@14.06,"Oct 14, 2025 09:31:25 ET",Limit,Day,,,,,US,USD,,1,13.74,13.74,"Oct 14, 2025 09:31:25 ET",US,USD,,,1.91,0.29,,0.02,0.02,0.19,,0.01,,,,,,0.0,2.44
+Buy,09988,BABA-W,159.98,192,30716.16,Filled,190@171.05,"Oct 14, 2025 15:35:17 HKT",Limit,Day,Allow,,,,HK,HKD,,192,164.11,31509.12,"Oct 14, 2025 15:35:17 HKT",HK,HKD,,,10.2,14.68,1.39,,,,,,34.5,1.86,0.8,0.05,,,63.48
+Sell,09988,BABA-W,163.63,204,33380.52,Filled,187@166.51,"Oct 14, 2025 14:21:47 HKT",Limit,Day,Allow,,,,HK,HKD,,200,145.43,29086.0,"Oct 14, 2025 14:21:48 HKT",HK,HKD,,,9.84,13.97,1.39,,,,,,31.53,1.67,0.79,0.05,,,59.24
+Buy,BMNR,Bitmine Immersion Technologies,54.06,30,1621.8,Filled,28@57.09,"Oct 13, 2025 10:06:16 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,27,55.33,1493.91,"Oct 13, 2025 10:06:16 ET",US,USD,,,1.08,0.97,0.09,,,,,,,,,,,0.0,2.14
+Sell,BRK.B,Berkshire Hathaway-B,Market Price,4,,Filled,4@526.64,"Oct 13, 2025 09:35:32 ET",Market,Day,,Regular Trading Hours,,,US,USD,,4,530.65,2122.6,"Oct 13, 2025 09:35:32 ET",US,USD,,,1.06,0.97,0.01,,,,,0.01,,,,,,0.0,2.05
+Buy,BIDU251219C150000,BIDU 251219 150.00C,4.47,2,8.94,Filled,2@4.67,"Oct 13, 2025 09:32:19 ET",Limit,Day,,,,,US,USD,,2,4.84,9.68,"Oct 13, 2025 09:33:33 ET",US,USD,,,2.11,0.62,,0.03,0.04,0.36,,,,,,,,0.0,3.16
+Sell,18099,JPXIAMI@EC2512B.C,0.01,"80,000",,Filled,"80,000@0.014","Oct 13, 2025 11:45:23 HKT",Limit,Day,Not Allowed,,,,HK,HKD,,"80,000",0.01,,"Oct 13, 2025 11:45:23 HKT",HK,HKD,,,3.04,14.21,0.05,,,,,,0.0,0.06,0.03,0.0,,,17.39
+Buy,09988,BABA-W,176.32,91,16045.12,Filled,95@146.53,"Oct 13, 2025 09:57:24 HKT",Limit,Day,Allow,,,,HK,HKD,,100,148.26,14826.0,"Oct 13, 2025 09:57:25 HKT",HK,HKD,,,5.0,16.43,0.73,,,,,,17.28,0.94,0.43,0.02,,,40.83
+Buy,AMZN,Amazon,222.24,8,1777.92,Filled,7@203.46,"Oct 10, 2025 11:47:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,6,241.66,1449.96,"Oct 10, 2025 11:47:10 ET",US,USD,,,1.08,1.0,0.02,,,,,,,,,,,0.0,2.1
+Buy,BIDU251219C150000,BIDU 251219 150.00C,4.6,1,4.6,Filled,1@4.1,"Oct 10, 2025 11:35:26 ET",Limit,Day,,,,,US,USD,,1,4.29,4.29,"Oct 10, 2025 11:58:38 ET",US,USD,,,2.02,0.32,,0.02,0.02,0.16,,,,,,,,0.0,2.54
+Sell,TSLA,Tesla,Market Price,9,,Filled,8@457.15,"Oct 10, 2025 11:34:03 ET",Market,Day,,Regular Trading Hours,,,US,USD,,8,396.15,3169.2,"Oct 10, 2025 11:34:04 ET",US,USD,,,1.04,1.03,0.02,,,,,0.01,,,,,,0.0,2.1
+Buy,BIDU251219C150000,BIDU 251219 150.00C,4.29,1,4.29,Cancelled,0@0.0,"Oct 10, 2025 11:26:18 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,AMZN,Amazon,205.54,5,1027.7,Filled,5@227.48,"Oct 10, 2025 09:46:55 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,212.24,1061.2,"Oct 10, 2025 09:46:55 ET",US,USD,,,1.04,1.08,0.02,,,,,,,,,,,0.0,2.14
+Short Sell,BIDU251219C150000,BIDU 251219 150.00C,5.95,3,17.85,Filled,3@5.75,"Oct 10, 2025 09:32:22 ET",Limit,Day,,,,,US,USD,,3,5.76,17.28,"Oct 10, 2025 09:32:28 ET",US,USD,,,2.17,0.97,,0.05,0.06,0.5,,0.01,,,,,,0.01,3.77
+Short Sell,BIDU251219C160000,BIDU 251219 160.00C,4.2,3,12.6,Cancelled,0@0.0,"Oct 10, 2025 09:31:51 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,AMZN,Amazon,225.7,5,1128.5,Filled,5@223.12,"Oct 9, 2025 12:20:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,226.38,1131.9,"Oct 9, 2025 12:20:48 ET",US,USD,,,0.98,1.06,0.02,,,,,,,,,,,0.0,2.06
+Sell,FIG,Figma Inc,Market Price,10,,Filled,11@69.93,"Oct 9, 2025 09:52:12 ET",Market,Day,,Regular Trading Hours,,,US,USD,,9,62.36,561.24,"Oct 9, 2025 09:52:12 ET",US,USD,,,0.98,0.91,0.03,,,,,0.01,,,,,,0.0,1.93
+Sell,FIG,Figma Inc,64.86,19,1232.34,Failed,0@0.0,"Oct 9, 2025 09:51:50 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,OSCR,Oscar Health,Market Price,16,,Filled,16@20.51,"Oct 8, 2025 09:47:33 ET",Market,Day,,Regular Trading Hours,,,US,USD,,14,24.15,338.1,"Oct 8, 2025 09:47:34 ET",US,USD,,,1.01,1.01,0.05,,,,,0.01,,,,,,0.0,2.08
+Buy,TSLA,Tesla,442.95,9,3986.55,Filled,7@460.4,"Oct 8, 2025 09:44:47 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,466.19,4195.71,"Oct 8, 2025 09:44:47 ET",US,USD,,,0.9,0.96,0.02,,,,,,,,,,,0.0,1.88
+Buy,HIMS,Hims & Hers Health,52.45,46,2412.7,Filled,48@54.81,"Oct 7, 2025 12:27:47 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,48,56.43,2708.64,"Oct 7, 2025 12:27:48 ET",US,USD,,,0.91,0.93,0.14,,,,,,,,,,,0.0,1.98
+Buy,HIMS,Hims & Hers Health,Market Price,26,,Filled,27@51.98,"Oct 7, 2025 12:27:32 ET",Market,Day,,Regular Trading Hours,,,US,USD,,26,52.47,1364.22,"Oct 7, 2025 12:27:32 ET",US,USD,,,0.9,1.08,0.08,,,,,,,,,,,0.0,2.06
+Buy,HIMS,Hims & Hers Health,54.98,26,1429.48,Cancelled,0@0.0,"Oct 7, 2025 12:27:25 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS,Hims & Hers Health,55.21,23,1269.83,Cancelled,0@0.0,"Oct 7, 2025 12:27:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,OSCR,Oscar Health,24.91,14,348.74,Filled,14@22.28,"Oct 7, 2025 11:42:30 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,16,24.37,389.92,"Oct 7, 2025 11:42:30 ET",US,USD,,,1.02,1.03,0.05,,,,,0.01,,,,,,0.0,2.11
+Buy,AMZN260618C250000,AMZN 260618 250.00C,17.2,1,17.2,Filled,1@16.15,"Oct 7, 2025 11:13:54 ET",Limit,Day,,,,,US,USD,,1,15.99,15.99,"Oct 7, 2025 11:13:54 ET",US,USD,,,2.19,0.28,,0.02,0.02,0.17,,,,,,,,0.0,2.68
+Sell,BMNR,Bitmine Immersion Technologies,56.71,29,1644.59,Filled,32@54.81,"Oct 7, 2025 11:10:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,29,62.25,1805.25,"Oct 7, 2025 11:10:12 ET",US,USD,,,1.03,0.98,0.09,,,,,0.01,,,,,,0.0,2.11
+Sell,BMNR,Bitmine Immersion Technologies,60.51,20,1210.2,Filled,20@61.91,"Oct 7, 2025 11:05:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,21,60.64,1273.44,"Oct 7, 2025 11:05:30 ET",US,USD,,,0.94,1.09,0.06,,,,,0.01,,,,,,0.0,2.1
+Buy,FIG,Figma Inc,56.98,10,569.8,Filled,10@55.18,"Oct 6, 2025 13:52:50 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,58.13,639.43,"Oct 6, 2025 13:52:53 ET",US,USD,,,0.95,1.02,0.03,,,,,,,,,,,0.0,2.0
+Sell,FIG,Figma Inc,Market Price,56,,Filled,60@55.72,"Oct 6, 2025 13:48:28 ET",Market,Day,,Regular Trading Hours,,,US,USD,,60,63.71,3822.6,"Oct 6, 2025 13:48:28 ET",US,USD,,,1.08,1.03,0.16,,,,,0.01,,,,,,0.0,2.28
+Buy,AMZN,Amazon,235.23,5,1176.15,Filled,5@202.3,"Oct 6, 2025 09:49:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,238.06,1190.3,"Oct 6, 2025 09:49:44 ET",US,USD,,,0.99,0.95,0.02,,,,,,,,,,,0.0,1.96
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,20.17,33,665.61,Filled,28@17.68,"Oct 3, 2025 13:28:28 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,29,17.82,516.78,"Oct 3, 2025 13:28:28 ET",US,USD,,,0.89,0.95,0.09,,,,,0.01,,,,,,0.0,1.94
+Buy,IBIT,iShares Bitcoin Trust,67.27,1,67.27,Failed,0@0.0,"Oct 3, 2025 12:16:25 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,20.25,16,324.0,Filled,14@20.48,"Oct 3, 2025 10:11:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,16,19.91,318.56,"Oct 3, 2025 10:11:12 ET",US,USD,,,1.06,0.93,0.05,,,,,0.01,,,,,,0.0,2.05
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,20.22,15,303.3,Cancelled,0@0.0,"Oct 3, 2025 10:10:52 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,18.41,15,276.15,Cancelled,0@0.0,"Oct 3, 2025 10:10:47 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,22.07,15,331.05,Filled,16@21.95,"Oct 2, 2025 13:22:16 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,14,20.49,286.86,"Oct 2, 2025 13:22:17 ET",US,USD,,,0.94,1.09,0.05,,,,,0.01,,,,,,0.0,2.09
+Buy,18099,JPXIAMI@EC2512B.C,0.05,"80,000",,Filled,"80,000@0.049","Oct 2, 2025 09:38:00 HKT",Limit,Day,Not Allowed,,,,HK,HKD,,"80,000",0.05,,"Oct 2, 2025 09:38:08 HKT",HK,HKD,,,2.76,16.23,0.16,,,,,,0.0,0.2,0.1,0.01,,,19.46
+Buy,HIMS,Hims & Hers Health,59.12,26,1537.12,Filled,24@53.55,"Oct 1, 2025 11:50:56 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,24,56.09,1346.16,"Oct 1, 2025 15:20:56 ET",US,USD,,,1.02,0.97,0.08,,,,,,,,,,,0.0,2.07
+Buy,BMNR,Bitmine Immersion Technologies,50.97,9,458.73,Filled,9@46.09,"Sep 26, 2025 13:33:16 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,54.49,599.39,"Sep 26, 2025 13:33:16 ET",US,USD,,,1.05,1.01,0.03,,,,,,,,,,,0.0,2.09
+Buy,BMNR,Bitmine Immersion Technologies,45.64,18,821.52,Filled,19@54.14,"Sep 26, 2025 13:32:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,4,54.38,217.52,"Sep 26, 2025 13:32:35 ET",US,USD,,,0.91,0.94,0.06,,,,,,,,,,,0.0,1.91
+,,,,,,,,,,,,,,,,,,14,48.43,678.02,"Sep 26, 2025 13:32:35 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,01810,XIAOMI-W,57.17,209,11948.53,Filled,186@57.6,"Sep 25, 2025 15:03:31 HKT",Limit,Day,Allow,,,,HK,HKD,,208,62.69,13039.52,"Sep 25, 2025 15:03:31 HKT",HK,HKD,,,3.87,13.92,0.46,,,,,,13.13,0.67,0.33,0.02,,,32.4
+Buy,BMNR,Bitmine Immersion Technologies,48.58,1,48.58,Filled,1@51.52,"Sep 23, 2025 13:40:26 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,52.82,52.82,"Sep 23, 2025 13:40:26 ET",US,USD,,,0.99,1.01,0.0,,,,,,,,,,,0.0,2.0
+Buy,BMNR,Bitmine Immersion Technologies,62.33,10,623.3,Failed,0@0.0,"Sep 23, 2025 09:40:22 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BMNR,Bitmine Immersion Technologies,58.09,15,871.35,Cancelled,0@0.0,"Sep 22, 2025 13:32:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BMNR,Bitmine Immersion Technologies,58.8,14,823.2,Filled,15@56.25,"Sep 22, 2025 13:20:20 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,15,59.93,898.95,"Sep 22, 2025 13:28:43 ET",US,USD,,,0.96,1.06,0.05,,,,,,,,,,,0.0,2.07
+Buy,BMNR,Bitmine Immersion Technologies,52.85,5,264.25,Filled,5@49.71,"Sep 22, 2025 12:41:43 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,55.01,275.05,"Sep 22, 2025 12:41:44 ET",US,USD,,,1.07,1.07,0.02,,,,,,,,,,,0.0,2.16
+Buy,FIG,Figma Inc,52.16,5,260.8,Filled,5@54.84,"Sep 22, 2025 11:23:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,60.89,304.45,"Sep 22, 2025 11:23:44 ET",US,USD,,,0.94,0.96,0.02,,,,,,,,,,,0.0,1.92
+Sell,BMNR,Bitmine Immersion Technologies,60.14,66,3969.24,Filled,55@60.14,"Sep 22, 2025 11:18:29 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,64,53.83,3445.12,"Sep 22, 2025 11:18:29 ET",US,USD,,,1.08,1.04,0.18,,,,,0.01,,,,,,0.0,2.31
+Short Sell,BIDU260116C175000,BIDU 260116 175.00C,6.7,1,6.7,Cancelled,0@0.0,"Sep 22, 2025 10:41:23 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BMNR,Bitmine Immersion Technologies,54.08,11,594.88,Filled,10@57.76,"Sep 22, 2025 10:00:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,56.59,565.9,"Sep 22, 2025 10:00:39 ET",US,USD,,,1.03,1.0,0.03,,,,,,,,,,,0.0,2.06
+Sell,HIMS,Hims & Hers Health,57.39,20,1147.8,Filled,20@59.4,"Sep 22, 2025 09:59:48 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,18,58.55,1053.9,"Sep 22, 2025 09:59:48 ET",US,USD,,,1.07,0.93,0.07,,,,,0.01,,,,,,0.0,2.08
+Buy,BMNR,Bitmine Immersion Technologies,53.09,46,2442.14,Filled,46@58.61,"Sep 22, 2025 09:52:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,51,63.9,3258.9,"Sep 22, 2025 10:05:26 ET",US,USD,,,0.99,1.1,0.16,,,,,,,,,,,0.0,2.25
+Buy,BIDU260116C175000,BIDU 260116 175.00C,7.58,1,7.58,Filled,1@7.76,"Sep 22, 2025 09:38:00 ET",Limit,Day,,,,,US,USD,,1,7.19,7.19,"Sep 22, 2025 09:38:10 ET",US,USD,,,1.87,0.33,,0.02,0.02,0.16,,,,,,,,0.0,2.4
+Buy,MSTR260116P300000,MSTR 260116 300.00P,29.7,1,29.7,Filled,1@27.89,"Sep 22, 2025 09:36:21 ET",Limit,Day,,,,,US,USD,,1,26.22,26.22,"Sep 22, 2025 09:36:28 ET",US,USD,,,2.08,0.28,,0.02,0.02,0.19,,,,,,,,0.0,2.59
+Sell,MSTR,Strategy,307.2,11,3379.2,Filled,10@329.55,"Sep 22, 2025 09:36:16 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,334.43,3344.3,"Sep 22, 2025 09:36:16 ET",US,USD,,,1.06,1.09,0.03,,,,,0.01,,,,,,0.0,2.19
+Buy,MSTR,Strategy,337.78,5,1688.9,Filled,5@323.75,"Sep 19, 2025 14:10:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,328.95,1644.75,"Sep 19, 2025 14:10:02 ET",US,USD,,,0.93,1.08,0.02,,,,,,,,,,,0.0,2.03
+Short Sell,BIDU260116C175000,BIDU 260116 175.00C,6.46,1,6.46,Filled,1@6.72,"Sep 19, 2025 12:16:16 ET",Limit,Day,,,,,US,USD,,1,6.47,6.47,"Sep 19, 2025 12:16:16 ET",US,USD,,,1.87,0.29,,0.02,0.02,0.19,,0.01,,,,,,0.0,2.4
+Buy,UNH,UnitedHealth,321.19,10,3211.9,Filled,10@309.1,"Sep 19, 2025 11:12:18 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,6,339.96,2039.76,"Sep 19, 2025 11:12:41 ET",US,USD,,,0.94,1.01,0.03,,,,,,,,,,,0.0,1.98
+,,,,,,,,,,,,,,,,,,4,334.02,1336.08,"Sep 19, 2025 11:12:41 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS,Hims & Hers Health,63.18,11,694.98,Filled,10@59.29,"Sep 19, 2025 09:40:53 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,56.7,567.0,"Sep 19, 2025 10:36:52 ET",US,USD,,,1.01,1.09,0.03,,,,,0.01,,,,,,0.0,2.14
+Buy,UNH,UnitedHealth,329.85,5,1649.25,Filled,5@341.01,"Sep 19, 2025 09:36:42 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,314.14,1570.7,"Sep 19, 2025 09:45:02 ET",US,USD,,,0.92,0.92,0.02,,,,,,,,,,,0.0,1.86
+Sell,INOD,Innodata,66.2,15,993.0,Filled,15@75.04,"Sep 19, 2025 09:30:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,16,73.02,1168.32,"Sep 19, 2025 09:30:11 ET",US,USD,,,0.91,0.96,0.05,,,,,0.01,,,,,,0.0,1.93
+Buy,OSCR,Oscar Health,17.44,37,645.28,Cancelled,0@0.0,"Sep 19, 2025 09:13:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,Figma Inc,59.58,10,595.8,Filled,11@56.03,"Sep 18, 2025 10:40:33 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,57.78,635.58,"Sep 18, 2025 10:40:40 ET",US,USD,,,1.07,1.08,0.03,,,,,,,,,,,0.0,2.18
+Buy,OSCR,Oscar Health,17.12,32,547.84,Filled,30@19.52,"Sep 18, 2025 10:35:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,32,17.22,551.04,"Sep 18, 2025 10:35:44 ET",US,USD,,,1.02,1.05,0.09,,,,,,,,,,,0.0,2.16
+Sell,INOD,Innodata,65.74,11,723.14,Filled,10@73.54,"Sep 17, 2025 10:23:58 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,72.09,720.9,"Sep 17, 2025 10:23:59 ET",US,USD,,,1.02,1.05,0.03,,,,,0.01,,,,,,0.0,2.11
+Buy,BRKB251219P440000,BRKB 251219 440.00P,3.35,1,3.35,Filled,1@2.79,"Sep 17, 2025 09:32:59 ET",Limit,Day,,,,,US,USD,,1,2.77,2.77,"Sep 17, 2025 09:32:59 ET",US,USD,,,2.04,0.32,,0.02,0.02,0.19,,,,,,,,0.0,2.59
+Sell,BIDU260618P105000,BIDU 260618 105.00P,8.29,1,8.29,Filled,1@8.4,"Sep 16, 2025 13:14:33 ET",Limit,Day,,,,,US,USD,,1,8.44,8.44,"Sep 16, 2025 13:14:36 ET",US,USD,,,2.1,0.29,,0.02,0.02,0.2,,0.01,,,,,,0.0,2.64
+Buy,BIDU260116C140000,BIDU 260116 140.00C,8.69,1,8.69,Filled,1@9.5,"Sep 16, 2025 13:14:02 ET",Limit,Day,,,,,US,USD,,1,9.16,9.16,"Sep 16, 2025 13:14:19 ET",US,USD,,,2.01,0.29,,0.02,0.02,0.17,,,,,,,,0.0,2.51
+Buy,BIDU260320P105/260618P105,BIDU Calendar Spread,2.19,1unit(s),,Filled,1unit(s)@2.05,"Sep 16, 2025 10:30:57 ET",Limit,Day,,,,,US,USD,,,,,,,,,,3.62,0.59,,0.04,0.04,0.39,,0.01,,,,,,0.0,4.69
+Sell,BIDU260320P105000,BIDU 260320 105.00P,,1,,,,,,,,,,,,,,1,7.13,7.13,"Sep 16, 2025 10:30:57 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,BIDU260618P105000,BIDU 260618 105.00P,,1,,,,,,,,,,,,,,1,8.56,8.56,"Sep 16, 2025 10:30:57 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS,Hims & Hers Health,47.6,18,856.8,Filled,21@53.39,"Sep 16, 2025 09:55:41 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,21,53.25,1118.25,"Sep 16, 2025 09:55:52 ET",US,USD,,,0.99,1.09,0.06,,,,,0.01,,,,,,0.0,2.15
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,17.9,19,340.1,Filled,20@17.5,"Sep 15, 2025 12:44:49 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,18,20.15,362.7,"Sep 15, 2025 13:26:04 ET",US,USD,,,1.01,1.08,0.06,,,,,0.01,,,,,,0.0,2.16
+Short Sell,BIDU260116C140000,BIDU 260116 140.00C,5.32,1,5.32,Filled,1@5.14,"Sep 15, 2025 10:25:32 ET",Limit,Day,,,,,US,USD,,1,6.03,6.03,"Sep 15, 2025 10:25:43 ET",US,USD,,,1.99,0.33,,0.02,0.02,0.17,,0.01,,,,,,0.0,2.54
+Sell,HIMS260618C60000,HIMS 260618 60.00C,15.06,1,15.06,Filled,1@16.2,"Sep 15, 2025 10:24:39 ET",Limit,Day,,,,,US,USD,,1,14.79,14.79,"Sep 15, 2025 10:24:42 ET",US,USD,,,2.18,0.29,,0.02,0.02,0.17,,0.01,,,,,,0.0,2.69
+Buy,HIMS,Hims & Hers Health,50.51,9,454.59,Filled,11@49.36,"Sep 12, 2025 12:28:21 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,48.41,484.1,"Sep 12, 2025 12:28:21 ET",US,USD,,,1.07,1.06,0.03,,,,,,,,,,,0.0,2.16
+Sell,OPEN260220C12000,OPEN 260220 12.00C,2.79,1,2.79,Filled,1@3.25,"Sep 12, 2025 10:50:25 ET",Limit,Day,,,,,US,USD,,1,2.96,2.96,"Sep 12, 2025 10:50:32 ET",US,USD,,,2.14,0.28,,0.02,0.02,0.17,,0.01,,,,,,0.0,2.64
+Buy,BIDU260320P105000,BIDU 260320 105.00P,7.22,1,7.22,Filled,1@8.69,"Sep 12, 2025 09:34:42 ET",Limit,Day,,,,,US,USD,,1,8.04,8.04,"Sep 12, 2025 09:34:47 ET",US,USD,,,1.99,0.28,,0.02,0.02,0.19,,,,,,,,0.0,2.5
+Buy,BIDU260320P105000,BIDU 260320 105.00P,8.16,1,8.16,Filled,1@8.48,"Sep 12, 2025 09:34:32 ET",Limit,Day,,,,,US,USD,,1,8.54,8.54,"Sep 12, 2025 09:34:32 ET",US,USD,,,2.18,0.32,,0.02,0.02,0.2,,,,,,,,0.0,2.74
+Short Sell,BIDU260320P105000,BIDU 260320 105.00P,7.47,1,7.47,Filled,1@8.55,"Sep 12, 2025 09:34:01 ET",Limit,Day,,,,,US,USD,,1,8.49,8.49,"Sep 12, 2025 09:34:02 ET",US,USD,,,2.16,0.31,,0.02,0.02,0.2,,0.01,,,,,,0.0,2.72
+Buy,BIDU260320P105000,BIDU 260320 105.00P,8.54,1,8.54,Cancelled,0@0.0,"Sep 12, 2025 09:33:40 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Short Sell,BIDU260320C125000,BIDU 260320 125.00C,13.72,1,13.72,Cancelled,0@0.0,"Sep 12, 2025 09:32:40 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,Figma Inc,49.31,19,936.89,Filled,22@49.27,"Sep 11, 2025 14:18:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,21,53.3,1119.3,"Sep 11, 2025 14:18:02 ET",US,USD,,,0.95,0.95,0.06,,,,,,,,,,,0.0,1.96
+Buy,BIDU251219P90000,BIDU 251219 90.00P,Market Price,2,,Cancelled,0@0.0,"Sep 11, 2025 12:21:10 ET",Market,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS260618C60000,HIMS 260618 60.00C,10.94,1,10.94,Filled,1@11.31,"Sep 11, 2025 09:32:34 ET",Limit,Day,,,,,US,USD,,1,11.61,11.61,"Sep 11, 2025 09:32:34 ET",US,USD,,,1.88,0.3,,0.02,0.02,0.17,,,,,,,,0.0,2.39
+Sell,INOD,Innodata,59.96,8,479.68,Filled,8@55.65,"Sep 10, 2025 12:11:57 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,57.76,519.84,"Sep 10, 2025 12:12:15 ET",US,USD,,,1.01,0.95,0.02,,,,,0.01,,,,,,0.0,1.99
+Sell,MIU251030C55000,MIU 251030 55.00 C,2.68,1,2.68,Filled,1@3.05,"Sep 10, 2025 14:45:13 HKT",Limit,Day,,,,,HK,HKD,,1,2.97,2.97,"Sep 10, 2025 14:45:14 HKT",HK,HKD,,,5.17,14.2,,,,,,,,,,,0.96,,20.33
+Buy,OPEN260220C12000,OPEN 260220 12.00C,1.7,1,1.7,Filled,1@1.88,"Sep 8, 2025 11:31:54 ET",Limit,Day,,,,,US,USD,,1,1.8,1.8,"Sep 8, 2025 11:31:54 ET",US,USD,,,2.11,0.31,,0.02,0.02,0.17,,,,,,,,0.0,2.63
+Short Sell,MSTR260116P300000,MSTR 260116 300.00P,32.94,1,32.94,Filled,1@29.81,"Sep 8, 2025 10:34:58 ET",Limit,Day,,,,,US,USD,,1,31.24,31.24,"Sep 8, 2025 10:34:59 ET",US,USD,,,1.98,0.29,,0.02,0.02,0.18,,0.01,,,,,,0.0,2.5
+Buy,FIG,Figma Inc,56.27,11,618.97,Filled,10@51.58,"Sep 4, 2025 14:28:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,51.64,568.04,"Sep 4, 2025 14:28:02 ET",US,USD,,,1.0,1.04,0.03,,,,,,,,,,,0.0,2.07
+Buy,OSCR,Oscar Health,16.01,31,496.31,Cancelled,0@0.0,"Sep 4, 2025 10:01:51 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,OSCR,Oscar Health,19.24,40,769.6,Filled,41@19.19,"Sep 4, 2025 08:43:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,41,18.14,743.74,"Sep 4, 2025 08:51:12 ET",US,USD,,,0.99,1.0,0.12,,,,,0.01,,,,,,0.0,2.12
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,12.94,83,1074.02,Filled,87@13.21,"Sep 3, 2025 10:14:18 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,78,13.32,1038.96,"Sep 3, 2025 10:14:18 ET",US,USD,,,0.97,1.0,0.23,,,,,,,,,,,0.0,2.2
+Sell,BRK.B,Berkshire Hathaway-B,468.66,2,937.32,Filled,2@459.72,"Sep 2, 2025 12:44:49 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,2,483.46,966.92,"Sep 2, 2025 12:46:01 ET",US,USD,,,1.03,1.02,0.01,,,,,0.01,,,,,,0.0,2.07
+Sell,09988,BABA-W,123.57,108,13345.56,Filled,96@135.36,"Sep 1, 2025 09:39:31 HKT",Limit,Day,Allow,,,,HK,HKD,,91,139.58,12701.78,"Sep 1, 2025 09:39:33 HKT",HK,HKD,,,3.77,15.64,0.58,,,,,,14.07,0.75,0.34,0.02,,,35.17
+Buy,09988,BABA-W,132.74,211,28008.14,Filled,194@132.1,"Sep 1, 2025 09:35:18 HKT",Limit,Day,Allow,,,,HK,HKD,,219,138.53,30338.07,"Sep 1, 2025 09:35:18 HKT",HK,HKD,,,8.84,14.62,1.06,,,,,,27.38,1.61,0.68,0.04,,,54.23
+Sell,09988,BABA-W,Market Price,206,,Filled,195@133.61,"Sep 1, 2025 09:32:58 HKT",Market,Day,,,,,HK,HKD,,207,143.43,29690.01,"Sep 1, 2025 09:32:59 HKT",HK,HKD,,,8.36,16.06,1.14,,,,,,26.55,1.45,0.7,0.04,,,54.3
+Buy,09988,BABA-W,115.31,94,10839.14,Filled,102@106.27,"Aug 28, 2025 11:48:09 HKT",Limit,Day,Allow,,,,HK,HKD,,98,125.35,12284.3,"Aug 28, 2025 11:48:09 HKT",HK,HKD,,,3.48,14.97,0.51,,,,,,10.98,0.68,0.29,0.02,,,30.93
+Sell,BRKB251219C500000,BRKB 251219 500.00C,18.23,1,18.23,Filled,1@17.04,"Aug 27, 2025 10:09:37 ET",Limit,Day,,,,,US,USD,,1,19.67,19.67,"Aug 27, 2025 10:09:44 ET",US,USD,,,2.07,0.28,,0.02,0.02,0.19,,0.01,,,,,,0.0,2.59
+Sell,OSCR,Oscar Health,17.16,20,343.2,Filled,20@17.05,"Aug 26, 2025 10:31:26 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,22,16.02,352.44,"Aug 26, 2025 10:31:29 ET",US,USD,,,0.89,0.94,0.06,,,,,0.01,,,,,,0.0,1.9
+Sell,OSCR260320C15000,OSCR 260320 15.00C,4.97,2,9.94,Filled,2@5.17,"Aug 26, 2025 10:01:16 ET",Limit,Day,,,,,US,USD,,2,4.62,9.24,"Aug 26, 2025 10:01:18 ET",US,USD,,,1.87,0.54,,0.03,0.04,0.34,,0.01,,,,,,0.01,2.84
+Buy,01810,XIAOMI-W,58.57,182,10659.74,Filled,193@50.6,"Aug 26, 2025 15:22:29 HKT",Limit,Day,Allow,,,,HK,HKD,,180,55.74,10033.2,"Aug 26, 2025 15:22:30 HKT",HK,HKD,,,3.25,15.79,0.41,,,,,,11.59,0.56,0.31,0.02,,,31.93
+Buy,MSTR,Strategy,324.52,5,1622.6,Filled,5@382.56,"Aug 22, 2025 10:49:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,371.17,1855.85,"Aug 22, 2025 10:49:37 ET",US,USD,,,0.96,0.9,0.02,,,,,,,,,,,0.0,1.88
+Sell,MSTR,Strategy,Market Price,5,,Filled,5@314.66,"Aug 22, 2025 10:19:36 ET",Market,Day,,Regular Trading Hours,,,US,USD,,5,373.97,1869.85,"Aug 22, 2025 10:19:36 ET",US,USD,,,1.01,0.95,0.02,,,,,0.01,,,,,,0.0,1.99
+Buy,MSTR,Strategy,343.49,5,1717.45,Filled,5@336.51,"Aug 22, 2025 10:18:14 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,317.79,1588.95,"Aug 22, 2025 10:18:14 ET",US,USD,,,0.94,0.98,0.02,,,,,,,,,,,0.0,1.94
+Buy,FIG,FIGMA INC,70.9,1,70.9,Filled,1@73.13,"Aug 22, 2025 09:15:20 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,66.93,66.93,"Aug 22, 2025 09:15:23 ET",US,USD,,,1.0,1.05,0.0,,,,,,,,,,,0.0,2.05
+Buy,09988,BABA-W,124.71,104,12969.84,Filled,104@106.95,"Aug 22, 2025 10:26:46 HKT",Limit,Day,Allow,,,,HK,HKD,,102,119.35,12173.7,"Aug 22, 2025 10:26:46 HKT",HK,HKD,,,3.31,16.46,0.46,,,,,,12.42,0.68,0.3,0.02,,,33.65
+Buy,UNH,UnitedHealth,288.46,5,1442.3,Filled,5@281.52,"Aug 21, 2025 10:35:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,329.3,1646.5,"Aug 21, 2025 10:35:09 ET",US,USD,,,0.98,1.05,0.02,,,,,,,,,,,0.0,2.05
+Buy,01810,XIAOMI-W,48.26,218,10520.68,Filled,219@50.86,"Aug 21, 2025 10:57:32 HKT",Limit,Day,Allow,,,,HK,HKD,,196,56.57,11087.72,"Aug 21, 2025 10:57:39 HKT",HK,HKD,,,3.16,13.7,0.4,,,,,,11.85,0.62,0.28,0.02,,,30.03
+Buy,INOD,Innodata,36.63,12,439.56,Filled,12@35.28,"Aug 20, 2025 10:05:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,12,38.81,465.72,"Aug 20, 2025 10:05:36 ET",US,USD,,,0.96,1.09,0.03,,,,,,,,,,,0.0,2.08
+Buy,INOD,Innodata,36.43,12,437.16,Filled,11@38.06,"Aug 20, 2025 10:05:32 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,36.5,401.5,"Aug 20, 2025 10:05:33 ET",US,USD,,,0.99,1.1,0.03,,,,,,,,,,,0.0,2.12
+Sell,BRKB251219C500000,BRKB 251219 500.00C,13.28,1,13.28,Filled,1@13.1,"Aug 19, 2025 10:19:55 ET",Limit,Day,,,,,US,USD,,1,12.78,12.78,"Aug 19, 2025 10:19:55 ET",US,USD,,,1.87,0.32,,0.02,0.02,0.18,,0.01,,,,,,0.0,2.42
+Sell,OSCR260320C15000,OSCR 260320 15.00C,5.03,1,5.03,Filled,1@5.56,"Aug 19, 2025 10:08:30 ET",Limit,Day,,,,,US,USD,,1,5.44,5.44,"Aug 19, 2025 10:08:30 ET",US,USD,,,2.07,0.3,,0.02,0.02,0.17,,0.01,,,,,,0.0,2.59
+Buy,INOD,Innodata,41.43,10,414.3,Cancelled,0@0.0,"Aug 18, 2025 10:20:30 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,BIIB,Biogen,Market Price,7,,Filled,8@149.42,"Aug 18, 2025 10:04:30 ET",Market,Day,,Regular Trading Hours,,,US,USD,,7,149.57,1046.99,"Aug 18, 2025 10:04:30 ET",US,USD,,,0.96,0.96,0.02,,,,,0.01,,,,,,0.0,1.95
+Sell,BIIB,Biogen,137.86,8,1102.88,Cancelled,0@0.0,"Aug 18, 2025 10:04:03 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,RKLB,Rocket Lab,47.18,20,943.6,Cancelled,0@0.0,"Aug 18, 2025 09:08:34 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BIIB,Biogen,Market Price,8,,Filled,9@136.78,"Aug 15, 2025 09:40:54 ET",Market,Day,,Regular Trading Hours,,,US,USD,,7,134.82,943.74,"Aug 15, 2025 09:40:54 ET",US,USD,,,1.06,0.99,0.02,,,,,,,,,,,0.0,2.07
+Sell,INOD,Innodata,Market Price,9,,Filled,9@37.94,"Aug 15, 2025 09:40:35 ET",Market,Day,,Regular Trading Hours,,,US,USD,,10,40.96,409.6,"Aug 15, 2025 09:40:35 ET",US,USD,,,0.95,0.95,0.03,,,,,0.01,,,,,,0.0,1.94
+Buy,FIG,FIGMA INC,Market Price,2,,Filled,2@71.68,"Aug 15, 2025 09:40:08 ET",Market,Day,,Regular Trading Hours,,,US,USD,,2,83.55,167.1,"Aug 15, 2025 09:40:08 ET",US,USD,,,0.93,0.98,0.01,,,,,,,,,,,0.0,1.92
+Buy,FIG,FIGMA INC,77.69,2,155.38,Cancelled,0@0.0,"Aug 15, 2025 09:39:53 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,FIGMA INC,71.93,1,71.93,Filled,1@85.01,"Aug 14, 2025 11:27:28 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,71.84,71.84,"Aug 14, 2025 11:27:28 ET",US,USD,,,0.92,0.91,0.0,,,,,,,,,,,0.0,1.83
+Sell,MIU251030C55000,MIU 251030 55.00 C,3.24,1,3.24,Filled,1@2.77,"Aug 14, 2025 10:31:44 HKT",Limit,Day,,,,,HK,HKD,,1,3.12,3.12,"Aug 14, 2025 10:31:44 HKT",HK,HKD,,,5.99,15.71,,,,,,,,,,,0.91,,22.61
+Buy,FIG,FIGMA INC,88.84,1,88.84,Filled,1@88.86,"Aug 13, 2025 11:12:40 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,79.81,79.81,"Aug 13, 2025 11:12:40 ET",US,USD,,,0.94,0.98,0.0,,,,,,,,,,,0.0,1.92
+Buy,PDD,PDD Holdings,124.69,16,1995.04,Cancelled,0@0.0,"Aug 13, 2025 09:57:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS,Hims & Hers Health,52.27,41,2143.07,Filled,38@47.74,"Aug 12, 2025 12:51:40 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,38,46.95,1784.1,"Aug 12, 2025 12:51:40 ET",US,USD,,,0.91,0.96,0.12,,,,,,,,,,,0.0,1.99
+Sell,OSCR,Oscar Health,16.04,32,513.28,Filled,33@15.6,"Aug 12, 2025 12:45:38 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,30,13.93,417.9,"Aug 12, 2025 12:45:45 ET",US,USD,,,0.94,1.02,0.09,,,,,0.01,,,,,,0.0,2.06
+Sell,OSCR260320C15000,OSCR 260320 15.00C,3.55,1,3.55,Filled,1@4.05,"Aug 12, 2025 12:45:26 ET",Limit,Day,,,,,US,USD,,1,3.82,3.82,"Aug 12, 2025 12:45:58 ET",US,USD,,,1.88,0.31,,0.02,0.02,0.18,,0.01,,,,,,0.0,2.42
+Buy,FIG,FIGMA INC,86.05,2,172.1,Filled,2@88.61,"Aug 12, 2025 12:40:33 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,2,87.41,174.82,"Aug 12, 2025 12:40:33 ET",US,USD,,,0.98,1.02,0.01,,,,,,,,,,,0.0,2.01
+Buy,BRK.B,Berkshire Hathaway-B,438.16,1,438.16,Filled,1@421.13,"Aug 12, 2025 07:53:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,491.96,491.96,"Aug 12, 2025 07:54:27 ET",US,USD,,,0.97,1.01,0.0,,,,,,,,,,,0.0,1.98
+Buy,01810,XIAOMI-W,50.87,203,10326.61,Filled,195@52.88,"Aug 12, 2025 15:32:15 HKT",Limit,Day,Allow,,,,HK,HKD,,198,48.47,9597.06,"Aug 12, 2025 15:32:21 HKT",HK,HKD,,,2.89,16.13,0.47,,,,,,9.96,0.59,0.28,0.02,,,30.34
+Buy,MIU251030C55000,MIU 251030 55.00 C,2.09,2,4.18,Filled,2@2.46,"Aug 12, 2025 15:14:11 HKT",Limit,Day,,,,,HK,HKD,,2,2.1,4.2,"Aug 12, 2025 15:15:00 HKT",HK,HKD,,,10.0,15.86,,,,,,,,,,,2.16,,28.02
+Sell,GOOGL,Alphabet-A,196.06,11,2156.66,Filled,10@194.88,"Aug 11, 2025 13:25:08 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,215.82,2158.2,"Aug 11, 2025 13:25:08 ET",US,USD,,,0.92,1.0,0.03,,,,,0.01,,,,,,0.0,1.96
+Sell,OSCR260320C15000,OSCR 260320 15.00C,4.94,1,4.94,Filled,1@4.86,"Aug 11, 2025 09:53:37 ET",Limit,Day,,,,,US,USD,,1,4.61,4.61,"Aug 11, 2025 09:55:23 ET",US,USD,,,2.11,0.3,,0.02,0.02,0.16,,0.01,,,,,,0.0,2.62
+Buy,INOD,Innodata,41.19,21,864.99,Filled,21@44.83,"Aug 11, 2025 09:44:51 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,21,40.96,860.16,"Aug 11, 2025 09:44:51 ET",US,USD,,,0.93,1.07,0.06,,,,,,,,,,,0.0,2.06
+Sell,AMZN,Amazon,234.5,5,1172.5,Filled,5@216.86,"Aug 11, 2025 09:42:59 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,240.21,1201.05,"Aug 11, 2025 09:42:59 ET",US,USD,,,0.99,0.91,0.02,,,,,0.01,,,,,,0.0,1.93
+Sell,GOOGL,Alphabet-A,198.19,5,990.95,Filled,5@202.9,"Aug 11, 2025 09:42:47 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,185.73,928.65,"Aug 11, 2025 09:42:48 ET",US,USD,,,1.09,1.1,0.02,,,,,0.01,,,,,,0.0,2.22
+Sell,AAPL,Apple,222.26,5,1111.3,Filled,5@241.88,"Aug 11, 2025 09:42:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,224.0,1120.0,"Aug 11, 2025 09:42:38 ET",US,USD,,,1.06,1.0,0.02,,,,,0.01,,,,,,0.0,2.09
+Buy,FIG,FIGMA INC,85.53,1,85.53,Filled,1@81.12,"Aug 8, 2025 15:37:42 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,74.48,74.48,"Aug 8, 2025 15:37:43 ET",US,USD,,,0.99,0.98,0.0,,,,,,,,,,,0.0,1.97
+Short Sell,BRKB251219P440000,BRKB 251219 440.00P,8.46,1,8.46,Failed,0@0.0,"Aug 8, 2025 14:33:38 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,OSCR260320C15000,OSCR 260320 15.00C,4.04,5,20.2,Filled,5@3.93,"Aug 7, 2025 12:34:29 ET",Limit,Day,,,,,US,USD,,5,3.8,19.0,"Aug 7, 2025 12:48:45 ET",US,USD,,,3.39,1.57,,0.08,0.11,0.85,,,,,,,,0.02,6.02
+Short Sell,BRKB251219P440000,BRKB 251219 440.00P,8.77,1,8.77,Filled,1@8.87,"Aug 7, 2025 12:25:00 ET",Limit,Day,,,,,US,USD,,1,7.58,7.58,"Aug 7, 2025 12:25:01 ET",US,USD,,,2.1,0.3,,0.02,0.02,0.17,,0.01,,,,,,0.0,2.62
+Buy,FIG,FIGMA INC,75.23,1,75.23,Filled,1@72.87,"Aug 7, 2025 12:03:49 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,85.73,85.73,"Aug 7, 2025 12:03:50 ET",US,USD,,,0.95,1.0,0.0,,,,,,,,,,,0.0,1.95
+Sell,MSTU,T-Rex 2X Long MSTR Daily Target ETF,Market Price,137,,Filled,162@8.18,"Aug 7, 2025 12:01:19 ET",Market,Day,,Regular Trading Hours,,,US,USD,,140,8.59,1202.6,"Aug 7, 2025 12:01:20 ET",US,USD,,,1.0,1.03,0.49,,,,,0.02,,,,,,0.01,2.55
+Sell,MSTU,T-Rex 2X Long MSTR Daily Target ETF,7.67,137,1050.79,Cancelled,0@0.0,"Aug 7, 2025 12:01:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,MSTU,T-Rex 2X Long MSTR Daily Target ETF,8.68,148,1284.64,Filled,153@7.15,"Aug 7, 2025 11:36:03 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,140,8.22,1150.8,"Aug 7, 2025 11:36:09 ET",US,USD,,,1.0,0.91,0.47,,,,,,,,,,,0.01,2.39
+Sell,OSCR,Oscar Health,14.98,40,599.2,Filled,38@15.66,"Aug 7, 2025 10:29:31 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,40,13.75,550.0,"Aug 7, 2025 10:29:34 ET",US,USD,,,0.97,0.96,0.11,,,,,0.01,,,,,,0.0,2.05
+Sell,OSCR,Oscar Health,16.03,47,753.41,Cancelled,0@0.0,"Aug 7, 2025 08:38:19 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,OSCR,Oscar Health,15.08,20,301.6,Filled,19@15.71,"Aug 6, 2025 13:37:01 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,22,14.2,312.4,"Aug 6, 2025 13:37:10 ET",US,USD,,,1.03,0.98,0.06,,,,,0.01,,,,,,0.0,2.08
+Sell,GOOGL,Alphabet-A,180.46,10,1804.6,Cancelled,0@0.0,"Aug 6, 2025 10:46:58 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,11.54,104,1200.16,Filled,103@11.18,"Aug 6, 2025 10:41:06 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,95,11.0,1045.0,"Aug 6, 2025 10:46:22 ET",US,USD,,,0.9,0.96,0.33,,,,,0.02,,,,,,0.0,2.21
+Buy,BRKB251219C500000,BRKB 251219 500.00C,7.7,1,7.7,Filled,1@7.47,"Aug 6, 2025 09:58:39 ET",Limit,Day,,,,,US,USD,,1,7.83,7.83,"Aug 6, 2025 10:03:45 ET",US,USD,,,2.11,0.32,,0.02,0.02,0.17,,,,,,,,0.0,2.64
+Sell,OSCR,Oscar Health,15.68,107,1677.76,Cancelled,0@0.0,"Aug 6, 2025 09:45:24 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,AAPL,Apple,192.28,5,961.4,Filled,5@205.05,"Aug 6, 2025 08:49:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,212.16,1060.8,"Aug 6, 2025 08:49:47 ET",US,USD,,,0.99,0.99,0.02,,,,,,,,,,,0.0,2.0
+Sell,AAPL,Apple,225.19,19,4278.61,Filled,21@219.56,"Aug 6, 2025 08:47:34 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,21,203.07,4264.47,"Aug 6, 2025 08:47:34 ET",US,USD,,,1.02,0.98,0.07,,,,,0.01,,,,,,0.0,2.08
+Buy,AAPL,Apple,189.23,19,3595.37,Filled,20@190.15,"Aug 6, 2025 08:47:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,20,196.26,3925.2,"Aug 6, 2025 08:47:12 ET",US,USD,,,0.98,1.02,0.06,,,,,,,,,,,0.0,2.06
+Buy,IBIT,iShares Bitcoin Trust,60.24,1,60.24,Failed,0@0.0,"Aug 5, 2025 12:23:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BRKB251219C500000,BRKB 251219 500.00C,8.05,1,8.05,Cancelled,0@0.0,"Aug 5, 2025 12:19:21 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,IBIT,iShares Bitcoin Trust,66.47,1,66.47,Failed,0@0.0,"Aug 5, 2025 12:18:43 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,IBIT,iShares Bitcoin Trust,56.92,29,1650.68,Failed,0@0.0,"Aug 5, 2025 12:17:17 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,IBIT,iShares Bitcoin Trust,55.53,28,1554.84,Failed,0@0.0,"Aug 5, 2025 12:17:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BRK.B,Berkshire Hathaway-B,500.74,5,2503.7,Filled,5@479.56,"Aug 5, 2025 12:08:26 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,496.56,2482.8,"Aug 5, 2025 12:08:26 ET",US,USD,,,0.96,0.91,0.02,,,,,,,,,,,0.0,1.89
+Buy,BRKB251219C500000,BRKB 251219 500.00C,7.69,1,7.69,Filled,1@7.9,"Aug 5, 2025 12:07:46 ET",Limit,Day,,,,,US,USD,,1,7.61,7.61,"Aug 5, 2025 12:07:46 ET",US,USD,,,1.93,0.3,,0.02,0.02,0.19,,,,,,,,0.0,2.46
+Sell,FIG,FIGMA INC,91.14,10,911.4,Filled,10@91.4,"Aug 5, 2025 10:19:25 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,8,87.39,699.12,"Aug 5, 2025 10:19:25 ET",US,USD,,,1.0,0.93,0.03,,,,,0.02,,,,,,0.0,1.98
+,,,,,,,,,,,,,,,,,,1,89.15,89.15,"Aug 5, 2025 10:19:25 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,FIGMA INC,92.25,10,922.5,Filled,10@83.02,"Aug 5, 2025 10:16:11 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,85.35,853.5,"Aug 5, 2025 10:16:12 ET",US,USD,,,1.08,1.07,0.03,,,,,,,,,,,0.0,2.18
+Buy,FIG,FIGMA INC,87.37,1,87.37,Filled,1@97.3,"Aug 5, 2025 09:51:08 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,89.92,89.92,"Aug 5, 2025 09:51:08 ET",US,USD,,,0.94,0.99,0.0,,,,,,,,,,,0.0,1.93
+Buy,BRK.B,Berkshire Hathaway-B,462.61,11,5088.71,Cancelled,0@0.0,"Aug 5, 2025 08:40:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,BRK.B,Berkshire Hathaway-B,457.07,5,2285.35,Filled,5@492.72,"Aug 5, 2025 08:40:03 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,466.38,2331.9,"Aug 5, 2025 08:40:03 ET",US,USD,,,0.89,1.04,0.02,,,,,0.01,,,,,,0.0,1.96
+Buy,HIMS,Hims & Hers Health,49.02,97,4754.94,Cancelled,0@0.0,"Aug 5, 2025 04:59:59 ET",Limit,"Good Till Sep 5, 2025 ET",,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BRK.B,Berkshire Hathaway-B,433.64,5,2168.2,Filled,5@480.0,"Aug 5, 2025 04:18:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,505.94,2529.7,"Aug 5, 2025 04:18:53 ET",US,USD,,,0.92,0.92,0.02,,,,,,,,,,,0.0,1.86
+Sell,FIG,FIGMA INC,Market Price,1,,Filled,1@102.71,"Aug 4, 2025 09:35:11 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,102.64,102.64,"Aug 4, 2025 09:35:12 ET",US,USD,,,1.06,1.06,0.0,,,,,0.01,,,,,,0.0,2.13
+Sell,FIG,FIGMA INC,112.35,1,112.35,Cancelled,0@0.0,"Aug 4, 2025 09:34:57 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,BRK.B,Berkshire Hathaway-B,Market Price,5,,Filled,5@483.54,"Aug 4, 2025 09:34:48 ET",Market,Day,,Regular Trading Hours,,,US,USD,,5,503.05,2515.25,"Aug 4, 2025 09:34:49 ET",US,USD,,,1.08,1.09,0.02,,,,,0.01,,,,,,0.0,2.2
+Sell,BRK.B,Berkshire Hathaway-B,435.19,5,2175.95,Cancelled,0@0.0,"Aug 4, 2025 09:34:14 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,09988,BABA-W,113.78,100,11378.0,Filled,108@123.19,"Aug 4, 2025 10:11:46 HKT",Limit,Day,Allow,,,,HK,HKD,,92,119.77,11018.84,"Aug 4, 2025 10:11:47 HKT",HK,HKD,,,3.27,15.59,0.52,,,,,,12.44,0.66,0.32,0.02,,,32.82
+Buy,01810,XIAOMI-W,51.72,192,9930.24,Cancelled,0@0.0,"Aug 4, 2025 02:07:08 HKT",Limit,"Good Till Aug 11, 2025 HKT",Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,INOD,Innodata,43.74,9,393.66,Filled,11@46.47,"Aug 1, 2025 14:45:38 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,43.51,478.61,"Aug 1, 2025 16:12:36 ET",US,USD,,,1.01,0.93,0.03,,,,,0.01,,,,,,0.0,1.98
+Sell,AMZN,Amazon,207.99,33,6863.67,Filled,31@223.76,"Aug 1, 2025 11:14:32 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,28,218.8,6126.4,"Aug 1, 2025 11:14:33 ET",US,USD,,,1.02,0.98,0.09,,,,,0.01,,,,,,0.0,2.1
+Sell,AAPL,Apple,Market Price,5,,Filled,5@210.05,"Aug 1, 2025 10:44:01 ET",Market,Day,,Regular Trading Hours,,,US,USD,,5,211.29,1056.45,"Aug 1, 2025 10:44:01 ET",US,USD,,,0.93,0.99,0.02,,,,,0.01,,,,,,0.0,1.95
+Sell,AAPL,Apple,214.18,5,1070.9,Cancelled,0@0.0,"Aug 1, 2025 10:43:48 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,9.43,47,443.21,Filled,55@9.81,"Aug 1, 2025 10:13:14 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,50,10.81,540.5,"Aug 1, 2025 10:13:14 ET",US,USD,,,1.05,0.94,0.16,,,,,,,,,,,0.0,2.15
+Sell,AMZN,Amazon,215.92,5,1079.6,Filled,5@212.87,"Aug 1, 2025 10:02:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,198.1,990.5,"Aug 1, 2025 10:02:49 ET",US,USD,,,0.96,1.02,0.02,,,,,0.01,,,,,,0.0,2.01
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,11.22,46,516.12,Filled,45@10.6,"Aug 1, 2025 09:57:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,54,10.39,561.06,"Aug 1, 2025 09:57:04 ET",US,USD,,,1.02,1.04,0.15,,,,,,,,,,,0.0,2.21
+Sell,INOD,Innodata,49.03,15,735.45,Filled,15@41.83,"Aug 1, 2025 09:43:41 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,15,44.57,668.55,"Aug 1, 2025 09:43:42 ET",US,USD,,,0.99,0.94,0.05,,,,,0.01,,,,,,0.0,1.99
+Buy,FIG,FIGMA INC,91.47,1,91.47,Cancelled,0@0.0,"Jul 31, 2025 14:15:34 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,FIGMA INC,98.98,1,98.98,Filled,1@97.02,"Jul 31, 2025 14:15:18 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,111.02,111.02,"Jul 31, 2025 14:20:45 ET",US,USD,,,1.04,0.99,0.0,,,,,,,,,,,0.0,2.03
+Sell,FIG,FIGMA INC,Market Price,1,,Filled,1@115.1,"Jul 31, 2025 14:13:48 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,104.24,104.24,"Jul 31, 2025 14:13:49 ET",US,USD,,,1.07,0.95,0.0,,,,,0.01,,,,,,0.0,2.03
+Buy,FIG,Figma,95.3,1,95.3,Filled,1@101.16,"Jul 31, 2025 14:00:33 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,103.65,103.65,"Jul 31, 2025 14:03:27 ET",US,USD,,,0.97,1.04,0.0,,,,,,,,,,,0.0,2.01
+Buy,FIG,Figma,Market Price,1,,Failed,0@0.0,"Jul 31, 2025 13:59:19 ET",Market,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,Figma,Market Price,1,,Failed,0@0.0,"Jul 31, 2025 13:59:16 ET",Market,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,Figma,51.07,27,1378.89,Cancelled,0@0.0,"Jul 31, 2025 09:32:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,Figma,48.43,26,1259.18,Cancelled,0@0.0,"Jul 31, 2025 09:32:14 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,Figma,43.03,32,1376.96,Cancelled,0@0.0,"Jul 31, 2025 09:32:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,Figma,Market Price,24,,Failed,0@0.0,"Jul 31, 2025 09:31:48 ET",Market,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,FIG,Figma,34.09,20,681.8,Cancelled,0@0.0,"Jul 31, 2025 08:56:31 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,AAPL,Apple,196.12,5,980.6,Filled,5@225.19,"Jul 30, 2025 10:53:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,215.15,1075.75,"Jul 30, 2025 10:53:36 ET",US,USD,,,0.95,1.08,0.02,,,,,0.01,,,,,,0.0,2.06
+Sell,TSLA,Tesla,Market Price,1,,Filled,1@344.17,"Jul 25, 2025 12:07:44 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,310.62,310.62,"Jul 25, 2025 12:07:45 ET",US,USD,,,1.02,1.06,0.0,,,,,0.01,,,,,,0.0,2.09
+Sell,09988,BABA-W,125.45,101,12670.45,Filled,94@108.14,"Jul 25, 2025 11:41:03 HKT",Limit,Day,Allow,,,,HK,HKD,,107,120.81,12926.67,"Jul 25, 2025 11:41:04 HKT",HK,HKD,,,3.28,15.66,0.5,,,,,,12.43,0.71,0.33,0.02,,,32.93
+Sell,GOOGL,Alphabet-A,Market Price,5,,Filled,5@181.97,"Jul 24, 2025 10:13:41 ET",Market,Day,,Regular Trading Hours,,,US,USD,,5,195.83,979.15,"Jul 24, 2025 10:13:41 ET",US,USD,,,0.92,0.92,0.02,,,,,0.01,,,,,,0.0,1.87
+Buy,TSLA,Tesla,319.19,1,319.19,Filled,1@322.75,"Jul 24, 2025 09:51:33 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,1,317.53,317.53,"Jul 24, 2025 09:51:33 ET",US,USD,,,1.05,0.92,0.0,,,,,,,,,,,0.0,1.97
+Buy,TSLA,Tesla,312.83,3,938.49,Cancelled,0@0.0,"Jul 24, 2025 09:51:06 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLA,Tesla,335.15,3,1005.45,Cancelled,0@0.0,"Jul 24, 2025 09:50:53 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,OSCR,Oscar Health,14.43,88,1269.84,Filled,75@14.5,"Jul 22, 2025 12:17:16 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,83,14.62,1213.46,"Jul 22, 2025 13:37:01 ET",US,USD,,,0.96,0.99,0.24,,,,,0.01,,,,,,0.0,2.2
+Buy,OSCR,Oscar Health,11.36,73,829.28,Filled,68@11.57,"Jul 22, 2025 07:20:16 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,67,13.0,871.0,"Jul 22, 2025 08:50:41 ET",US,USD,,,1.02,0.97,0.2,,,,,,,,,,,0.0,2.19
+Buy,OSCR,Oscar Health,13.82,65,898.3,Cancelled,0@0.0,"Jul 21, 2025 09:23:53 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,OSCR,Oscar Health,12.53,77,964.81,Cancelled,0@0.0,"Jul 18, 2025 09:15:50 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,BRK.B,Berkshire Hathaway-B,487.23,5,2436.15,Filled,5@494.85,"Jul 17, 2025 09:41:14 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,503.74,2518.7,"Jul 17, 2025 09:41:20 ET",US,USD,,,1.0,1.0,0.02,,,,,,,,,,,0.0,2.02
+Buy,OSCR,Oscar Health,15.5,85,1317.5,Filled,77@15.07,"Jul 11, 2025 10:07:29 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,73,14.62,1067.26,"Jul 11, 2025 15:38:43 ET",US,USD,,,1.06,0.98,0.23,,,,,,,,,,,0.0,2.27
+Buy,OSCR,Oscar Health,15.96,77,1228.92,Filled,77@16.39,"Jul 8, 2025 09:38:51 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,74,18.6,1376.4,"Jul 8, 2025 09:38:51 ET",US,USD,,,0.91,1.06,0.25,,,,,,,,,,,0.0,2.22
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,8.97,131,1175.07,Filled,115@10.42,"Jul 7, 2025 09:48:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,111,10.02,1112.22,"Jul 7, 2025 09:48:37 ET",US,USD,,,0.92,1.0,0.39,,,,,0.02,,,,,,0.01,2.34
+Sell,AAPL,Apple,197.29,11,2170.19,Filled,10@229.82,"Jul 3, 2025 11:42:07 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,205.95,2059.5,"Jul 3, 2025 11:42:07 ET",US,USD,,,0.94,1.09,0.03,,,,,0.01,,,,,,0.0,2.07
+Sell,AAPL260116C215000,AAPL 260116 215.00C,15.31,1,15.31,Filled,1@16.5,"Jul 1, 2025 10:48:31 ET",Limit,Day,,,,,US,USD,,1,14.97,14.97,"Jul 1, 2025 10:48:31 ET",US,USD,,,1.92,0.29,,0.01,0.02,0.18,,0.01,,,,,,0.0,2.43
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,9.9,40,396.0,Filled,37@11.18,"Jul 1, 2025 09:44:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,42,10.53,442.26,"Jul 1, 2025 09:44:52 ET",US,USD,,,0.95,0.98,0.11,,,,,,,,,,,0.0,2.04
+Buy,GOOGL,Alphabet-A,180.25,5,901.25,Filled,5@189.53,"Jun 30, 2025 12:01:19 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,184.75,923.75,"Jun 30, 2025 12:01:20 ET",US,USD,,,0.94,1.05,0.02,,,,,,,,,,,0.0,2.01
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,12.75,73,930.75,Filled,78@11.72,"Jun 27, 2025 14:08:23 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,79,11.21,885.59,"Jun 27, 2025 14:08:23 ET",US,USD,,,1.02,1.08,0.24,,,,,,,,,,,0.0,2.34
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,11.83,23,272.09,Filled,23@13.47,"Jun 26, 2025 11:48:45 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,23,12.07,277.61,"Jun 26, 2025 11:48:50 ET",US,USD,,,0.94,1.01,0.08,,,,,0.01,,,,,,0.0,2.04
+Sell,CONL,GraniteShares 2x Long COIN Daily ETF,52.66,29,1527.14,Filled,28@48.47,"Jun 26, 2025 10:48:54 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,29,54.11,1569.19,"Jun 26, 2025 10:48:54 ET",US,USD,,,0.98,1.03,0.09,,,,,0.01,,,,,,0.0,2.11
+Buy,AAPL,Apple,192.31,5,961.55,Filled,5@204.64,"Jun 24, 2025 11:44:24 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,188.75,943.75,"Jun 24, 2025 11:44:26 ET",US,USD,,,1.06,0.93,0.02,,,,,,,,,,,0.0,2.01
+Sell,CONL,GraniteShares 2x Long COIN Daily ETF,42.71,20,854.2,Filled,22@42.45,"Jun 24, 2025 11:43:19 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,14,39.66,555.24,"Jun 24, 2025 11:43:50 ET",US,USD,,,0.96,1.07,0.06,,,,,0.02,,,,,,0.0,2.11
+,,,,,,,,,,,,,,,,,,6,43.15,258.9,"Jun 24, 2025 11:43:33 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,INOD,Innodata,51.55,13,670.15,Filled,13@49.74,"Jun 24, 2025 11:18:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,13,52.18,678.34,"Jun 24, 2025 11:18:06 ET",US,USD,,,1.01,0.94,0.04,,,,,0.01,,,,,,0.0,2.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,14.62,10,146.2,Filled,11@13.64,"Jun 24, 2025 10:28:47 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,13.76,151.36,"Jun 24, 2025 10:28:47 ET",US,USD,,,1.08,1.04,0.03,,,,,0.01,,,,,,0.0,2.16
+Buy,INOD,Innodata,42.35,19,804.65,Filled,21@43.13,"Jun 23, 2025 12:44:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,20,49.92,998.4,"Jun 23, 2025 12:44:37 ET",US,USD,,,0.97,0.98,0.06,,,,,,,,,,,0.0,2.01
+Sell,INOD,Innodata,45.41,20,908.2,Failed,0@0.0,"Jun 23, 2025 12:44:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,INOD,Innodata,42.71,18,768.78,Filled,20@40.28,"Jun 23, 2025 09:33:29 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,19,47.67,905.73,"Jun 23, 2025 09:33:31 ET",US,USD,,,0.93,0.96,0.06,,,,,0.01,,,,,,0.0,1.96
+Buy,CONL,GraniteShares 2x Long COIN Daily ETF,33.21,55,1826.55,Filled,48@38.8,"Jun 20, 2025 12:54:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,46,35.08,1613.68,"Jun 20, 2025 12:54:48 ET",US,USD,,,0.9,1.05,0.16,,,,,,,,,,,0.0,2.11
+Buy,AAPL,Apple,209.11,5,1045.55,Filled,5@208.77,"Jun 20, 2025 11:36:20 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,211.16,1055.8,"Jun 20, 2025 11:36:22 ET",US,USD,,,1.04,0.99,0.02,,,,,,,,,,,0.0,2.05
+Buy,09988,BABA-W,113.22,96,10869.12,Filled,100@116.01,"Jun 19, 2025 13:13:35 HKT",Limit,Day,Allow,,,,HK,HKD,,99,109.8,10870.2,"Jun 19, 2025 13:13:35 HKT",HK,HKD,,,3.42,15.38,2.03,,,,,,11.75,0.62,0.29,0.02,,,33.51
+Buy,AAPL260116C215000,AAPL 260116 215.00C,10.81,1,10.81,Filled,1@11.61,"Jun 18, 2025 10:10:08 ET",Limit,Day,,,,,US,USD,,1,12.05,12.05,"Jun 18, 2025 10:10:09 ET",US,USD,,,2.17,0.28,,0.01,0.02,0.2,,,,,,,,0.0,2.68
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,12.43,16,198.88,Filled,15@11.64,"Jun 13, 2025 10:23:27 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,15,12.45,186.75,"Jun 13, 2025 10:23:27 ET",US,USD,,,1.03,0.93,0.05,,,,,0.01,,,,,,0.0,2.02
+Sell,AAPL260116C235000,AAPL 260116 235.00C,5.86,2,11.72,Filled,2@5.66,"Jun 13, 2025 10:22:47 ET",Limit,Day,,,,,US,USD,,2,5.61,11.22,"Jun 13, 2025 10:22:48 ET",US,USD,,,1.82,0.56,,0.03,0.04,0.33,,0.01,,,,,,0.01,2.8
+Buy,AAPL260116C235000,AAPL 260116 235.00C,6.31,1,6.31,Failed,0@0.0,"Jun 13, 2025 09:36:40 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,AAPL260116C235000,AAPL 260116 235.00C,5.77,2,11.54,Failed,0@0.0,"Jun 13, 2025 09:36:23 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,INOD,Innodata,39.35,20,787.0,Filled,17@40.41,"Jun 10, 2025 13:07:31 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,18,39.69,714.42,"Jun 10, 2025 13:37:10 ET",US,USD,,,0.92,1.02,0.07,,,,,,,,,,,0.0,2.01
+Sell,INOD,Innodata,51.38,18,924.84,Filled,19@43.09,"Jun 10, 2025 11:14:17 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,3,52.14,156.42,"Jun 10, 2025 11:14:20 ET",US,USD,,,0.91,0.95,0.06,,,,,0.02,,,,,,0.0,1.94
+,,,,,,,,,,,,,,,,,,17,44.3,753.1,"Jun 10, 2025 11:14:20 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,12.73,52,661.96,Filled,48@12.54,"Jun 10, 2025 09:30:33 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,50,12.86,643.0,"Jun 10, 2025 09:30:34 ET",US,USD,,,0.9,0.99,0.15,,,,,,,,,,,0.0,2.04
+Buy,AAPL260116C235000,AAPL 260116 235.00C,7.42,1,7.42,Filled,1@7.61,"Jun 9, 2025 13:35:35 ET",Limit,Day,,,,,US,USD,,1,7.88,7.88,"Jun 9, 2025 13:39:06 ET",US,USD,,,2.14,0.32,,0.01,0.02,0.17,,,,,,,,0.0,2.66
+Sell,SBUX260116C100000,SBUX 260116 100.00C,6.13,1,6.13,Filled,1@5.46,"Jun 9, 2025 09:35:03 ET",Limit,Day,,,,,US,USD,,1,6.01,6.01,"Jun 9, 2025 09:35:06 ET",US,USD,,,2.01,0.3,,0.01,0.02,0.18,,0.01,,,,,,0.0,2.53
+Sell,INOD,Innodata,47.09,13,612.17,Filled,12@44.89,"Jun 5, 2025 13:02:01 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,12,50.78,609.36,"Jun 5, 2025 13:02:28 ET",US,USD,,,0.9,0.9,0.04,,,,,0.01,,,,,,0.0,1.85
+Buy,GOOGL,Alphabet-A,155.4,5,777.0,Filled,5@163.28,"Jun 4, 2025 13:29:45 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,182.79,913.95,"Jun 4, 2025 13:29:45 ET",US,USD,,,0.97,1.08,0.02,,,,,,,,,,,0.0,2.07
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,12.72,104,1322.88,Filled,102@12.82,"Jun 4, 2025 12:33:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,100,14.58,1458.0,"Jun 4, 2025 12:33:06 ET",US,USD,,,1.04,0.95,0.32,,,,,0.02,,,,,,0.0,2.33
+Buy,INOD,Innodata,41.35,14,578.9,Cancelled,0@0.0,"Jun 4, 2025 10:28:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,14.86,99,1471.14,Filled,106@13.19,"Jun 4, 2025 10:27:58 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,92,13.38,1230.96,"Jun 4, 2025 10:27:59 ET",US,USD,,,0.91,1.02,0.3,,,,,,,,,,,0.0,2.23
+Sell,TSM,Taiwan Semiconductor,212.63,11,2338.93,Filled,10@209.89,"Jun 4, 2025 10:09:00 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,212.41,1911.69,"Jun 4, 2025 10:09:00 ET",US,USD,,,0.94,1.0,0.03,,,,,0.01,,,,,,0.0,1.98
+Buy,INOD,Innodata,46.1,26,1198.6,Filled,25@41.61,"Jun 3, 2025 09:39:20 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,26,38.82,1009.32,"Jun 3, 2025 14:05:46 ET",US,USD,,,0.92,0.98,0.09,,,,,,,,,,,0.0,1.99
+Buy,INOD,Innodata,Market Price,26,,Filled,27@42.27,"May 29, 2025 11:50:01 ET",Market,Day,,Regular Trading Hours,,,US,USD,,24,38.74,929.76,"May 29, 2025 11:50:01 ET",US,USD,,,1.02,0.92,0.09,,,,,,,,,,,0.0,2.03
+Buy,INOD,Innodata,35.74,41,1465.34,Cancelled,0@0.0,"May 29, 2025 08:43:54 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,INOD,Innodata,34.01,26,884.26,Cancelled,0@0.0,"May 29, 2025 08:43:43 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,INOD,Innodata,35.62,25,890.5,Cancelled,0@0.0,"May 29, 2025 08:43:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,GOOGL,Alphabet-A,159.01,9,1431.09,Filled,10@186.57,"May 27, 2025 15:11:59 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,171.15,1711.5,"May 27, 2025 15:11:59 ET",US,USD,,,1.07,1.02,0.03,,,,,,,,,,,0.0,2.12
+Buy,AMZN,Amazon,216.82,21,4553.22,Filled,19@192.53,"May 27, 2025 15:11:30 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,20,212.42,4248.4,"May 27, 2025 15:11:32 ET",US,USD,,,0.95,0.95,0.06,,,,,,,,,,,0.0,1.96
+Sell,AAPL260116C235000,AAPL 260116 235.00C,7.65,1,7.65,Cancelled,0@0.0,"May 23, 2025 14:36:07 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,AAPL260116C235000,AAPL 260116 235.00C,6.92,1,6.92,Filled,1@7.62,"May 23, 2025 14:30:54 ET",Limit,Day,,,,,US,USD,,1,7.27,7.27,"May 23, 2025 14:30:54 ET",US,USD,,,1.89,0.3,,0.01,0.02,0.19,,,,,,,,,2.41
+Buy,AAPL,Apple,Market Price,9,,Filled,10@185.03,"May 23, 2025 14:24:07 ET",Market,Day,,Regular Trading Hours,,,US,USD,,10,198.96,1989.6,"May 23, 2025 14:24:08 ET",US,USD,,,0.95,1.02,0.03,,,,,,,,,,,,2.0
+Buy,AAPL,Apple,200.19,10,2001.9,Cancelled,0@0.0,"May 23, 2025 14:23:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,AAPL,Apple,187.47,18,3374.46,Filled,21@186.53,"May 22, 2025 10:04:34 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,21,214.37,4501.77,"May 22, 2025 10:04:39 ET",US,USD,,,1.02,1.01,0.06,,,,,0.01,,,,,,,2.1
+Sell,AAPL260116C235000,AAPL 260116 235.00C,9.12,2,18.24,Filled,2@8.55,"May 22, 2025 10:01:56 ET",Limit,Day,,,,,US,USD,,1,9.14,9.14,"May 22, 2025 10:02:00 ET",US,USD,,,1.84,0.64,,0.02,0.04,0.35,,0.02,,,,,,,2.91
+,,,,,,,,,,,,,,,,,,1,7.74,7.74,"May 22, 2025 10:02:00 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TSM,Taiwan Semiconductor,193.13,23,4441.99,Cancelled,0@0.0,"May 19, 2025 09:42:56 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLA,Tesla,367.75,12,4413.0,Filled,12@326.81,"May 19, 2025 09:39:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,12,317.9,3814.8,"May 19, 2025 09:39:16 ET",US,USD,,,1.06,0.91,0.04,,,,,0.01,,,,,,,2.02
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,15.13,96,1452.48,Filled,103@12.95,"May 19, 2025 09:38:59 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,92,12.91,1187.72,"May 19, 2025 09:38:59 ET",US,USD,,,0.9,0.93,0.29,,,,,0.02,,,,,,,2.14
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,15.21,112,1703.52,Filled,129@13.44,"May 19, 2025 09:13:27 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,127,15.22,1932.94,"May 19, 2025 09:13:41 ET",US,USD,,,1.02,1.03,0.37,,,,,0.02,,,,,,,2.44
+Buy,SBUX260116C100000,SBUX 260116 100.00C,3.67,1,3.67,Filled,1@3.68,"May 14, 2025 09:44:54 ET",Limit,Day,,,,,US,USD,,1,4.1,4.1,"May 14, 2025 09:44:56 ET",US,USD,,,2.13,0.27,,0.01,0.02,0.18,,,,,,,,,2.61
+Sell,SVIX250620C21000,SVIX 250620 21.00C,Market Price,5,,Failed,0@0.0,"May 13, 2025 13:20:19 ET",Market,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLA,Tesla,340.96,14,4773.44,Filled,14@336.11,"May 13, 2025 13:02:21 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,13,352.6,4583.8,"May 13, 2025 13:02:27 ET",US,USD,,,0.96,1.07,0.04,,,,,,,,,,,,2.07
+Buy,AAPL260116C235000,AAPL 260116 235.00C,10.58,2,21.16,Filled,2@9.9,"May 13, 2025 12:07:30 ET",Limit,Day,,,,,US,USD,,2,10.34,20.68,"May 13, 2025 12:07:30 ET",US,USD,,,1.98,0.62,,0.03,0.04,0.36,,,,,,,,,3.03
+Buy,AAPL,Apple,229.65,16,3674.4,Filled,16@207.91,"May 13, 2025 08:31:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,14,192.96,2701.44,"May 13, 2025 08:31:22 ET",US,USD,,,1.08,1.07,0.05,,,,,,,,,,,,2.2
+Sell,GOOGL260116C180000,GOOGL 260116 180.00C,8.75,1,8.75,Filled,1@8.33,"May 12, 2025 09:53:30 ET",Limit,Day,,,,,US,USD,,1,8.78,8.78,"May 12, 2025 09:53:30 ET",US,USD,,,2.01,0.29,,0.01,0.02,0.2,0.02,0.01,,,,,,,2.56
+Buy,AAPL,Apple,222.81,5,1114.05,Filled,5@193.16,"May 12, 2025 09:51:59 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,224.55,1122.75,"May 12, 2025 09:52:00 ET",US,USD,,,0.94,1.08,0.02,,,,,,,,,,,,2.04
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,13.26,93,1233.18,Filled,104@12.81,"May 12, 2025 09:41:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,110,11.99,1318.9,"May 12, 2025 09:41:46 ET",US,USD,,,0.98,0.91,0.33,,,,0.03,0.02,,,,,,,2.27
+Sell,SVXY,ProShares Short VIX Short-Term Futures ETF,38.41,141,5415.81,Filled,144@41.59,"May 12, 2025 09:30:41 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,138,39.55,5457.9,"May 12, 2025 09:30:48 ET",US,USD,,,1.08,0.98,0.41,,,,0.18,0.02,,,,,,,2.67
+Sell,AMZN250815C215000,AMZN 250815 215.00C,5.92,1,5.92,Filled,1@5.34,"May 8, 2025 11:56:53 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,5.2,5.2,"May 8, 2025 11:56:53 ET",US,USD,,,2.07,0.28,,0.01,0.02,0.17,0.02,0.01,,,,,,,2.58
+Sell,SVIX,-1x Short VIX Futures ETF,12.2,52,634.4,Filled,51@12.28,"May 8, 2025 11:54:43 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,53,14.43,764.79,"May 8, 2025 11:54:43 ET",US,USD,,,0.93,1.03,0.15,,,,0.02,0.01,,,,,,,2.14
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,11.1,60,666.0,Filled,64@9.51,"May 8, 2025 11:24:45 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,13,9.93,129.09,"May 8, 2025 16:00:38 ET",US,USD,,,1.01,1.02,0.19,,,,,,,,,,,,2.22
+,,,,,,,,,,,,,,,,,,51,10.31,525.81,"May 8, 2025 16:00:38 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,11.07,58,642.06,Filled,63@9.54,"May 8, 2025 11:21:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,59,9.5,560.5,"May 8, 2025 11:21:38 ET",US,USD,,,1.02,1.04,0.19,,,,,,,,,,,,2.25
+Buy,GOOGL260116C180000,GOOGL 260116 180.00C,7.7,1,7.7,Filled,1@7.51,"May 8, 2025 10:24:02 ET",Limit,Day,,,,,US,USD,,1,8.78,8.78,"May 8, 2025 10:24:02 ET",US,USD,,,2.04,0.31,,0.01,0.02,0.17,,,,,,,,,2.55
+Buy,TSM,Taiwan Semiconductor,186.56,11,2052.16,Filled,9@164.91,"May 8, 2025 10:02:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,162.67,1789.37,"May 8, 2025 10:02:47 ET",US,USD,,,1.0,1.06,0.03,,,,,,,,,,,,2.09
+Sell,SVXY,ProShares Short VIX Short-Term Futures ETF,38.02,48,1824.96,Filled,48@38.51,"May 8, 2025 10:02:26 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,49,37.97,1860.53,"May 8, 2025 10:02:27 ET",US,USD,,,0.99,0.94,0.14,,,,0.05,0.01,,,,,,,2.13
+Sell,HIMS,Hims & Hers Health,51.08,49,2502.92,Filled,47@55.31,"May 8, 2025 10:01:52 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,55,54.96,3022.8,"May 8, 2025 10:01:54 ET",US,USD,,,1.02,0.99,0.15,,,,0.07,0.01,,,,,,,2.24
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.2,211,2152.2,Filled,192@8.73,"May 7, 2025 11:11:56 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,211,10.09,2128.99,"May 7, 2025 11:11:56 ET",US,USD,,,0.95,1.02,0.56,,,,,,,,,,,,2.53
+Sell,HIMS,Hims & Hers Health,Trigger MKT price,52,,Cancelled,0@0.0,"May 6, 2025 14:35:43 ET",Stop,Day,,Regular Trading Hours,48.2,Allow,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,HIMS,Hims & Hers Health,41.13,51,2097.63,Filled,50@40.83,"May 6, 2025 10:07:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,47,47.23,2219.81,"May 6, 2025 10:07:38 ET",US,USD,,,0.96,1.09,0.16,,,,,,,,,,,,2.21
+Buy,AMZN,Amazon,169.9,10,1699.0,Filled,11@181.34,"May 2, 2025 09:55:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,184.66,2031.26,"May 2, 2025 09:55:46 ET",US,USD,,,1.0,0.92,0.03,,,,,,,,,,,,1.95
+Buy,09988,BABA-W,114.98,102,11727.96,Filled,90@126.71,"May 2, 2025 14:58:14 HKT",Limit,Day,Allow,,,,HK,HKD,,102,128.44,13100.88,"May 2, 2025 14:58:14 HKT",HK,HKD,,,3.9,14.4,2.05,,,,,,13.23,0.7,0.36,0.02,,,34.66
+Buy,TSLA260116C500000,TSLA 260116 500.00C,14.77,1,14.77,Failed,0@0.0,"May 1, 2025 13:15:26 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,AMZN,Amazon,203.16,9,1828.44,Filled,11@202.06,"May 1, 2025 12:14:42 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,176.28,1762.8,"May 1, 2025 12:14:44 ET",US,USD,,,0.98,0.97,0.03,,,,,,,,,,,,1.98
+Sell,TSM250815C170000,TSM 250815 170.00C,17.6,1,17.6,Filled,1@14.97,"May 1, 2025 09:38:37 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,15.83,15.83,"May 1, 2025 09:38:37 ET",US,USD,,,1.94,0.29,,0.01,0.02,0.18,0.04,0.01,,,,,,,2.49
+Sell,AMZN250815C215000,AMZN 250815 215.00C,5.88,1,5.88,Filled,1@6.16,"May 1, 2025 09:31:33 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,5.66,5.66,"May 1, 2025 09:31:37 ET",US,USD,,,1.89,0.27,,0.01,0.02,0.17,0.02,0.01,,,,,,,2.39
+Buy,AMZN250815C215000,AMZN 250815 215.00C,5.55,1,5.55,Filled,1@4.94,"Apr 29, 2025 10:32:48 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,5.36,5.36,"Apr 29, 2025 10:32:49 ET",US,USD,,,1.91,0.3,,0.01,0.02,0.17,,,,,,,,,2.41
+Buy,AMZN250815C215000,AMZN 250815 215.00C,5.73,1,5.73,Filled,1@5.54,"Apr 25, 2025 10:44:15 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,5.74,5.74,"Apr 25, 2025 10:44:15 ET",US,USD,,,1.79,0.3,,0.01,0.02,0.17,,,,,,,,,2.29
+Short Sell,01024,KUAISHOU-W,55.3,575,31797.5,Failed,0@0.0,"Apr 25, 2025 00:42:08 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,98.71,24,2369.04,Cancelled,0@0.0,"Apr 24, 2025 12:24:50 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,SVXY,ProShares Short VIX Short-Term Futures ETF,39.82,52,2070.64,Filled,55@35.11,"Apr 23, 2025 10:19:27 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,47,39.91,1875.77,"Apr 23, 2025 10:19:28 ET",US,USD,,,1.05,0.96,0.14,,,,0.05,0.01,,,,,,,2.21
+Sell,SVIX,-1x Short VIX Futures ETF,11.08,48,531.84,Filled,50@11.04,"Apr 23, 2025 10:19:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,47,10.88,511.36,"Apr 23, 2025 10:26:06 ET",US,USD,,,1.06,0.93,0.15,,,,0.02,0.01,,,,,,,2.17
+Sell,QQQ250630C460/465, Vertical,3.12,2unit(s),,Filled,2unit(s)@2.85,"Apr 23, 2025 10:10:48 ET",Limit,Day,,,,,US,USD,,,,,,,,,,3.86,1.25,,0.06,0.08,0.79,0.14,0.01,,,,,,,6.19
+Sell,QQQ250630C460000,,,2,,,,,,,,,,,,,,2,23.72,47.44,"Apr 23, 2025 10:12:44 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,QQQ250630C465000,,,2,,,,,,,,,,,,,,2,21.26,42.52,"Apr 23, 2025 10:12:44 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,TSM250620C170000,TSM 250620 170.00C,4.68,2,9.36,Filled,2@4.54,"Apr 23, 2025 10:10:19 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,5.45,10.9,"Apr 23, 2025 10:10:26 ET",US,USD,,,1.98,0.57,,0.03,0.04,0.33,0.03,0.01,,,,,,,2.99
+Buy,TSM250815C170000,TSM 250815 170.00C,8.9,1,8.9,Filled,1@8.54,"Apr 17, 2025 11:22:06 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,8.62,8.62,"Apr 17, 2025 11:22:07 ET",US,USD,,,1.79,0.3,,0.01,0.02,0.17,,,,,,,,,2.29
+Buy,QQQ250630C460/465, Vertical,2.57,2unit(s),,Cancelled,0unit(s)@0.00,"Apr 14, 2025 12:00:13 ET",Limit,Day,,,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,QQQ250630C460000,,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,QQQ250630C465000,,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,QQQ250630C460/465, Vertical,2.63,2unit(s),,Filled,2unit(s)@2.85,"Apr 14, 2025 11:59:39 ET",Limit,Day,,,,,US,USD,,,,,,,,,,4.32,1.21,,0.06,0.08,0.67,0.12,0.01,,,,,,,6.47
+Buy,QQQ250630C460000,,,2,,,,,,,,,,,,,,2,22.22,44.44,"Apr 14, 2025 12:00:02 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,QQQ250630C465000,,,2,,,,,,,,,,,,,,2,22.1,44.2,"Apr 14, 2025 12:00:02 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,QQQ250414C458/463, Vertical,1.1,3unit(s),,Filled,3unit(s)@1.11,"Apr 14, 2025 11:58:30 ET",Limit,Day,,,,,US,USD,,,,,,,,,,4.34,1.87,,0.08,0.11,1.14,0.01,0.01,,,,,,,7.56
+Sell,QQQ250414C458000,,,3,,,,,,,,,,,,,,3,1.48,4.44,"Apr 14, 2025 11:58:37 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,QQQ250414C463000,,,3,,,,,,,,,,,,,,3,0.39,1.17,"Apr 14, 2025 11:58:37 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,QQQ250414C458/463, Vertical,1.3,3unit(s),,Filled,3unit(s)@1.23,"Apr 14, 2025 11:57:50 ET",Limit,Day,,,,,US,USD,,,,,,,,,,3.96,1.84,,0.07,0.11,1.12,0.01,0.01,,,,,,,7.12
+Buy,QQQ250414C458000,,,3,,,,,,,,,,,,,,3,1.55,4.65,"Apr 14, 2025 11:57:51 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,QQQ250414C463000,,,3,,,,,,,,,,,,,,3,0.36,1.08,"Apr 14, 2025 11:57:51 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,TSM250620P170000,TSM 250620 170.00P,19.21,1,19.21,Filled,1@20.91,"Apr 14, 2025 11:41:41 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,18.72,18.72,"Apr 14, 2025 11:41:45 ET",US,USD,,,1.79,0.28,,0.01,0.02,0.18,0.06,0.01,,,,,,,2.35
+Buy,TSM250620C170000,TSM 250620 170.00C,6.18,2,12.36,Filled,2@6.36,"Apr 14, 2025 11:41:02 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,5.59,11.18,"Apr 14, 2025 11:41:02 ET",US,USD,,,1.96,0.63,,0.03,0.04,0.33,,,,,,,,,2.99
+Buy,TSM250620P170000,TSM 250620 170.00P,18.54,1,18.54,Filled,1@19.8,"Apr 14, 2025 10:27:51 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,19.79,19.79,"Apr 14, 2025 10:27:51 ET",US,USD,,,1.91,0.31,,0.01,0.02,0.17,,,,,,,,,2.42
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,33.28,49,1630.72,Cancelled,0@0.0,"Apr 11, 2025 15:01:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA250620C113/120, Vertical,3.2,1unit(s),,Filled,1unit(s)@3.15,"Apr 11, 2025 14:34:17 ET",Limit,Day,,,,,US,USD,,,,,,,,,,3.77,0.66,,0.02,0.04,0.33,0.03,0.01,,,,,,,4.86
+Sell,NVDA250620C113000,,,1,,,,,,,,,,,,,,1,10.24,10.24,"Apr 11, 2025 15:55:03 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA250620C120000,,,1,,,,,,,,,,,,,,1,7.41,7.41,"Apr 11, 2025 15:55:03 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,MSTU,T-Rex 2X Long MSTR Daily Target ETF,5.09,94,478.46,Filled,103@5.0,"Apr 11, 2025 14:32:47 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,110,5.5,605.0,"Apr 11, 2025 14:33:02 ET",US,USD,,,0.89,1.0,0.31,,,,0.01,0.02,,,,,,,2.23
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,34.38,50,1719.0,Cancelled,0@0.0,"Apr 11, 2025 14:31:59 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,SVXY,ProShares Short VIX Short-Term Futures ETF,Market Price,54,,Filled,49@34.07,"Apr 11, 2025 13:55:17 ET",Market,Day,,Regular Trading Hours,,,US,USD,,54,35.17,1899.18,"Apr 11, 2025 13:55:17 ET",US,USD,,,0.96,1.04,0.14,,,,0.05,0.01,,,,,,,2.2
+Sell,SVXY,ProShares Short VIX Short-Term Futures ETF,31.12,52,1618.24,Cancelled,0@0.0,"Apr 11, 2025 13:55:01 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,MSTU,T-Rex 2X Long MSTR Daily Target ETF,5.6,93,520.8,Filled,102@5.56,"Apr 11, 2025 13:11:51 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,93,4.67,434.31,"Apr 11, 2025 13:11:52 ET",US,USD,,,0.97,1.09,0.28,,,,0.01,0.02,,,,,,,2.37
+Sell,TQQQ,ProShares UltraPro QQQ ETF,46.47,31,1440.57,Filled,28@49.03,"Apr 11, 2025 11:38:22 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,32,48.77,1560.64,"Apr 11, 2025 11:38:26 ET",US,USD,,,1.0,1.1,0.09,,,,0.04,0.01,,,,,,,2.24
+Sell,TQQQ,ProShares UltraPro QQQ ETF,Market Price,31,,Filled,28@45.57,"Apr 11, 2025 10:01:01 ET",Market,Day,,Regular Trading Hours,,,US,USD,,28,44.11,1235.08,"Apr 11, 2025 10:01:01 ET",US,USD,,,0.97,0.96,0.09,,,,0.04,0.01,,,,,,,2.07
+Sell,TQQQ,ProShares UltraPro QQQ ETF,Market Price,95,,Failed,0@0.0,"Apr 11, 2025 10:00:53 ET",Market,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,Market Price,31,,Filled,33@43.89,"Apr 11, 2025 09:36:15 ET",Market,Day,,Regular Trading Hours,,,US,USD,,31,42.54,1318.74,"Apr 11, 2025 09:36:15 ET",US,USD,,,0.92,1.02,0.09,,,,,,,,,,,,2.03
+Buy,TQQQ,ProShares UltraPro QQQ ETF,47.77,30,1433.1,Filled,29@48.97,"Apr 11, 2025 09:36:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,32,46.35,1483.2,"Apr 11, 2025 09:36:33 ET",US,USD,,,1.04,0.96,0.08,,,,,,,,,,,,2.08
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,411,,Filled,424@8.69,"Apr 11, 2025 09:33:23 ET",Market,Day,,Regular Trading Hours,,,US,USD,,421,7.71,3245.91,"Apr 11, 2025 09:33:23 ET",US,USD,,,1.92,2.01,1.21,,,,0.09,0.07,,,,,,,5.3
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,8.86,364,3225.04,Cancelled,0@0.0,"Apr 11, 2025 09:33:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,8.52,197,1678.44,Filled,212@7.6,"Apr 11, 2025 09:15:07 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,207,8.68,1796.76,"Apr 11, 2025 09:15:07 ET",US,USD,,,0.97,1.1,0.58,,,,,,,,,,,,2.65
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,32.55,83,2701.65,Filled,83@30.48,"Apr 10, 2025 12:33:45 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,80,31.47,2517.6,"Apr 10, 2025 12:33:45 ET",US,USD,,,0.94,0.97,0.24,,,,,,,,,,,,2.15
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,7.58,184,1394.72,Filled,218@7.67,"Apr 10, 2025 11:44:07 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,203,7.77,1577.31,"Apr 10, 2025 11:44:07 ET",US,USD,,,0.97,0.93,0.64,,,,,,,,,,,,2.54
+Buy,NVDA250620C113/120, Vertical,3.15,1unit(s),,Filled,1unit(s)@3.05,"Apr 10, 2025 10:38:25 ET",Limit,Day,,,,,US,USD,,,,,,,,,,3.77,0.61,,0.02,0.04,0.34,0.02,0.01,,,,,,,4.81
+Buy,NVDA250620C113000,,,1,,,,,,,,,,,,,,1,10.86,10.86,"Apr 10, 2025 10:38:25 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA250620C120000,,,1,,,,,,,,,,,,,,1,6.82,6.82,"Apr 10, 2025 10:38:25 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,Market Price,40,,Filled,39@36.46,"Apr 10, 2025 10:25:14 ET",Market,Day,,Regular Trading Hours,,,US,USD,,40,33.29,1331.6,"Apr 10, 2025 10:25:14 ET",US,USD,,,1.04,1.0,0.12,,,,,,,,,,,,2.16
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,34.39,43,1478.77,Cancelled,0@0.0,"Apr 10, 2025 10:23:55 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,AAPL,Apple,Market Price,20,,Filled,21@193.53,"Apr 9, 2025 14:46:34 ET",Market,Day,,Regular Trading Hours,,,US,USD,,21,201.83,4238.43,"Apr 9, 2025 14:46:34 ET",US,USD,,,1.07,1.03,0.07,,,,0.1,0.01,,,,,,,2.28
+Buy,AAPL,Apple,Market Price,22,,Filled,19@186.31,"Apr 9, 2025 13:33:08 ET",Market,Day,,Regular Trading Hours,,,US,USD,,22,171.92,3782.24,"Apr 9, 2025 13:33:08 ET",US,USD,,,1.05,1.0,0.05,,,,,,,,,,,,2.1
+Sell,AAPL,Apple,Market Price,22,,Filled,19@171.42,"Apr 9, 2025 13:30:53 ET",Market,Day,,Regular Trading Hours,,,US,USD,,18,202.82,3650.76,"Apr 9, 2025 13:30:53 ET",US,USD,,,1.03,0.94,0.05,,,,0.11,0.01,,,,,,,2.14
+Sell,SVIX250620C21000,SVIX 250620 21.00C,3.85,5,19.25,Cancelled,0@0.0,"Apr 9, 2025 13:26:42 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,SVIX250620C21000,SVIX 250620 21.00C,1.28,5,6.4,Cancelled,0@0.0,"Apr 9, 2025 10:29:46 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,AAPL,Apple,Trigger MKT price,22,,Cancelled,0@0.0,"Apr 9, 2025 08:41:24 ET",Stop,Day,,Regular Trading Hours,167.5,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,AAPL,Apple,Trigger MKT price,19,,Cancelled,0@0.0,"Apr 9, 2025 08:41:18 ET",Stop,Day,,Regular Trading Hours,167.5,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA,NVIDIA,Market Price,21,,Filled,21@104.65,"Apr 8, 2025 12:52:09 ET",Stop,Day,,Regular Trading Hours,98.0,,US,USD,,20,91.05,1821.0,"Apr 8, 2025 15:02:34 ET",US,USD,,,0.95,1.02,0.06,,,,0.05,0.01,,,,,,,2.09
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,8.25,216,1782.0,Cancelled,0@0.0,"Apr 8, 2025 12:02:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,92,,Filled,109@7.53,"Apr 8, 2025 11:53:06 ET",Market,Day,,Regular Trading Hours,,,US,USD,,96,7.53,722.88,"Apr 8, 2025 11:53:07 ET",US,USD,,,1.04,1.04,0.27,,,,0.02,0.02,,,,,,,2.39
+Buy,SVIX250620C21000,SVIX 250620 21.00C,0.58,5,2.9,Filled,5@0.54,"Apr 8, 2025 11:42:22 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,0.55,1.1,"Apr 8, 2025 11:42:26 ET",US,USD,,,3.45,1.64,,0.07,0.1,0.92,,,,,,,,,6.18
+,,,,,,,,,,,,,,,,,,3,0.54,1.62,"Apr 8, 2025 11:42:26 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,SVIX,-1x Short VIX Futures ETF,12.6,101,1272.6,Filled,98@11.91,"Apr 8, 2025 11:41:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,109,13.52,1473.68,"Apr 8, 2025 11:41:44 ET",US,USD,,,0.97,0.9,0.28,,,,,,,,,,,,2.15
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,8.21,104,853.84,Filled,95@8.05,"Apr 8, 2025 11:39:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,97,7.57,734.29,"Apr 8, 2025 11:39:40 ET",US,USD,,,1.06,0.9,0.32,,,,,,,,,,,,2.28
+Buy,AAPL,Apple,178.55,22,3928.1,Filled,21@188.58,"Apr 8, 2025 11:26:34 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,2,164.43,328.86,"Apr 8, 2025 12:31:32 ET",US,USD,,,0.93,1.03,0.06,,,,,,,,,,,,2.02
+,,,,,,,,,,,,,,,,,,19,192.66,3660.54,"Apr 8, 2025 12:31:29 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,AAPL250718C205000,AAPL 250718 205.00C,Market Price,1,,Filled,1@7.05,"Apr 8, 2025 11:23:21 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,6.58,6.58,"Apr 8, 2025 11:23:22 ET",US,USD,,,1.91,0.28,,0.01,0.02,0.17,0.02,0.01,,,,,,,2.42
+Buy,AAPL250718C205000,AAPL 250718 205.00C,6.81,1,6.81,Filled,1@7.78,"Apr 8, 2025 11:22:47 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,6.85,6.85,"Apr 8, 2025 11:22:47 ET",US,USD,,,2.04,0.32,,0.01,0.02,0.2,,,,,,,,,2.59
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,431,,Filled,414@8.02,"Apr 8, 2025 10:50:23 ET",Market,Day,,Regular Trading Hours,,,US,USD,,397,7.75,3076.75,"Apr 8, 2025 10:50:24 ET",US,USD,,,2.01,2.12,1.19,,,,0.1,0.07,,,,,,,5.49
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,7.71,374,2883.54,Cancelled,0@0.0,"Apr 8, 2025 10:50:13 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,AAPL,Apple,Market Price,38,,Filled,35@196.11,"Apr 8, 2025 10:47:19 ET",Market,Day,,Regular Trading Hours,,,US,USD,,36,171.67,6180.12,"Apr 8, 2025 10:47:20 ET",US,USD,,,0.94,1.1,0.11,,,,0.16,0.01,,,,,,,2.32
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,8.26,220,1817.2,Filled,184@8.66,"Apr 8, 2025 10:44:57 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,194,8.79,1705.26,"Apr 8, 2025 10:44:58 ET",US,USD,,,1.01,0.98,0.64,,,,,,,,,,,,2.63
+Buy,AAPL,Apple,206.32,24,4951.68,Filled,24@183.76,"Apr 8, 2025 10:43:28 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,23,190.6,4383.8,"Apr 8, 2025 10:43:28 ET",US,USD,,,0.93,0.97,0.07,,,,,,,,,,,,1.97
+Buy,AAPL,Apple,196.45,10,1964.5,Filled,10@185.19,"Apr 8, 2025 10:43:06 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,198.87,1988.7,"Apr 8, 2025 10:43:06 ET",US,USD,,,0.89,1.01,0.03,,,,,,,,,,,,1.93
+Sell,AAPL250718C205000,AAPL 250718 205.00C,8.86,1,8.86,Filled,1@8.3,"Apr 8, 2025 10:33:52 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,8.16,8.16,"Apr 8, 2025 10:34:09 ET",US,USD,,,1.81,0.31,,0.01,0.02,0.18,0.02,0.01,,,,,,,2.36
+Buy,AAPL250718C205000,AAPL 250718 205.00C,8.34,1,8.34,Filled,1@7.42,"Apr 8, 2025 10:17:59 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,8.6,8.6,"Apr 8, 2025 10:18:12 ET",US,USD,,,2.0,0.27,,0.01,0.02,0.18,,,,,,,,,2.48
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,6.85,217,1486.45,Filled,206@6.64,"Apr 7, 2025 11:25:25 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,188,7.15,1344.2,"Apr 7, 2025 11:25:26 ET",US,USD,,,0.93,0.94,0.65,,,,,,,,,,,,2.52
+Buy,NVDA,NVIDIA,Market Price,22,,Filled,21@101.61,"Apr 7, 2025 11:20:10 ET",Market,Day,,Regular Trading Hours,,,US,USD,,19,87.51,1662.69,"Apr 7, 2025 11:20:10 ET",US,USD,,,0.91,0.96,0.05,,,,,,,,,,,,1.92
+Buy,NVDA,NVIDIA,95.65,18,1721.7,Cancelled,0@0.0,"Apr 7, 2025 11:20:05 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TQQQ,ProShares UltraPro QQQ ETF,Market Price,20,,Filled,21@36.33,"Apr 7, 2025 11:19:40 ET",Market,Day,,Regular Trading Hours,,,US,USD,,21,39.74,834.54,"Apr 7, 2025 11:19:41 ET",US,USD,,,0.94,1.06,0.06,,,,0.02,0.01,,,,,,,2.09
+Sell,NVDL,GraniteShares 2x Long NVDA Daily ETF,Market Price,28,,Filled,30@25.97,"Apr 7, 2025 11:18:37 ET",Market,Day,,Regular Trading Hours,,,US,USD,,29,29.83,865.07,"Apr 7, 2025 11:18:37 ET",US,USD,,,1.03,0.96,0.09,,,,0.02,0.01,,,,,,,2.11
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,219,,Filled,219@6.6,"Apr 7, 2025 11:18:14 ET",Market,Day,,Regular Trading Hours,,,US,USD,,203,6.59,1337.77,"Apr 7, 2025 11:18:14 ET",US,USD,,,1.03,1.0,0.6,,,,0.04,0.03,,,,,,,2.7
+Sell,NVDA,NVIDIA,Market Price,24,,Filled,24@96.92,"Apr 7, 2025 11:18:03 ET",Market,Day,,Regular Trading Hours,,,US,USD,,25,99.56,2489.0,"Apr 7, 2025 11:18:03 ET",US,USD,,,0.94,0.96,0.09,,,,0.07,0.01,,,,,,,2.07
+Buy,TQQQ,ProShares UltraPro QQQ ETF,35.53,22,781.66,Filled,20@37.21,"Apr 7, 2025 10:37:24 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,20,42.17,843.4,"Apr 7, 2025 10:37:24 ET",US,USD,,,0.92,0.9,0.05,,,,,,,,,,,,1.87
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,101,,Filled,99@8.3,"Apr 7, 2025 10:21:18 ET",Market,Day,,Regular Trading Hours,,,US,USD,,97,7.86,762.42,"Apr 7, 2025 10:21:18 ET",US,USD,,,0.99,1.04,0.31,,,,0.02,0.02,,,,,,,2.38
+Sell,NVDL,GraniteShares 2x Long NVDA Daily ETF,Market Price,20,,Filled,20@31.11,"Apr 7, 2025 10:21:05 ET",Market,Day,,Regular Trading Hours,,,US,USD,,21,28.8,604.8,"Apr 7, 2025 10:21:05 ET",US,USD,,,0.96,0.97,0.06,,,,0.02,0.01,,,,,,,2.02
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,7.57,109,825.13,Cancelled,0@0.0,"Apr 7, 2025 10:20:40 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,89.64,11,986.04,Filled,10@83.96,"Apr 7, 2025 09:52:43 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,99.32,893.88,"Apr 7, 2025 09:52:44 ET",US,USD,,,0.95,1.04,0.03,,,,,,,,,,,,2.02
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,7.0,199,1393.0,Filled,200@7.1,"Apr 7, 2025 09:50:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,184,6.28,1155.52,"Apr 7, 2025 09:50:37 ET",US,USD,,,1.05,1.02,0.55,,,,,,,,,,,,2.62
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,35.9,19,682.1,Filled,18@34.2,"Apr 7, 2025 09:30:45 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,21,34.66,727.86,"Apr 7, 2025 09:30:45 ET",US,USD,,,1.09,0.91,0.06,,,,,,,,,,,,2.06
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,6.81,92,626.52,Filled,101@6.17,"Apr 7, 2025 09:20:45 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,99,6.73,666.27,"Apr 7, 2025 09:20:46 ET",US,USD,,,0.98,0.94,0.32,,,,,,,,,,,,2.24
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,24.5,47,1151.5,Filled,46@25.29,"Apr 7, 2025 09:20:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,46,25.69,1181.74,"Apr 7, 2025 09:20:10 ET",US,USD,,,1.05,0.97,0.15,,,,,,,,,,,,2.17
+Buy,NVDA,NVIDIA,84.72,10,847.2,Filled,10@86.36,"Apr 7, 2025 09:13:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,89.7,986.7,"Apr 7, 2025 09:13:47 ET",US,USD,,,0.96,0.97,0.03,,,,,,,,,,,,1.96
+Buy,09988,BABA-W,103.44,95,9826.8,Filled,100@97.9,"Apr 7, 2025 14:38:01 HKT",Limit,Day,Allow,,,,HK,HKD,,99,112.52,11139.48,"Apr 7, 2025 14:38:01 HKT",HK,HKD,,,3.33,15.52,2.04,,,,,,11.99,0.58,0.3,0.02,,,33.78
+Buy,09988,BABA-W,104.24,187,19492.88,Cancelled,0@0.0,"Apr 7, 2025 14:13:10 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,09988,BABA-W,116.51,105,12233.55,Filled,103@119.91,"Apr 7, 2025 10:23:50 HKT",Limit,Day,Allow,,,,HK,HKD,,90,100.62,9055.8,"Apr 7, 2025 10:23:52 HKT",HK,HKD,,,3.6,16.25,2.13,,,,,,11.74,0.65,0.28,0.02,,,34.67
+Buy,MSTU,T-Rex 2X Long MSTR Daily Target ETF,5.21,212,1104.52,Filled,195@5.07,"Apr 4, 2025 15:28:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,218,5.1,1111.8,"Apr 4, 2025 15:28:11 ET",US,USD,,,0.9,1.06,0.55,,,,,,,,,,,,2.51
+Sell,MSTU,T-Rex 2X Long MSTR Daily Target ETF,5.07,507,2570.49,Filled,472@5.5,"Apr 4, 2025 15:27:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,470,5.67,2664.9,"Apr 4, 2025 15:27:39 ET",US,USD,,,2.59,2.57,1.5,,,,0.09,0.08,,,,,,,6.83
+Buy,NVDA,NVIDIA,88.27,16,1412.32,Cancelled,0@0.0,"Apr 4, 2025 13:14:05 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,92.5,9,832.5,Cancelled,0@0.0,"Apr 4, 2025 13:13:53 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,90.9,5,454.5,Filled,5@96.25,"Apr 4, 2025 13:13:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,85.83,429.15,"Apr 4, 2025 13:13:37 ET",US,USD,,,0.91,1.0,0.02,,,,,,,,,,,,1.93
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,40.8,43,1754.4,Filled,40@39.55,"Apr 4, 2025 10:05:42 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,37,36.62,1354.94,"Apr 4, 2025 10:05:42 ET",US,USD,,,0.98,1.03,0.11,,,,,,,,,,,,2.12
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,40.26,43,1731.18,Filled,42@35.37,"Apr 4, 2025 10:05:27 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,41,39.35,1613.35,"Apr 4, 2025 10:05:28 ET",US,USD,,,0.93,1.08,0.13,,,,,,,,,,,,2.14
+Sell,SVXY,ProShares Short VIX Short-Term Futures ETF,39.65,40,1586.0,Filled,42@36.23,"Apr 4, 2025 10:05:25 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,37,38.73,1433.01,"Apr 4, 2025 10:05:26 ET",US,USD,,,1.06,1.01,0.12,,,,0.04,0.01,,,,,,,2.24
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,36.73,60,2203.8,Filled,63@41.38,"Apr 4, 2025 09:14:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,71,37.46,2659.66,"Apr 4, 2025 09:14:35 ET",US,USD,,,1.05,0.97,0.21,,,,,,,,,,,,2.23
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,36.65,41,1502.65,Filled,44@37.38,"Apr 4, 2025 09:04:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,38,42.86,1628.68,"Apr 4, 2025 09:04:44 ET",US,USD,,,1.05,1.06,0.13,,,,,,,,,,,,2.24
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,35.22,56,1972.32,Cancelled,0@0.0,"Apr 4, 2025 09:04:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,SVXY,ProShares Short VIX Short-Term Futures ETF,36.64,14,512.96,Filled,15@40.15,"Apr 4, 2025 08:56:25 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,15,38.83,582.45,"Apr 4, 2025 08:56:25 ET",US,USD,,,0.92,0.98,0.05,,,,,,,,,,,,1.95
+Buy,MSTU,T-Rex 2X Long MSTR Daily Target ETF,5.31,386,2049.66,Filled,364@4.98,"Apr 4, 2025 08:34:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,380,5.29,2010.2,"Apr 4, 2025 08:34:35 ET",US,USD,,,2.07,2.1,1.16,,,,,,,,,,,,5.33
+Buy,MSTU,T-Rex 2X Long MSTR Daily Target ETF,5.62,95,533.9,Filled,93@5.48,"Apr 4, 2025 08:32:55 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,97,5.36,519.92,"Apr 4, 2025 08:32:55 ET",US,USD,,,0.94,1.07,0.33,,,,,,,,,,,,2.34
+Sell,TSLA250417C265000,TSLA 250417 265.00C,17.33,1,17.33,Filled,1@17.46,"Apr 3, 2025 12:22:33 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,17.43,17.43,"Apr 3, 2025 12:22:33 ET",US,USD,,,2.1,0.29,,0.01,0.02,0.17,0.05,0.01,,,,,,,2.65
+Sell,TSLA250417C265000,TSLA 250417 265.00C,18.23,1,18.23,Filled,1@17.41,"Apr 3, 2025 12:18:10 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,19.32,19.32,"Apr 3, 2025 12:18:14 ET",US,USD,,,1.97,0.31,,0.01,0.02,0.19,0.05,0.01,,,,,,,2.56
+Sell,PLTR,Palantir,87.23,26,2267.98,Filled,27@83.31,"Apr 3, 2025 12:08:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,24,91.14,2187.36,"Apr 3, 2025 12:08:15 ET",US,USD,,,1.04,0.96,0.08,,,,0.07,0.01,,,,,,,2.16
+Buy,TSLA250417C265000,TSLA 250417 265.00C,16.48,2,32.96,Filled,2@18.54,"Apr 3, 2025 12:05:41 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,18.08,36.16,"Apr 3, 2025 12:05:42 ET",US,USD,,,1.8,0.6,,0.03,0.04,0.34,,,,,,,,,2.81
+Buy,PLTR,Palantir,87.71,10,877.1,Filled,10@77.78,"Apr 3, 2025 11:36:52 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,88.94,889.4,"Apr 3, 2025 11:36:52 ET",US,USD,,,0.98,0.94,0.03,,,,,,,,,,,,1.95
+Buy,PLTR,Palantir,84.12,16,1345.92,Filled,15@91.4,"Apr 3, 2025 11:36:17 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,14,87.93,1231.02,"Apr 3, 2025 11:45:37 ET",US,USD,,,1.04,1.04,0.05,,,,,,,,,,,,2.13
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,9.41,271,2550.11,Filled,320@10.1,"Apr 3, 2025 08:40:36 ET",Limit,Day,,24 Hour Trading,,,US,USD,,309,9.35,2889.15,"Apr 3, 2025 08:40:36 ET",US,USD,,,1.48,1.59,0.95,,,,0.08,0.05,,,,,,,4.15
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.31,206,2123.86,Filled,211@9.9,"Apr 3, 2025 06:45:41 ET",Limit,Day,,24 Hour Trading,,,US,USD,,208,9.9,2059.2,"Apr 3, 2025 07:01:01 ET",US,USD,,,1.09,1.08,0.63,,,,,,,,,,,,2.8
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,9.01,104,937.04,Filled,103@10.91,"Apr 3, 2025 06:04:05 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,90,9.46,851.4,"Apr 3, 2025 07:01:01 ET",US,USD,,,0.98,0.97,0.31,,,,,,,,,,,,2.26
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,10.74,639,6862.86,Filled,649@10.23,"Apr 3, 2025 06:02:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,697,9.9,6900.3,"Apr 3, 2025 06:02:37 ET",US,USD,,,3.55,3.83,2.03,,,,0.2,0.13,,,,,,,9.74
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,10.82,185,2001.7,Filled,201@9.35,"Apr 3, 2025 06:01:19 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,185,10.18,1883.3,"Apr 3, 2025 06:01:19 ET",US,USD,,,0.95,0.96,0.55,,,,0.06,0.03,,,,,,,2.55
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,9.42,192,1808.64,Cancelled,0@0.0,"Apr 3, 2025 06:01:01 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Trigger MKT price,392,,Cancelled,0@0.0,"Apr 3, 2025 04:43:12 ET",Stop,Day,,Regular Trading Hours,10.3,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,9.87,200,1974.0,Cancelled,0@0.0,"Apr 3, 2025 02:09:58 ET",Limit,Day,,24 Hour Trading,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,9.63,216,2080.08,Filled,217@11.0,"Apr 2, 2025 12:51:14 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,82,10.13,830.66,"Apr 2, 2025 16:30:16 ET",US,USD,,,0.95,0.91,0.56,,,,,,,,,,,,2.42
+,,,,,,,,,,,,,,,,,,117,9.47,1107.99,"Apr 2, 2025 16:30:16 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,11.09,728,8073.52,Filled,698@10.18,"Apr 2, 2025 12:13:11 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,631,10.01,6316.31,"Apr 2, 2025 16:30:37 ET",US,USD,,,3.52,3.84,2.06,,,,,,,,,,,,9.42
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.2,192,1958.4,Cancelled,0@0.0,"Apr 2, 2025 11:44:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,369,,Filled,434@9.98,"Apr 2, 2025 11:30:46 ET",Market,Day,,Regular Trading Hours,,,US,USD,,416,11.02,4584.32,"Apr 2, 2025 11:30:46 ET",US,USD,,,1.78,2.05,1.25,,,,0.13,0.07,,,,,,,5.28
+Sell,01810,XIAOMI-W,Market Price,217,,Filled,203@46.6,"Apr 2, 2025 15:33:29 HKT",Market,Day,,,,,HK,HKD,,213,43.43,9250.59,"Apr 2, 2025 15:33:29 HKT",HK,HKD,,,3.26,16.03,2.02,,,,,,8.38,0.53,0.22,0.01,,,30.45
+Buy,01810,XIAOMI-W,42.64,192,8186.88,Filled,185@45.79,"Apr 2, 2025 10:56:20 HKT",Limit,Day,Allow,,,,HK,HKD,,220,43.6,9592.0,"Apr 2, 2025 10:56:20 HKT",HK,HKD,,,3.01,15.21,1.98,,,,,,9.16,0.54,0.26,0.01,,,30.17
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,205,,Filled,204@10.99,"Apr 1, 2025 14:51:01 ET",Market,Day,,Regular Trading Hours,,,US,USD,,197,11.07,2180.79,"Apr 1, 2025 14:51:01 ET",US,USD,,,0.94,0.98,0.65,,,,,,,,,,,,2.57
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,9.69,189,1831.41,Filled,200@9.96,"Apr 1, 2025 14:50:50 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,69,9.32,643.08,"Apr 1, 2025 14:51:03 ET",US,USD,,,1.02,1.02,0.55,,,,,,,,,,,,2.59
+,,,,,,,,,,,,,,,,,,114,10.88,1240.32,"Apr 1, 2025 14:51:03 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,PLTR,Palantir,Market Price,9,,Filled,11@91.73,"Apr 1, 2025 11:38:40 ET",Market,Day,,Regular Trading Hours,,,US,USD,,10,77.8,778.0,"Apr 1, 2025 11:38:40 ET",US,USD,,,0.93,1.07,0.03,,,,0.02,0.01,,,,,,,2.06
+Sell,PLTR,Palantir,90.96,9,818.64,Filled,11@81.19,"Apr 1, 2025 11:21:13 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,78.18,781.8,"Apr 1, 2025 11:21:31 ET",US,USD,,,1.07,1.05,0.03,,,,0.02,0.01,,,,,,,2.18
+Buy,PLTR,Palantir,83.25,21,1748.25,Filled,22@91.88,"Apr 1, 2025 10:46:01 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,18,87.99,1583.82,"Apr 1, 2025 10:46:10 ET",US,USD,,,1.06,1.04,0.06,,,,,,,,,,,,2.16
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,10.3,102,1050.6,Filled,99@9.0,"Apr 1, 2025 10:07:06 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,96,10.32,990.72,"Apr 1, 2025 10:07:10 ET",US,USD,,,0.93,0.96,0.32,,,,0.03,0.02,,,,,,,2.26
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.34,98,1013.32,Filled,98@10.36,"Apr 1, 2025 09:45:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,108,10.07,1087.56,"Apr 1, 2025 09:45:36 ET",US,USD,,,0.91,0.91,0.27,,,,,,,,,,,,2.09
+Sell,MIU250429P43000,MIU 250429 43.00 P,1.08,1,1.08,Filled,1@0.94,"Apr 1, 2025 15:48:00 HKT",Limit,Day,,,,,HK,HKD,,1,1.0,1.0,"Apr 1, 2025 15:48:00 HKT",HK,HKD,,,3.08,14.74,,,,,,,,,,,0.98,,18.8
+Buy,MIU250429P43000,MIU 250429 43.00 P,0.91,1,0.91,Filled,1@0.95,"Apr 1, 2025 13:17:51 HKT",Limit,Day,,,,,HK,HKD,,1,0.9,0.9,"Apr 1, 2025 13:17:54 HKT",HK,HKD,,,2.89,14.99,,,,,,,,,,,0.99,,18.87
+Sell,MIU250429C52500,MIU 250429 52.50 C,1.26,1,1.26,Filled,1@1.26,"Apr 1, 2025 13:12:00 HKT",Limit,Day,,,,,HK,HKD,,1,1.12,1.12,"Apr 1, 2025 13:12:05 HKT",HK,HKD,,,2.8,14.21,,,,,,,,,,,1.0,,18.01
+Buy,MIU250429C52500,MIU 250429 52.50 C,1.33,1,1.33,Filled,1@1.16,"Apr 1, 2025 13:11:11 HKT",Limit,Day,,,,,HK,HKD,,1,1.14,1.14,"Apr 1, 2025 13:11:11 HKT",HK,HKD,,,2.87,14.86,,,,,,,,,,,1.09,,18.82
+Sell,MIU250429P45000,MIU 250429 45.00 P,0.89,7,6.23,Filled,7@0.84,"Mar 31, 2025 14:48:21 HKT",Limit,Day,,,,,HK,HKD,,5,0.84,4.2,"Mar 31, 2025 14:48:21 HKT",HK,HKD,,,11.29,16.35,,,,,,,,,,,6.79,,34.43
+,,,,,,,,,,,,,,,,,,2,0.91,1.82,"Mar 31, 2025 14:48:21 HKT",HK,HKD,,,,,,,,,,,,,,,,,0.0
+Sell,MIU250429C50000,MIU 250429 50.00 C,2.34,1,2.34,Filled,1@2.32,"Mar 31, 2025 11:27:57 HKT",Limit,Day,,,,,HK,HKD,,1,2.35,2.35,"Mar 31, 2025 11:28:00 HKT",HK,HKD,,,4.74,14.15,,,,,,,,,,,1.04,,19.93
+Buy,MIU250429P45000,MIU 250429 45.00 P,0.96,5,4.8,Filled,5@0.99,"Mar 31, 2025 11:27:39 HKT",Limit,Day,,,,,HK,HKD,,5,1.03,5.15,"Mar 31, 2025 11:27:42 HKT",HK,HKD,,,8.66,14.41,,,,,,,,,,,4.52,,27.59
+Buy,MIU250429C50000,MIU 250429 50.00 C,2.59,1,2.59,Filled,1@2.43,"Mar 31, 2025 11:16:16 HKT",Limit,Day,,,,,HK,HKD,,1,2.54,2.54,"Mar 31, 2025 11:16:33 HKT",HK,HKD,,,4.41,13.84,,,,,,,,,,,0.96,,19.21
+Buy,MIU250429P45000,MIU 250429 45.00 P,0.91,2,1.82,Filled,2@0.87,"Mar 31, 2025 11:12:46 HKT",Limit,Day,,,,,HK,HKD,,2,0.98,1.96,"Mar 31, 2025 11:12:48 HKT",HK,HKD,,,3.8,15.85,,,,,,,,,,,1.88,,21.53
+Sell,TSLA250411P250000,TSLA 250411 250.00P,9.34,2,18.68,Filled,2@8.39,"Mar 28, 2025 11:37:46 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,8.82,17.64,"Mar 28, 2025 11:37:49 ET",US,USD,,,1.98,0.63,,0.03,0.04,0.33,0.05,0.01,,,,,,,3.07
+Sell,TSLA250516P220000,TSLA 250516 220.00P,9.81,1,9.81,Filled,1@9.48,"Mar 28, 2025 11:37:34 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,9.07,9.07,"Mar 28, 2025 11:37:37 ET",US,USD,,,2.03,0.32,,0.01,0.02,0.19,0.03,0.01,,,,,,,2.61
+Buy,TSLA250516P220000,TSLA 250516 220.00P,10.05,1,10.05,Filled,1@9.93,"Mar 28, 2025 10:44:40 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,10.26,10.26,"Mar 28, 2025 10:44:40 ET",US,USD,,,1.94,0.3,,0.01,0.02,0.18,,,,,,,,,2.45
+Sell,TSLA250328P250000,TSLA 250328 250.00P,0.51,4,2.04,Filled,4@0.58,"Mar 28, 2025 10:36:42 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,0.51,0.51,"Mar 28, 2025 10:36:43 ET",US,USD,,,2.39,1.09,,0.05,0.08,0.75,0.03,0.03,,,,,,,4.42
+,,,,,,,,,,,,,,,,,,2,0.56,1.12,"Mar 28, 2025 10:36:43 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,1,0.51,0.51,"Mar 28, 2025 10:36:43 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TSLA250411P250000,TSLA 250411 250.00P,10.02,1,10.02,Filled,1@11.23,"Mar 28, 2025 10:36:33 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,9.68,9.68,"Mar 28, 2025 10:36:33 ET",US,USD,,,1.85,0.3,,0.01,0.02,0.17,,,,,,,,,2.35
+Buy,TSLA250411P250000,TSLA 250411 250.00P,11.1,1,11.1,Filled,1@10.65,"Mar 28, 2025 10:35:41 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,11.33,11.33,"Mar 28, 2025 10:35:41 ET",US,USD,,,1.83,0.3,,0.01,0.02,0.2,,,,,,,,,2.36
+Sell,TSLA250328C250000,TSLA 250328 250.00C,13.53,1,13.53,Filled,1@11.94,"Mar 28, 2025 10:35:03 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,12.51,12.51,"Mar 28, 2025 10:35:04 ET",US,USD,,,2.04,0.28,,0.01,0.02,0.18,0.04,0.01,,,,,,,2.58
+Buy,TSLA250328P250000,TSLA 250328 250.00P,0.6,4,2.4,Filled,4@0.56,"Mar 28, 2025 10:34:42 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,4,0.63,2.52,"Mar 28, 2025 10:34:52 ET",US,USD,,,2.82,1.3,,0.05,0.07,0.66,,,,,,,,,4.9
+Buy,TSLA250328C250000,TSLA 250328 250.00C,13.79,1,13.79,Filled,1@12.54,"Mar 28, 2025 10:34:17 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,13.65,13.65,"Mar 28, 2025 10:34:18 ET",US,USD,,,2.19,0.31,,0.01,0.02,0.18,,,,,,,,,2.71
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,145,,Filled,144@9.48,"Mar 28, 2025 10:28:39 ET",Market,Day,,Regular Trading Hours,,,US,USD,,164,10.59,1736.76,"Mar 28, 2025 10:28:40 ET",US,USD,,,1.01,1.0,0.45,,,,0.04,0.02,,,,,,,2.52
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,151,,Failed,0@0.0,"Mar 28, 2025 10:28:23 ET",Market,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,92,,Filled,107@10.37,"Mar 28, 2025 10:28:09 ET",Market,Day,,Regular Trading Hours,,,US,USD,,96,10.67,1024.32,"Mar 28, 2025 10:28:09 ET",US,USD,,,0.9,1.06,0.27,,,,0.03,0.02,,,,,,,2.28
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,9.56,141,1347.96,Cancelled,0@0.0,"Mar 28, 2025 10:28:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,9.44,102,962.88,Filled,96@10.83,"Mar 28, 2025 10:17:55 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,93,11.29,1049.97,"Mar 28, 2025 10:17:55 ET",US,USD,,,1.02,0.93,0.28,,,,,,,,,,,,2.23
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.19,46,468.74,Filled,45@11.31,"Mar 28, 2025 10:00:50 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,48,11.32,543.36,"Mar 28, 2025 10:00:51 ET",US,USD,,,1.03,1.07,0.14,,,,,,,,,,,,2.24
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.25,100,1025.0,Filled,92@11.53,"Mar 28, 2025 09:49:19 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,92,10.98,1010.16,"Mar 28, 2025 09:49:21 ET",US,USD,,,1.05,1.06,0.31,,,,,,,,,,,,2.42
+Sell,GLD250516P270000,GLD 250516 270.00P,1.41,7,9.87,Filled,7@1.57,"Mar 28, 2025 09:48:48 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,7,1.5,10.5,"Mar 28, 2025 09:48:54 ET",US,USD,,,4.21,2.28,,0.09,0.15,1.3,0.03,0.02,,,,,,,8.08
+Sell,AMZN250815C205000,AMZN 250815 205.00C,14.77,1,14.77,Filled,1@14.83,"Mar 28, 2025 09:44:53 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,13.26,13.26,"Mar 28, 2025 09:44:57 ET",US,USD,,,1.88,0.31,,0.01,0.02,0.17,0.04,0.01,,,,,,,2.44
+Buy,AMZN250815C205000,AMZN 250815 205.00C,14.01,1,14.01,Filled,1@15.96,"Mar 28, 2025 09:40:08 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,16.4,16.4,"Mar 28, 2025 09:40:08 ET",US,USD,,,2.18,0.28,,0.01,0.02,0.17,,,,,,,,,2.66
+Buy,GLD250516P270000,GLD 250516 270.00P,2.16,1,2.16,Filled,1@2.18,"Mar 26, 2025 13:56:54 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,2.43,2.43,"Mar 26, 2025 13:56:55 ET",US,USD,,,2.1,0.31,,0.01,0.02,0.18,,,,,,,,,2.62
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,182,,Filled,207@11.8,"Mar 26, 2025 10:12:35 ET",Market,Day,,Regular Trading Hours,,,US,USD,,208,10.37,2156.96,"Mar 26, 2025 10:12:36 ET",US,USD,,,1.04,0.99,0.65,,,,0.06,0.03,,,,,,,2.77
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,11.62,198,2300.76,Filled,196@12.21,"Mar 26, 2025 10:03:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,214,10.47,2240.58,"Mar 26, 2025 10:03:05 ET",US,USD,,,1.05,1.04,0.59,,,,,,,,,,,,2.68
+Buy,GLD250516P270000,GLD 250516 270.00P,2.48,3,7.44,Filled,3@2.29,"Mar 26, 2025 09:58:34 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,3,2.48,7.44,"Mar 26, 2025 09:58:34 ET",US,USD,,,1.97,0.9,,0.04,0.06,0.55,,,,,,,,,3.52
+Sell,FBL,GraniteShares 2x Long META Daily ETF,Market Price,31,,Filled,30@32.12,"Mar 26, 2025 09:48:44 ET",Market,Day,,Regular Trading Hours,,,US,USD,,29,34.23,992.67,"Mar 26, 2025 09:48:44 ET",US,USD,,,0.93,0.9,0.1,,,,0.03,0.01,,,,,,,1.97
+Sell,PLTR,Palantir,Market Price,29,,Filled,29@98.62,"Mar 26, 2025 09:48:31 ET",Market,Day,,Regular Trading Hours,,,US,USD,,30,93.22,2796.6,"Mar 26, 2025 09:48:31 ET",US,USD,,,1.03,1.09,0.09,,,,0.08,0.01,,,,,,,2.3
+Sell,PLTR,Palantir,87.96,32,2814.72,Cancelled,0@0.0,"Mar 26, 2025 09:48:20 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLA,Tesla,Market Price,10,,Filled,11@304.43,"Mar 26, 2025 09:48:11 ET",Market,Day,,Regular Trading Hours,,,US,USD,,10,255.45,2554.5,"Mar 26, 2025 09:48:11 ET",US,USD,,,0.96,1.04,0.03,,,,0.08,0.01,,,,,,,2.12
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,102,,Filled,107@12.39,"Mar 26, 2025 09:48:01 ET",Market,Day,,Regular Trading Hours,,,US,USD,,105,12.3,1291.5,"Mar 26, 2025 09:48:01 ET",US,USD,,,0.92,1.02,0.28,,,,0.03,0.02,,,,,,,2.27
+Sell,PLTR,Palantir,Trigger MKT price,27,,Cancelled,0@0.0,"Mar 25, 2025 11:39:53 ET",Stop,Day,,Regular Trading Hours,94.2,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.84,97,1051.48,Filled,104@11.36,"Mar 25, 2025 11:05:40 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,96,11.18,1073.28,"Mar 25, 2025 11:05:44 ET",US,USD,,,1.07,0.92,0.31,,,,,,,,,,,,2.3
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,11.11,456,5066.16,Filled,526@11.13,"Mar 25, 2025 11:00:16 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,182,10.81,1967.42,"Mar 25, 2025 11:00:16 ET",US,USD,,,2.44,2.48,1.51,,,,0.16,0.07,,,,,,,6.66
+,,,,,,,,,,,,,,,,,,108,10.24,1105.92,"Mar 25, 2025 11:00:16 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,218,11.32,2467.76,"Mar 25, 2025 11:00:16 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,HIMS,Hims & Hers Health,35.94,44,1581.36,Filled,41@38.58,"Mar 25, 2025 10:24:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,40,33.13,1325.2,"Mar 25, 2025 10:24:45 ET",US,USD,,,0.98,0.91,0.12,,,,0.04,0.01,,,,,,,2.06
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.32,217,2239.44,Filled,219@10.47,"Mar 25, 2025 10:24:31 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,185,11.46,2120.1,"Mar 25, 2025 10:24:31 ET",US,USD,,,0.95,1.0,0.65,,,,,,,,,,,,2.6
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,10.71,274,2934.54,Filled,281@11.25,"Mar 25, 2025 10:15:05 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,300,10.24,3072.0,"Mar 25, 2025 10:15:06 ET",US,USD,,,1.53,1.55,0.92,,,,,,,,,,,,4.0
+Sell,TQQQ,ProShares UltraPro QQQ ETF,71.94,38,2733.72,Filled,33@62.21,"Mar 25, 2025 09:57:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,36,65.49,2357.64,"Mar 25, 2025 09:57:02 ET",US,USD,,,0.93,0.96,0.1,,,,0.06,0.01,,,,,,,2.06
+Buy,FBL,GraniteShares 2x Long META Daily ETF,37.09,27,1001.43,Filled,30@35.58,"Mar 25, 2025 09:56:03 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,30,35.32,1059.6,"Mar 25, 2025 09:56:03 ET",US,USD,,,0.93,1.02,0.08,,,,,,,,,,,,2.03
+Buy,HIMS,Hims & Hers Health,38.78,39,1512.42,Filled,39@37.74,"Mar 25, 2025 09:52:58 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,44,36.35,1599.4,"Mar 25, 2025 09:52:59 ET",US,USD,,,0.96,0.96,0.12,,,,,,,,,,,,2.04
+Sell,GOOGL,Alphabet-A,180.66,32,5781.12,Filled,28@171.53,"Mar 25, 2025 09:51:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,33,176.18,5813.94,"Mar 25, 2025 09:51:39 ET",US,USD,,,1.04,1.08,0.1,,,,0.15,0.01,,,,,,,2.38
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,11.13,21,233.73,Filled,19@10.21,"Mar 25, 2025 09:49:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,22,11.16,245.52,"Mar 25, 2025 09:49:39 ET",US,USD,,,0.95,0.96,0.06,,,,0.01,0.01,,,,,,,1.99
+Sell,PLTR,Palantir,93.33,44,4106.52,Filled,42@89.05,"Mar 25, 2025 09:49:18 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,29,96.94,2811.26,"Mar 25, 2025 09:49:19 ET",US,USD,,,1.06,0.94,0.13,,,,0.11,0.02,,,,,,,2.26
+,,,,,,,,,,,,,,,,,,10,87.71,877.1,"Mar 25, 2025 09:49:19 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,TQQQ,ProShares UltraPro QQQ ETF,60.02,15,900.3,Filled,14@64.24,"Mar 25, 2025 09:42:40 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,15,60.64,909.6,"Mar 25, 2025 09:42:50 ET",US,USD,,,1.07,0.96,0.05,,,,0.03,0.01,,,,,,,2.12
+Sell,GOOGL,Alphabet-A,163.92,10,1639.2,Filled,9@183.54,"Mar 25, 2025 09:42:18 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,157.36,1573.6,"Mar 25, 2025 09:54:46 ET",US,USD,,,1.0,0.96,0.03,,,,0.05,0.01,,,,,,,2.05
+Sell,PLTR,Palantir,102.56,33,3384.48,Filled,31@100.77,"Mar 25, 2025 09:42:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,31,99.91,3097.21,"Mar 25, 2025 09:42:10 ET",US,USD,,,0.9,0.99,0.09,,,,0.07,0.01,,,,,,,2.06
+Sell,GOOGL250718C185000,GOOGL 250718 185.00C,5.67,1,5.67,Filled,1@5.38,"Mar 25, 2025 09:35:27 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,5.48,5.48,"Mar 25, 2025 09:35:27 ET",US,USD,,,1.85,0.28,,0.01,0.02,0.17,0.01,0.01,,,,,,,2.35
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,12.13,21,254.73,Filled,19@11.75,"Mar 25, 2025 09:32:43 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,22,10.61,233.42,"Mar 25, 2025 09:32:43 ET",US,USD,,,0.95,0.93,0.06,,,,,,,,,,,,1.94
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,11.28,216,2436.48,Filled,193@10.83,"Mar 25, 2025 08:25:26 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,211,11.84,2498.24,"Mar 25, 2025 08:25:28 ET",US,USD,,,0.94,0.95,0.6,,,,0.06,0.03,,,,,,,2.58
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,11.8,195,2301.0,Filled,187@10.27,"Mar 25, 2025 06:43:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,181,11.21,2029.01,"Mar 25, 2025 06:43:11 ET",US,USD,,,0.96,0.9,0.55,,,,,,,,,,,,2.41
+Buy,GLD250516P270000,GLD 250516 270.00P,2.74,3,8.22,Filled,3@2.66,"Mar 24, 2025 10:56:23 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,3,2.68,8.04,"Mar 24, 2025 10:56:23 ET",US,USD,,,1.79,0.92,,0.04,0.06,0.59,,,,,,,,,3.4
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,103,,Filled,101@9.82,"Mar 24, 2025 10:38:30 ET",Market,Day,,Regular Trading Hours,,,US,USD,,95,10.21,969.95,"Mar 24, 2025 10:38:30 ET",US,USD,,,1.02,1.0,0.29,,,,0.03,0.02,,,,,,,2.36
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,11.07,101,1118.07,Filled,94@10.23,"Mar 24, 2025 10:29:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,91,11.4,1037.4,"Mar 24, 2025 10:29:45 ET",US,USD,,,0.97,0.94,0.32,,,,,,,,,,,,2.23
+Buy,GOOGL250718C185000,GOOGL 250718 185.00C,4.77,1,4.77,Filled,1@4.91,"Mar 24, 2025 09:53:39 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,4.66,4.66,"Mar 24, 2025 09:53:43 ET",US,USD,,,1.86,0.29,,0.01,0.02,0.2,,,,,,,,,2.38
+Buy,GOOGL250718C180000,GOOGL 250718 180.00C,5.38,1,5.38,Cancelled,0@0.0,"Mar 24, 2025 09:49:11 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,GOOGL250417C175000,GOOGL 250417 175.00C,1.28,3,3.84,Cancelled,0@0.0,"Mar 24, 2025 09:42:54 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,GOOGL250417C175000,GOOGL 250417 175.00C,1.27,3,3.81,Cancelled,0@0.0,"Mar 24, 2025 09:42:45 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,AAPL250404C227500,AAPL 250404 227.50C,1.39,8,11.12,Filled,8@1.51,"Mar 24, 2025 09:31:32 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,8,1.42,11.36,"Mar 24, 2025 09:31:46 ET",US,USD,,,4.7,2.31,,0.1,0.17,1.31,0.03,0.02,,,,,,,8.64
+Buy,TQQQ,ProShares UltraPro QQQ ETF,66.08,42,2775.36,Filled,40@70.13,"Mar 24, 2025 01:35:04 ET",Limit,Day,,24 Hour Trading,,,US,USD,,40,61.02,2440.8,"Mar 24, 2025 01:35:04 ET",US,USD,,,1.06,0.93,0.12,,,,,,,,,,,,2.11
+Sell,09988,BABA-W,128.69,378,48644.82,Filled,426@143.82,"Mar 24, 2025 10:54:22 HKT",Limit,Day,Allow,,,,HK,HKD,,410,135.88,55710.8,"Mar 24, 2025 10:54:22 HKT",HK,HKD,,,16.61,15.61,1.89,,,,,,56.51,2.93,1.45,0.08,,,95.08
+Sell,ALB250403P125000,ALB 250403 125.00 P,1.32,4,5.28,Filled,4@1.46,"Mar 24, 2025 10:28:05 HKT",Limit,Day,,,,,HK,HKD,,4,1.41,5.64,"Mar 24, 2025 10:42:59 HKT",HK,HKD,,,5.35,14.35,,,,,,,,,,,11.63,,31.33
+Buy,09988,BABA-W,Market Price,362,,Filled,396@141.92,"Mar 24, 2025 09:58:29 HKT",Market,Day,,,,,HK,HKD,,393,135.69,53326.17,"Mar 24, 2025 09:58:29 HKT",HK,HKD,,,16.46,14.23,2.11,,,,,,54.69,2.93,1.53,0.09,,,92.04
+Sell,09988,BABA-W,Market Price,672,,Filled,716@133.87,"Mar 24, 2025 09:57:22 HKT",Market,Day,,,,,HK,HKD,,728,118.82,86500.96,"Mar 24, 2025 09:57:22 HKT",HK,HKD,,,28.32,13.71,2.06,,,,,,91.15,4.69,2.28,0.15,,,142.36
+Buy,ALB250403P125000,ALB 250403 125.00 P,1.57,4,6.28,Filled,4@1.64,"Mar 24, 2025 09:56:06 HKT",Limit,Day,,,,,HK,HKD,,4,1.55,6.2,"Mar 24, 2025 09:56:32 HKT",HK,HKD,,,6.37,15.34,,,,,,,,,,,11.36,,33.07
+Buy,AAPL250404C227500,AAPL 250404 227.50C,0.72,2,1.44,Filled,2@0.84,"Mar 21, 2025 13:09:38 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,0.8,1.6,"Mar 21, 2025 13:11:02 ET",US,USD,,,1.95,0.58,,0.03,0.04,0.39,,,,,,,,,2.99
+Buy,AAPL250404C227500,AAPL 250404 227.50C,0.78,2,1.56,Filled,2@0.74,"Mar 21, 2025 12:26:40 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,0.69,1.38,"Mar 21, 2025 12:26:43 ET",US,USD,,,2.0,0.59,,0.03,0.04,0.35,,,,,,,,,3.01
+Buy,09988,BABA-W,118.97,532,63292.04,Filled,504@125.69,"Mar 21, 2025 13:04:30 HKT",Limit,Day,Allow,,,,HK,HKD,,191,126.18,24100.38,"Mar 21, 2025 13:04:40 HKT",HK,HKD,,,19.7,13.89,7.64,,,,,,75.28,3.58,1.77,0.1,,,121.96
+,,,,,,,,,,,,,,,,,,96,123.81,11885.76,"Mar 21, 2025 13:04:40 HKT",HK,HKD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,100,121.87,12187.0,"Mar 21, 2025 13:04:40 HKT",HK,HKD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,94,124.98,11748.12,"Mar 21, 2025 13:04:40 HKT",HK,HKD,,,,,,,,,,,,,,,,,0.0
+Buy,09988,BABA-W,128.32,95,12190.4,Filled,108@139.55,"Mar 21, 2025 11:59:21 HKT",Limit,Day,Allow,,,,HK,HKD,,106,126.59,13418.54,"Mar 21, 2025 11:59:22 HKT",HK,HKD,,,3.97,14.91,1.88,,,,,,14.26,0.73,0.32,0.02,,,36.09
+Sell,MIU250429P55000,MIU 250429 55.00 P,3.05,3,9.15,Filled,3@3.2,"Mar 21, 2025 10:47:17 HKT",Limit,Day,,,,,HK,HKD,,3,2.72,8.16,"Mar 21, 2025 10:47:17 HKT",HK,HKD,,,18.53,15.53,,,,,,,,,,,2.83,,36.89
+Buy,AAPL250404C227500,AAPL 250404 227.50C,0.9,3,2.7,Filled,3@0.9,"Mar 20, 2025 12:12:17 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,3,1.04,3.12,"Mar 20, 2025 12:12:21 ET",US,USD,,,1.92,0.83,,0.04,0.06,0.55,,,,,,,,,3.4
+Buy,TSLA,Tesla,239.02,11,2629.22,Filled,11@218.06,"Mar 20, 2025 11:57:12 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,217.28,2172.8,"Mar 20, 2025 11:57:12 ET",US,USD,,,1.02,0.91,0.03,,,,,,,,,,,,1.96
+Buy,GOOGL,Alphabet-A,151.32,42,6355.44,Filled,40@177.84,"Mar 20, 2025 09:55:41 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,43,159.3,6849.9,"Mar 20, 2025 09:55:54 ET",US,USD,,,0.91,0.99,0.12,,,,,,,,,,,,2.02
+Buy,AAPL250404C227500,AAPL 250404 227.50C,1.02,1,1.02,Filled,1@1.12,"Mar 20, 2025 09:43:28 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,1.07,1.07,"Mar 20, 2025 09:43:31 ET",US,USD,,,2.0,0.28,,0.01,0.02,0.2,,,,,,,,,2.51
+Buy,MIU250429P55000,MIU 250429 55.00 P,2.14,3,6.42,Filled,3@2.12,"Mar 20, 2025 13:12:46 HKT",Limit,Day,,,,,HK,HKD,,3,2.35,7.05,"Mar 20, 2025 13:12:55 HKT",HK,HKD,,,12.88,15.29,,,,,,,,,,,3.25,,31.42
+Sell,AAPL250502C230000,AAPL 250502 230.00C,4.49,2,8.98,Filled,2@4.76,"Mar 19, 2025 10:12:57 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,4.91,9.82,"Mar 19, 2025 10:13:00 ET",US,USD,,,2.12,0.61,,0.03,0.04,0.33,0.03,0.01,,,,,,,3.17
+Buy,PLTR,Palantir,80.25,53,4253.25,Filled,53@91.38,"Mar 18, 2025 12:22:35 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,52,90.38,4699.76,"Mar 18, 2025 12:22:53 ET",US,USD,,,0.92,1.07,0.16,,,,,,,,,,,,2.15
+Buy,PLTR,Palantir,82.24,54,4440.96,Filled,49@78.43,"Mar 18, 2025 12:22:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,53,77.88,4127.64,"Mar 18, 2025 12:22:09 ET",US,USD,,,1.06,1.04,0.15,,,,,,,,,,,,2.25
+Sell,TSLA250502P200000,TSLA 250502 200.00P,12.15,2,24.3,Filled,2@12.02,"Mar 18, 2025 12:05:39 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,12.39,24.78,"Mar 18, 2025 12:05:42 ET",US,USD,,,1.87,0.61,,0.03,0.04,0.38,0.06,0.01,,,,,,,3.0
+Buy,TSLA250502P200000,TSLA 250502 200.00P,11.12,1,11.12,Filled,1@12.03,"Mar 18, 2025 11:39:40 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,10.36,10.36,"Mar 18, 2025 11:39:41 ET",US,USD,,,1.98,0.29,,0.01,0.02,0.19,,,,,,,,,2.49
+Buy,AAPL250502C230000,AAPL 250502 230.00C,3.89,1,3.89,Filled,1@4.03,"Mar 18, 2025 10:09:31 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,3.34,3.34,"Mar 18, 2025 10:09:32 ET",US,USD,,,1.83,0.32,,0.01,0.02,0.17,,,,,,,,,2.35
+Buy,AAPL250502C230000,AAPL 250502 230.00C,3.95,1,3.95,Filled,1@3.44,"Mar 18, 2025 10:09:28 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,4.01,4.01,"Mar 18, 2025 10:09:28 ET",US,USD,,,2.02,0.31,,0.01,0.02,0.19,,,,,,,,,2.55
+Buy,TSLA250502P200000,TSLA 250502 200.00P,12.88,1,12.88,Filled,1@13.09,"Mar 18, 2025 10:01:12 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,14.53,14.53,"Mar 18, 2025 10:01:12 ET",US,USD,,,2.12,0.31,,0.01,0.02,0.18,,,,,,,,,2.64
+Sell,PLTR,Palantir,76.0,52,3952.0,Filled,46@75.58,"Mar 18, 2025 09:39:24 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,48,84.24,4043.52,"Mar 18, 2025 09:39:24 ET",US,USD,,,1.02,1.01,0.14,,,,0.13,0.01,,,,,,,2.31
+Sell,VIX250521P22000,VIX 250521 22.00P,3.75,2,7.5,Filled,2@4.2,"Mar 18, 2025 09:33:25 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,4.21,4.21,"Mar 18, 2025 09:33:28 ET",US,USD,,,2.0,0.66,,0.02,0.04,0.34,0.02,0.02,,,,,,,3.1
+,,,,,,,,,,,,,,,,,,1,4.32,4.32,"Mar 18, 2025 09:33:28 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,62.9,10,629.0,Filled,10@59.01,"Mar 18, 2025 07:51:58 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,61.38,552.42,"Mar 18, 2025 07:51:59 ET",US,USD,,,1.03,1.05,0.03,,,,,,,,,,,,2.11
+Buy,VIX250521P22000,VIX 250521 22.00P,4.34,2,8.68,Filled,2@3.86,"Mar 17, 2025 11:53:09 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,3.65,7.3,"Mar 17, 2025 11:55:35 ET",US,USD,,,1.89,0.6,,0.03,0.04,0.38,,,,,,,,,2.94
+Buy,PLTR,Palantir,83.51,47,3924.97,Filled,51@84.94,"Mar 17, 2025 11:15:56 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,52,77.84,4047.68,"Mar 17, 2025 11:15:56 ET",US,USD,,,0.96,0.93,0.14,,,,,,,,,,,,2.03
+Sell,VIX250521P22000,VIX 250521 22.00P,4.12,7,28.84,Filled,6@4.14,"Mar 17, 2025 10:33:46 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,7,3.86,27.02,"Mar 17, 2025 10:33:47 ET",US,USD,,,4.65,2.23,,0.09,0.15,1.3,0.08,0.02,,,,,,,8.52
+Sell,NVDA,NVIDIA,126.35,43,5433.05,Filled,40@123.22,"Mar 17, 2025 10:31:37 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,44,127.05,5590.2,"Mar 17, 2025 10:31:38 ET",US,USD,,,0.91,1.08,0.12,,,,0.12,0.01,,,,,,,2.24
+Buy,NVDA,NVIDIA,122.77,18,2209.86,Cancelled,0@0.0,"Mar 17, 2025 10:28:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,126.63,20,2532.6,Filled,20@126.67,"Mar 17, 2025 09:57:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,20,123.35,2467.0,"Mar 17, 2025 10:01:25 ET",US,USD,,,1.08,0.99,0.06,,,,,,,,,,,,2.13
+Sell,03690,MEITUAN-W,190.41,287,54647.67,Filled,305@181.72,"Mar 17, 2025 15:52:46 HKT",Limit,Day,Allow,,,,HK,HKD,,317,186.3,59057.1,"Mar 17, 2025 15:52:46 HKT",HK,HKD,,,14.8,14.87,1.97,,,,,,47.76,2.8,1.31,0.08,,,83.59
+Sell,03690,MEITUAN-W,166.73,106,17673.38,Filled,91@192.59,"Mar 17, 2025 10:37:37 HKT",Limit,Day,Allow,,,,HK,HKD,,104,192.29,19998.16,"Mar 17, 2025 10:37:49 HKT",HK,HKD,,,5.31,15.55,1.93,,,,,,19.69,1.04,0.45,0.03,,,44.0
+Sell,03690,MEITUAN-W,162.82,209,34029.38,Cancelled,0@0.0,"Mar 17, 2025 10:33:27 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,108.96,34,3704.64,Cancelled,0@0.0,"Mar 14, 2025 09:12:43 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,106.4,25,2660.0,Cancelled,0@0.0,"Mar 14, 2025 09:12:34 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA,NVIDIA,119.93,26,3118.18,Cancelled,0@0.0,"Mar 14, 2025 09:12:28 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA,NVIDIA,119.47,5,597.35,Filled,5@124.73,"Mar 14, 2025 07:26:50 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,108.24,541.2,"Mar 14, 2025 07:26:56 ET",US,USD,,,1.07,1.04,0.02,,,,0.02,0.01,,,,,,,2.16
+Buy,09988,BABA-W,123.61,96,11866.56,Cancelled,0@0.0,"Mar 14, 2025 15:04:26 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,03690,MEITUAN-W,179.07,371,66434.97,Cancelled,0@0.0,"Mar 14, 2025 14:46:14 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,03690,MEITUAN-W,183.81,206,37864.86,Filled,192@159.98,"Mar 14, 2025 14:25:12 HKT",Limit,Day,Allow,,,,HK,HKD,,185,186.42,34487.7,"Mar 14, 2025 14:25:13 HKT",HK,HKD,,,9.58,14.9,2.1,,,,,,36.09,1.83,0.94,0.05,,,65.49
+Buy,03690,MEITUAN-W,162.63,189,30737.07,Filled,211@172.03,"Mar 14, 2025 14:25:07 HKT",Limit,Day,Allow,,,,HK,HKD,,211,165.26,34869.86,"Mar 14, 2025 14:29:48 HKT",HK,HKD,,,11.08,14.2,1.82,,,,,,38.16,1.97,0.98,0.05,,,68.26
+Buy,NVDA,NVIDIA,116.45,23,2678.35,Cancelled,0@0.0,"Mar 13, 2025 13:15:23 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,SPY250321C565000,SPY 250321 565.00C,3.19,2,6.38,Failed,0@0.0,"Mar 13, 2025 12:49:17 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,SPY250321C565000,SPY 250321 565.00C,2.81,2,5.62,Filled,2@3.2,"Mar 13, 2025 12:49:16 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,3.16,3.16,"Mar 13, 2025 12:49:17 ET",US,USD,,,1.82,0.57,,0.02,0.04,0.35,0.02,0.02,,,,,,,2.84
+,,,,,,,,,,,,,,,,,,1,3.11,3.11,"Mar 13, 2025 12:49:17 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,SPY250321C565000,SPY 250321 565.00C,3.93,1,3.93,Filled,1@3.71,"Mar 13, 2025 11:44:01 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,3.61,3.61,"Mar 13, 2025 11:44:02 ET",US,USD,,,2.01,0.32,,0.01,0.02,0.18,,,,,,,,,2.54
+Buy,VIX250521P22000,VIX 250521 22.00P,3.83,1,3.83,Filled,1@3.42,"Mar 13, 2025 11:43:43 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,3.37,3.37,"Mar 13, 2025 11:54:13 ET",US,USD,,,2.16,0.31,,0.01,0.02,0.18,,,,,,,,,2.68
+Buy,NVDA,NVIDIA,106.66,26,2773.16,Filled,26@116.79,"Mar 13, 2025 10:13:52 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,27,112.02,3024.54,"Mar 13, 2025 10:14:03 ET",US,USD,,,0.97,1.08,0.08,,,,,,,,,,,,2.13
+Buy,NVDA,NVIDIA,101.74,20,2034.8,Cancelled,0@0.0,"Mar 13, 2025 08:13:26 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,SPY250321C565000,SPY 250321 565.00C,6.9,1,6.9,Filled,1@6.66,"Mar 12, 2025 13:38:02 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,6.93,6.93,"Mar 12, 2025 13:38:03 ET",US,USD,,,1.94,0.29,,0.01,0.02,0.18,,,,,,,,,2.44
+Sell,TQQQ,ProShares UltraPro QQQ ETF,63.66,67,4265.22,Filled,63@66.58,"Mar 12, 2025 12:47:15 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,56,57.4,3214.4,"Mar 12, 2025 12:47:22 ET",US,USD,,,1.03,1.04,0.2,,,,0.1,0.01,,,,,,,2.38
+Sell,PLTR,Palantir,90.63,11,996.93,Filled,11@86.83,"Mar 12, 2025 12:47:05 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,10,83.19,831.9,"Mar 12, 2025 12:47:05 ET",US,USD,,,1.05,1.03,0.03,,,,0.02,0.01,,,,,,,2.14
+Buy,VIX250521P22000,VIX 250521 22.00P,3.57,3,10.71,Filled,3@3.92,"Mar 12, 2025 12:43:43 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,3.32,3.32,"Mar 12, 2025 12:43:44 ET",US,USD,,,1.9,0.95,,0.03,0.06,0.54,,,,,,,,,3.48
+,,,,,,,,,,,,,,,,,,1,3.61,3.61,"Mar 12, 2025 12:43:44 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,1,3.89,3.89,"Mar 12, 2025 12:43:44 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,VIX250521P22000,VIX 250521 22.00P,3.75,3,11.25,Filled,3@3.64,"Mar 12, 2025 12:41:54 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,3.49,3.49,"Mar 12, 2025 12:43:49 ET",US,USD,,,1.81,0.97,,0.03,0.06,0.52,,,,,,,,,3.39
+,,,,,,,,,,,,,,,,,,1,3.76,3.76,"Mar 12, 2025 12:43:49 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,1,3.83,3.83,"Mar 12, 2025 12:43:49 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,TSLA250328P235000,TSLA 250328 235.00P,8.97,1,8.97,Filled,1@8.83,"Mar 12, 2025 12:36:49 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,10.42,10.42,"Mar 12, 2025 12:36:49 ET",US,USD,,,1.82,0.3,,0.01,0.02,0.19,0.03,0.01,,,,,,,2.38
+Sell,TSLA250328P235000,TSLA 250328 235.00P,10.23,1,10.23,Filled,1@9.92,"Mar 12, 2025 12:36:16 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,9.33,9.33,"Mar 12, 2025 12:36:24 ET",US,USD,,,1.91,0.27,,0.01,0.02,0.17,0.03,0.01,,,,,,,2.42
+Buy,TSLA250328P235000,TSLA 250328 235.00P,10.92,1,10.92,Filled,1@10.23,"Mar 12, 2025 12:21:36 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,9.9,9.9,"Mar 12, 2025 12:21:37 ET",US,USD,,,2.17,0.3,,0.01,0.02,0.17,,,,,,,,,2.67
+Sell,NVDL,GraniteShares 2x Long NVDA Daily ETF,39.66,73,2895.18,Filled,79@46.63,"Mar 12, 2025 12:12:25 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,76,40.54,3081.04,"Mar 12, 2025 12:12:25 ET",US,USD,,,1.08,0.97,0.24,,,,0.09,0.01,,,,,,,2.39
+Buy,TSLA250328P235000,TSLA 250328 235.00P,14.13,1,14.13,Filled,1@13.17,"Mar 12, 2025 11:20:25 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,13.67,13.67,"Mar 12, 2025 11:20:29 ET",US,USD,,,1.83,0.3,,0.01,0.02,0.18,,,,,,,,,2.34
+Buy,TQQQ,ProShares UltraPro QQQ ETF,66.88,15,1003.2,Filled,15@62.58,"Mar 12, 2025 09:39:01 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,14,65.67,919.38,"Mar 12, 2025 09:39:02 ET",US,USD,,,1.03,0.93,0.05,,,,,,,,,,,,2.01
+Buy,TQQQ,ProShares UltraPro QQQ ETF,63.57,16,1017.12,Filled,14@58.84,"Mar 12, 2025 09:38:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,15,64.26,963.9,"Mar 12, 2025 09:40:28 ET",US,USD,,,1.0,1.05,0.05,,,,,,,,,,,,2.1
+Sell,SGOV,iShares 0-3 Month Treasury Bond ETF,92.84,62,5756.08,Filled,69@94.31,"Mar 12, 2025 08:35:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,59,93.96,5543.64,"Mar 12, 2025 08:41:09 ET",US,USD,,,0.93,1.02,0.22,,,,0.19,0.01,,,,,,,2.37
+Sell,TSLA250321P215000,TSLA 250321 215.00P,10.53,2,21.06,Filled,2@10.18,"Mar 11, 2025 11:13:49 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,10.12,20.24,"Mar 11, 2025 11:13:49 ET",US,USD,,,2.0,0.56,,0.03,0.04,0.37,0.05,0.01,,,,,,,3.06
+Buy,TSLA250321P215000,TSLA 250321 215.00P,13.26,2,26.52,Filled,2@13.43,"Mar 11, 2025 10:52:06 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,12.54,25.08,"Mar 11, 2025 10:52:10 ET",US,USD,,,1.89,0.55,,0.03,0.04,0.33,,,,,,,,,2.84
+Sell,TSLA250417C240000,TSLA 250417 240.00C,Market Price,1,,Filled,1@20.55,"Mar 11, 2025 10:23:18 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,19.65,19.65,"Mar 11, 2025 10:23:18 ET",US,USD,,,2.04,0.32,,0.01,0.02,0.17,0.05,0.01,,,,,,,2.62
+Buy,TSLA250417C240000,TSLA 250417 240.00C,19.78,1,19.78,Filled,1@20.6,"Mar 11, 2025 10:08:56 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,21.46,21.46,"Mar 11, 2025 10:08:57 ET",US,USD,,,1.86,0.32,,0.01,0.02,0.16,,,,,,,,,2.37
+Sell,TSLA250417C240000,TSLA 250417 240.00C,Market Price,1,,Filled,1@17.58,"Mar 11, 2025 10:05:00 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,19.05,19.05,"Mar 11, 2025 10:05:00 ET",US,USD,,,2.09,0.29,,0.01,0.02,0.16,0.05,0.01,,,,,,,2.63
+Buy,TSLA250417C240000,TSLA 250417 240.00C,21.34,1,21.34,Filled,1@22.63,"Mar 11, 2025 09:51:58 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,23.49,23.49,"Mar 11, 2025 09:52:14 ET",US,USD,,,1.96,0.31,,0.01,0.02,0.19,,,,,,,,,2.49
+Sell,TSM,Taiwan Semiconductor,Market Price,28,,Filled,30@164.12,"Mar 10, 2025 10:47:28 ET",Market,Day,,Regular Trading Hours,,,US,USD,,32,172.06,5505.92,"Mar 10, 2025 10:47:28 ET",US,USD,,,0.91,1.06,0.09,,,,0.15,0.01,,,,,,,2.22
+Sell,TSM250417C220000,TSM 250417 220.00C,0.67,6,4.02,Filled,6@0.71,"Mar 10, 2025 10:47:10 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,0.71,0.71,"Mar 10, 2025 10:47:13 ET",US,USD,,,4.01,1.81,,0.07,0.11,1.18,0.05,0.05,,,,,,,7.28
+,,,,,,,,,,,,,,,,,,2,0.71,1.42,"Mar 10, 2025 10:47:13 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,1,0.74,0.74,"Mar 10, 2025 10:47:13 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,1,0.71,0.71,"Mar 10, 2025 10:47:13 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,1,0.64,0.64,"Mar 10, 2025 10:47:13 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,SGOV,iShares 0-3 Month Treasury Bond ETF,100.56,61,6134.16,Filled,60@102.84,"Mar 10, 2025 09:05:00 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,64,91.77,5873.28,"Mar 10, 2025 09:05:00 ET",US,USD,,,0.96,0.98,0.2,,,,,,,,,,,,2.14
+Sell,MIU250328P52500,MIU 250328 52.50 P,2.82,2,5.64,Filled,2@2.81,"Mar 10, 2025 11:30:37 HKT",Limit,Day,,,,,HK,HKD,,2,2.89,5.78,"Mar 10, 2025 11:30:37 HKT",HK,HKD,,,11.58,14.74,,,,,,,,,,,1.94,,28.26
+Sell,MIU250328P52500,MIU 250328 52.50 P,2.88,2,5.76,Filled,2@2.75,"Mar 7, 2025 15:35:15 HKT",Limit,Day,,,,,HK,HKD,,2,2.58,5.16,"Mar 7, 2025 15:35:17 HKT",HK,HKD,,,11.12,15.36,,,,,,,,,,,2.04,,28.52
+Buy,MIU250328P52500,MIU 250328 52.50 P,2.7,4,10.8,Filled,4@2.58,"Mar 7, 2025 14:01:34 HKT",Limit,Day,,,,,HK,HKD,,4,2.43,9.72,"Mar 7, 2025 14:01:48 HKT",HK,HKD,,,21.88,15.14,,,,,,,,,,,4.27,,41.29
+Buy,09988,BABA-W,129.05,92,11872.6,Filled,101@136.21,"Mar 7, 2025 10:56:18 HKT",Limit,Day,Allow,,,,HK,HKD,,97,127.57,12374.29,"Mar 7, 2025 10:56:19 HKT",HK,HKD,,,3.92,16.42,1.93,,,,,,13.51,0.81,0.41,0.02,,,37.02
+Sell,MSTU,T-Rex 2X Long MSTR Daily Target ETF,6.98,731,5102.38,Filled,674@6.3,"Mar 6, 2025 21:46:43 ET",Limit,Day,,Overnight Trading,,,US,USD,,700,6.4,4480.0,"Mar 6, 2025 21:46:54 ET",US,USD,,,3.21,3.42,1.97,,,,0.13,0.11,,,,,,,8.84
+Sell,MSTU,T-Rex 2X Long MSTR Daily Target ETF,7.75,281,2177.75,Filled,270@7.17,"Mar 6, 2025 10:44:13 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,324,7.27,2355.48,"Mar 6, 2025 10:44:13 ET",US,USD,,,1.44,1.45,0.93,,,,0.06,0.05,,,,,,,3.93
+Buy,MSTU,T-Rex 2X Long MSTR Daily Target ETF,7.0,477,3339.0,Filled,472@6.87,"Mar 6, 2025 09:35:42 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,230,6.5,1495.0,"Mar 6, 2025 09:35:42 ET",US,USD,,,2.37,2.66,1.45,,,,,,,,,,,,6.48
+,,,,,,,,,,,,,,,,,,269,5.98,1608.62,"Mar 6, 2025 09:35:42 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,44.62,26,1160.12,Filled,25@45.75,"Mar 6, 2025 05:08:26 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,27,45.68,1233.36,"Mar 6, 2025 05:08:41 ET",US,USD,,,0.92,1.02,0.08,,,,,,,,,,,,2.02
+Buy,MSTU,T-Rex 2X Long MSTR Daily Target ETF,6.0,510,3060.0,Filled,463@6.36,"Mar 5, 2025 10:07:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,545,5.56,3030.2,"Mar 5, 2025 10:07:05 ET",US,USD,,,2.69,2.64,1.45,,,,,,,,,,,,6.78
+Buy,PLTR,Palantir,90.9,11,999.9,Filled,11@86.12,"Mar 5, 2025 10:06:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,93.09,837.81,"Mar 5, 2025 10:06:44 ET",US,USD,,,0.98,0.99,0.03,,,,,,,,,,,,2.0
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,50.42,47,2369.74,Filled,49@44.34,"Mar 5, 2025 02:16:32 ET",Limit,Day,,Overnight Trading,,,US,USD,,50,49.41,2470.5,"Mar 5, 2025 02:16:34 ET",US,USD,,,0.96,1.06,0.16,,,,,,,,,,,,2.18
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,147,,Filled,141@10.31,"Mar 4, 2025 10:01:32 ET",Market,Day,,Regular Trading Hours,,,US,USD,,134,11.28,1511.52,"Mar 4, 2025 10:01:32 ET",US,USD,,,0.95,1.01,0.45,,,,0.04,0.02,,,,,,,2.47
+Sell,TSLA,Tesla,Market Price,46,,Filled,45@283.9,"Mar 4, 2025 10:01:17 ET",Market,Day,,Regular Trading Hours,,,US,USD,,47,266.11,12507.17,"Mar 4, 2025 10:01:18 ET",US,USD,,,1.09,0.95,0.13,,,,0.35,0.01,,,,,,,2.53
+Buy,TSM250417C220000,TSM 250417 220.00C,1.23,1,1.23,Filled,1@1.2,"Mar 3, 2025 12:24:01 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,1.28,1.28,"Mar 3, 2025 12:24:01 ET",US,USD,,,1.92,0.31,,0.01,0.02,0.18,,,,,,,,,2.44
+Sell,TSLA250417C320000,TSLA 250417 320.00C,19.85,1,19.85,Filled,1@17.81,"Mar 3, 2025 11:49:08 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,18.9,18.9,"Mar 3, 2025 11:49:09 ET",US,USD,,,1.94,0.27,,0.01,0.02,0.19,0.05,0.01,,,,,,,2.49
+Buy,TSLA250417C320000,TSLA 250417 320.00C,16.32,1,16.32,Filled,1@14.83,"Mar 3, 2025 10:00:15 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,17.15,17.15,"Mar 3, 2025 10:00:15 ET",US,USD,,,2.1,0.33,,0.01,0.02,0.17,,,,,,,,,2.63
+Buy,TSM,Taiwan Semiconductor,Market Price,14,,Filled,14@164.26,"Feb 28, 2025 10:35:20 ET",Market,Day,,Regular Trading Hours,,,US,USD,,14,196.15,2746.1,"Feb 28, 2025 10:35:20 ET",US,USD,,,0.98,1.01,0.05,,,,,,,,,,,,2.04
+Buy,TSM,Taiwan Semiconductor,Market Price,16,,Filled,15@164.75,"Feb 28, 2025 10:35:14 ET",Market,Day,,Regular Trading Hours,,,US,USD,,15,179.97,2699.55,"Feb 28, 2025 10:35:15 ET",US,USD,,,1.03,1.0,0.05,,,,,,,,,,,,2.08
+Sell,02097,MIXUEGROUP,250.17,90,22515.3,Filled,102@246.83,"Feb 28, 2025 16:57:46 HKT",Futu Grey MKT,Day,,,,,HK,HKD,,96,267.19,25650.24,"Feb 28, 2025 17:10:19 HKT",HK,HKD,,,7.71,15.28,1.99,,,,,,27.2,1.43,0.74,0.04,,,54.39
+Sell,02097,MIXUEGROUP,256.65,109,27974.85,Failed,0@0.0,"Feb 28, 2025 16:57:37 HKT",Futu Grey MKT,Day,,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,MIU250328P50000,MIU 250328 50.00 P,2.69,2,5.38,Cancelled,0@0.0,"Feb 28, 2025 10:45:20 HKT",Limit,Day,,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,MIU250328P50000,MIU 250328 50.00 P,2.96,2,5.92,Filled,2@3.35,"Feb 28, 2025 09:55:23 HKT",Limit,Day,,,,,HK,HKD,,2,3.19,6.38,"Feb 28, 2025 09:55:49 HKT",HK,HKD,,,12.56,14.89,,,,,,,,,,,2.06,,29.51
+Buy,MIU250328P50000,MIU 250328 50.00 P,3.11,2,6.22,Filled,2@2.94,"Feb 28, 2025 09:39:27 HKT",Limit,Day,,,,,HK,HKD,,2,2.81,5.62,"Feb 28, 2025 09:39:30 HKT",HK,HKD,,,10.97,15.17,,,,,,,,,,,1.85,,27.99
+Sell,MIU250328P50000,MIU 250328 50.00 P,2.8,5,14.0,Filled,5@2.62,"Feb 28, 2025 09:35:24 HKT",Limit,Day,,,,,HK,HKD,,5,2.62,13.1,"Feb 28, 2025 09:36:55 HKT",HK,HKD,,,27.7,15.97,,,,,,,,,,,4.79,,48.46
+Sell,01810,XIAOMI-W,49.26,"1,000",,Filled,"1,000@53.80","Feb 27, 2025 14:09:10 HKT",Limit,Day,Allow,,,,HK,HKD,,"1,000",50.04,,"Feb 27, 2025 14:09:10 HKT",HK,HKD,,,17.52,14.03,2.16,,,,,,56.53,2.91,1.48,0.08,,,94.71
+Buy,MIU250328P50000,MIU 250328 50.00 P,2.69,5,13.45,Filled,5@2.43,"Feb 27, 2025 14:08:57 HKT",Limit,Day,,,,,HK,HKD,,5,2.28,11.4,"Feb 27, 2025 14:09:03 HKT",HK,HKD,,,23.77,16.37,,,,,,,,,,,5.21,,45.35
+Buy,01810,XIAOMI-W,Market Price,"1,000",,Filled,"1,000@54.05","Feb 27, 2025 14:07:02 HKT",Market,Day,,,,,HK,HKD,,"1,000",49.76,,"Feb 27, 2025 14:07:02 HKT",HK,HKD,,,17.72,13.71,1.86,,,,,,60.03,3.01,1.46,0.09,,,97.88
+Sell,01810,XIAOMI-W,Market Price,"2,200",,Filled,"2,200@51.95","Feb 27, 2025 13:11:52 HKT",Market,Day,,,,,HK,HKD,,"2,200",56.1,,"Feb 27, 2025 13:11:52 HKT",HK,HKD,,,33.93,13.83,2.49,,,,,,116.59,6.99,3.16,0.17,,,177.16
+Buy,01810,XIAOMI-W,49.53,"2,200",,Filled,"2,200@52.20","Feb 27, 2025 11:40:58 HKT",Limit,Day,Allow,,,,HK,HKD,,"2,200",50.57,,"Feb 27, 2025 11:41:03 HKT",HK,HKD,,,33.74,15.94,2.28,,,,,,108.36,6.46,3.39,0.18,,,170.35
+Sell,01810,XIAOMI-W,Market Price,"2,600",,Filled,"2,600@51.40","Feb 27, 2025 11:34:59 HKT",Market,Day,,,,,HK,HKD,,"2,600",53.6,,"Feb 27, 2025 11:34:59 HKT",HK,HKD,,,41.9,15.81,2.61,,,,,,121.9,7.02,3.51,0.2,,,192.95
+Buy,TSM250417C220000,TSM 250417 220.00C,4.02,1,4.02,Filled,1@4.27,"Feb 24, 2025 11:28:47 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,4.05,4.05,"Feb 24, 2025 11:28:47 ET",US,USD,,,2.18,0.29,,0.01,0.02,0.18,,,,,,,,,2.68
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,17.7,9,159.3,Filled,10@16.6,"Feb 24, 2025 10:13:17 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,16.19,145.71,"Feb 24, 2025 10:13:18 ET",US,USD,,,1.01,1.0,0.03,,,,,,,,,,,,2.04
+Buy,TSLA,Tesla,325.43,22,7159.46,Filled,20@334.15,"Feb 24, 2025 07:32:56 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,22,316.64,6966.08,"Feb 24, 2025 07:32:56 ET",US,USD,,,0.99,1.03,0.06,,,,,,,,,,,,2.08
+Buy,TSLA,Tesla,303.6,12,3643.2,Filled,12@335.35,"Feb 21, 2025 13:15:03 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,13,331.03,4303.39,"Feb 21, 2025 14:34:43 ET",US,USD,,,1.09,0.92,0.04,,,,,,,,,,,,2.05
+Buy,TSM250417C220000,TSM 250417 220.00C,5.78,2,11.56,Filled,2@5.78,"Feb 21, 2025 11:43:24 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,5.33,10.66,"Feb 21, 2025 11:43:25 ET",US,USD,,,1.91,0.64,,0.02,0.04,0.33,,,,,,,,,2.94
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,17.87,68,1215.16,Filled,74@19.52,"Feb 21, 2025 10:47:39 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,6,19.17,115.02,"Feb 21, 2025 10:47:53 ET",US,USD,,,0.95,1.08,0.23,,,,0.05,0.03,,,,,,,2.34
+,,,,,,,,,,,,,,,,,,7,17.78,124.46,"Feb 21, 2025 10:47:53 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+,,,,,,,,,,,,,,,,,,53,18.59,985.27,"Feb 21, 2025 10:47:53 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,CONL,GraniteShares 2x Long COIN Daily ETF,Market Price,116,,Filled,107@34.58,"Feb 21, 2025 10:43:34 ET",Market,Day,,Regular Trading Hours,,,US,USD,,97,32.99,3200.03,"Feb 21, 2025 10:43:34 ET",US,USD,,,0.93,1.08,0.33,,,,0.11,0.03,,,,,,,2.48
+,,,,,,,,,,,,,,,,,,16,33.86,541.76,"Feb 21, 2025 10:43:34 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,CONL,GraniteShares 2x Long COIN Daily ETF,34.22,78,2669.16,Filled,79@33.95,"Feb 21, 2025 09:54:41 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,86,35.1,3018.6,"Feb 21, 2025 09:54:41 ET",US,USD,,,1.06,1.03,0.22,,,,,,,,,,,,2.31
+Buy,TSM250417C220000,TSM 250417 220.00C,6.25,2,12.5,Filled,2@6.09,"Feb 21, 2025 09:49:46 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,6.02,12.04,"Feb 21, 2025 09:49:54 ET",US,USD,,,1.8,0.54,,0.02,0.04,0.33,,,,,,,,,2.73
+Buy,CONL,GraniteShares 2x Long COIN Daily ETF,36.65,30,1099.5,Filled,33@39.63,"Feb 21, 2025 08:20:45 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,27,40.03,1080.81,"Feb 21, 2025 08:20:46 ET",US,USD,,,1.05,0.93,0.09,,,,,,,,,,,,2.07
+Buy,CONL,GraniteShares 2x Long COIN Daily ETF,41.03,5,205.15,Filled,5@37.05,"Feb 21, 2025 08:15:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,39.25,196.25,"Feb 21, 2025 08:15:46 ET",US,USD,,,1.03,0.93,0.02,,,,,,,,,,,,1.98
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,20.59,184,3788.56,Filled,189@19.72,"Feb 20, 2025 10:16:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,107,18.05,1931.35,"Feb 20, 2025 10:16:11 ET",US,USD,,,0.95,1.01,0.56,,,,,,,,,,,,2.52
+,,,,,,,,,,,,,,,,,,105,18.16,1906.8,"Feb 20, 2025 10:16:11 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,18.82,197,3707.54,Cancelled,0@0.0,"Feb 20, 2025 10:15:06 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TQQQ,ProShares UltraPro QQQ ETF,79.03,20,1580.6,Filled,18@85.26,"Feb 20, 2025 10:08:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,18,90.67,1632.06,"Feb 20, 2025 10:08:09 ET",US,USD,,,1.0,0.98,0.06,,,,,,,,,,,,2.04
+Sell,TSM250417C220000,TSM 250417 220.00C,5.77,2,11.54,Filled,2@4.99,"Feb 20, 2025 10:05:44 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,5.07,10.14,"Feb 20, 2025 10:05:54 ET",US,USD,,,2.01,0.61,,0.02,0.04,0.38,0.03,0.01,,,,,,,3.1
+Sell,TSLL,Direxion Daily TSLA Bull 2X Shares,Market Price,195,,Filled,195@18.78,"Feb 20, 2025 10:02:04 ET",Market,Day,,Regular Trading Hours,,,US,USD,,171,20.18,3450.78,"Feb 20, 2025 10:02:04 ET",US,USD,,,1.07,0.94,0.54,,,,0.1,0.03,,,,,,,2.68
+Buy,TSM250417C220000,TSM 250417 220.00C,5.55,2,11.1,Filled,2@6.0,"Feb 19, 2025 10:04:03 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,6.24,12.48,"Feb 19, 2025 10:04:04 ET",US,USD,,,1.85,0.62,,0.02,0.04,0.38,,,,,,,,,2.91
+Sell,TSM250417P220000,TSM 250417 220.00P,25.63,1,25.63,Filled,1@26.91,"Feb 19, 2025 10:03:18 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,26.55,26.55,"Feb 19, 2025 10:03:35 ET",US,USD,,,1.81,0.29,,0.01,0.02,0.19,0.07,0.01,,,,,,,2.4
+Buy,TSM250417P220000,TSM 250417 220.00P,23.35,1,23.35,Filled,1@24.35,"Feb 18, 2025 10:11:35 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,25.15,25.15,"Feb 18, 2025 10:11:35 ET",US,USD,,,1.93,0.3,,0.01,0.02,0.17,,,,,,,,,2.43
+Sell,BIDU250919P70000,BIDU 250919 70.00P,3.26,1,3.26,Filled,1@3.3,"Feb 18, 2025 09:47:27 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,3.0,3.0,"Feb 18, 2025 09:51:30 ET",US,USD,,,1.85,0.32,,0.01,0.02,0.19,0.01,0.01,,,,,,,2.41
+Sell,BIDU250404P87000,BIDU 250404 87.00P,4.36,3,13.08,Filled,3@4.0,"Feb 18, 2025 09:43:38 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,3,4.27,12.81,"Feb 18, 2025 09:45:04 ET",US,USD,,,1.94,0.86,,0.04,0.06,0.54,0.04,0.01,,,,,,,3.49
+Buy,BIDU250404P87000,BIDU 250404 87.00P,2.25,1,2.25,Cancelled,0@0.0,"Feb 14, 2025 13:40:18 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,19.5,65,1267.5,Filled,61@18.26,"Feb 14, 2025 12:32:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,65,18.14,1179.1,"Feb 14, 2025 12:32:03 ET",US,USD,,,1.01,1.09,0.17,,,,,,,,,,,,2.27
+Buy,BIDU250404P87000,BIDU 250404 87.00P,2.77,1,2.77,Filled,1@2.55,"Feb 14, 2025 11:54:20 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,2.54,2.54,"Feb 14, 2025 12:03:01 ET",US,USD,,,1.88,0.3,,0.01,0.02,0.17,,,,,,,,,2.38
+Sell,VIX250219C19000,VIX 250219 19.00C,0.13,20,2.6,Filled,21@0.15,"Feb 14, 2025 11:53:39 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,20,0.15,3.0,"Feb 14, 2025 12:43:38 ET",US,USD,,,13.81,6.58,,0.23,0.41,3.49,0.01,0.06,,,,,,,24.59
+Buy,TSLL,Direxion Daily TSLA Bull 2X Shares,18.67,112,2091.04,Filled,120@19.28,"Feb 14, 2025 11:39:25 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,125,20.55,2568.75,"Feb 14, 2025 11:39:31 ET",US,USD,,,0.91,0.97,0.35,,,,,,,,,,,,2.23
+Sell,TCH250227P400000,TCH 250227 400.00 P,1.14,25,28.5,Filled,28@1.1,"Feb 14, 2025 11:38:25 HKT",Limit,Day,,,,,HK,HKD,,6,1.08,6.48,"Feb 14, 2025 11:39:37 HKT",HK,HKD,,,5.61,13.77,,,,,,,,,,,85.17,,104.55
+,,,,,,,,,,,,,,,,,,22,1.12,24.64,"Feb 14, 2025 11:39:37 HKT",HK,HKD,,,,,,,,,,,,,,,,,0.0
+Buy,BIDU250404P87000,BIDU 250404 87.00P,2.63,2,5.26,Filled,2@2.94,"Feb 13, 2025 11:18:03 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,2.98,5.96,"Feb 13, 2025 11:33:29 ET",US,USD,,,2.16,0.54,,0.02,0.04,0.39,,,,,,,,,3.15
+Buy,TSLA,Tesla,362.2,13,4708.6,Filled,12@355.11,"Feb 13, 2025 11:03:36 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,11,342.82,3771.02,"Feb 13, 2025 11:03:37 ET",US,USD,,,1.04,1.1,0.04,,,,,,,,,,,,2.18
+Buy,BIDU250919P70000,BIDU 250919 70.00P,2.39,2,4.78,Cancelled,0@0.0,"Feb 13, 2025 11:01:44 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLA,Tesla,351.64,15,5274.6,Filled,15@349.91,"Feb 13, 2025 10:02:30 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,14,341.16,4776.24,"Feb 13, 2025 10:02:30 ET",US,USD,,,1.03,0.98,0.05,,,,0.15,0.01,,,,,,,2.22
+Sell,TSLA250417C370000,TSLA 250417 370.00C,24.73,1,24.73,Filled,1@23.42,"Feb 13, 2025 10:01:39 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,26.56,26.56,"Feb 13, 2025 10:01:40 ET",US,USD,,,2.11,0.28,,0.01,0.02,0.18,0.07,0.01,,,,,,,2.68
+Buy,VIX250219C19000,VIX 250219 19.00C,0.3,19,5.7,Filled,18@0.3,"Feb 13, 2025 09:43:11 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,18,0.31,5.58,"Feb 13, 2025 09:43:12 ET",US,USD,,,12.15,5.75,,0.23,0.4,3.93,,,,,,,,,22.46
+Sell,01810,XIAOMI-W,40.0,"1,600",,Failed,0@0.0,"Feb 13, 2025 16:00:25 HKT",Limit,Day,Allow,,,,HK,HKD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TCH250227P400000,TCH 250227 400.00 P,2.21,21,46.41,Filled,19@1.99,"Feb 13, 2025 15:56:00 HKT",Limit,Day,,,,,HK,HKD,,20,2.19,43.8,"Feb 13, 2025 15:56:00 HKT",HK,HKD,,,9.03,14.61,,,,,,,,,,,64.0,,87.64
+Buy,TCH250227P400000,TCH 250227 400.00 P,1.91,4,7.64,Filled,4@2.09,"Feb 13, 2025 15:51:12 HKT",Limit,Day,,,,,HK,HKD,,4,2.13,8.52,"Feb 13, 2025 15:51:13 HKT",HK,HKD,,,3.11,15.15,,,,,,,,,,,12.42,,30.68
+Buy,TCH250227P400000,TCH 250227 400.00 P,1.9,2,3.8,Filled,2@1.89,"Feb 13, 2025 15:50:37 HKT",Limit,Day,,,,,HK,HKD,,2,2.1,4.2,"Feb 13, 2025 15:50:38 HKT",HK,HKD,,,3.05,13.66,,,,,,,,,,,6.28,,22.99
+Sell,PLTR250228P100000,PLTR 250228 100.00P,0.95,2,1.9,Filled,2@1.08,"Feb 12, 2025 13:40:20 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,2,1.07,2.14,"Feb 12, 2025 13:40:23 ET",US,USD,,,2.15,0.62,,0.02,0.04,0.33,0.01,0.01,,,,,,,3.18
+Sell,TSLA250314C380000,TSLA 250314 380.00C,8.73,3,26.19,Filled,3@9.28,"Feb 12, 2025 13:36:32 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,9.37,9.37,"Feb 12, 2025 13:37:02 ET",US,USD,,,2.03,0.96,,0.03,0.06,0.53,0.07,0.02,,,,,,,3.7
+,,,,,,,,,,,,,,,,,,2,9.59,19.18,"Feb 12, 2025 13:37:02 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,TSLA250417C370000,TSLA 250417 370.00C,Trigger MKT price,1,,Cancelled,0@0.0,"Feb 12, 2025 12:48:37 ET",Market-If-Touched,Day,,Regular Trading Hours,23.8,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,TSLA250314C380000,TSLA 250314 380.00C,Market Price,3,,Failed,0@0.0,"Feb 12, 2025 12:48:06 ET",Market-If-Touched,Day,,Regular Trading Hours,9.0,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,PLTR250228P100000,PLTR 250228 100.00P,1.07,1,1.07,Filled,1@1.08,"Feb 12, 2025 10:52:05 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,1.14,1.14,"Feb 12, 2025 10:52:05 ET",US,USD,,,1.91,0.29,,0.01,0.02,0.19,0.01,0.01,,,,,,,2.44
+Buy,TSLA,Tesla,334.59,15,5018.85,Cancelled,0@0.0,"Feb 12, 2025 09:36:27 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLA250314C380000,TSLA 250314 380.00C,8.0,2,16.0,Filled,2@6.7,"Feb 12, 2025 09:31:02 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,7.21,7.21,"Feb 12, 2025 09:31:06 ET",US,USD,,,2.08,0.64,,0.02,0.04,0.35,,,,,,,,,3.13
+,,,,,,,,,,,,,,,,,,1,7.21,7.21,"Feb 12, 2025 09:31:06 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TSLA250314C380000,TSLA 250314 380.00C,6.93,2,13.86,Cancelled,0@0.0,"Feb 12, 2025 09:30:39 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Buy,TSLA250314C380000,TSLA 250314 380.00C,6.56,1,6.56,Cancelled,0@0.0,"Feb 12, 2025 09:30:21 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDL,GraniteShares 2x Long NVDA Daily ETF,56.89,18,1024.02,Filled,18@57.91,"Feb 12, 2025 09:20:00 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,17,53.42,908.14,"Feb 12, 2025 09:21:43 ET",US,USD,,,1.01,1.07,0.06,,,,0.04,0.02,,,,,,,2.2
+,,,,,,,,,,,,,,,,,,2,53.82,107.64,"Feb 12, 2025 09:20:07 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA,NVIDIA,135.95,5,679.75,Filled,5@133.48,"Feb 12, 2025 09:19:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,141.76,708.8,"Feb 12, 2025 09:19:47 ET",US,USD,,,0.91,0.95,0.02,,,,0.02,0.01,,,,,,,1.91
+Sell,AAPL,Apple,253.51,11,2788.61,Filled,9@234.8,"Feb 12, 2025 09:19:31 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,230.81,2077.29,"Feb 12, 2025 09:19:31 ET",US,USD,,,0.9,1.04,0.03,,,,0.06,0.01,,,,,,,2.04
+Sell,TCH250214P410000,TCH 250214 410.00 P,0.3,3,0.9,Filled,3@0.29,"Feb 12, 2025 13:08:34 HKT",Limit,Day,,,,,HK,HKD,,3,0.28,0.84,"Feb 12, 2025 13:08:35 HKT",HK,HKD,,,3.16,14.68,,,,,,,,,,,9.53,,27.37
+Sell,NVDL,GraniteShares 2x Long NVDA Daily ETF,56.73,26,1474.98,Filled,23@64.76,"Feb 11, 2025 12:26:33 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,25,55.02,1375.5,"Feb 11, 2025 12:26:33 ET",US,USD,,,0.96,0.96,0.07,,,,0.04,0.01,,,,,,,2.04
+Sell,NVDA,NVIDIA,122.06,5,610.3,Filled,5@134.35,"Feb 11, 2025 12:26:10 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,121.44,607.2,"Feb 11, 2025 12:26:24 ET",US,USD,,,1.05,0.98,0.02,,,,0.02,0.01,,,,,,,2.08
+Buy,PLTR250228P100000,PLTR 250228 100.00P,1.4,3,4.2,Filled,3@1.56,"Feb 11, 2025 12:23:19 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,3,1.59,4.77,"Feb 11, 2025 12:23:20 ET",US,USD,,,1.96,0.88,,0.04,0.05,0.52,,,,,,,,,3.45
+Buy,TSLA,Tesla,326.9,16,5230.4,Filled,15@330.76,"Feb 11, 2025 09:41:54 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,15,318.15,4772.25,"Feb 11, 2025 09:41:54 ET",US,USD,,,1.06,1.01,0.05,,,,,,,,,,,,2.12
+Buy,TSLA250417C370000,TSLA 250417 370.00C,22.09,1,22.09,Filled,1@23.16,"Feb 11, 2025 09:32:36 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,24.67,24.67,"Feb 11, 2025 09:32:37 ET",US,USD,,,2.14,0.31,,0.01,0.02,0.18,,,,,,,,,2.66
+Buy,TCH250214P410000,TCH 250214 410.00 P,0.82,3,2.46,Filled,3@0.98,"Feb 11, 2025 15:19:35 HKT",Limit,Day,,,,,HK,HKD,,3,0.97,2.91,"Feb 11, 2025 15:19:35 HKT",HK,HKD,,,2.84,14.92,,,,,,,,,,,9.54,,27.3
+Sell,00700,TENCENT,429.92,12,5159.04,Filled,12@455.21,"Feb 11, 2025 14:58:28 HKT",Odd Lot,Day,,,,,HK,HKD,,14,459.77,6436.78,"Feb 11, 2025 15:09:19 HKT",HK,HKD,,,3.09,14.06,1.83,,,,,,6.17,0.29,0.16,0.01,,,25.61
+Buy,ASTS,AST SpaceMobile,25.3,50,1265.0,Cancelled,0@0.0,"Feb 10, 2025 10:09:27 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,BIDU,Baidu,101.82,29,2952.78,Filled,31@98.48,"Feb 10, 2025 10:02:54 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,28,84.4,2363.2,"Feb 10, 2025 10:19:09 ET",US,USD,,,1.01,0.98,0.1,,,,0.08,0.01,,,,,,,2.18
+Buy,TSLA250314C380000,TSLA 250314 380.00C,12.33,1,12.33,Filled,1@11.2,"Feb 10, 2025 09:43:23 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,11.57,11.57,"Feb 10, 2025 09:43:24 ET",US,USD,,,1.8,0.33,,0.01,0.02,0.18,,,,,,,,,2.34
+Sell,TSLA,Tesla,Market Price,5,,Filled,5@350.67,"Feb 7, 2025 11:14:57 ET",Market,Day,,Regular Trading Hours,,,US,USD,,5,387.6,1938.0,"Feb 7, 2025 11:14:58 ET",US,USD,,,1.04,1.07,0.02,,,,0.05,0.01,,,,,,,2.19
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,58.72,15,880.8,Filled,16@54.67,"Feb 7, 2025 10:29:01 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,14,52.28,731.92,"Feb 7, 2025 10:29:01 ET",US,USD,,,0.97,0.93,0.05,,,,,,,,,,,,1.95
+Sell,TSLA250307C395000,TSLA 250307 395.00C,Market Price,1,,Filled,1@12.12,"Feb 7, 2025 10:20:04 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,11.61,11.61,"Feb 7, 2025 10:20:04 ET",US,USD,,,1.91,0.33,,0.01,0.02,0.16,0.03,0.01,,,,,,,2.47
+Sell,NVDA,NVIDIA,Market Price,10,,Filled,9@125.87,"Feb 7, 2025 10:19:48 ET",Market,Day,,Regular Trading Hours,,,US,USD,,10,120.12,1201.2,"Feb 7, 2025 10:19:48 ET",US,USD,,,0.9,1.03,0.03,,,,0.04,0.01,,,,,,,2.01
+Sell,NVDL,GraniteShares 2x Long NVDA Daily ETF,Market Price,27,,Filled,28@52.55,"Feb 7, 2025 10:19:34 ET",Market,Day,,Regular Trading Hours,,,US,USD,,32,59.58,1906.56,"Feb 7, 2025 10:19:34 ET",US,USD,,,1.0,0.93,0.1,,,,0.05,0.01,,,,,,,2.09
+Sell,BIDU,Baidu,83.7,30,2511.0,Filled,32@90.61,"Feb 7, 2025 10:08:42 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,31,95.44,2958.64,"Feb 7, 2025 10:08:42 ET",US,USD,,,0.92,0.91,0.09,,,,0.08,0.01,,,,,,,2.01
+Sell,TSLA250307P395000,TSLA 250307 395.00P,31.51,1,31.51,Filled,1@27.29,"Feb 7, 2025 09:51:46 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,31.16,31.16,"Feb 7, 2025 09:51:51 ET",US,USD,,,1.99,0.27,,0.01,0.02,0.18,0.08,0.01,,,,,,,2.56
+Buy,TSLA250307C395000,TSLA 250307 395.00C,Market Price,1,,Filled,1@14.28,"Feb 7, 2025 09:51:26 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,13.39,13.39,"Feb 7, 2025 09:51:27 ET",US,USD,,,1.88,0.31,,0.01,0.02,0.19,,,,,,,,,2.41
+Buy,TSLA250307P395000,TSLA 250307 395.00P,Market Price,1,,Filled,1@25.96,"Feb 7, 2025 09:49:21 ET",Market,Day,,Regular Trading Hours,,,US,USD,,1,28.24,28.24,"Feb 7, 2025 09:49:22 ET",US,USD,,,1.81,0.3,,0.01,0.02,0.17,,,,,,,,,2.31
+Sell,SOXL,Direxion Daily Semiconductor Bull 3x Shares ETF,27.72,22,609.84,Filled,21@27.79,"Feb 7, 2025 09:47:04 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,18,27.27,490.86,"Feb 7, 2025 09:47:53 ET",US,USD,,,1.04,0.99,0.06,,,,0.02,0.01,,,,,,,2.12
+Buy,TSLA,Tesla,405.48,5,2027.4,Filled,5@375.99,"Feb 7, 2025 09:46:08 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,390.64,1953.2,"Feb 7, 2025 09:46:08 ET",US,USD,,,0.97,1.1,0.02,,,,,,,,,,,,2.09
+Buy,BIDU250919P70000,BIDU 250919 70.00P,3.55,1,3.55,Filled,1@3.57,"Feb 6, 2025 11:33:53 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,3.32,3.32,"Feb 6, 2025 13:43:44 ET",US,USD,,,1.97,0.28,,0.01,0.02,0.19,,,,,,,,,2.47
+Sell,NVDA,NVIDIA,Market Price,10,,Filled,11@134.34,"Feb 5, 2025 12:11:36 ET",Market,Day,,Regular Trading Hours,,,US,USD,,10,123.07,1230.7,"Feb 5, 2025 12:11:36 ET",US,USD,,,1.01,1.03,0.03,,,,0.03,0.01,,,,,,,2.11
+Sell,NVDL,GraniteShares 2x Long NVDA Daily ETF,Market Price,21,,Filled,21@54.02,"Feb 5, 2025 12:11:22 ET",Market,Day,,Regular Trading Hours,,,US,USD,,21,50.2,1054.2,"Feb 5, 2025 12:11:22 ET",US,USD,,,0.99,0.98,0.06,,,,0.03,0.01,,,,,,,2.07
+Sell,NVDL,GraniteShares 2x Long NVDA Daily ETF,52.24,22,1149.28,Cancelled,0@0.0,"Feb 5, 2025 12:10:49 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,YINN,Direxion Daily FTSE China Bull 3X Shares ETF,32.93,56,1844.08,Filled,61@32.47,"Feb 4, 2025 11:00:55 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,58,34.99,2029.42,"Feb 4, 2025 11:00:58 ET",US,USD,,,0.93,0.99,0.18,,,,0.06,0.01,,,,,,,2.17
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,46.15,14,646.1,Filled,14@49.52,"Feb 4, 2025 10:11:58 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,16,48.73,779.68,"Feb 4, 2025 10:11:59 ET",US,USD,,,0.95,1.06,0.05,,,,,,,,,,,,2.06
+Sell,NVDA250214C120000,NVDA 250214 120.00C,Market Price,2,,Filled,2@6.04,"Feb 4, 2025 10:08:54 ET",Market,Day,,Regular Trading Hours,,,US,USD,,2,5.74,11.48,"Feb 4, 2025 10:08:55 ET",US,USD,,,1.95,0.61,,0.02,0.04,0.36,0.03,0.01,,,,,,,3.02
+Buy,NVDA250214C120000,NVDA 250214 120.00C,4.01,2,8.02,Filled,2@4.29,"Feb 4, 2025 09:49:01 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,4.22,4.22,"Feb 4, 2025 09:49:13 ET",US,USD,,,1.84,0.59,,0.02,0.04,0.33,,,,,,,,,2.82
+,,,,,,,,,,,,,,,,,,1,4.66,4.66,"Feb 4, 2025 09:49:13 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,TSLA,Tesla,408.62,10,4086.2,Cancelled,0@0.0,"Feb 4, 2025 09:11:11 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0
+Sell,NVDA250207C120000,NVDA 250207 120.00C,Market Price,2,,Filled,2@1.78,"Feb 3, 2025 09:34:27 ET",Stop,Day,,Regular Trading Hours,1.7,,US,USD,,1,1.69,1.69,"Feb 3, 2025 09:46:52 ET",US,USD,,,1.82,0.56,,0.02,0.04,0.38,0.02,0.02,,,,,,,2.86
+,,,,,,,,,,,,,,,,,,1,1.81,1.81,"Feb 3, 2025 09:46:52 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,NVDA250207C120000,NVDA 250207 120.00C,2.34,1,2.34,Filled,1@2.41,"Feb 3, 2025 09:30:32 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,2.26,2.26,"Feb 3, 2025 09:30:33 ET",US,USD,,,2.02,0.3,,0.01,0.02,0.18,,,,,,,,,2.53
+Buy,NVDA250207C120000,NVDA 250207 120.00C,2.45,1,2.45,Filled,1@2.13,"Feb 3, 2025 09:30:26 ET",Limit,Day,,Regular Trading Hours,,,US,USD,,1,2.51,2.51,"Feb 3, 2025 09:30:30 ET",US,USD,,,1.81,0.3,,0.01,0.02,0.17,,,,,,,,,2.31
+Buy,AAPL,Apple,224.37,10,2243.7,Filled,10@216.67,"Feb 3, 2025 09:26:00 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,6,251.1,1506.6,"Feb 3, 2025 09:26:00 ET",US,USD,,,0.97,0.99,0.03,,,,,,,,,,,,1.99
+,,,,,,,,,,,,,,,,,,4,227.17,908.68,"Feb 3, 2025 09:26:00 ET",US,USD,,,,,,,,,,,,,,,,,0.0
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,41.47,5,207.35,Filled,5@43.36,"Feb 3, 2025 08:48:07 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,43.34,216.7,"Feb 3, 2025 08:48:08 ET",US,USD,,,0.91,0.97,0.02,,,,,,,,,,,,1.9
+Buy,TQQQ,ProShares UltraPro QQQ ETF,80.28,5,401.4,Filled,5@76.74,"Feb 3, 2025 04:50:05 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,76.32,381.6,"Feb 3, 2025 04:50:05 ET",US,USD,,,0.99,0.94,0.02,,,,,,,,,,,,1.95
+Buy,NVDA,NVIDIA,104.92,11,1154.12,Filled,9@120.02,"Feb 3, 2025 04:28:02 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,9,115.83,1042.47,"Feb 3, 2025 07:20:04 ET",US,USD,,,1.04,1.02,0.03,,,,,,,,,,,,2.09
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,42.73,5,213.65,Filled,5@46.66,"Feb 3, 2025 04:26:00 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,50.22,251.1,"Feb 3, 2025 04:26:00 ET",US,USD,,,0.92,1.02,0.02,,,,,,,,,,,,1.96
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,49.3,5,246.5,Filled,5@41.6,"Jan 31, 2025 23:26:44 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,49.07,245.35,"Feb 3, 2025 04:02:32 ET",US,USD,,,0.92,1.07,0.02,,,,,,,,,,,,2.01
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,50.43,5,252.15,Filled,5@54.46,"Jan 31, 2025 13:39:20 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,55.65,278.25,"Jan 31, 2025 13:39:22 ET",US,USD,,,1.0,0.95,0.02,,,,,,,,,,,,1.97
+Buy,NVDA,NVIDIA,137.35,5,686.75,Filled,5@121.56,"Jan 31, 2025 12:42:56 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,115.96,579.8,"Jan 31, 2025 12:42:56 ET",US,USD,,,0.99,1.0,0.02,,,,,,,,,,,,2.01
+Buy,NVDA,NVIDIA,115.39,5,576.95,Filled,5@128.71,"Jan 31, 2025 12:42:46 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,118.67,593.35,"Jan 31, 2025 12:47:04 ET",US,USD,,,1.02,0.98,0.02,,,,,,,,,,,,2.02
+Buy,NVDA,NVIDIA,131.66,5,658.3,Filled,5@133.93,"Jan 31, 2025 11:44:55 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,128.58,642.9,"Jan 31, 2025 11:44:56 ET",US,USD,,,0.93,1.01,0.02,,,,,,,,,,,,1.96
+Buy,NVDA,NVIDIA,128.89,5,644.45,Filled,5@122.66,"Jan 31, 2025 10:40:59 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,135.48,677.4,"Jan 31, 2025 10:41:00 ET",US,USD,,,1.01,0.97,0.02,,,,,,,,,,,,2.0
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,51.93,5,259.65,Filled,5@50.72,"Jan 28, 2025 09:35:38 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,49.48,247.4,"Jan 28, 2025 09:35:39 ET",US,USD,,,1.04,1.1,0.02,,,,,,,,,,,,2.16
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,44.98,20,899.6,Filled,21@46.7,"Jan 27, 2025 11:40:00 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,18,43.74,787.32,"Jan 27, 2025 11:40:01 ET",US,USD,,,0.94,1.01,0.06,,,,,,,,,,,,2.01
+Buy,NVDL,GraniteShares 2x Long NVDA Daily ETF,54.28,18,977.04,Filled,21@53.85,"Jan 27, 2025 10:26:23 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,22,57.78,1271.16,"Jan 27, 2025 10:26:24 ET",US,USD,,,0.91,1.04,0.06,,,,,,,,,,,,2.01
+Buy,TQQQ,ProShares UltraPro QQQ ETF,74.23,5,371.15,Filled,5@75.7,"Jan 27, 2025 05:58:00 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,5,80.14,400.7,"Jan 27, 2025 05:58:00 ET",US,USD,,,1.04,0.92,0.02,,,,,,,,,,,,1.98
+Buy,TQQQ,ProShares UltraPro QQQ ETF,73.77,5,368.85,Cancelled,0@0.0,"Jan 27, 2025 05:57:09 ET",Limit,Day,,RTH + Pre/Post-Mkt,,,US,USD,,,,,,,,,,,,,,,,,,,,,,,,0.0

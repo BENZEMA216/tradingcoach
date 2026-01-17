@@ -35,7 +35,7 @@ import { useTaskStorage } from '@/hooks/useTaskStorage';
 type PageState = 'upload' | 'error';
 
 export function LandingUpload() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const notification = useNotification();
@@ -52,6 +52,7 @@ export function LandingUpload() {
   const [darkMode, setDarkMode] = useState(() =>
     document.documentElement.classList.contains('dark')
   );
+  const [isLoadingSample, setIsLoadingSample] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasNotified = useRef(false);
 
@@ -170,6 +171,47 @@ export function LandingUpload() {
         file: selectedFile,
         userEmail: email.trim() || undefined,
       });
+    }
+  };
+
+  // Handle sample data loading
+  const handleUseSampleData = async () => {
+    setIsLoadingSample(true);
+    try {
+      // Select sample file based on current language
+      const lang = i18n.language?.startsWith('zh') ? 'zh' : 'en';
+      const fileName = lang === 'zh'
+        ? 'sample_trades_zh.csv'
+        : 'sample_trades_en.csv';
+
+      // Fetch sample data from public directory
+      const response = await fetch(`/sample-data/${fileName}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch sample data: ${response.status}`);
+      }
+      const blob = await response.blob();
+
+      // Convert to File object
+      const file = new File([blob], fileName, { type: 'text/csv' });
+
+      // Create task using existing API
+      const result = await taskApi.create(file, undefined, true);
+
+      // Save to localStorage
+      saveTask({
+        taskId: result.task_id,
+        fileName: fileName,
+        createdAt: new Date().toISOString(),
+        status: 'running',
+      });
+
+      // Navigate to analysis page
+      navigate(`/analysis/${result.task_id}`);
+    } catch (error) {
+      console.error('Failed to load sample data:', error);
+      setPageState('error');
+    } finally {
+      setIsLoadingSample(false);
     }
   };
 
@@ -451,6 +493,33 @@ export function LandingUpload() {
                     </p>
                   </div>
                 )}
+
+                {/* Sample Data Section */}
+                <div className="text-center pt-6 border-t border-white/10 mt-6">
+                  <p className="text-white/40 text-sm mb-4 font-mono uppercase tracking-wider">
+                    {t('landing.noDataYet', '没有交易数据？')}
+                  </p>
+                  <button
+                    onClick={handleUseSampleData}
+                    disabled={isLoadingSample || createTaskMutation.isPending}
+                    className="px-6 py-3 bg-white/5 border border-white/20 text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-sm font-mono text-sm uppercase tracking-widest flex items-center justify-center space-x-2 mx-auto transition-colors"
+                  >
+                    {isLoadingSample ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>{t('landing.loadingSample', '加载中...')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FileSpreadsheet className="w-4 h-4" />
+                        <span>{t('landing.useSampleData', '使用示例数据体验')}</span>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-white/30 text-xs mt-2 font-mono">
+                    {t('landing.sampleDataDesc', '约1700条真实交易记录（已脱敏）')}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
