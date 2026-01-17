@@ -81,6 +81,11 @@ export default {
     viewResults: '查看分析结果',
     viewStatistics: '查看统计分析',
     redirecting: '正在跳转到分析结果...',
+    // Sample data
+    noDataYet: '没有交易数据？',
+    useSampleData: '使用示例数据体验',
+    loadingSample: '加载中...',
+    sampleDataDesc: '约1700条真实交易记录（已脱敏）',
     // Email and notification options
     emailLabel: '邮箱通知（可选）',
     emailPlaceholder: 'your@email.com',
@@ -513,7 +518,7 @@ export default {
     keyMetrics: '关键指标',
     insightsOverview: '洞察概览',
     type: '类型',
-    category: '维度',
+    categoryLabel: '维度',
     totalTrades: '总交易数',
     problems: '待改进',
     strengths: '优势',

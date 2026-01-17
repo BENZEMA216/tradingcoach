@@ -81,6 +81,11 @@ export default {
     viewResults: 'View Analysis Results',
     viewStatistics: 'View Statistics',
     redirecting: 'Redirecting to analysis results...',
+    // Sample data
+    noDataYet: 'No trading data?',
+    useSampleData: 'Try with Sample Data',
+    loadingSample: 'Loading...',
+    sampleDataDesc: '~1700 real trades (anonymized)',
     // Email and notification options
     emailLabel: 'Email Notification (Optional)',
     emailPlaceholder: 'your@email.com',
@@ -513,7 +518,7 @@ export default {
     keyMetrics: 'Key Metrics',
     insightsOverview: 'Insights Overview',
     type: 'Type',
-    category: 'Category',
+    categoryLabel: 'Category',
     totalTrades: 'Total Trades',
     problems: 'Problems',
     strengths: 'Strengths',
