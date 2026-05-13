@@ -4,7 +4,7 @@ import { Globe } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [expandUp, setExpandUp] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -49,7 +49,7 @@ export function LanguageSwitcher() {
                    bg-black hover:bg-white/10
                    text-white border border-white/10
                    transition-colors"
-        aria-label="Select language"
+        aria-label={t('common.selectLanguage', 'Select language')}
       >
         <Globe className="w-3 h-3 text-white/50" />
         <span className="hidden sm:inline">{currentLanguage.flag}</span>

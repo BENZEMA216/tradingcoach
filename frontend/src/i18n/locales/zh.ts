@@ -12,6 +12,7 @@ export default {
     filter: '筛选',
     reset: '重置',
     refresh: '刷新',
+    selectLanguage: '选择语言',
     all: '全部',
     yes: '是',
     no: '否',

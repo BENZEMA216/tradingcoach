@@ -41,6 +41,24 @@ import clsx from 'clsx';
 
 type PeriodType = 'all' | 'week' | 'month' | 'quarter' | 'year';
 
+// Backend ships English period labels (e.g. "1-3 Days"). Map to zh strings
+// when language is Chinese. Keys must match backend buckets in
+// backend/app/api/v1/endpoints/statistics.py.
+const HOLDING_PERIOD_LABELS_ZH: Record<string, string> = {
+  'Same Day': '当日',
+  '1-3 Days': '1-3 天',
+  '4-7 Days': '4-7 天',
+  '1-2 Weeks': '1-2 周',
+  '2-4 Weeks': '2-4 周',
+  '1-3 Months': '1-3 月',
+  '3+ Months': '3+ 月',
+};
+
+function translateHoldingPeriodLabel(label: string, isZh: boolean): string {
+  if (!isZh) return label;
+  return HOLDING_PERIOD_LABELS_ZH[label] ?? label;
+}
+
 
 function getDateRange(type: PeriodType, offset: number = 0): { start: Date | null; end: Date | null } {
   if (type === 'all') return { start: null, end: null };
@@ -745,7 +763,7 @@ export function Statistics() {
                   <tbody className="divide-y divide-white/5">
                     {byHolding.map((item) => (
                       <tr key={item.period_label} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3 font-mono text-sm font-medium text-white">{item.period_label}</td>
+                        <td className="px-4 py-3 font-mono text-sm font-medium text-white">{translateHoldingPeriodLabel(item.period_label, isZh)}</td>
                         <td className="px-4 py-3 text-right font-mono text-sm text-white/60">{item.count}</td>
                         <td className={clsx('px-4 py-3 text-right font-mono text-sm font-medium', item.total_pnl > 0 ? 'text-green-500' : 'text-red-500')}>
                           {formatCurrency(item.total_pnl)}

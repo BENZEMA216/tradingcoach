@@ -12,6 +12,7 @@ export default {
     filter: 'Filter',
     reset: 'Reset',
     refresh: 'Refresh',
+    selectLanguage: 'Select language',
     all: 'All',
     yes: 'Yes',
     no: 'No',

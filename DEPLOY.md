@@ -108,6 +108,45 @@ npx vercel --prod
 
 ## 生产环境配置
 
+### ⚠️ 必须配置的安全环境变量
+
+部署到 Railway / Fly / VPS 等任何对外服务前，**这些环境变量必须设置**，否则会暴露严重安全风险：
+
+```bash
+# 1) 关闭 DEBUG（隐藏 /api/v1/docs 公开 OpenAPI 暴露）
+DEBUG=false
+
+# 2) 锁定 CORS：必须显式列出你的前端真实域名（逗号分隔多个）
+#    切勿包含 "*"，与 allow_credentials=True 同用会让任意网站
+#    代用户调用 DELETE /system/data/reset 等敏感端点
+CORS_ORIGINS=https://tradingcoach.vercel.app
+
+# 3) 设置 ADMIN_TOKEN：保护 DELETE /api/v1/system/data/reset
+#    配置后该端点除 X-Confirm-Reset header 外还要求匹配的 X-Admin-Token
+ADMIN_TOKEN=<openssl rand -hex 32>
+```
+
+**验证生产配置是否正确**：
+
+```bash
+# A) 任意来源不应该被 CORS 接受
+curl -i -X OPTIONS \
+  -H "Origin: https://evil.example.com" \
+  -H "Access-Control-Request-Method: DELETE" \
+  https://your-backend/api/v1/system/data/reset
+# 应该返回 400 / 缺失 access-control-allow-origin
+
+# B) 交互式 Swagger UI 不应该公开（openapi.json 保留供 SDK/客户端）
+curl -o /dev/null -w "/docs %{http_code}\n" https://your-backend/api/v1/docs
+# 应该返回 404
+curl -o /dev/null -w "/openapi.json %{http_code}\n" https://your-backend/api/v1/openapi.json
+# 应该 200（SDK 客户端需要）
+
+# C) 无 token 调用 reset 应该 403
+curl -o /dev/null -w "%{http_code}\n" -X DELETE https://your-backend/api/v1/system/data/reset
+# 应该返回 403
+```
+
 ### HTTPS 配置
 
 使用 Caddy 自动获取 SSL 证书：

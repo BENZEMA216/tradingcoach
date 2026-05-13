@@ -10,7 +10,8 @@ pos: 后端配置层 - 通过 pydantic-settings 解析
 
 import os
 from pathlib import Path
-from pydantic_settings import BaseSettings
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 
 # 计算本地默认数据库路径
@@ -31,36 +32,35 @@ _DEFAULT_ALLOWED_ORIGINS = [
 ]
 
 
-def _parse_cors_env() -> List[str]:
-    """从 CORS_ORIGINS 环境变量解析逗号分隔的来源列表。
-
-    生产部署（Railway/Vercel）通过环境变量传入实际域名，例如：
-        CORS_ORIGINS=https://tradingcoach.vercel.app,https://tc-staging.vercel.app
-    """
-    raw = os.getenv("CORS_ORIGINS", "")
-    if not raw:
-        return []
-    return [o.strip() for o in raw.split(",") if o.strip()]
-
-
 class Settings(BaseSettings):
     APP_NAME: str = "Trading Coach"
     APP_VERSION: str = "0.5.0"
     API_V1_PREFIX: str = "/api/v1"
 
-    # 显式来源列表 — 不再使用 "*"。
-    # 任何 "*" 与 allow_credentials=True 同用都是 CORS 规范禁止的组合，
-    # 并且会让任意网站调用 DELETE /system/data/reset 等敏感端点。
-    CORS_ORIGINS: List[str] = _DEFAULT_ALLOWED_ORIGINS + _parse_cors_env()
+    # 接受逗号分隔字符串，避免 pydantic 把 env 值当 JSON 数组解析。
+    # 生产部署示例：CORS_ORIGINS=https://tradingcoach.vercel.app,https://...
+    # 不要使用 "*"（与 allow_credentials=True 同用会让任意网站借 cookie
+    # 调用敏感端点，例如 DELETE /system/data/reset）。
+    CORS_ORIGINS_RAW: str = Field(default="", alias="CORS_ORIGINS")
 
     # 从环境变量读取，默认使用本地项目路径
     DATABASE_URL: str = os.getenv("DATABASE_URL", _DEFAULT_DB_URL)
     DEBUG: bool = False
 
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
-        extra = "ignore"  # Ignore extra env vars like API keys
+    model_config = SettingsConfigDict(
+        case_sensitive=True,
+        env_file=".env",
+        extra="ignore",
+        populate_by_name=True,
+    )
+
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        """返回合并后的来源白名单：默认 localhost + env 传入的真实域名。"""
+        env_origins = [
+            o.strip() for o in self.CORS_ORIGINS_RAW.split(",") if o.strip()
+        ]
+        return _DEFAULT_ALLOWED_ORIGINS + env_origins
 
 
 settings = Settings()
