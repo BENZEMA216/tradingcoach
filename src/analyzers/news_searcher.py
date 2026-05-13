@@ -303,7 +303,7 @@ class NewsSearcher:
                     news_date = datetime.strptime(result['date'], '%Y-%m-%d').date()
                 else:
                     news_date = result['date']
-            except:
+            except Exception:
                 pass
 
         # 计算相关性
@@ -371,7 +371,7 @@ class NewsSearcher:
                     relevance += 0.2
                 elif days_diff <= 3:
                     relevance += 0.1
-            except:
+            except Exception:
                 pass
 
         # 来源权重

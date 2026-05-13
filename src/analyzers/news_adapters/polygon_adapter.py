@@ -100,7 +100,7 @@ class PolygonAdapter(NewsAdapter):
                 if "published_utc" in item:
                     try:
                         date_str = item["published_utc"][:10]
-                    except:
+                    except Exception:
                         pass
 
                 results.append(self._normalize_result({
@@ -171,5 +171,5 @@ class PolygonAdapter(NewsAdapter):
                 timeout=10
             )
             return response.status_code == 200
-        except:
+        except Exception:
             return False

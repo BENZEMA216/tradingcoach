@@ -13,7 +13,7 @@ def check_port(host, port):
         result = sock.connect_ex((host, port))
         sock.close()
         return result == 0
-    except:
+    except Exception:
         return False
 
 def test_proxy(proxy_url):

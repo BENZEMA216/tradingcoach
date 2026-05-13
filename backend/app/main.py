@@ -78,9 +78,12 @@ app = FastAPI(
 )
 
 # CORS middleware
+# 注意：allow_origins 不能包含 "*" 同时 allow_credentials=True
+# （浏览器会拒绝此组合）。生产环境通过 CORS_ORIGINS 环境变量传入真实域名。
+_cors_origins = [o for o in settings.CORS_ORIGINS if o != "*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

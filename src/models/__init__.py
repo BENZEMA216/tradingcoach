@@ -20,6 +20,7 @@ from .stock_classification import StockClassification
 from .news_context import NewsContext, NewsSentiment, NewsImpactLevel, NewsCategory
 from .event_context import EventContext, EventType, EventImpact
 from .task import Task, TaskStatus, TaskType
+from .import_history import ImportHistory, PositionSnapshot
 
 # 导出所有模型和工具函数
 __all__ = [
@@ -41,6 +42,8 @@ __all__ = [
     'NewsContext',
     'EventContext',
     'Task',
+    'ImportHistory',
+    'PositionSnapshot',
 
     # 枚举类型
     'TradeDirection',

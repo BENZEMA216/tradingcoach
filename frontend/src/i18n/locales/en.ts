@@ -528,7 +528,7 @@ export default {
     noInsightsHint: 'More trading data is needed to generate analysis',
     dataSupport: 'Supporting Data',
     suggestion: 'Suggestion',
-    category: {
+    categories: {
       all: 'All',
       symbol: 'Symbol',
       risk: 'Risk',

@@ -172,13 +172,13 @@ export function Statistics() {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
 
-  // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
-  const { formatCurrency, formatPnL: _formatPnL } = getPrivacyAwareFormatters();
+  // Subscribe to privacy state so charts re-render on toggle even though we
+  // don't read isPrivacyMode directly here.
+  usePrivacyStore();
+  const { formatCurrency } = getPrivacyAwareFormatters();
 
   const [periodType, setPeriodType] = useState<PeriodType>('all');
   const [periodOffset, setPeriodOffset] = useState(0);
-
 
   // Fetch data date range
   const { data: dateRange } = useQuery({
@@ -186,16 +186,25 @@ export function Statistics() {
     queryFn: () => statisticsApi.getDateRange(),
   });
 
-  // Auto-adjust to the most recent period with data
-  useEffect(() => {
-    if (dateRange?.max_date && periodType !== 'all') {
-      const maxDate = new Date(dateRange.max_date);
-      const newOffset = calculateOffsetForDate(periodType, maxDate);
-      setPeriodOffset(newOffset);
-    } else if (periodType === 'all') {
+  // Auto-snap to the most recent period when periodType or dateRange.max_date
+  // changes. We reset during render (React docs pattern) instead of inside a
+  // useEffect, which avoids the cascading-render warning and a flash of stale
+  // data on the first paint after the trigger changes.
+  const [lastSnap, setLastSnap] = useState<{ type: PeriodType; maxDate?: string }>({
+    type: periodType,
+    maxDate: dateRange?.max_date,
+  });
+  if (
+    lastSnap.type !== periodType ||
+    lastSnap.maxDate !== dateRange?.max_date
+  ) {
+    setLastSnap({ type: periodType, maxDate: dateRange?.max_date });
+    if (periodType === 'all') {
       setPeriodOffset(0);
+    } else if (dateRange?.max_date) {
+      setPeriodOffset(calculateOffsetForDate(periodType, new Date(dateRange.max_date)));
     }
-  }, [periodType, dateRange?.max_date]);
+  }
 
   const { start, end } = useMemo(
     () => getDateRange(periodType, periodOffset),

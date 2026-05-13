@@ -528,7 +528,7 @@ export default {
     noInsightsHint: '需要更多交易数据才能生成分析',
     dataSupport: '数据支撑',
     suggestion: '建议',
-    category: {
+    categories: {
       all: '全部',
       symbol: '标的',
       risk: '风险',

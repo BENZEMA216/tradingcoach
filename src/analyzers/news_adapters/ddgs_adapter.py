@@ -138,7 +138,7 @@ class DDGSAdapter(NewsAdapter):
                     try:
                         # 提取日期部分
                         date_str = item["date"][:10] if item["date"] else ""
-                    except:
+                    except Exception:
                         pass
 
                 results.append(self._normalize_result({
@@ -215,7 +215,7 @@ class DDGSAdapter(NewsAdapter):
             if domain.startswith('www.'):
                 domain = domain[4:]
             return domain
-        except:
+        except Exception:
             return "unknown"
 
     def _check_availability(self) -> bool:

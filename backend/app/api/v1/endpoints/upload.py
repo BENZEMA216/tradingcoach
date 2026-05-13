@@ -17,6 +17,7 @@ from datetime import datetime
 from typing import Optional
 import logging
 
+import pandas as pd
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 
@@ -44,6 +45,10 @@ class UploadResponse(BaseModel):
     file_name: str
     file_hash: str
     language: str
+
+    # 模式："incremental"（与已有数据合并去重）或 "replace"（先清空再导入）
+    mode: str = "incremental"
+    cleared_existing: bool = False  # 本次上传是否清空了旧数据
 
     # 处理结果
     total_rows: int = 0
@@ -98,15 +103,19 @@ def clear_all_trading_data(session):
 @router.post("/trades", response_model=UploadResponse)
 async def upload_trades(
     file: UploadFile = File(...),
-    replace_mode: bool = True  # 默认替换模式：清除旧数据
+    replace_mode: bool = False,  # 默认增量去重；replace=True 才会清空旧数据
 ):
     """
     上传交易记录CSV文件
 
     支持富途证券导出的中文/英文CSV格式
 
-    - replace_mode=True (默认): 清除所有旧数据，只分析本次上传的数据
-    - replace_mode=False: 增量导入，与旧数据合并
+    - replace_mode=False (默认): 增量导入，按 trade_fingerprint 与现有数据去重
+    - replace_mode=True: 先清空所有旧 trades/positions/import_history 再导入
+
+    注意：旧版默认是 replace_mode=True，会在每次上传时静默清空整库。
+    现在改为默认增量，避免重复上传同一文件时数据被反复清空、
+    "duplicates_skipped" 字段始终为 0 的误导性表现。
     """
     start_time = datetime.now()
 
@@ -186,12 +195,25 @@ async def upload_trades(
         # 计算处理时间
         processing_time = int((datetime.now() - start_time).total_seconds() * 1000)
 
+        mode_label = "replace" if replace_mode else "incremental"
+        if replace_mode:
+            human_msg = (
+                f"Replaced existing data; imported {result.new_trades} trades "
+                f"from {file.filename}"
+            )
+        else:
+            human_msg = (
+                f"Imported {result.new_trades} new trades, "
+                f"skipped {result.duplicates_skipped} duplicates"
+            )
         return UploadResponse(
             success=True,
-            message=f"Successfully processed {result.new_trades} new trades",
+            message=human_msg,
             file_name=file.filename,
             file_hash=file_hash[:16],
             language=language,
+            mode=mode_label,
+            cleared_existing=replace_mode,
             total_rows=result.total_rows,
             completed_trades=result.completed_trades,
             new_trades=result.new_trades,
@@ -205,15 +227,37 @@ async def upload_trades(
 
     except HTTPException:
         raise
+    except UnicodeDecodeError as e:
+        # 上传的不是 UTF-8 文本（典型：把图片/二进制当 CSV 上传）
+        logger.warning(f"Upload not UTF-8 decodable: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="File is not a valid UTF-8 text CSV. Please export from your broker as CSV.",
+        )
+    except pd.errors.EmptyDataError:
+        raise HTTPException(
+            status_code=400,
+            detail="CSV file is empty or has no parseable columns.",
+        )
+    except pd.errors.ParserError as e:
+        logger.warning(f"CSV parse error: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="CSV file is malformed and could not be parsed.",
+        )
     except Exception as e:
         logger.error(f"Upload processing failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        # 不把内部异常细节抛给客户端，避免栈/路径泄漏
+        raise HTTPException(
+            status_code=500,
+            detail="Upload processing failed. Check server logs for details.",
+        )
 
     finally:
         # 清理临时文件
         try:
             os.unlink(tmp_path)
-        except:
+        except OSError:
             pass
 
 
@@ -302,5 +346,5 @@ async def upload_position_snapshot(file: UploadFile = File(...)):
     finally:
         try:
             os.unlink(tmp_path)
-        except:
+        except Exception:
             pass

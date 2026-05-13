@@ -624,7 +624,7 @@ class TaskManager:
             # 清理临时文件
             try:
                 Path(file_path).unlink()
-            except:
+            except Exception:
                 pass
 
     def _log_all_imported_trades(self, task_id: str):

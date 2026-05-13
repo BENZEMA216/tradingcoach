@@ -229,7 +229,7 @@ export function AICoach() {
                 >
                   {CATEGORY_FILTERS.map((filter) => (
                     <option key={filter.value} value={filter.value}>
-                      {isZh ? t(`insights.category.${filter.value}`, filter.label) : filter.label}
+                      {isZh ? t(`insights.categories.${filter.value}`, filter.label) : filter.label}
                     </option>
                   ))}
                 </select>
