@@ -909,7 +909,7 @@ class InsightEngine:
                     hour_stats[hour]["pnl"] += float(p.net_pnl or 0)
                     if p.net_pnl and float(p.net_pnl) > 0:
                         hour_stats[hour]["winners"] += 1
-                except:
+                except Exception:
                     continue
 
         if hour_stats:
@@ -979,7 +979,7 @@ class InsightEngine:
                                 add_to_position_results.append(
                                     trades[i].net_pnl and float(trades[i].net_pnl) > 0
                                 )
-                        except:
+                        except Exception:
                             continue
 
         if len(add_to_position_results) >= 10:

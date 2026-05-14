@@ -24,10 +24,13 @@ interface MonthlyPerformanceChartProps {
   bare?: boolean;
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS_ZH = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
 export function MonthlyPerformanceChart({ data, isLoading, onBarClick, bare = false }: MonthlyPerformanceChartProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isZh = i18n.language === 'zh';
+  const months = isZh ? MONTHS_ZH : MONTHS_EN;
   const colors = useChartColors();
 
   // Subscribe to privacy state for re-renders
@@ -60,7 +63,9 @@ export function MonthlyPerformanceChart({ data, isLoading, onBarClick, bare = fa
   }
 
   const chartData = data.map((item) => ({
-    month: `${item.year}-${MONTHS[item.month - 1]}`,
+    month: isZh
+      ? `${item.year}年${months[item.month - 1]}`
+      : `${item.year}-${months[item.month - 1]}`,
     year: item.year,
     monthNum: item.month,
     pnl: item.pnl,

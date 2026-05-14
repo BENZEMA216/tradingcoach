@@ -12,6 +12,7 @@ export default {
     filter: 'Filter',
     reset: 'Reset',
     refresh: 'Refresh',
+    selectLanguage: 'Select language',
     all: 'All',
     yes: 'Yes',
     no: 'No',
@@ -528,7 +529,7 @@ export default {
     noInsightsHint: 'More trading data is needed to generate analysis',
     dataSupport: 'Supporting Data',
     suggestion: 'Suggestion',
-    category: {
+    categories: {
       all: 'All',
       symbol: 'Symbol',
       risk: 'Risk',

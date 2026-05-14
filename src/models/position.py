@@ -177,9 +177,12 @@ class Position(Base):
         comment="新闻契合度评分（0-100）"
     )
     # 新闻上下文关联
+    # use_alter=True 打破 news_context ↔ positions 的循环 FK
+    # （news_context.position_id 反过来指向 positions.id），否则
+    # Base.metadata.drop_all() 会发出 SAWarning 并部分跳过表。
     news_context_id = Column(
         Integer,
-        ForeignKey('news_context.id'),
+        ForeignKey('news_context.id', use_alter=True, name='fk_positions_news_context'),
         comment="关联的新闻上下文ID"
     )
     # 评分详情 (JSON)

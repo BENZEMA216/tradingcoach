@@ -213,7 +213,7 @@ class IndicatorCalculator:
     def calculate_ema(
         self,
         df: pd.DataFrame,
-        periods: List[int] = [12, 26],
+        periods: Optional[List[int]] = None,
         column: str = 'Close'
     ) -> Dict[str, pd.Series]:
         """
@@ -231,6 +231,8 @@ class IndicatorCalculator:
             EMA = Close × k + EMA(前一天) × (1 - k)
             k = 2 / (period + 1)
         """
+        if periods is None:
+            periods = [12, 26]
         if df.empty or column not in df.columns:
             return {f'ema_{p}': pd.Series(dtype=float) for p in periods}
 
@@ -404,7 +406,7 @@ class IndicatorCalculator:
     def calculate_ma(
         self,
         df: pd.DataFrame,
-        periods: List[int] = [5, 10, 20, 50, 200],
+        periods: Optional[List[int]] = None,
         column: str = 'Close'
     ) -> Dict[str, pd.Series]:
         """
@@ -418,6 +420,8 @@ class IndicatorCalculator:
         Returns:
             dict: {f'ma_{period}': MA值}
         """
+        if periods is None:
+            periods = [5, 10, 20, 50, 200]
         if df.empty or column not in df.columns:
             return {f'ma_{p}': pd.Series(dtype=float) for p in periods}
 

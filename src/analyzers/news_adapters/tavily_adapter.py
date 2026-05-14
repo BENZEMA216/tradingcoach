@@ -136,7 +136,7 @@ class TavilyAdapter(NewsAdapter):
             if domain.startswith('www.'):
                 domain = domain[4:]
             return domain
-        except:
+        except Exception:
             return "unknown"
 
     def _check_availability(self) -> bool:
@@ -156,5 +156,5 @@ class TavilyAdapter(NewsAdapter):
                 timeout=10
             )
             return response.status_code == 200
-        except:
+        except Exception:
             return False

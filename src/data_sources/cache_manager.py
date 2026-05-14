@@ -224,7 +224,7 @@ class CacheManager:
         try:
             l2_count = self.session.query(MarketData).count()
             l2_symbols = self.session.query(MarketData.symbol).distinct().count()
-        except:
+        except Exception:
             l2_count = 0
             l2_symbols = 0
 

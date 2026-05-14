@@ -9,7 +9,8 @@ pos: 系统管理端点 - 健康检查、数据统计、数据重置
 """
 
 import logging
-from fastapi import APIRouter, Depends
+import os
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 from datetime import datetime
@@ -157,6 +158,8 @@ async def list_all_symbols(
 @router.delete("/data/reset", response_model=DataResetResponse)
 async def reset_all_data(
     db: Session = Depends(get_db),
+    x_confirm_reset: Optional[str] = Header(None, alias="X-Confirm-Reset"),
+    x_admin_token: Optional[str] = Header(None, alias="X-Admin-Token"),
 ):
     """
     重置所有交易数据，清空数据库准备重新上传。
@@ -168,7 +171,29 @@ async def reset_all_data(
     - 所有任务记录 (tasks)
 
     警告：此操作不可撤销！
+
+    安全要求 (必须同时满足)：
+    1. Header `X-Confirm-Reset: I-UNDERSTAND-THIS-DELETES-ALL-DATA`
+    2. 若环境变量 `ADMIN_TOKEN` 已配置，则 Header `X-Admin-Token` 必须匹配
     """
+    # 1) 必须显式确认 — 拦截 CSRF / 误点
+    if x_confirm_reset != "I-UNDERSTAND-THIS-DELETES-ALL-DATA":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "Reset blocked. Set header "
+                "'X-Confirm-Reset: I-UNDERSTAND-THIS-DELETES-ALL-DATA' to confirm."
+            ),
+        )
+
+    # 2) 若配置了 ADMIN_TOKEN，必须匹配 — 拦截未授权调用
+    admin_token = os.getenv("ADMIN_TOKEN")
+    if admin_token and x_admin_token != admin_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing X-Admin-Token.",
+        )
+
     deleted_counts = {}
 
     try:

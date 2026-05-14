@@ -124,9 +124,17 @@ export function Positions() {
     );
   };
 
-  // Sortable header component
-  const SortableHeader = ({ field, children, align = 'left' }: { field: SortField; children: React.ReactNode; align?: 'left' | 'right' | 'center' }) => (
+  // Sortable header — written as a regular render helper (NOT a nested
+  // component) so it doesn't get a new identity every parent render and
+  // remount the underlying <th>. The react-hooks/static-components lint
+  // warning was flagging exactly this anti-pattern.
+  const renderSortableHeader = (
+    field: SortField,
+    children: React.ReactNode,
+    align: 'left' | 'right' | 'center' = 'left',
+  ) => (
     <th
+      key={field}
       className={clsx(
         'px-4 py-3 text-[10px] font-mono font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest cursor-pointer hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors select-none',
         align === 'left' && 'text-left',
@@ -349,33 +357,15 @@ export function Positions() {
           <table className="w-full">
             <thead className="bg-neutral-50 dark:bg-black border-b border-neutral-200 dark:border-white/10">
               <tr>
-                <SortableHeader field="symbol">
-                  {t('positions.symbol')}
-                </SortableHeader>
-                <SortableHeader field="direction">
-                  {t('positions.direction')}
-                </SortableHeader>
-                <SortableHeader field="open_date">
-                  {t('positions.openDate')}
-                </SortableHeader>
-                <SortableHeader field="close_date">
-                  {t('positions.closeDate')}
-                </SortableHeader>
-                <SortableHeader field="quantity" align="right">
-                  {isZh ? '数量' : 'SIZE'}
-                </SortableHeader>
-                <SortableHeader field="net_pnl" align="right">
-                  {t('positions.pnl')}
-                </SortableHeader>
-                <SortableHeader field="net_pnl_pct" align="right">
-                  {t('positions.pnlPct')}
-                </SortableHeader>
-                <SortableHeader field="score_grade" align="center">
-                  {t('positions.grade')}
-                </SortableHeader>
-                <SortableHeader field="holding_period_days" align="right">
-                  {t('positions.holdingDays')}
-                </SortableHeader>
+                {renderSortableHeader('symbol', t('positions.symbol'))}
+                {renderSortableHeader('direction', t('positions.direction'))}
+                {renderSortableHeader('open_date', t('positions.openDate'))}
+                {renderSortableHeader('close_date', t('positions.closeDate'))}
+                {renderSortableHeader('quantity', isZh ? '数量' : 'SIZE', 'right')}
+                {renderSortableHeader('net_pnl', t('positions.pnl'), 'right')}
+                {renderSortableHeader('net_pnl_pct', t('positions.pnlPct'), 'right')}
+                {renderSortableHeader('score_grade', t('positions.grade'), 'center')}
+                {renderSortableHeader('holding_period_days', t('positions.holdingDays'), 'right')}
                 <th className="px-4 py-3 text-left w-24"></th> {/* Visual Bar */}
               </tr>
             </thead>

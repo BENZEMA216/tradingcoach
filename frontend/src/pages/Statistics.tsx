@@ -41,6 +41,24 @@ import clsx from 'clsx';
 
 type PeriodType = 'all' | 'week' | 'month' | 'quarter' | 'year';
 
+// Backend ships English period labels (e.g. "1-3 Days"). Map to zh strings
+// when language is Chinese. Keys must match backend buckets in
+// backend/app/api/v1/endpoints/statistics.py.
+const HOLDING_PERIOD_LABELS_ZH: Record<string, string> = {
+  'Same Day': '当日',
+  '1-3 Days': '1-3 天',
+  '4-7 Days': '4-7 天',
+  '1-2 Weeks': '1-2 周',
+  '2-4 Weeks': '2-4 周',
+  '1-3 Months': '1-3 月',
+  '3+ Months': '3+ 月',
+};
+
+function translateHoldingPeriodLabel(label: string, isZh: boolean): string {
+  if (!isZh) return label;
+  return HOLDING_PERIOD_LABELS_ZH[label] ?? label;
+}
+
 
 function getDateRange(type: PeriodType, offset: number = 0): { start: Date | null; end: Date | null } {
   if (type === 'all') return { start: null, end: null };
@@ -172,13 +190,13 @@ export function Statistics() {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
 
-  // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
-  const { formatCurrency, formatPnL: _formatPnL } = getPrivacyAwareFormatters();
+  // Subscribe to privacy state so charts re-render on toggle even though we
+  // don't read isPrivacyMode directly here.
+  usePrivacyStore();
+  const { formatCurrency } = getPrivacyAwareFormatters();
 
   const [periodType, setPeriodType] = useState<PeriodType>('all');
   const [periodOffset, setPeriodOffset] = useState(0);
-
 
   // Fetch data date range
   const { data: dateRange } = useQuery({
@@ -186,16 +204,25 @@ export function Statistics() {
     queryFn: () => statisticsApi.getDateRange(),
   });
 
-  // Auto-adjust to the most recent period with data
-  useEffect(() => {
-    if (dateRange?.max_date && periodType !== 'all') {
-      const maxDate = new Date(dateRange.max_date);
-      const newOffset = calculateOffsetForDate(periodType, maxDate);
-      setPeriodOffset(newOffset);
-    } else if (periodType === 'all') {
+  // Auto-snap to the most recent period when periodType or dateRange.max_date
+  // changes. We reset during render (React docs pattern) instead of inside a
+  // useEffect, which avoids the cascading-render warning and a flash of stale
+  // data on the first paint after the trigger changes.
+  const [lastSnap, setLastSnap] = useState<{ type: PeriodType; maxDate?: string }>({
+    type: periodType,
+    maxDate: dateRange?.max_date,
+  });
+  if (
+    lastSnap.type !== periodType ||
+    lastSnap.maxDate !== dateRange?.max_date
+  ) {
+    setLastSnap({ type: periodType, maxDate: dateRange?.max_date });
+    if (periodType === 'all') {
       setPeriodOffset(0);
+    } else if (dateRange?.max_date) {
+      setPeriodOffset(calculateOffsetForDate(periodType, new Date(dateRange.max_date)));
     }
-  }, [periodType, dateRange?.max_date]);
+  }
 
   const { start, end } = useMemo(
     () => getDateRange(periodType, periodOffset),
@@ -736,7 +763,7 @@ export function Statistics() {
                   <tbody className="divide-y divide-white/5">
                     {byHolding.map((item) => (
                       <tr key={item.period_label} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3 font-mono text-sm font-medium text-white">{item.period_label}</td>
+                        <td className="px-4 py-3 font-mono text-sm font-medium text-white">{translateHoldingPeriodLabel(item.period_label, isZh)}</td>
                         <td className="px-4 py-3 text-right font-mono text-sm text-white/60">{item.count}</td>
                         <td className={clsx('px-4 py-3 text-right font-mono text-sm font-medium', item.total_pnl > 0 ? 'text-green-500' : 'text-red-500')}>
                           {formatCurrency(item.total_pnl)}

@@ -12,6 +12,7 @@ export default {
     filter: '筛选',
     reset: '重置',
     refresh: '刷新',
+    selectLanguage: '选择语言',
     all: '全部',
     yes: '是',
     no: '否',
@@ -528,7 +529,7 @@ export default {
     noInsightsHint: '需要更多交易数据才能生成分析',
     dataSupport: '数据支撑',
     suggestion: '建议',
-    category: {
+    categories: {
       all: '全部',
       symbol: '标的',
       risk: '风险',
