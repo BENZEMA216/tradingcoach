@@ -30,6 +30,11 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov pytest-benchmark allure-pytest
 
+      - name: Generate config.py from template
+        # src/analyzers/quality_scorer.py 直接 `from config import ...`，
+        # 而 config.py 是 gitignored 的本地配置。CI 需要先从模板生成。
+        run: cp config_template.py config.py
+
       - name: Run unit tests with coverage
         run: |
           python -m pytest tests/unit/ -v \
@@ -82,6 +87,8 @@ jobs:
           pip install -r requirements.txt
           pip install pytest httpx
 
+      - name: Generate config.py from template
+        run: cp config_template.py config.py
       - name: Run integration tests
         run: |
           python -m pytest tests/integration/ -v --tb=short
@@ -108,6 +115,8 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
+      - name: Generate config.py from template
+        run: cp config_template.py config.py
       - name: Run contract tests
         run: |
           python -m pytest tests/contract/ -v --tb=short
@@ -134,6 +143,8 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
+      - name: Generate config.py from template
+        run: cp config_template.py config.py
       - name: Run data integrity tests
         run: |
           python -m pytest tests/data_integrity/ -v --tb=short
@@ -227,6 +238,9 @@ jobs:
           pip install -r requirements.txt
           pip install uvicorn
 
+      - name: Generate config.py from template
+        run: cp config_template.py config.py
+
       - name: Install frontend dependencies
         run: |
           cd frontend && npm ci
@@ -277,6 +291,8 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-benchmark
 
+      - name: Generate config.py from template
+        run: cp config_template.py config.py
       - name: Run benchmarks
         run: |
           python -m pytest tests/benchmark/ -v --benchmark-only --benchmark-json=benchmark.json

@@ -19,7 +19,9 @@ _PROJECT_ROOT = Path(__file__).parent.parent.parent
 _LOCAL_DB_PATH = _PROJECT_ROOT / "data" / "tradingcoach.db"
 _DEFAULT_DB_URL = f"sqlite:///{_LOCAL_DB_PATH}"
 
-# 默认开发环境允许的来源
+# 默认允许的来源：本地开发 + 已知的 Vercel production 域名。
+# 任何额外环境（staging、预览部署、新域名等）通过 CORS_ORIGINS env 追加。
+# 这样部署 Railway 时哪怕忘了配 CORS_ORIGINS，主前端也不会被 CORS 挡掉。
 _DEFAULT_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
@@ -29,6 +31,7 @@ _DEFAULT_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://127.0.0.1:8501",
     "http://127.0.0.1:8502",
+    "https://tradingcoach.vercel.app",
 ]
 
 
