@@ -148,7 +148,7 @@ class Position(Base):
     )
 
     # 评分等级（A/B/C/D/F）
-    score_grade = Column(String(2), comment="评分等级")
+    score_grade = Column(String(4), comment="评分等级（可带 '?' 后缀表示数据不全）")
 
     # ==================== V2 新增评分字段 ====================
     # 市场环境评分

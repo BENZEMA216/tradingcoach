@@ -1606,12 +1606,37 @@ class QualityScorer:
         if news_alignment_score is not None and 'news_alignment' in weights:
             overall_score += news_alignment_score * weights['news_alignment']
 
-        grade = self._assign_grade(overall_score)
+        # 评估输入数据完整度 —— 没有市场数据/新闻数据时，多个维度会 fallback
+        # 到中位默认值（50-60），导致评分挤在 C 段、丢失差异化信号。
+        # 这里把"哪些维度实际有真数据"显式上报，让前端能标"评分仅供参考"。
+        has_entry_md = entry_md is not None
+        has_exit_md = exit_md is not None
+        has_market_snapshot = score_details.get('market_env') is not None and \
+            not score_details.get('market_env', {}).get('fallback', False)
+        has_news = news_alignment_score is not None
+        signals_present = sum([has_entry_md, has_exit_md, has_market_snapshot, has_news])
+        data_completeness = signals_present / 4.0  # 0.0 ~ 1.0
+
+        # 输入不足时降级 grade —— 用 "?" 后缀让用户警觉，不假装精确
+        # < 0.5 = 4 个信号源（入场/出场/大盘/新闻）至少 3 个没数据
+        if data_completeness < 0.5:
+            grade = self._assign_grade(overall_score) + "?"
+        else:
+            grade = self._assign_grade(overall_score)
 
         # 构建完整结果
         result = {
             'overall_score': round(overall_score, 2),
             'grade': grade,
+            # 输入数据完整度：4 项（入场 / 出场 / 大盘 / 新闻）有真数据的比例。
+            # 1.0 = 满数据；< 0.25 = 评分基本是默认值，grade 会带 "?" 提示。
+            'data_completeness': round(data_completeness, 2),
+            'data_signals': {
+                'entry_market_data': has_entry_md,
+                'exit_market_data': has_exit_md,
+                'market_snapshot': has_market_snapshot,
+                'news_context': has_news,
+            },
             # 9维度评分
             'entry_score': entry_result['entry_score'],
             'exit_score': exit_result['exit_score'],

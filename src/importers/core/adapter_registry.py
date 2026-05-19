@@ -213,6 +213,16 @@ class AdapterRegistry:
 # 全局注册表实例
 registry = AdapterRegistry()
 
+# 注册专用 adapter — 没注册的 broker_id 会 fallback 到 GenericAdapter，
+# 但 GenericAdapter 不会跑 FutuAdapter._fill_spread_orders / _parse_option_symbols
+# 等富途特有的转换。FutuAdapter 同时绑定 futu_cn 和 futu_en。
+try:
+    from ..adapters.futu_adapter import FutuAdapter
+    registry._adapters["futu_cn"] = FutuAdapter
+    registry._adapters["futu_en"] = FutuAdapter
+except ImportError:
+    pass
+
 
 def get_adapter_for_file(file_path: str) -> Optional[BaseCSVAdapter]:
     """

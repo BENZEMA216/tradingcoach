@@ -44,6 +44,9 @@ class SymbolMatcher:
         self.open_long_queue = deque()  # Queue[TradeQuantity] for long positions
         self.open_short_queue = deque()  # Queue[TradeQuantity] for short positions
         self.matched_positions = []  # List[Position]
+        # 卖单找不到对应买单时记录（典型：CSV 起点前已经持有的仓位被卖出）
+        # 这部分卖单的 P&L 计算不进系统，必须显式上报给用户。
+        self.orphaned_closes = []  # list of dicts: {trade_id, qty, direction, filled_time}
 
         logger.info(f"Created SymbolMatcher for {symbol}")
 
@@ -220,11 +223,24 @@ class SymbolMatcher:
                 queue.popleft()
                 logger.debug(f"Opening trade fully consumed, removed from queue")
 
-        # 检查是否有未配对的平仓交易（理论上不应发生）
+        # 检查是否有未配对的平仓交易。
+        # 典型场景：CSV 起点之前用户已经持有该标的，导出文件里只看到卖单。
+        # 这部分卖单的 P&L 无法重建（不知道开仓成本）— 但要显式记录，
+        # 避免用户以为系统的"总盈亏"包含了这部分。
         if remaining_qty > 0:
+            self.orphaned_closes.append({
+                "trade_id": closing_trade.id,
+                "symbol": closing_trade.symbol,
+                "direction": closing_trade.direction.value,
+                "quantity": remaining_qty,
+                "filled_time": closing_trade.filled_time,
+                "filled_price": float(closing_trade.filled_price) if closing_trade.filled_price else None,
+                "currency": closing_trade.currency,
+            })
             logger.warning(
                 f"Orphaned closing trade: {closing_trade.symbol} {closing_trade.direction.value} "
-                f"{remaining_qty} shares have no matching opening trade"
+                f"{remaining_qty} shares have no matching opening trade "
+                f"(opening likely occurred before CSV start date)"
             )
 
         return positions
