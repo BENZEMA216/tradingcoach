@@ -73,7 +73,7 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
               getPnLColorClass(position.net_pnl)
             )}
           >
-            {formatCurrency(position.net_pnl)}
+            {formatCurrency(position.net_pnl, position?.currency || 'USD')}
           </div>
           <div
             className={clsx(
@@ -89,11 +89,11 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.openPrice')}</div>
-            <div className="text-lg font-semibold">{formatCurrency(position.open_price)}</div>
+            <div className="text-lg font-semibold">{formatCurrency(position.open_price, position?.currency || 'USD')}</div>
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.closePrice')}</div>
-            <div className="text-lg font-semibold">{formatCurrency(position.close_price)}</div>
+            <div className="text-lg font-semibold">{formatCurrency(position.close_price, position?.currency || 'USD')}</div>
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.quantity')}</div>
@@ -124,13 +124,13 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
               <InfoTooltip termKey="pnl" size="xs" />
             </div>
             <div className={clsx('text-sm font-medium', getPnLColorClass(position.realized_pnl))}>
-              {formatCurrency(position.realized_pnl)}
+              {formatCurrency(position.realized_pnl, position?.currency || 'USD')}
             </div>
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.totalFees')}</div>
             <div className="text-sm font-medium text-red-600">
-              -{formatCurrency(position.total_fees)}
+              -{formatCurrency(position.total_fees, position?.currency || 'USD')}
             </div>
           </div>
         </div>

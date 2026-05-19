@@ -65,6 +65,8 @@ export interface PositionListItem {
   score_grade: string | null;
   strategy_type: string | null;
   reviewed_at: string | null;
+  // 货币（USD/HKD/CNY）— 用于在 P&L 单元格渲染正确符号（$ vs HK$）
+  currency: string | null;
 }
 
 export interface PositionSummary {

@@ -89,13 +89,19 @@ class InsightEngine:
 
     def _compute_basic_stats(self):
         """Compute commonly used statistics"""
+        from ..utils.currency import get_pnl_in_usd
+
         self._winners = [p for p in self.positions if p.net_pnl and float(p.net_pnl) > 0]
         self._losers = [p for p in self.positions if p.net_pnl and float(p.net_pnl) <= 0]
 
         total = len(self.positions)
         self._win_rate = len(self._winners) / total * 100 if total > 0 else 0
-        self._total_pnl = sum(float(p.net_pnl or 0) for p in self.positions)
+        # USD-equivalent — 不能直接 sum HKD+USD（之前会让 "最大亏损占总盈利 X%"
+        # 这种指标的分母虚高几倍，得出 21.9% 的假数字）。
+        self._total_pnl = sum(get_pnl_in_usd(p) for p in self.positions)
         self._avg_pnl = self._total_pnl / total if total > 0 else 0
+        # 保留一份 USD-equivalent 的单笔列表，给 R03 等用
+        self._pnls_usd = [get_pnl_in_usd(p) for p in self.positions]
 
     def _add_insight(self, insight: TradingInsight):
         """Add an insight to the list"""
@@ -675,21 +681,27 @@ class InsightEngine:
                 ))
 
         # R03: Single trade risk too high
-        if self._total_pnl > 0:
-            max_loss = min(float(p.net_pnl or 0) for p in self.positions)
-            if abs(max_loss) > self._total_pnl * 0.2:  # Single loss > 20% of total profit
+        # 用 USD-equivalent 的最大亏损 vs USD-equivalent 总盈利。之前直接对
+        # HKD+USD 求和，分母虚高 ~8 倍，把"亏 191% 总盈利"误报成"21.9%"。
+        if self._total_pnl > 0 and self._pnls_usd:
+            max_loss_usd = min(self._pnls_usd)
+            if abs(max_loss_usd) > self._total_pnl * 0.2:
                 self._add_insight(TradingInsight(
                     id="R03",
                     type=InsightType.PROBLEM,
                     category=InsightCategory.RISK,
                     priority=82,
                     title="单笔风险过大",
-                    description=f"最大单笔亏损${abs(max_loss):.0f}，占总盈利的{abs(max_loss)/self._total_pnl*100:.0f}%",
+                    description=(
+                        f"最大单笔亏损 ${abs(max_loss_usd):.0f}（USD等价），"
+                        f"占总盈利 ${self._total_pnl:.0f} 的 "
+                        f"{abs(max_loss_usd)/self._total_pnl*100:.0f}%"
+                    ),
                     suggestion="建议控制单笔交易的风险敞口，设置止损以限制最大亏损",
                     data_points={
-                        "max_single_loss": round(max_loss, 2),
+                        "max_single_loss": round(max_loss_usd, 2),
                         "total_pnl": round(self._total_pnl, 2),
-                        "pct_of_total": round(abs(max_loss) / self._total_pnl * 100, 1),
+                        "pct_of_total": round(abs(max_loss_usd) / self._total_pnl * 100, 1),
                     }
                 ))
 

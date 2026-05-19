@@ -51,7 +51,7 @@ export function RiskAnalysisTab({ position, marketData, loadingMarketData }: Ris
                 <InfoTooltip termKey="mae" size="xs" />
               </div>
               <div className={clsx('text-2xl font-bold', getPnLColorClass(position.risk_metrics.mae))}>
-                {formatCurrency(position.risk_metrics.mae)}
+                {formatCurrency(position.risk_metrics.mae, position?.currency || 'USD')}
               </div>
               <div className="text-sm text-neutral-500 mt-1">
                 {formatPercent(position.risk_metrics.mae_pct)}
@@ -70,7 +70,7 @@ export function RiskAnalysisTab({ position, marketData, loadingMarketData }: Ris
                 <InfoTooltip termKey="mfe" size="xs" />
               </div>
               <div className={clsx('text-2xl font-bold', getPnLColorClass(position.risk_metrics.mfe))}>
-                {formatCurrency(position.risk_metrics.mfe)}
+                {formatCurrency(position.risk_metrics.mfe, position?.currency || 'USD')}
               </div>
               <div className="text-sm text-neutral-500 mt-1">
                 {formatPercent(position.risk_metrics.mfe_pct)}

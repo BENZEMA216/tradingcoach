@@ -63,7 +63,7 @@ export function ExecutionTab({ trades, loading }: ExecutionTabProps) {
             {t('positionDetail.totalFees')}
           </div>
           <div className="text-2xl font-bold text-red-600">
-            -{formatCurrency(feesSummary?.total || 0)}
+            -{formatCurrency(feesSummary?.total || 0, position?.currency || 'USD')}
           </div>
         </div>
 
@@ -73,7 +73,7 @@ export function ExecutionTab({ trades, loading }: ExecutionTabProps) {
             {t('positionDetail.avgSlippage')}
           </div>
           <div className={clsx('text-2xl font-bold', avgSlippage !== null ? getPnLColorClass(-avgSlippage) : '')}>
-            {avgSlippage !== null ? formatCurrency(avgSlippage) : '-'}
+            {avgSlippage !== null ? formatCurrency(avgSlippage, position?.currency || 'USD') : '-'}
           </div>
         </div>
       </div>
@@ -137,22 +137,22 @@ export function ExecutionTab({ trades, loading }: ExecutionTabProps) {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right font-medium">
-                      {formatCurrency(trade.filled_price)}
+                      {formatCurrency(trade.filled_price, position?.currency || 'USD')}
                     </td>
                     <td className="px-4 py-3 text-right">
                       {trade.filled_quantity}
                     </td>
                     <td className="px-4 py-3 text-right font-medium">
-                      {formatCurrency(trade.filled_amount)}
+                      {formatCurrency(trade.filled_amount, position?.currency || 'USD')}
                     </td>
                     <td className="px-4 py-3 text-right text-red-600">
-                      -{formatCurrency(trade.total_fees)}
+                      -{formatCurrency(trade.total_fees, position?.currency || 'USD')}
                     </td>
                     <td className={clsx(
                       'px-4 py-3 text-right font-medium',
                       trade.slippage !== null ? getPnLColorClass(-trade.slippage) : 'text-neutral-400'
                     )}>
-                      {trade.slippage !== null ? formatCurrency(trade.slippage) : '-'}
+                      {trade.slippage !== null ? formatCurrency(trade.slippage, position?.currency || 'USD') : '-'}
                     </td>
                   </tr>
                 ))}
@@ -176,19 +176,19 @@ export function ExecutionTab({ trades, loading }: ExecutionTabProps) {
             <div className="text-center p-3 rounded-lg bg-neutral-50 dark:bg-neutral-800/50">
               <div className="text-xs text-neutral-500 mb-1">{isZh ? '总滑点' : 'Total Slippage'}</div>
               <div className={clsx('text-lg font-bold', getPnLColorClass(-slippageSummary.total))}>
-                {formatCurrency(slippageSummary.total)}
+                {formatCurrency(slippageSummary.total, position?.currency || 'USD')}
               </div>
             </div>
             <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
               <div className="text-xs text-neutral-500 mb-1">{isZh ? '最佳滑点' : 'Best Slippage'}</div>
               <div className="text-lg font-bold text-green-600">
-                {slippageSummary.best !== Infinity ? formatCurrency(slippageSummary.best) : '-'}
+                {slippageSummary.best !== Infinity ? formatCurrency(slippageSummary.best, position?.currency || 'USD') : '-'}
               </div>
             </div>
             <div className="text-center p-3 rounded-lg bg-red-50 dark:bg-red-900/20">
               <div className="text-xs text-neutral-500 mb-1">{isZh ? '最差滑点' : 'Worst Slippage'}</div>
               <div className="text-lg font-bold text-red-600">
-                {slippageSummary.worst !== -Infinity ? formatCurrency(slippageSummary.worst) : '-'}
+                {slippageSummary.worst !== -Infinity ? formatCurrency(slippageSummary.worst, position?.currency || 'USD') : '-'}
               </div>
             </div>
           </div>

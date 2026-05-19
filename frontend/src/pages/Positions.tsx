@@ -430,7 +430,7 @@ export function Positions() {
                         (position.net_pnl || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
                       )}
                     >
-                      {formatCurrency(position.net_pnl)}
+                      {formatCurrency(position.net_pnl, (position as any).currency || 'USD')}
                     </td>
                     <td
                       className={clsx(

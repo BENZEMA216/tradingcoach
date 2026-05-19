@@ -61,6 +61,10 @@ class PositionListItem(BaseModel):
     # Review status
     reviewed_at: Optional[datetime] = None
 
+    # Currency code (USD/HKD/CNY) — frontend needs this to render the right
+    # symbol ($ vs HK$) and to know whether to currency-convert in aggregates.
+    currency: Optional[str] = None
+
     class Config:
         from_attributes = True
 

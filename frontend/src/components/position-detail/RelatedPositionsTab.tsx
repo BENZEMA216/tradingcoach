@@ -64,7 +64,7 @@ export function RelatedPositionsTab({
               {isZh ? '关联交易总盈亏' : 'Total Related P&L'}
             </div>
             <div className={clsx('text-lg font-bold', getPnLColorClass(totalPnL))}>
-              {formatCurrency(totalPnL)}
+              {formatCurrency(totalPnL, position?.currency || 'USD')}
             </div>
           </div>
         )}
@@ -178,7 +178,7 @@ function PositionCard({ position }: { position: RelatedPosition }) {
         <div className="flex items-center gap-3">
           <div className="text-right">
             <div className={clsx('font-semibold', getPnLColorClass(position.net_pnl))}>
-              {formatCurrency(position.net_pnl)}
+              {formatCurrency(position.net_pnl, position?.currency || 'USD')}
             </div>
             <div className={clsx('text-xs', getPnLColorClass(position.net_pnl_pct))}>
               {formatPercent(position.net_pnl_pct)}

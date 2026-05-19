@@ -36,27 +36,14 @@ from ....services.insight_engine import InsightEngine
 
 router = APIRouter()
 
-# Currency exchange rates (to USD)
-EXCHANGE_RATES = {
-    "USD": 1.0,
-    "HKD": 0.128,  # 1 HKD ≈ 0.128 USD (1 USD ≈ 7.8 HKD)
-    "CNY": 0.14,   # 1 CNY ≈ 0.14 USD
-}
-
-
-def convert_to_usd(amount: float, currency: str) -> float:
-    """Convert amount to USD based on currency."""
-    if amount is None:
-        return 0.0
-    rate = EXCHANGE_RATES.get(currency, 1.0)
-    return float(amount) * rate
-
-
-def get_pnl_in_usd(position) -> float:
-    """Get position PnL converted to USD."""
-    pnl = float(position.net_pnl or 0)
-    currency = position.currency or "USD"
-    return convert_to_usd(pnl, currency)
+# Currency helpers — moved to backend.app.utils.currency so dashboard /
+# positions / insights endpoints share the same conversion (previously each
+# endpoint had its own copy or none at all, producing inconsistent totals).
+from ....utils.currency import (  # noqa: E402
+    EXCHANGE_RATES,
+    convert_to_usd,
+    get_pnl_in_usd,
+)
 
 
 @router.get("/date-range")
@@ -148,7 +135,13 @@ async def get_performance_metrics(
         if drawdown > max_drawdown:
             max_drawdown = drawdown
 
-    max_drawdown_pct = (max_drawdown / peak * 100) if peak > 0 else None
+    # 一个 P&L 曲线可以从 +5000 下穿到 -7000，绝对回撤 12000 但 peak 才 5000
+    # → 旧公式给出 240% 这种没意义的数。clamp 到 100%，并要求 peak 至少
+    # 等于回撤量级才报百分比，否则用户应当看绝对金额。
+    if peak > 0 and peak >= max_drawdown:
+        max_drawdown_pct = min(max_drawdown / peak * 100, 100.0)
+    else:
+        max_drawdown_pct = None
 
     # Consecutive wins/losses
     max_consecutive_wins = 0
@@ -650,7 +643,13 @@ async def get_risk_metrics(
     current_drawdown = current_dd if cumulative < peak else 0.0
 
     # Max drawdown percentage
-    max_drawdown_pct = (max_drawdown / peak * 100) if peak > 0 else None
+    # 一个 P&L 曲线可以从 +5000 下穿到 -7000，绝对回撤 12000 但 peak 才 5000
+    # → 旧公式给出 240% 这种没意义的数。clamp 到 100%，并要求 peak 至少
+    # 等于回撤量级才报百分比，否则用户应当看绝对金额。
+    if peak > 0 and peak >= max_drawdown:
+        max_drawdown_pct = min(max_drawdown / peak * 100, 100.0)
+    else:
+        max_drawdown_pct = None
 
     # Average drawdown
     all_drawdowns = drawdowns + [current_dd] if current_dd > 0 else drawdowns

@@ -188,6 +188,14 @@ class FutuAdapter(BaseCSVAdapter):
             )
         return df
 
+    # 富途垂直价差代码 — 两个 strike 在同一行
+    #   NVDA260717C195/200             单月双 strike
+    #   BIDU260320P105/260618P105      双月同 strike
+    #   HIMS260618C45/50               不带千位
+    _SPREAD_PATTERN = re.compile(
+        r'^([A-Z]+)\d{4,6}[CP][\d.]+/(\d{4,6}[CP])?[\d.]+$'
+    )
+
     def _parse_option_symbols(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         解析期权符号
@@ -197,37 +205,52 @@ class FutuAdapter(BaseCSVAdapter):
         - 260618: 到期日 (YYMMDD)
         - C/P: Call/Put
         - 205000: 行权价 (需除以1000)
+
+        Vertical spread:
+        - NVDA260717C195/200 等 — 标记为期权（is_option=True）
+        - underlying 从前缀提取
+        - strike / expiry 不可单值表示，留空
         """
+        spread_re = self._SPREAD_PATTERN
+
         def parse_option(symbol):
             if pd.isna(symbol):
                 return {}
 
             symbol = str(symbol).strip()
 
-            # 匹配期权格式
+            # 1) 单 leg OCC 格式
             pattern = r'^([A-Z]+)(\d{6})([CP])(\d+)$'
             match = re.match(pattern, symbol)
+            if match:
+                underlying, date_str, option_type, strike_raw = match.groups()
+                try:
+                    expiry = datetime.strptime(date_str, '%y%m%d').date()
+                    strike = int(strike_raw) / 1000.0
+                    return {
+                        'is_option': True,
+                        'underlying_symbol': underlying,
+                        'option_type': 'CALL' if option_type == 'C' else 'PUT',
+                        'strike_price': strike,
+                        'expiration_date': expiry,
+                    }
+                except Exception:
+                    pass
 
-            if not match:
-                return {'is_option': False}
+            # 2) Vertical spread —— 用 / 隔开两条 leg
+            if '/' in symbol:
+                sp = spread_re.match(symbol)
+                if sp:
+                    return {
+                        'is_option': True,
+                        'underlying_symbol': sp.group(1),
+                        # 价差不能用单一 strike / expiry / type 表示
+                        'option_type': None,
+                        'strike_price': None,
+                        'expiration_date': None,
+                    }
 
-            underlying, date_str, option_type, strike_raw = match.groups()
-
-            try:
-                # 解析到期日
-                expiry = datetime.strptime(date_str, '%y%m%d').date()
-                # 解析行权价
-                strike = int(strike_raw) / 1000.0
-
-                return {
-                    'is_option': True,
-                    'underlying_symbol': underlying,
-                    'option_type': 'CALL' if option_type == 'C' else 'PUT',
-                    'strike_price': strike,
-                    'expiration_date': expiry,
-                }
-            except Exception:
-                return {'is_option': False}
+            return {'is_option': False}
 
         # 应用解析
         option_info = df['symbol'].apply(parse_option)

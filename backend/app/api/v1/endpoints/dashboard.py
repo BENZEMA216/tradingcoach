@@ -18,6 +18,7 @@ from ....schemas import (
     StrategyBreakdownItem,
     DailyPnLItem,
 )
+from ....utils.currency import get_pnl_in_usd, get_fees_in_usd
 
 router = APIRouter()
 
@@ -54,12 +55,13 @@ async def get_dashboard_kpis(
             avg_holding_days=0.0,
         )
 
-    # Calculate metrics
-    total_pnl = sum(float(p.net_pnl or 0) for p in positions)
-    total_fees = sum(float(p.total_fees or 0) for p in positions)
+    # Calculate metrics — convert each position's P&L / fees to USD so HKD
+    # and USD positions don't get summed naïvely as if they were the same unit.
+    total_pnl = sum(get_pnl_in_usd(p) for p in positions)
+    total_fees = sum(get_fees_in_usd(p) for p in positions)
     trade_count = len(positions)
 
-    # Win rate
+    # Win rate (sign of P&L is currency-agnostic, no conversion needed here)
     winners = sum(1 for p in positions if p.net_pnl and float(p.net_pnl) > 0)
     win_rate = (winners / trade_count * 100) if trade_count > 0 else 0.0
 
@@ -119,11 +121,11 @@ async def get_equity_curve(
     if not positions:
         return EquityCurveResponse(data=[], total_pnl=0.0)
 
-    # Group by date and calculate cumulative P&L
+    # Group by date and calculate cumulative P&L (USD-equivalent)
     date_pnl = {}
     for p in positions:
         d = p.close_date
-        pnl = float(p.net_pnl or 0)
+        pnl = get_pnl_in_usd(p)
         if d not in date_pnl:
             date_pnl[d] = {"pnl": 0, "count": 0}
         date_pnl[d]["pnl"] += pnl
@@ -301,7 +303,7 @@ async def get_strategy_breakdown(
                 "winners": 0,
             }
         strategy_stats[strategy]["count"] += 1
-        strategy_stats[strategy]["total_pnl"] += float(p.net_pnl or 0)
+        strategy_stats[strategy]["total_pnl"] += get_pnl_in_usd(p)
         if p.net_pnl and float(p.net_pnl) > 0:
             strategy_stats[strategy]["winners"] += 1
 
@@ -344,13 +346,13 @@ async def get_daily_pnl(
         .all()
     )
 
-    # Group by date
+    # Group by date (USD-equivalent)
     date_pnl = {}
     for p in positions:
         d = p.close_date
         if d not in date_pnl:
             date_pnl[d] = {"pnl": 0.0, "count": 0}
-        date_pnl[d]["pnl"] += float(p.net_pnl or 0)
+        date_pnl[d]["pnl"] += get_pnl_in_usd(p)
         date_pnl[d]["count"] += 1
 
     return [
