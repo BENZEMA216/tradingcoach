@@ -86,7 +86,7 @@ export function StrategyPieChart({ data, title, onDrillDown, bare = false, isLoa
 
   const chartContent = (
     <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minHeight={200}>
         <PieChart>
           <Pie
             data={chartData}

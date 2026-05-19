@@ -366,7 +366,7 @@ export function Positions() {
                 {renderSortableHeader('net_pnl_pct', t('positions.pnlPct'), 'right')}
                 {renderSortableHeader('score_grade', t('positions.grade'), 'center')}
                 {renderSortableHeader('holding_period_days', t('positions.holdingDays'), 'right')}
-                <th className="px-4 py-3 text-left w-24"></th> {/* Visual Bar */}
+                <th className="px-4 py-3 text-left w-24" aria-hidden="true"></th> {/* Visual Bar */}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -456,7 +456,7 @@ export function Positions() {
                     <td className="px-4 py-3 text-xs font-mono text-right text-slate-500 dark:text-white/50">
                       {position.holding_period_days}D
                     </td>
-                    <td className="px-4 py-3 align-middle">
+                    <td className="px-4 py-3 align-middle" aria-hidden="true">
                       {/* Visual PnL Bar - Industrial */}
                       <div className="flex items-center justify-start h-full w-24 opacity-30 group-hover:opacity-100 transition-opacity">
                         <div

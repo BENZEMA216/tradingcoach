@@ -64,7 +64,7 @@ export function PnLDistributionChart({ data, isLoading, bare = false }: PnLDistr
 
   const chartContent = (
     <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minHeight={200}>
         <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
           <XAxis dataKey="range" tick={{ fontSize: 10, fill: colors.text }} tickLine={false} axisLine={{ stroke: colors.axis }} interval={Math.floor(chartData.length / 6)} />

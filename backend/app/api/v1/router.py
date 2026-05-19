@@ -4,7 +4,7 @@ API v1 Router - Aggregates all endpoint routers
 
 from fastapi import APIRouter
 
-from .endpoints import dashboard, positions, trades, market_data, statistics, system, ai_coach, upload, tasks, events, feedback
+from .endpoints import dashboard, positions, trades, market_data, statistics, system, ai_coach, upload, tasks, events, feedback, backtest
 
 api_router = APIRouter()
 
@@ -72,4 +72,10 @@ api_router.include_router(
     feedback.router,
     prefix="/feedback",
     tags=["Feedback"]
+)
+
+api_router.include_router(
+    backtest.router,
+    prefix="/backtest",
+    tags=["Counterfactual Backtest"]
 )

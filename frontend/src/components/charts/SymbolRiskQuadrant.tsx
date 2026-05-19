@@ -74,7 +74,7 @@ export function SymbolRiskQuadrant({ data, isLoading, onDotClick, bare = false }
 
   const chartContent = (
     <div className="h-72">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minHeight={200}>
         <ScatterChart margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
           <XAxis

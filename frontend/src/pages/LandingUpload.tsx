@@ -291,7 +291,7 @@ export function LandingUpload() {
           {/* Hero - The "Monolith" */}
           <div className="text-center mb-24 relative z-10 pt-10">
             <div className="inline-block border border-white/20 px-4 py-1.5 rounded-full mb-10 bg-black/50 backdrop-blur">
-              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">{t('landing.systemStatus')} • {t('landing.version')} 0.9.2</span>
+              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">{t('landing.systemStatus')} • {t('landing.version')} 1.0.0</span>
             </div>
 
             <h1 className="text-7xl md:text-9xl font-bold text-white mb-8 tracking-tighter leading-[0.9] whitespace-pre-line">

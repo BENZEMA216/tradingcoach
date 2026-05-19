@@ -11,6 +11,7 @@ import {
   Monitor,
   Menu,
   X,
+  Rewind,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { LanguageSwitcher, ThemeToggle } from '@/components/common';
@@ -20,6 +21,7 @@ const navItems = [
   { to: '/statistics', icon: BarChart3, labelKey: 'nav.statistics' },
   { to: '/positions', icon: List, labelKey: 'nav.positions' },
   { to: '/events', icon: Calendar, labelKey: 'nav.events' },
+  { to: '/backtest', icon: Rewind, labelKey: 'nav.backtest' },
 ];
 
 export function Sidebar() {

@@ -117,7 +117,7 @@ export function DurationPnLChart({ data, isLoading, bare = false }: DurationPnLC
 
   const chartContent = (
     <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
             <XAxis

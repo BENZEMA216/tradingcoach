@@ -99,7 +99,7 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
         </div>
       )}
       <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
             <defs>
               <linearGradient id="equityCurveGradient" x1="0" y1="0" x2="0" y2="1">

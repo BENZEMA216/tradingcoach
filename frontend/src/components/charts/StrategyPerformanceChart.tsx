@@ -71,7 +71,7 @@ export function StrategyPerformanceChart({ data, isLoading, onBarClick, bare = f
 
   const chartContent = (
     <div ref={containerRef} className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <BarChart
             data={chartData}
             layout="vertical"

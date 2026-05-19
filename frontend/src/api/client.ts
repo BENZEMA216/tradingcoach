@@ -629,4 +629,48 @@ export const eventsApi = {
   },
 };
 
+// ==================== Counterfactual Backtest API ====================
+
+export interface BacktestMonthlyPoint {
+  month: string;
+  actual_pnl: number;
+  cf_pnl: number;
+  savings: number;
+  actual_cumulative: number;
+  cf_cumulative: number;
+}
+
+export interface BacktestResult {
+  rule_id: string;
+  name_cn: string;
+  name_en: string;
+  notes: string;
+  params: Record<string, number>;
+  skipped_count: number;
+  actual_total_pnl: number;
+  counterfactual_total_pnl: number;
+  savings: number;
+  savings_pct: number | null;
+  monthly: BacktestMonthlyPoint[];
+  skipped_by_symbol: Record<string, number>;
+}
+
+export const backtestApi = {
+  /** Run every rule with default params, sorted by savings desc */
+  summary: async (): Promise<BacktestResult[]> => {
+    const { data } = await api.get<BacktestResult[]>('/backtest/summary');
+    return data;
+  },
+  /** Run a specific rule with optional param overrides */
+  run: async (
+    ruleId: string,
+    params?: Record<string, number>,
+  ): Promise<BacktestResult> => {
+    const { data } = await api.get<BacktestResult>(`/backtest/run/${ruleId}`, {
+      params,
+    });
+    return data;
+  },
+};
+
 export default api;

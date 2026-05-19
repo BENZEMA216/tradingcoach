@@ -37,7 +37,7 @@ _DEFAULT_ALLOWED_ORIGINS = [
 
 class Settings(BaseSettings):
     APP_NAME: str = "Trading Coach"
-    APP_VERSION: str = "0.5.0"
+    APP_VERSION: str = "1.0.0"
     API_V1_PREFIX: str = "/api/v1"
 
     # 接受逗号分隔字符串，避免 pydantic 把 env 值当 JSON 数组解析。

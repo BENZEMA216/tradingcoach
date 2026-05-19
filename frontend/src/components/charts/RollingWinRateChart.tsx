@@ -57,7 +57,7 @@ export function RollingWinRateChart({ data, window = 20, isLoading, bare = false
 
   const chartContent = (
     <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minHeight={200}>
         <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
           <XAxis dataKey="trade" tick={{ fontSize: 11, fill: colors.text }} tickLine={false} axisLine={{ stroke: colors.axis }} />

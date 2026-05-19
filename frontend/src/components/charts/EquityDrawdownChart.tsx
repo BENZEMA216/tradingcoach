@@ -102,7 +102,7 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
   // The actual chart content
   const chartContent = (
     <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
             <defs>
               {/* Equity gradient - green with fade */}
