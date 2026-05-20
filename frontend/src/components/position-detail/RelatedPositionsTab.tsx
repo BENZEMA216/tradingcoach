@@ -17,6 +17,7 @@ interface RelatedPositionsTabProps {
   currentSymbol: string;
   isOption: boolean;
   underlyingSymbol?: string | null;
+  currency?: string;
 }
 
 export function RelatedPositionsTab({
@@ -25,6 +26,7 @@ export function RelatedPositionsTab({
   currentSymbol,
   isOption,
   underlyingSymbol,
+  currency = 'USD',
 }: RelatedPositionsTabProps) {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
@@ -64,7 +66,7 @@ export function RelatedPositionsTab({
               {isZh ? '关联交易总盈亏' : 'Total Related P&L'}
             </div>
             <div className={clsx('text-lg font-bold', getPnLColorClass(totalPnL))}>
-              {formatCurrency(totalPnL, position?.currency || 'USD')}
+              {formatCurrency(totalPnL, currency)}
             </div>
           </div>
         )}
@@ -178,7 +180,7 @@ function PositionCard({ position }: { position: RelatedPosition }) {
         <div className="flex items-center gap-3">
           <div className="text-right">
             <div className={clsx('font-semibold', getPnLColorClass(position.net_pnl))}>
-              {formatCurrency(position.net_pnl, position?.currency || 'USD')}
+              {formatCurrency(position.net_pnl, 'USD')}
             </div>
             <div className={clsx('text-xs', getPnLColorClass(position.net_pnl_pct))}>
               {formatPercent(position.net_pnl_pct)}

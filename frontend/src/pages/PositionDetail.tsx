@@ -169,7 +169,7 @@ export function PositionDetail() {
 
         {/* Section 3: Trade Executions */}
         <section>
-          <ExecutionTab trades={trades} loading={loadingTrades} />
+          <ExecutionTab trades={trades} loading={loadingTrades} currency={position.currency} />
         </section>
 
         {/* Section 4: News Context */}
@@ -217,6 +217,7 @@ export function PositionDetail() {
             currentSymbol={position.symbol}
             isOption={position.is_option}
             underlyingSymbol={position.underlying_symbol}
+            currency={position.currency}
           />
         </section>
       </div>

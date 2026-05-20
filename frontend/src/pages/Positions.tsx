@@ -366,7 +366,7 @@ export function Positions() {
                 {renderSortableHeader('net_pnl_pct', t('positions.pnlPct'), 'right')}
                 {renderSortableHeader('score_grade', t('positions.grade'), 'center')}
                 {renderSortableHeader('holding_period_days', t('positions.holdingDays'), 'right')}
-                <th className="px-4 py-3 text-left w-24" aria-hidden="true"></th> {/* Visual Bar */}
+                <th className="px-4 py-3 text-left w-24" aria-hidden="true"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
