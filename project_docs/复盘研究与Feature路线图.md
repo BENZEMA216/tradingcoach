@@ -8,22 +8,40 @@
 
 ---
 
-## 0. 执行摘要 (TL;DR)
+## 0. 执行摘要 (TL;DR) — v2 (2026-05-20 reframe)
 
-**核心结论**：交易复盘的本质不是"记录"，而是"在结果到来前就把过程钉死，以便事后能区分『决策好坏』和『盈亏好坏』。" 中英文社区在这一点上殊途同归（孟岩 = Annie Duke = Howard Marks = 段永平）。
+### 产品定位公理
 
-**TradingCoach 的差异化窗口**（来自 14 款产品 landscape）：
-1. **反事实回测** — Edgewonk 有 alt-strategy 模拟，但没人做"如果你执行了止损，整年亏损削减 X%"这种基于真实交易的 counterfactual。TradingCoach 现有 cf1-cf5 引擎已经独占。
-2. **中英双语 + 港美股混合 + Futu/IBKR 原生** — Tradervue/Tradezella 英文 only；同花顺/复盘盒子 A 股 only。港美股+港股+期权混合账户在主流工具里完全空白。
-3. **行为锚定 AI 教练** — TraderSync 的 Cypher 给的是泛泛"你周二表现更好"。基于用户自己的 8 维评分 + counterfactual delta 才能说"你在 7 笔 NVDA 财报交易里平均提前 12 分钟离场，损失 $4,300"。
-4. **期权价差 + 隐私模式截图分享** — 只有 TradingDiary Pro / Trademetria 处理 spread P&L 还做得难看；没人提供"打码账户大小+股票代码"的安全分享，这是 viral 钩子。
+**TradingCoach 不是 trading journal，是 trading post-mortem analyst。**
 
-**Top 5 建议 Feature**（ROI/Effort 排序，详见第 6 节）：
-1. 决策日志 (Decision Journal) — 开仓时强制 2 句话 thesis + 卖出触发条件
-2. 过程分/结果分双轴展示 — 当前 V2 评分已有数据，UI 拆分即可
-3. 周度复盘模板 (Weekly Retro Loop) — 仿 Steenbarger/Bellafiore，强制输出"明天要练的一个动作"
-4. 错误分类二分（违纪 vs 概率）— 段永平不为清单思想 + Pabrai 错误清单
-5. 年度致股东信自动生成 — 中文圈仪式感，刘建位/唐朝/孟岩共识
+> **Slogan**: 「你不用记，我们帮你看见。」
+
+用户唯一输入是 CSV。系统输出是「看见」——看见你看不见的行为模式、看见错误的真实价格、看见你与典型风格的差距。用户从「被要求填写」变成「被告知发现」。
+
+### 为什么是这个定位
+
+1. **认知科学硬约束**：散户事后 100% 记不得当初为什么买。要求用户高纪律记录的 journal 范式（Tradervue / Edgewonk / Steenbarger / 老唐手把手日记）在散户身上结构性失效。
+2. **跟竞品差异化**：所有同类产品都是"笔记本"，没人是"事后分析师"。这是真正的蓝海空白，比"中英双语+港美股"差异化更上一层。
+3. **跟 LLM 时代契合**：2026 年的 LLM 已经能从交易数据反推 thesis、识别行为模式、生成分析报告——这些以前必须用户填，现在系统能猜出 80%。
+
+### 设计 Gate（任何新 feature 必过）
+
+**问：如果用户什么都不填，这个功能还有价值吗？** 必须是 yes，否则废弃。
+
+### Top 5 v2 Feature（详见 §6）
+
+1. **G0 行为模式自动检测库** — 产品基石。从 CSV 自动识别 20+ 种用户看不见的行为模式（复仇交易/追涨/砍底部/提前离场/连亏加仓/...）
+2. **G3 AI 周/月/季/年复盘报告** — 主要触点。系统自动生成"分析师写给散户"的文字报告，零用户输入
+3. **G7 复盘问答 Chatbot** — 杀手 feature。用户自然语言提问，LLM 用全部交易数据 + G0 事件流 + counterfactual 作为上下文回答
+4. **G4 错误价签** — Viral 钩子。"你这个习惯一年花了你 $4,300"，让错误有价格标签
+5. **F12 反事实回测 v2** — 独占壁垒。基于真实交易数据的 counterfactual，主要竞品都做不到
+
+### 保留 vs 砍掉
+
+- ✅ **保留**：F2 (过程/结果双轴), F5 (年度股东信), F8 (AI 教练→改造为 G3 一部分), F10 (隐私分享), F11 (赛道白名单), F12 (反事实回测), F15 (行为连击)
+- ❌ **砍掉/改造**：F1 (决策日志→G1 AI 反推 thesis), F3 (错误打 tag→G0 自动检测), F4 (周报模板→G3 AI 生成), F6 (引导 post-mortem→G3 一部分), F7 (情绪 tag→G0 行为推断), F9 (setup tag→G6 AI 识别), F13 (清单订阅), F14 (语音备注)
+
+**结果：用户填写动作从 8 个降到 0 个。全程只需「上传 CSV → 看报告 → 提问」。**
 
 ---
 
@@ -189,126 +207,170 @@
 
 ---
 
-## 6. Feature 路线图（15 个，按 ROI/Effort 排序）
+## 6. Feature 路线图 v2 — 「事后整体复盘」视角（2026-05-20 reframe）
 
-### Tier 1 — 低 Effort × 高 ROI（4 个，Q3 2026）
+> **重要**：v1 路线图（F1-F15）的 8 个功能要求用户主动填写（决策日志、错误打 tag、周报、情绪 tag、setup tag 等），违反"用户事后记不得"公理，已废弃。v2 重组为「零负担复盘」路线，所有 G 系列功能在用户什么都不填的前提下仍有完整价值。
 
-#### F1. 决策日志 (Decision Journal)
-- **依据**: C3, C4, E7, E14 (Pabrai)、彼得林奇 / Parrish / 唐朝
-- **what**: 开仓时强制 2 字段——`thesis_140char`（≤140 中文/英文字）、`exit_trigger`（什么情况会让我卖）。平仓时自动 resurface，提示用户做 retrospective。
-- **API**: `POST /api/v1/positions/{id}/decision-log` `{thesis, exit_trigger, confidence_1_10, emotion_tag}`
-- **UI**: 开仓后弹一次性 dialog（5 个字段），平仓后在交易详情页置顶展示。
-- **Effort**: 后端 0.5d，前端 1d。
-- **ROI**: 解锁后续所有"过程分"feature 的数据基础。
+### 6.0 v1 → v2 映射表
 
-#### F2. 过程分/结果分双轴展示
-- **依据**: C4 (孟岩)、E5/E6 (Grimes)、Annie Duke、Howard Marks
-- **what**: V2 评分已经包含技术/行为/风控等 8 维，但目前只有总分。拆分为 `process_score` (技术+行为+风控+决策) 和 `outcome_score` (盈亏分位)，在交易卡片同屏展示。
-- **API**: 现有 `scoring.compute_v2()` 返回结构已经有这些维度，只需 expose 两个 aggregate 字段。
-- **UI**: 散点图 X=过程分, Y=结果分；四象限：好决策好结果 / 好决策坏结果（运气差，可接受）/ 坏决策好结果（运气好，要警惕）/ 坏决策坏结果。
-- **Effort**: 后端 0.5d，前端 1.5d。
-- **ROI**: 直接命中跨文化 #1 共性主题。
+| v1 Feature | v2 处理 | 原因 |
+|------------|---------|------|
+| F1 决策日志（用户开仓填） | → **G1** AI 反推 thesis 考古 | 用户记不得，改 AI 反推 |
+| F2 过程/结果双轴 | ✅ 保留为 **G2** | 现有数据即可，无需用户填 |
+| F3 错误分类（用户打 tag） | → **G0** 自动检测违纪 | 用户事后打也会失真 |
+| F4 周度复盘模板（用户写） | → **G3** AI 自动生成周报 | 用户不会写 |
+| F5 年度致股东信 | ✅ 保留为 **G3** 一部分 | 已经是 AI 生成 |
+| F6 引导 post-mortem（用户填） | → **G3** AI 草稿 | 改为系统先写，用户只改 |
+| F7 情绪 tag（用户开仓选） | → **G0** 从行为推断 | 追高=贪婪/砍底部=恐惧 |
+| F8 行为锚定 AI 教练 | → **G3** 主要输出 | 升级为完整报告 |
+| F9 Setup 分桶（用户打 tag） | → **G6** AI 识别 setup | 突破/回踩/财报 LLM 能识别 |
+| F10 隐私截图分享 | ✅ 保留 | 无需用户填 |
+| F11 赛道白名单 | ✅ 保留（一次性配置） | 配置后系统自动判 |
+| F12 反事实回测 v2 | ✅ 保留 | 独占壁垒 |
+| F13 决策清单订阅 | ❌ 砍 | 违反公理 |
+| F14 语音备注 | ❌ 砍 | 违反公理 |
+| F15 行为连击天数 | ✅ 保留 | 系统自动统计 |
 
-#### F3. 错误分类二分（违纪 vs 概率）
-- **依据**: C2 段永平、Livermore "don'ts"、Pabrai 错误清单、Munger
-- **what**: 用户在亏损交易（PnL < 0）的复盘里勾选"违纪类型"——`broke_stop_loss` / `oversized` / `revenge_trade` / `out_of_circle` / `not_violation_just_unlucky`。系统聚合后给出"违纪类亏损 $X / 概率类亏损 $Y"。
-- **API**: `POST /api/v1/positions/{id}/error-tag` `{tags: [...]}` (multi-select)
-- **UI**: 亏损交易页面右上角"标记错误类型"，月度/年度报告里出"违纪 vs 概率"饼图。
-- **Effort**: 后端 0.5d，前端 1d。
-- **ROI**: 让 counterfactual 引擎的 cf1-cf5 有了"哪些规则该 enforce"的用户反馈。
+### Tier 1 — 产品基石（Month 1-2, Q3 2026）
 
-#### F4. 周度复盘模板 (Weekly Retro Loop)
-- **依据**: E1/E2 (Steenbarger)、E3/E4 (Bellafiore)、唐朝
-- **what**: 每周日推送一份模板——本周 3 个最佳交易 + 3 个最差交易，模板要求用户为下周写一个 "明天/下周要练的一个动作" (强制单数)。系统跟踪连续完成情况。
-- **API**: `POST /api/v1/retro/weekly` `{week_start, best_3, worst_3, next_drill}`
-- **UI**: 单页向导，3 步完成。dashboard 显示"已连续复盘 X 周"。
-- **Effort**: 后端 1d，前端 2d。
-- **ROI**: 形成习惯，提高 retention。
+#### 🌟 G0. 行为模式自动检测库（**最重要**）
+- **依据**: TradingCoach 8 维评分 + counterfactual delta + 跨文化共性主题（错误 > 成功的学习价值）
+- **what**: 从 CSV 自动识别用户看不见的行为模式。每种模式 = 一个可被 query 的事件流。MVP 20 种：
+  - **冲动类**：复仇交易（亏损后 1h 内开新仓）、追涨（突破后 5% 进）、FOMO（连续 N 天上涨后追入）
+  - **执行类**：砍在底部（亏损超 X% 才止损）、提前离场（出场后该股继续涨 > Y%）、止损不严（实际止损位远于预设）
+  - **加仓类**：连亏后加仓（M2M 思维）、单股过度集中、跨账户相互掩盖
+  - **时间类**：周一效应、周五效应、季度尾效应、过度交易日（>N 笔/日）
+  - **品种类**：期权 IV 高位买入、低流动性标的、首次接触新行业
+  - **赛道类**：能力圈外交易（结合 F11/G8 赛道白名单）
+- **API**: `GET /api/v1/behavior/patterns?from=&to=` → `[{pattern_id, position_ids, severity, pnl_impact, ...}]`
+- **数据模型**: 新表 `behavior_events`，每次 import/recompute 时刷新
+- **UI**: 这是引擎层，本身不展示。但 G3/G4/G7 全部消费这个事件流
+- **Effort**: 后端 5d（20 种规则 + 测试），前端 0d
+- **ROI**: 后续所有零负担 feature 的数据底座
 
-### Tier 2 — 中 Effort × 高 ROI（5 个，Q4 2026）
+#### 🌟 G2. 过程分 / 结果分双轴展示（原 F2）
+- **依据**: C4 (孟岩)、Annie Duke、Howard Marks
+- **what**: V2 评分已经包含 8 维，拆分为 `process_score`（技术+行为+风控+决策）和 `outcome_score`（盈亏分位），同屏散点图
+- **API**: `scoring.compute_v2()` 返回值已含数据，新增 aggregate endpoint
+- **UI**: 四象限散点图：好决策好结果 / 好决策坏结果（运气差）/ 坏决策好结果（要警惕）/ 坏决策坏结果
+- **Effort**: 后端 0.5d，前端 1.5d
+- **ROI**: 跨文化共识 #1，让用户第一次区分"决策"和"运气"
 
-#### F5. 年度致股东信自动生成
-- **依据**: C11 (刘建位)、唐朝、孟岩、Buffett 1994 致股东信
-- **what**: 年终一键生成"致自己的股东信"PDF——包含总收益、跑赢/跑输基准、Top 5 持仓贡献、3 大错误反思、明年承诺。所有数据来自系统，文字由 GPT 模板化润色。
-- **API**: `POST /api/v1/reports/annual-letter` `{year}` → PDF
-- **UI**: 12 月底自动入口，让用户编辑 4 个字段后生成。
-- **Effort**: 后端 2d（含 PDF 渲染），前端 1d。
-- **ROI**: 中文圈独有仪式感，强 viral（用户会主动分享朋友圈）。
+### Tier 2 — 主要表现层（Month 3-4, Q3-Q4 2026）
 
-#### F6. 引导式 Post-Mortem 模板
-- **依据**: E6 (Grimes CREE)、E3 (Bellafiore)、E10 (Minervini)
-- **what**: 每笔交易提供 5 个引导问题：`thesis_was`, `what_was_right`, `what_was_wrong`, `if_redo`, `next_drill`. 用户答完，系统自动 tag 关键词聚合。
-- **Effort**: 后端 1d，前端 1.5d。
-- **ROI**: 让低活跃用户也能写出有质量的复盘。
+#### 🌟 G3. AI 周/月/季/年复盘报告（**主要触点**）
+- **依据**: E1/E2 (Steenbarger)、E3/E4 (Bellafiore "next drill")、C11 (刘建位致股东信)、唐朝、孟岩、TraderSync Cypher 痛点
+- **what**: 系统每周一/月初/季初/年初**自动**生成"分析师写给散户"的文字报告。零用户输入。报告结构（4 段）：
+  1. **本期画像**：N 笔交易，胜率 X%，平均持仓 Y，最大单笔 +Z%/-W%
+  2. **Top 3 错误**（消费 G0 事件流）+ 错误价签：复仇交易 3 次 → 损失 $1,200
+  3. **Top 3 亮点**：连续 5 天遵守止损、NVDA 仓位控制得当
+  4. **与上期对比**：止损纪律改善 +15% / 仓位过大恶化 -8%
+  5. **下期 1 个建议**（强制单数，仿 Bellafiore "next drill"）：每条带"应用此建议"按钮，直链具体 setting
+- **API**: `GET /api/v1/reports/auto?period=weekly|monthly|quarterly|annual`
+- **UI**: 首页顶部卡片"本周复盘报告已生成"。点击进入全屏阅读。年度报告生成 PDF 可分享
+- **LLM 调用**: 把 G0 事件流 + V2 评分 + counterfactual 喂给 LLM，prompt 模板按周期切换语气（周报偏战术、年报偏 Buffett 致股东信仪式感）
+- **Effort**: 后端 4d（含 prompt 工程 + PDF 渲染），前端 2d
+- **ROI**: 用户日常的唯一触点。所有研究投入 → 通过这一张报告兑现给用户
 
-#### F7. 情绪标签 + 与亏损相关性
-- **依据**: C5 (知乎)、E9 (BabyPips 2025)、Hougaard
-- **what**: 开仓时选 emotion（FOMO/平静/恐惧/贪婪/复仇），平仓后系统给"按情绪分组的胜率/盈亏"。
-- **Effort**: 后端 1d，前端 2d。
-- **ROI**: 让用户看到自己的情绪定价。
+#### 🌟 G4. 错误价签（**Viral 钩子**）
+- **依据**: White-space #4 行为锚定教练、Steenbarger 行为成本量化
+- **what**: G0 检测到的每种错误模式自动计算"这个习惯一年花了你多少钱"：
+  - "连亏后加仓" 一年损失 $4,300
+  - "提前离场" 一年错过 $2,100
+  - "复仇交易" 一年损失 $890
+  - **总坏习惯成本**：年化 $7,290（占总盈亏 18%）
+- **计算**: 行为模式触发的交易 P&L 减去 counterfactual P&L（即"如果没犯这个错"的应得收益）
+- **API**: `GET /api/v1/behavior/cost-tags?period=annual`
+- **UI**: 单独 dashboard 页"我的坏习惯账单"。每个 tag 一张大数字卡片。一键分享为打码图（联动 F10）
+- **Effort**: 后端 1.5d，前端 2d
+- **ROI**: 最强 viral 钩子。用户主动分享朋友圈"我今年因为复仇交易亏了 $4,300"
 
-#### F8. 行为锚定 AI 教练
-- **依据**: TraderSync Cypher 痛点、E2 (Steenbarger best practices)、White-space #4
-- **what**: 基于用户 8 维评分 + counterfactual delta + 情绪标签，每周生成 3 条 actionable insight。例："你在 NVDA 财报前 7 笔交易里有 5 次提前 12 分钟离场，导致 $4,300 损失。建议下次设 trailing stop 而非 hard exit。"
-- **API**: `GET /api/v1/coach/weekly-insights`
-- **UI**: 主页顶部 3 张卡片，每条带"应用此建议"按钮（链到具体 setting）。
-- **Effort**: 后端 3d（含 prompt 工程），前端 1d。
-- **ROI**: 最具产品差异化，决定用户长期留存。
+### Tier 3 — 杀手 Feature & 差异化（Month 5-6, Q4 2026 / Q1 2027）
 
-#### F9. Setup 分桶 + 每桶 Expectancy
-- **依据**: E10 (Minervini)、E12 (Van Tharp R-multiples)、Bellafiore Playbook
-- **what**: 用户给交易打 setup tag（突破/回踩/反转/财报/事件/...），系统按 setup 算 win rate / avg gain / avg loss / expectancy，按 expectancy 降序排。
-- **API**: `GET /api/v1/stats/by-setup`
-- **UI**: 表格 + 漏斗图，最差 setup 标红"建议剔除"。
-- **Effort**: 后端 1.5d，前端 1.5d。
-- **ROI**: 让用户看到"哪类交易应该放弃"。
+#### 🌟 G7. 复盘问答 Chatbot（**杀手 feature**）
+- **依据**: 事后整体复盘的最自然交互形态、LLM 时代必然路径
+- **what**: 用户自然语言提问，LLM 用全部交易数据 + G0 行为事件流 + counterfactual 结果作为上下文回答：
+  - "我今年 NVDA 表现怎样？"
+  - "我什么时候最容易亏钱？" → "周五下午 14:00 后，胜率从 52% 降到 31%"
+  - "我的止损策略有用吗？" → 自动跑 counterfactual 对比
+  - "如果我严格执行所有止损，会多赚多少？"
+  - "我有没有过度交易？" → 检测 G0 时间类模式
+  - "TSLA 和 NVDA 我哪个做得更好？"
+- **架构**: 把用户的交易数据 + G0 事件流 + V2 评分 + counterfactual 序列化成结构化 context（≤200K tokens），喂给 Claude/GPT。配合 function calling 允许 LLM 触发系统计算
+- **API**: `POST /api/v1/chat` `{message, session_id}` → streamed response
+- **UI**: 浮动 chat 按钮 + 完整 chat 页。支持引用具体交易/图表
+- **Effort**: 后端 7d（context 序列化 + function calling），前端 4d
+- **ROI**: 杀手级。这才是真正的"事后分析师"，决定用户长期留存
 
-### Tier 3 — 高 Effort × 高 ROI（3 个，Q1 2027）
+#### G6. AI 自动 Setup 识别（原 F9 改造）
+- **依据**: E10 (Minervini 按 setup 分桶)、E12 (Van Tharp)、White-space #4
+- **what**: LLM + 技术指标自动识别每笔交易的 setup 类型（突破/回踩/反转/财报前/事件驱动/IV crush/...）。不让用户打 tag
+- **API**: `POST /api/v1/positions/{id}/setup-detect` (batch)
+- **UI**: 自动按 setup 分桶展示 win rate / expectancy。最差 setup 标红 "G3 报告里会提醒你戒掉此 setup"
+- **Effort**: 后端 3d（特征工程 + LLM prompt），前端 1d
+- **ROI**: 让 G0/G3 报告里的"行为模式"更细粒度
 
-#### F10. 隐私模式截图分享
-- **依据**: White-space #5、Hougaard Book of Truths（私密）
-- **what**: 一键生成"打码"截图——账户金额→百分比、股票代码→`XXXX`、用户名→匿名。用户可选公开分享或仅好友。
-- **Effort**: 后端 2d（图片合成），前端 2d。
-- **ROI**: viral 钩子，每次分享=广告。
+#### G8. 风格定位 + 双胞胎对照
+- **依据**: 跨文化共识、白皮书 "我是谁" 范式
+- **what**: 把用户与 N 种典型风格对比（短线狙击 / 趋势跟随 / 价值长持 / 事件驱动 / 期权策略 / 韭菜散户）：
+  - 风格画像："你其实是趋势跟随者，但你在做短线狙击——这是你亏钱的根本原因。"
+  - 双胞胎：找出用户做过的相似交易（同 setup / 同股票 / 同行业）：
+    - "你在 NVDA 财报前 8 次交易胜率 25%，平均亏 $X — 这个 setup 对你无效"
+    - "你 80% 的科技股盈利来自周二、80% 的亏损来自周五"
+- **API**: `GET /api/v1/profile/style` / `GET /api/v1/positions/{id}/twins`
+- **UI**: 个人画像页 + 每笔交易底部"相似历史交易"
+- **Effort**: 后端 4d（聚类 + LLM 标注），前端 3d
+- **ROI**: 强情绪冲击。让用户第一次"看见自己"
 
-#### F11. 赛道白名单 (Watchlist Bands)
-- **依据**: C6 (林园)、C8 (张磊)、唐朝、段永平能力圈
-- **what**: 用户自定义"我懂的赛道"（消费/医药/AI/...），赛道外的交易在 UI 标红，月度报告专门统计"赛道外亏损"。
-- **Effort**: 后端 2d，前端 2d。
-- **ROI**: 强化能力圈纪律。
+#### F10. 隐私模式截图分享（保留）
+- **what**: 一键打码截图，金额→%、股票代码→`XXXX`、用户名→匿名
+- **Effort**: 后端 2d，前端 2d
+- **ROI**: viral 钩子。配合 G4 错误价签效果最大化
 
-#### F12. 反事实回测 v2 — 用户可自定义规则
-- **依据**: 现有 cf1-cf5 引擎、Edgewonk alt-strategy、White-space #1
-- **what**: 用户可拖拽组合规则（"如果第一个月亏损 > -5% 就停止交易 X 天" + "如果连续 3 笔亏损就 size 减半"），系统算如果应用这些规则，过去一年 P&L 会变成多少。
-- **Effort**: 后端 3d（规则 DSL 设计），前端 3d（rule builder UI）。
-- **ROI**: 独占壁垒，最强差异化。
+#### F11. 赛道白名单（保留，一次性配置）
+- **what**: 用户一次性配置"我懂的赛道"，赛道外交易自动标红 + 进 G0 "能力圈外"事件流
+- **Effort**: 后端 2d，前端 2d
+- **ROI**: 强化能力圈纪律。中文圈共识
 
-### Tier 4 — 低优先（3 个，可观察）
+#### F12. 反事实回测 v2（保留，最强差异化）
+- **what**: 用户拖拽组合规则，系统跑 counterfactual。例："如果连续 3 笔亏损就 size 减半 + 单股 < 20% 仓位"，过去一年 P&L 会变成多少
+- **Effort**: 后端 3d（DSL），前端 3d（rule builder）
+- **ROI**: 独占壁垒，竞品做不到
 
-#### F13. 决策清单订阅（社区版）
-- **依据**: E14 (Pabrai 97-item)、Spier
-- **what**: 公开错误清单订阅（"巴菲特错误集"/"段永平不为清单"/"用户A 公开清单"），开仓前必跑一次。
-
-#### F14. 语音备注 + 60s 点评
-- **依据**: C10 (老虎社区)
-- **what**: 移动端可录 60s 语音备注挂在交易记录上，未来 AI 转文字 + 情绪检测。
+### Tier 4 — 可观察（2 个）
 
 #### F15. 良好行为连击天数
-- **依据**: E2 (Steenbarger best practices)
-- **what**: 系统检测"无违纪交易日"连击，类似 Duolingo streak，奖励持续纪律。
+- **what**: 系统检测"无违纪交易日"连击（依赖 G0），类似 Duolingo streak
+- **ROI**: retention 工具
+
+#### G9. 社区错误模式订阅（替代 F13）
+- **what**: 用户可订阅"段永平不为清单 → 自动映射为 G0 检测规则"、"巴菲特规避错误 → 自动检测"。不是订阅清单让用户对照，是订阅规则让系统帮你查
+- **ROI**: 差异化护城河，等社区起来再做
 
 ---
 
-## 7. 推荐执行顺序（6 个月排期）
+## 7. 推荐执行顺序 v2（6 个月排期）
 
 ```
-Month 1-2 (Q3 2026):  F1 + F2 + F3   → 数据底座 + 过程/结果双轴
-Month 3   (Q3 2026):  F4              → 周度复盘形成习惯
-Month 4   (Q4 2026):  F5 + F7         → 年度仪式 + 情绪分析（中文圈强）
-Month 5   (Q4 2026):  F6 + F9         → Post-mortem + Setup 分桶（英文圈强）
-Month 6   (Q1 2027):  F8 + F10        → AI 教练 + 隐私分享（差异化 + viral）
-观察期:               F11/F12/F13-15  → 根据 retention 决定
+Month 1-2 (Q3 2026):  G0 (行为模式检测 20 种)     [产品基石 — 后续全部依赖]
+                      G2 (过程/结果双轴)          [现有数据即可]
+Month 3   (Q3 2026):  G3 (AI 周/月报告 v1)        [主要触点]
+                      G4 (错误价签)              [Viral 钩子]
+Month 4   (Q4 2026):  G6 (AI Setup 识别)          [G3 细粒度增强]
+                      G3 (季报/年报扩展)
+Month 5   (Q4 2026):  G7 (复盘问答 Chatbot)       [杀手 feature]
+                      G8 (风格定位 + 双胞胎)
+Month 6   (Q1 2027):  F10 (隐私分享)              [Viral 闭环]
+                      F12 (反事实回测 v2)         [差异化护城河]
+观察期:               F11 (赛道白名单)
+                      F15 (行为连击)
+                      G9 (社区订阅)
 ```
+
+**关键变化对比 v1**：
+- ✂️ 砍掉 4 个用户填写功能（F1/F3/F4/F6/F7/F9/F13/F14）= **0 用户填写动作**
+- ➕ 新增 5 个零负担 AI feature（G0/G3/G4/G7/G8）
+- 🎯 产品体验：上传 CSV → 看报告（G3）→ 提问（G7）→ 分享坏习惯账单（G4+F10）— 全程零文字输入
 
 ---
 
@@ -356,4 +418,14 @@ Month 6   (Q1 2027):  F8 + F10        → AI 教练 + 隐私分享（差异化 +
 
 ---
 
-**报告字数**: ~5500 字 | **覆盖深度**: 文章 25 / KOL 12 / 大师 39 / 产品 14 | **可立即落地的 Feature**: 15 个（Tier 1 共 4 个 < 一周可启动）
+**报告字数**: ~6500 字 | **覆盖深度**: 文章 25 / KOL 12 / 大师 39 / 产品 14 | **v2 Feature**: 9 个零负担 G 系列 + 4 个保留 F 系列 = 13 个，按 ROI/Effort 排序
+
+## 9. 设计公理速查表（v2 核心）
+
+| 公理 | 含义 | 测试 |
+|------|------|------|
+| **用户事后 100% 记不得** | 散户没有事中记录的纪律。这是认知科学硬约束，不是 UX 问题 | 任何 feature 要求填字段 → 砍掉或改 AI 反推 |
+| **零负担复盘** | 用户全程只需「上传 CSV → 看 → 提问」 | 用户输入动作 > 0 → 重设计 |
+| **系统主动看见** | 用户看不见的行为模式，系统自动检测并标价 | G0 行为模式检测库是基石 |
+| **AI 是数据采集层，不只是输出层** | LLM 不是用来生成花哨建议，而是用来反推用户没填的字段（thesis/setup/情绪） | LLM 应用先想"补什么数据"再想"输出什么" |
+| **差异化 = post-mortem analyst，不是 journal** | 跟 Tradervue/Edgewonk/Tradezella/老唐范式划清界限 | 营销/PR 文案必须围绕这一点 |
