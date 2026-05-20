@@ -53,7 +53,12 @@ export function StrategyPieChart({ data, title, onDrillDown, bare = false, isLoa
     );
   }
 
-  if (!data || data.length === 0) {
+  // Treat "all unclassified" the same as no data — pie chart of 100% one slice is noise
+  const isAllUnclassified =
+    data && data.length === 1 &&
+    (data[0].strategy_name === 'Unclassified' || data[0].strategy === 'unclassified');
+
+  if (!data || data.length === 0 || isAllUnclassified) {
     return (
       <div className={bare ? '' : 'bg-white dark:bg-black rounded-sm p-6 shadow-sm border border-neutral-200 dark:border-white/10 transition-colors'}>
         {!bare && (
@@ -61,8 +66,11 @@ export function StrategyPieChart({ data, title, onDrillDown, bare = false, isLoa
             {displayTitle}
           </h3>
         )}
-        <div className="h-64 flex items-center justify-center text-slate-400 dark:text-white/30 font-mono text-xs">
-          {t('common.noData')}
+        <div className="h-64 flex flex-col items-center justify-center text-slate-400 dark:text-white/30 font-mono text-xs gap-2">
+          <div>{t('strategy.allUnclassifiedTitle', '暂未分类策略')}</div>
+          <div className="text-[10px] text-slate-300 dark:text-white/20">
+            {t('strategy.allUnclassifiedHint', '策略自动分类正在开发中')}
+          </div>
         </div>
       </div>
     );

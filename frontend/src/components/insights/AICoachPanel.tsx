@@ -158,29 +158,7 @@ export function AICoachPanel({ dateStart, dateEnd, limit = 20 }: AICoachPanelPro
           </div>
         </div>
 
-        {/* Summary badges */}
-        {!isLoading && !error && totalCount > 0 && (
-          <div className="flex items-center gap-2">
-            {problemCount > 0 && (
-              <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                {problemCount}
-              </span>
-            )}
-            {strengthCount > 0 && (
-              <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                {strengthCount}
-              </span>
-            )}
-            {reminderCount > 0 && (
-              <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                {reminderCount}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Summary badges removed — each InsightGroup header now shows the count inline */}
       </div>
 
       {/* Content */}

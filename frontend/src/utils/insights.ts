@@ -37,14 +37,22 @@ export function getEquityCurveInsight(
   // （peak 不是初始资金而是历史最高 P&L）。clamp 到 100% 给用户一个
   // 物理上有意义的"最深回撤比例"。
   const rawMax = Math.max(...data.map(d => d.drawdown_pct ?? 0));
-  const maxDrawdown = Math.min(rawMax, 100);
-  const wasClamped = rawMax > 100;
-  const suffix = wasClamped ? (isZh ? '+' : '+') : '';
+  const maxDrawdownAmt = Math.max(...data.map(d => d.drawdown ?? 0));
 
-  if (isZh) {
-    return `累计收益 ${formatUSD(last.cumulative_pnl)}，期间最大回撤 ${maxDrawdown.toFixed(1)}%${suffix}。`;
+  // 当 peak 从正穿越到负（或反之），drawdown_pct 会失去物理意义（>100%）
+  // 这种情况用绝对金额代替百分比展示，避免"100%+ 回撤"这种用户看不懂的数字
+  if (rawMax > 100) {
+    if (isZh) {
+      return `累计收益 ${formatUSD(last.cumulative_pnl)}，期间最大回撤 ${formatUSD(-maxDrawdownAmt)}。`;
+    }
+    return `Cumulative P&L of ${formatUSD(last.cumulative_pnl)} with maximum drawdown of ${formatUSD(-maxDrawdownAmt)}.`;
   }
-  return `Cumulative P&L of ${formatUSD(last.cumulative_pnl)} with maximum drawdown of ${maxDrawdown.toFixed(1)}%${suffix}.`;
+
+  const maxDrawdown = rawMax;
+  if (isZh) {
+    return `累计收益 ${formatUSD(last.cumulative_pnl)}，期间最大回撤 ${maxDrawdown.toFixed(1)}%。`;
+  }
+  return `Cumulative P&L of ${formatUSD(last.cumulative_pnl)} with maximum drawdown of ${maxDrawdown.toFixed(1)}%.`;
 }
 
 /**

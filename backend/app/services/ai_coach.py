@@ -24,6 +24,7 @@ from .prompts.templates import (
 )
 from ..database import Position, PositionStatus
 from ..schemas.insights import TradingInsight
+from ..utils.currency import get_pnl_in_usd
 
 logger = logging.getLogger(__name__)
 
@@ -137,18 +138,19 @@ class AICoach:
         return self._llm_client
 
     def _get_key_metrics(self, positions: List[Position]) -> Dict[str, Any]:
-        """计算关键指标"""
+        """计算关键指标（按 USD 等价归一，避免 HKD/USD 直接相加）"""
         if not positions:
             return {}
 
+        pnls_usd = [(p, get_pnl_in_usd(p)) for p in positions]
         total_trades = len(positions)
-        winners = [p for p in positions if p.net_pnl and float(p.net_pnl) > 0]
-        losers = [p for p in positions if p.net_pnl and float(p.net_pnl) <= 0]
+        winners = [(p, v) for p, v in pnls_usd if v > 0]
+        losers = [(p, v) for p, v in pnls_usd if v <= 0 and p.net_pnl is not None]
 
         win_rate = len(winners) / total_trades * 100 if total_trades > 0 else 0
-        total_pnl = sum(float(p.net_pnl or 0) for p in positions)
-        avg_win = sum(float(p.net_pnl) for p in winners) / len(winners) if winners else 0
-        avg_loss = abs(sum(float(p.net_pnl) for p in losers) / len(losers)) if losers else 0
+        total_pnl = sum(v for _, v in pnls_usd)
+        avg_win = sum(v for _, v in winners) / len(winners) if winners else 0
+        avg_loss = abs(sum(v for _, v in losers) / len(losers)) if losers else 0
 
         return {
             "total_trades": total_trades,

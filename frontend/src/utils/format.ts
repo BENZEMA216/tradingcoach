@@ -21,11 +21,11 @@ export const formatPercent = (value: number | null | undefined, decimals = 2): s
   return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
 };
 
-// Format number with sign
+// Format number with sign — keeps currency symbol for both positive and negative
 export const formatPnL = (value: number | null | undefined): string => {
   if (value === null || value === undefined) return '-';
   const formatted = formatCurrency(Math.abs(value));
-  return value >= 0 ? `+${formatted}` : `-${formatted.replace('$', '')}`;
+  return value >= 0 ? `+${formatted}` : `-${formatted}`;
 };
 
 // Format date
@@ -143,7 +143,7 @@ export function getPrivacyAwareFormatters() {
       maximumFractionDigits: 2,
     }).format(absValue);
 
-    return value >= 0 ? `+${formatted}` : `-${formatted.replace('$', '')}`;
+    return value >= 0 ? `+${formatted}` : `-${formatted}`;
   };
 
   const formatAxisPrivate = (value: number): string => {

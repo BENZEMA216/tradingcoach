@@ -169,7 +169,12 @@ export function PositionDetail() {
 
         {/* Section 3: Trade Executions */}
         <section>
-          <ExecutionTab trades={trades} loading={loadingTrades} currency={position.currency} />
+          <ExecutionTab
+            trades={trades}
+            loading={loadingTrades}
+            currency={position.currency}
+            totalFeesFallback={position.total_fees}
+          />
         </section>
 
         {/* Section 4: News Context */}

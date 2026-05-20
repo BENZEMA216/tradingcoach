@@ -193,7 +193,7 @@ export function Statistics() {
   // Subscribe to privacy state so charts re-render on toggle even though we
   // don't read isPrivacyMode directly here.
   usePrivacyStore();
-  const { formatCurrency } = getPrivacyAwareFormatters();
+  const { formatCurrency, formatPnL } = getPrivacyAwareFormatters();
 
   const [periodType, setPeriodType] = useState<PeriodType>('all');
   const [periodOffset, setPeriodOffset] = useState(0);
@@ -581,7 +581,7 @@ export function Statistics() {
                         </div>
                         <div className="flex justify-between text-sm font-mono">
                           <span className={clsx('font-bold', item.total_pnl > 0 ? 'text-green-500' : 'text-red-500')}>
-                            {formatCurrency(item.total_pnl)}
+                            {formatPnL(item.total_pnl)}
                           </span>
                           <span className="text-white/60 text-xs">
                             {isZh ? '胜率' : 'WIN'}: {formatPercent(item.win_rate, 1)}

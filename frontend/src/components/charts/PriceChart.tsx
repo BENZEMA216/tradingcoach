@@ -347,16 +347,11 @@ export function PriceChart({ data, height = 400, showIndicators = true, bare = f
       );
     }
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {t('chart.priceChart')}
-        </h3>
-        <div
-          className="flex items-center justify-center text-gray-500 dark:text-gray-400"
-          style={{ height: height }}
-        >
-          {data?.message || t('chart.noData')}
-        </div>
+      <div
+        className="flex items-center justify-center text-gray-500 dark:text-gray-400"
+        style={{ height: height }}
+      >
+        {data?.message || t('chart.noData')}
       </div>
     );
   }
@@ -405,11 +400,8 @@ export function PriceChart({ data, height = 400, showIndicators = true, bare = f
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          {t('chart.priceChart')} - {data.symbol}
-        </h3>
+    <div>
+      <div className="flex items-center justify-end mb-4">
         {legend}
       </div>
       {chartContent}

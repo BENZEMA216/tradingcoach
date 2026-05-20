@@ -311,6 +311,7 @@ export interface RelatedPosition {
   net_pnl_pct: number | null;
   overall_score: number | null;
   score_grade: string | null;
+  currency?: string;
 }
 
 // Risk Metrics

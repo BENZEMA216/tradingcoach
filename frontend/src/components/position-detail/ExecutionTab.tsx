@@ -11,9 +11,10 @@ interface ExecutionTabProps {
   trades?: PositionTrade[];
   loading?: boolean;
   currency?: string;
+  totalFeesFallback?: number | null;
 }
 
-export function ExecutionTab({ trades, loading, currency = 'USD' }: ExecutionTabProps) {
+export function ExecutionTab({ trades, loading, currency = 'USD', totalFeesFallback }: ExecutionTabProps) {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
 
@@ -35,14 +36,11 @@ export function ExecutionTab({ trades, loading, currency = 'USD' }: ExecutionTab
     ? slippageSummary.total / slippageSummary.count
     : null;
 
-  // Calculate fees summary
-  const feesSummary = trades?.reduce(
-    (acc, trade) => {
-      acc.total += trade.total_fees;
-      return acc;
-    },
-    { total: 0 }
-  );
+  // Calculate fees summary (use position.total_fees as fallback when trade-level fees are missing/zero)
+  const tradeFeesSum = trades?.reduce((acc, trade) => acc + (trade.total_fees || 0), 0) || 0;
+  const feesSummary = {
+    total: tradeFeesSum > 0 ? tradeFeesSum : (totalFeesFallback || 0),
+  };
 
   return (
     <div className="space-y-6">
