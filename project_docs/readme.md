@@ -24,6 +24,7 @@
 | frontend_audit_report.md | 审计报告 | 前端代码审计报告 |
 | session_summary_*.md | 会话记录 | 开发会话总结 |
 | 复盘想法.md | 业务文档 | 复盘功能设计想法 |
+| 复盘研究与Feature路线图.md | 研究报告 | 25 篇文章+12 KOL+39 大师+14 产品 landscape+15 个 Feature 路线图 (2026-05-20) |
 
 ## reports/ 子目录
 
