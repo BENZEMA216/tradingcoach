@@ -27,7 +27,7 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
   const locale = i18n.language === 'zh' ? 'zh-CN' : 'en-US';
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {

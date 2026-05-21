@@ -32,7 +32,7 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
   const locale = i18n.language === 'zh' ? 'zh-CN' : 'en-US';
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {

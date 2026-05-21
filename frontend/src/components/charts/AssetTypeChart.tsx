@@ -51,8 +51,8 @@ export function AssetTypeChart({ data, isLoading, onBarClick, bare = false }: As
   const chartConfig = useResponsiveChart(containerRef, { layout: 'horizontal' });
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
-  const { formatCurrency: _formatCurrency, formatPnL, formatAxis } = getPrivacyAwareFormatters();
+  usePrivacyStore((state) => state.isPrivacyMode);
+  const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
     if (bare) return <ChartSkeleton height="h-64" showTitle={false} />;

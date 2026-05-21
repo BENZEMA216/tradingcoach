@@ -24,18 +24,20 @@ export function TradingCalendar({ className }: TradingCalendarProps) {
     const isZh = i18n.language === 'zh';
 
     const [currentDate, setCurrentDate] = useState(new Date());
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
 
     // Fetch calendar heatmap data for the current year
     const { data: yearData, isLoading } = useQuery({
-        queryKey: ['statistics', 'calendar-heatmap', currentDate.getFullYear()],
-        queryFn: () => statisticsApi.getCalendarHeatmap(currentDate.getFullYear()),
+        queryKey: ['statistics', 'calendar-heatmap', currentYear],
+        queryFn: () => statisticsApi.getCalendarHeatmap(currentYear),
     });
 
     // Transform array data into a map for O(1) lookup
     const dailyDataMap = useMemo(() => {
         const map = new Map<string, DailyData>();
         if (Array.isArray(yearData)) {
-            yearData.forEach((item: any) => {
+            yearData.forEach((item) => {
                 // Assuming item has { date: string, value: number, count: number } structure matches backend
                 // We might need to adjust based on actual API response, but strictly typing for now
                 map.set(item.date, {
@@ -50,8 +52,8 @@ export function TradingCalendar({ className }: TradingCalendarProps) {
     }, [yearData]);
 
     // Calendar Logic
-    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
     // Generate calendar grid
     const calendarDays = useMemo(() => {
@@ -62,17 +64,17 @@ export function TradingCalendar({ className }: TradingCalendarProps) {
         }
         // Days of current month
         for (let i = 1; i <= daysInMonth; i++) {
-            days.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), i));
+            days.push(new Date(currentYear, currentMonth, i));
         }
         return days;
-    }, [currentDate.getFullYear(), currentDate.getMonth()]);
+    }, [currentMonth, currentYear, daysInMonth, firstDayOfMonth]);
 
     const handlePrevMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+        setCurrentDate(new Date(currentYear, currentMonth - 1, 1));
     };
 
     const handleNextMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+        setCurrentDate(new Date(currentYear, currentMonth + 1, 1));
     };
 
     const handleDayClick = (date: Date) => {
@@ -110,7 +112,7 @@ export function TradingCalendar({ className }: TradingCalendarProps) {
                             <ChevronLeft className="w-4 h-4" />
                         </button>
                         <span className="px-4 text-sm font-mono font-medium text-slate-900 dark:text-white min-w-[120px] text-center uppercase">
-                            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+                            {monthNames[currentMonth]} {currentYear}
                         </span>
                         <button
                             onClick={handleNextMonth}

@@ -34,7 +34,7 @@ export function MonthlyPerformanceChart({ data, isLoading, onBarClick, bare = fa
   const colors = useChartColors();
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {

@@ -185,10 +185,10 @@ test.describe('Memory and Resource Usage', () => {
 
       // Get JS heap size
       const metrics = await page.evaluate(() => {
-        if ('memory' in performance) {
-          return (performance as any).memory.usedJSHeapSize;
-        }
-        return 0;
+        const performanceWithMemory = performance as Performance & {
+          memory?: { usedJSHeapSize: number };
+        };
+        return performanceWithMemory.memory?.usedJSHeapSize ?? 0;
       });
 
       if (metrics > 0) {
@@ -240,7 +240,7 @@ test.describe('Network Request Performance', () => {
 
     // All API calls should complete within 2 seconds
     apiTimes.forEach(({ url, time }) => {
-      expect(time).toBeLessThan(2000);
+      expect(time, url).toBeLessThan(2000);
     });
   });
 });
@@ -251,7 +251,6 @@ test.describe('Bundle Size Check', () => {
     let totalCssSize = 0;
 
     page.on('response', async (response) => {
-      const url = response.url();
       const contentType = response.headers()['content-type'] || '';
 
       if (contentType.includes('javascript')) {

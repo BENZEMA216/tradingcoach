@@ -5,7 +5,7 @@
  * output: 渲染 Toast 通知列表
  * pos: UI 组件 - 显示在页面右上角的通知
  */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
@@ -110,13 +110,8 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
 
 export function ToastContainer() {
   const { toasts, removeToast } = useToastStore();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
+  if (typeof document === 'undefined') return null;
 
   return createPortal(
     <div

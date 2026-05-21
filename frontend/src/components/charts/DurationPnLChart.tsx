@@ -31,7 +31,7 @@ export function DurationPnLChart({ data, isLoading, bare = false }: DurationPnLC
   const { t } = useTranslation();
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   // Calculate optimal visualization settings based on data density

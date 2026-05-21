@@ -1,7 +1,7 @@
 // Utility components
 export { ChartContainer } from './ChartContainer';
 export type { ChartAction } from './ChartContainer';
-export { ChartTooltip, createTooltipRenderer, simpleTooltipFormatter } from './ChartTooltip';
+export { ChartTooltip } from './ChartTooltip';
 export type { TooltipItem } from './ChartTooltip';
 
 // Existing charts

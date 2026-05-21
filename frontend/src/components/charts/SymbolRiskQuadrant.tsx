@@ -30,7 +30,7 @@ export function SymbolRiskQuadrant({ data, isLoading, onDotClick, bare = false }
   const colors = useChartColors();
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatCurrency, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {

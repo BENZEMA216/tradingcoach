@@ -27,7 +27,7 @@ export function PnLDistributionChart({ data, isLoading, bare = false }: PnLDistr
   const colors = useChartColors();
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatCurrency, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
