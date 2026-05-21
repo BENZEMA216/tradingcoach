@@ -25,7 +25,9 @@
 | session_summary_*.md | 会话记录 | 开发会话总结 |
 | 复盘想法.md | 业务文档 | 复盘功能设计想法 |
 | 复盘研究与Feature路线图.md | 研究报告 | 25 篇文章+12 KOL+39 大师+14 产品 landscape+15 个 Feature 路线图 (2026-05-20) |
-| QA_REPORT_20260520.md | QA 报告 | chrome-devtools MCP 8 页前端遍历，1 个 P0 已修 + 14 个待修 (2026-05-20) |
+| QA_REPORT_20260520_v2.md | QA 报告 | API + 静态审计混合 QA，记录数据可信度、评分、UX 和流程问题 |
+| NEXT_ACTIONS_20260521.md | 近期计划 | 当前 dogfood/QA 分支的近期稳定化执行计划 |
+| ACCEPTANCE_CHECKLIST_20260521.md | 验收文档 | 近期稳定化工作的验收清单和发布门禁 |
 
 ## reports/ 子目录
 
