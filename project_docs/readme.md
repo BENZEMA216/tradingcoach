@@ -28,6 +28,9 @@
 | QA_REPORT_20260520_v2.md | QA 报告 | API + 静态审计混合 QA，记录数据可信度、评分、UX 和流程问题 |
 | NEXT_ACTIONS_20260521.md | 近期计划 | 当前 dogfood/QA 分支的近期稳定化执行计划 |
 | ACCEPTANCE_CHECKLIST_20260521.md | 验收文档 | 近期稳定化工作的验收清单和发布门禁 |
+| REMAINING_TASKS_20260521.md | 剩余计划 | 稳定化开发完成后的发布前收口任务 |
+| REMAINING_ACCEPTANCE_20260521.md | 剩余验收 | 剩余收口任务的验收清单和当前状态 |
+| PR_NOTES_20260522.md | PR 草稿 | 当前收口分支的 PR 描述、验证记录和 deferred 列表 |
 
 ## reports/ 子目录
 

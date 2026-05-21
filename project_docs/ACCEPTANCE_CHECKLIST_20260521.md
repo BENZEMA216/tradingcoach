@@ -115,7 +115,28 @@
 | A-703 | 没有提交 secrets 或私人数据 | `git diff`，并用 `rg` 搜 known keys | 没有 API key、token、真实券商原始导出文件 | |
 | A-704 | 文档和实际行为一致 | 审查 `project_docs/` | 报告不会继续声称已修复问题仍失败，或已失败问题未标注状态变化 | |
 
-## 11. 最终签收
+## 11. 本轮执行记录（2026-05-21）
+
+已通过的自动化验证：
+
+- `npm run typecheck`
+- `npm run lint`
+- `npm run test:unit`
+- `npm run build`
+- `/Users/benzema/tradingcoach/.venv/bin/python -m pytest tests/data_integrity/ -q`
+- `/Users/benzema/tradingcoach/.venv/bin/python -m pytest tests/unit/test_symbol_parser.py tests/unit/test_fifo_matcher.py -q`
+- `/Users/benzema/tradingcoach/.venv/bin/python -m pytest tests/integration/ -q`
+
+已执行浏览器 smoke：
+
+- `http://127.0.0.1:5173/dashboard`
+- `http://127.0.0.1:5173/statistics`
+- `http://127.0.0.1:5173/positions`
+- `http://127.0.0.1:5173/backtest`
+
+结果：四个页面均可渲染，复跑后无 `console.error`。Landing/upload、Position detail、AI Coach 仍建议在 PR 前做人工补充检查。
+
+## 12. 最终签收
 
 | 角色 | 姓名 | 日期 | 结论 | 备注 |
 |------|------|------|------|------|
