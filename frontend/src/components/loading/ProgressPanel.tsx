@@ -2,7 +2,7 @@
  * ProgressPanel - 进度面板
  *
  * input: 任务状态数据
- * output: 进度条、步骤指示器、日志流、结果展示
+ * output: 进度条、步骤指示器、日志流、取消入口、结果展示
  * pos: 组件 - Loading页面右侧进度展示区
  */
 import { useEffect } from 'react';
@@ -11,10 +11,10 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  ArrowRight,
   BarChart3,
   RefreshCw,
   FileText,
+  X,
 } from 'lucide-react';
 import { TickingLogStream } from './TickingLogStream';
 import type { TaskStatus } from '@/api/client';
@@ -36,6 +36,8 @@ interface ProgressPanelProps {
   onViewPositions: () => void;
   onViewDashboard: () => void;
   onRetry: () => void;
+  onCancel: () => void;
+  isCancelling?: boolean;
 }
 
 export function ProgressPanel({
@@ -46,6 +48,8 @@ export function ProgressPanel({
   onViewPositions,
   onViewDashboard,
   onRetry,
+  onCancel,
+  isCancelling = false,
 }: ProgressPanelProps) {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
@@ -190,6 +194,34 @@ export function ProgressPanel({
     );
   }
 
+  // Cancelled state
+  if (task?.status === 'cancelled') {
+    return (
+      <div className="w-full max-w-xl">
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 rounded-full mb-6">
+              <X className="w-8 h-8 text-white/70" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              {t('loading.analysisCancelled', 'Analysis Cancelled')}
+            </h2>
+            <p className="text-white/50 text-sm mb-6 font-mono">
+              {t('loading.cancelledDescription', 'This import task was stopped and will not continue writing data.')}
+            </p>
+            <button
+              onClick={onRetry}
+              className="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 flex items-center justify-center space-x-2 mx-auto font-bold transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              <span>{t('processingLog.uploadAnother', 'Upload Another File')}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Processing state
   return (
     <div className="w-full max-w-xl">
@@ -202,11 +234,29 @@ export function ProgressPanel({
               {t('loading.analyzing', 'Analyzing...')}
             </span>
           </div>
-          {task?.file_name && (
-            <span className="text-xs font-mono text-white/40 truncate max-w-[200px]">
-              {task.file_name}
-            </span>
-          )}
+          <div className="flex items-center gap-3 min-w-0">
+            {task?.file_name && (
+              <span className="text-xs font-mono text-white/40 truncate max-w-[200px]">
+                {task.file_name}
+              </span>
+            )}
+            {(task?.status === 'pending' || task?.status === 'running') && (
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={isCancelling}
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                title={t('loading.cancelAnalysis', 'Cancel analysis')}
+                aria-label={t('loading.cancelAnalysis', 'Cancel analysis')}
+              >
+                {isCancelling ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <X className="h-4 w-4" />
+                )}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Progress Bar */}

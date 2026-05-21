@@ -21,11 +21,11 @@ export const formatPercent = (value: number | null | undefined, decimals = 2): s
   return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
 };
 
-// Format number with sign — keeps currency symbol for both positive and negative
+// Format number with sign
 export const formatPnL = (value: number | null | undefined): string => {
   if (value === null || value === undefined) return '-';
   const formatted = formatCurrency(Math.abs(value));
-  return value >= 0 ? `+${formatted}` : `-${formatted}`;
+  return value >= 0 ? `+${formatted}` : `-${formatted.replace('$', '')}`;
 };
 
 // Format date
@@ -68,6 +68,10 @@ export const getGradeBadgeClass = (grade: string | null | undefined): string => 
     case 'F': return 'grade-f';
     default: return 'bg-gray-100 text-gray-800';
   }
+};
+
+export const isIncompleteGrade = (grade: string | null | undefined): boolean => {
+  return Boolean(grade?.trim().endsWith('?'));
 };
 
 // Format holding days
@@ -143,7 +147,7 @@ export function getPrivacyAwareFormatters() {
       maximumFractionDigits: 2,
     }).format(absValue);
 
-    return value >= 0 ? `+${formatted}` : `-${formatted}`;
+    return value >= 0 ? `+${formatted}` : `-${formatted.replace('$', '')}`;
   };
 
   const formatAxisPrivate = (value: number): string => {

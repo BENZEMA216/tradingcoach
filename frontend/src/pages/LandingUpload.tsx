@@ -6,7 +6,7 @@
  * pos: 页面组件 - 应用入口，支持异步分析和多渠道通知
  */
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { taskApi, systemApi } from '@/api/client';
@@ -37,7 +37,6 @@ type PageState = 'upload' | 'error';
 export function LandingUpload() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const notification = useNotification();
   const taskStorage = useTaskStorage();
 
@@ -84,12 +83,12 @@ export function LandingUpload() {
   useEffect(() => {
     if (recoveredTask && storedTask) {
       updateTaskStatus(
-        recoveredTask.status as 'pending' | 'running' | 'completed' | 'failed',
+        recoveredTask.status as 'pending' | 'running' | 'completed' | 'failed' | 'cancelled',
         recoveredTask.progress,
         recoveredTask.current_step || undefined
       );
     }
-  }, [recoveredTask?.status, recoveredTask?.progress]);
+  }, [recoveredTask, storedTask, updateTaskStatus]);
 
   // Task status polling for error state display
   const { data: task } = useQuery({

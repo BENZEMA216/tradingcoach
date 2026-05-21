@@ -3,6 +3,7 @@ import type {
   DashboardKPIs,
   EquityCurveResponse,
   RecentTradeItem,
+  NeedsReviewItem,
   StrategyBreakdownItem,
   DailyPnLItem,
   PositionListItem,
@@ -63,6 +64,13 @@ export const dashboardApi = {
 
   getRecentTrades: async (limit = 10) => {
     const { data } = await api.get<RecentTradeItem[]>('/dashboard/recent-trades', {
+      params: { limit },
+    });
+    return data;
+  },
+
+  getNeedsReview: async (limit = 5) => {
+    const { data } = await api.get<NeedsReviewItem[]>('/dashboard/needs-review', {
       params: { limit },
     });
     return data;
@@ -184,7 +192,7 @@ export const statisticsApi = {
   },
 
   getCalendarHeatmap: async (year: number) => {
-    const { data } = await api.get('/statistics/calendar-heatmap', { params: { year } });
+    const { data } = await api.get<{ date: string; value: number; count?: number }[]>('/statistics/calendar-heatmap', { params: { year } });
     return data;
   },
 
@@ -457,7 +465,7 @@ export interface TaskStatus {
     error_messages?: string[];
   } | null;
   error_message: string | null;
-  logs: { time: string; level: string; message: string }[];
+  logs: { time: string; level?: string; message: string; category?: string }[];
   created_at: string | null;
   started_at: string | null;
   completed_at: string | null;

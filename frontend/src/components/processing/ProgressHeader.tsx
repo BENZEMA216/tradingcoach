@@ -14,7 +14,7 @@ import clsx from 'clsx';
 interface ProgressHeaderProps {
   progress: number;
   currentStep: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
 }
 
 const steps = [
@@ -30,7 +30,7 @@ function getStepStatus(
   taskStatus: string
 ): 'done' | 'current' | 'pending' {
   if (taskStatus === 'completed') return 'done';
-  if (taskStatus === 'failed') return progress >= stepRange[0] ? 'current' : 'pending';
+  if (taskStatus === 'failed' || taskStatus === 'cancelled') return progress >= stepRange[0] ? 'current' : 'pending';
 
   if (progress >= stepRange[1]) return 'done';
   if (progress >= stepRange[0]) return 'current';
@@ -60,12 +60,14 @@ export function ProgressHeader({ progress, currentStep, status }: ProgressHeader
               ? t('processingLog.completed', '已完成')
               : status === 'failed'
               ? t('processingLog.failed', '处理失败')
+              : status === 'cancelled'
+              ? t('processingLog.cancelled', '已取消')
               : currentStep}
           </span>
           <span className={clsx(
             'font-medium tabular-nums',
             status === 'completed' ? 'text-green-600 dark:text-green-400' :
-            status === 'failed' ? 'text-red-600 dark:text-red-400' :
+            status === 'failed' || status === 'cancelled' ? 'text-red-600 dark:text-red-400' :
             'text-blue-600 dark:text-blue-400'
           )}>
             {Math.round(progress)}%
@@ -78,7 +80,7 @@ export function ProgressHeader({ progress, currentStep, status }: ProgressHeader
               'h-full rounded-full transition-all duration-300 ease-out',
               status === 'completed'
                 ? 'bg-green-500'
-                : status === 'failed'
+                : status === 'failed' || status === 'cancelled'
                 ? 'bg-red-500'
                 : 'bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 progress-bar-glow'
             )}

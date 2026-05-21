@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { uploadApi, taskApi, systemApi } from '@/api/client';
-import type { UploadHistoryItem, TaskStatus } from '@/api/client';
+import type { UploadHistoryItem } from '@/api/client';
 import {
   Upload as UploadIcon,
   FileText,

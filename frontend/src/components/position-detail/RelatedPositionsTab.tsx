@@ -5,8 +5,8 @@ import {
   formatPercent,
   formatDate,
   getPnLColorClass,
-  getGradeBadgeClass,
 } from '@/utils/format';
+import { GradeBadge } from '@/components/common';
 import type { RelatedPosition } from '@/types';
 import clsx from 'clsx';
 import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
@@ -17,7 +17,6 @@ interface RelatedPositionsTabProps {
   currentSymbol: string;
   isOption: boolean;
   underlyingSymbol?: string | null;
-  currency?: string;
 }
 
 export function RelatedPositionsTab({
@@ -26,7 +25,6 @@ export function RelatedPositionsTab({
   currentSymbol,
   isOption,
   underlyingSymbol,
-  currency = 'USD',
 }: RelatedPositionsTabProps) {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
@@ -42,6 +40,9 @@ export function RelatedPositionsTab({
 
   // Calculate totals
   const totalPnL = relatedPositions?.reduce((sum, p) => sum + (p.net_pnl || 0), 0) || 0;
+  const currencies = new Set((relatedPositions || []).map((p) => p.currency || 'USD'));
+  const totalCurrency = currencies.size === 1 ? Array.from(currencies)[0] : 'USD';
+  const hasMixedCurrencies = currencies.size > 1;
 
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
@@ -66,8 +67,13 @@ export function RelatedPositionsTab({
               {isZh ? '关联交易总盈亏' : 'Total Related P&L'}
             </div>
             <div className={clsx('text-lg font-bold', getPnLColorClass(totalPnL))}>
-              {formatCurrency(totalPnL, currency)}
+              {formatCurrency(totalPnL, totalCurrency)}
             </div>
+            {hasMixedCurrencies && (
+              <div className="text-[10px] text-neutral-400">
+                {isZh ? '含多币种，按原币种合计' : 'Mixed currencies, raw sum'}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -156,16 +162,7 @@ function PositionCard({ position }: { position: RelatedPosition }) {
               >
                 {t(`direction.${position.direction}`)}
               </span>
-              {position.score_grade && (
-                <span
-                  className={clsx(
-                    'px-1.5 py-0.5 text-xs font-medium rounded',
-                    getGradeBadgeClass(position.score_grade)
-                  )}
-                >
-                  {position.score_grade}
-                </span>
-              )}
+              <GradeBadge grade={position.score_grade} size="sm" showIncompleteInfo className="font-medium rounded" />
             </div>
             <div className="text-xs text-neutral-500 mt-0.5">
               {formatDate(position.open_date)} → {formatDate(position.close_date)}

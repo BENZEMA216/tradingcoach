@@ -1,26 +1,23 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { DollarSign, TrendingUp, Target, Clock } from 'lucide-react';
 import { dashboardApi } from '@/api/client';
 import { KPICard } from '@/components/dashboard/KPICard';
+import { NeedsReviewPanel } from '@/components/dashboard/NeedsReviewPanel';
 import { RecentTradesTable } from '@/components/dashboard/RecentTradesTable';
 import { EquityCurveChart } from '@/components/charts/EquityCurveChart';
 import { StrategyPieChart } from '@/components/charts/StrategyPieChart';
 import { formatCurrency, formatPercent } from '@/utils/format';
 import { InfoTooltip } from '@/components/common';
-import type { PositionFilters } from '@/types';
-
-// Drill-down filter state type
 
 export function Dashboard() {
   const { t, i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
 
   // Handle strategy drill-down
-  const handleStrategyDrillDown = (strategyType: string, strategyName: string) => {
+  const handleStrategyDrillDown = (strategyType: string) => {
     const params = new URLSearchParams();
-    params.set('strategy', strategyType);
+    params.set('strategy_type', strategyType);
     window.location.href = `/positions?${params.toString()}`;
   };
 
@@ -40,6 +37,11 @@ export function Dashboard() {
   const { data: recentTrades, isLoading: tradesLoading } = useQuery({
     queryKey: ['dashboard', 'recent-trades'],
     queryFn: () => dashboardApi.getRecentTrades(10),
+  });
+
+  const { data: needsReview, isLoading: needsReviewLoading } = useQuery({
+    queryKey: ['dashboard', 'needs-review'],
+    queryFn: () => dashboardApi.getNeedsReview(5),
   });
 
   // Fetch strategy breakdown
@@ -102,6 +104,8 @@ export function Dashboard() {
           icon={<Clock className="w-6 h-6 text-purple-600" />}
         />
       </div>
+
+      <NeedsReviewPanel items={needsReview || []} isLoading={needsReviewLoading} />
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

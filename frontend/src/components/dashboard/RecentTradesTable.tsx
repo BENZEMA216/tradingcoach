@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { RecentTradeItem } from '@/types';
-import { formatCurrency, formatPercent, formatDate, getPnLColorClass, getGradeBadgeClass } from '@/utils/format';
+import { GradeBadge } from '@/components/common';
+import { formatCurrency, formatPercent, formatDate } from '@/utils/format';
 import clsx from 'clsx';
 
 interface RecentTradesTableProps {
@@ -86,7 +87,7 @@ export function RecentTradesTable({ trades, isLoading, title }: RecentTradesTabl
                     (trade.net_pnl || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
                   )}
                 >
-                  {formatCurrency(trade.net_pnl)}
+                  {formatCurrency(trade.net_pnl, trade.currency || 'USD')}
                 </td>
                 <td
                   className={clsx(
@@ -97,18 +98,7 @@ export function RecentTradesTable({ trades, isLoading, title }: RecentTradesTabl
                   {formatPercent(trade.net_pnl_pct)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span
-                    className={clsx(
-                      'px-2 py-1 text-[10px] font-bold rounded-sm border',
-                      // Dual-mode industrial badges
-                      trade.grade === 'A' || trade.grade === 'A+' ? 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-500/30' :
-                        trade.grade === 'B' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30' :
-                          trade.grade === 'C' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/30' :
-                            'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30'
-                    )}
-                  >
-                    {trade.grade || '-'}
-                  </span>
+                  <GradeBadge grade={trade.grade} showIncompleteInfo className="py-1" />
                 </td>
               </tr>
             ))}

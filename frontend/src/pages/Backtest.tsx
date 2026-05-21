@@ -22,6 +22,13 @@ import {
 import { backtestApi, type BacktestResult } from '@/api/client';
 import { formatCurrency } from '@/utils/format';
 
+function formatSavingsPct(value: BacktestResult['savings_pct'], isZh: boolean) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return isZh ? '百分比不稳定' : 'unstable %';
+  }
+  return `${value >= 0 ? '+' : ''}${value.toFixed(0)}%`;
+}
+
 export function Backtest() {
   const { i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
@@ -65,7 +72,11 @@ export function Backtest() {
 
       {/* Rule cards, sorted by savings desc */}
       <div className="space-y-4">
-        {results.map((r, idx) => {
+        {results.length === 0 ? (
+          <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 px-6 py-10 text-center text-sm text-slate-500 dark:text-white/40 font-mono">
+            {isZh ? '暂无可回测规则' : 'No backtest rules available'}
+          </div>
+        ) : results.map((r, idx) => {
           const isExpanded = expanded === r.rule_id;
           const positive = r.savings > 0;
           return (
@@ -110,11 +121,9 @@ export function Backtest() {
                     <div className="text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-white/40 mt-1">
                       {isZh ? '可省 / 多赚' : 'savings'}
                     </div>
-                    {r.savings_pct !== null && (
-                      <div className="text-xs font-mono text-slate-500 dark:text-white/50 mt-0.5">
-                        {r.savings_pct >= 0 ? '+' : ''}{r.savings_pct.toFixed(0)}%
-                      </div>
-                    )}
+                    <div className="text-xs font-mono text-slate-500 dark:text-white/50 mt-0.5">
+                      {formatSavingsPct(r.savings_pct, isZh)}
+                    </div>
                   </div>
                 </div>
               </button>

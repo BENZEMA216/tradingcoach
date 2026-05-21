@@ -30,6 +30,17 @@ export interface RecentTradeItem {
   net_pnl_pct: number | null;
   grade: string | null;
   direction: string;
+  currency: string | null;
+}
+
+export interface NeedsReviewItem {
+  id: number;
+  symbol: string;
+  close_date: string | null;
+  net_pnl: number;
+  grade: string | null;
+  reason: string;
+  currency: string | null;
 }
 
 export interface StrategyBreakdownItem {
@@ -311,7 +322,7 @@ export interface RelatedPosition {
   net_pnl_pct: number | null;
   overall_score: number | null;
   score_grade: string | null;
-  currency?: string;
+  currency: string | null;
 }
 
 // Risk Metrics

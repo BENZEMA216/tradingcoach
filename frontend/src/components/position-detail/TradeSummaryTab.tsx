@@ -4,10 +4,9 @@ import {
   formatPercent,
   formatDateTime,
   getPnLColorClass,
-  getGradeBadgeClass,
   formatHoldingDays,
 } from '@/utils/format';
-import { InfoTooltip } from '@/components/common/InfoTooltip';
+import { GradeBadge, InfoTooltip } from '@/components/common';
 import type { PositionDetail } from '@/types';
 import clsx from 'clsx';
 
@@ -55,14 +54,7 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
           <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
             {t('positionDetail.tradeSummary')}
           </h3>
-          <span
-            className={clsx(
-              'px-3 py-1 text-lg font-bold rounded-lg',
-              getGradeBadgeClass(position.score_grade)
-            )}
-          >
-            {position.score_grade || '-'}
-          </span>
+          <GradeBadge grade={position.score_grade} size="md" showIncompleteInfo className="rounded-lg" />
         </div>
 
         {/* Hero P&L */}

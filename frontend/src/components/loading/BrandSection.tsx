@@ -42,16 +42,18 @@ export function BrandSection({ status }: BrandSectionProps) {
     }
   };
 
-  const StatusIcon = () => {
+  const statusIcon = (() => {
     switch (status) {
       case 'completed':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
       case 'failed':
         return <AlertCircle className="w-4 h-4 text-red-500" />;
+      case 'cancelled':
+        return <AlertCircle className="w-4 h-4 text-yellow-500" />;
       default:
         return <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />;
     }
-  };
+  })();
 
   return (
     <div className="text-center px-12">
@@ -89,7 +91,7 @@ export function BrandSection({ status }: BrandSectionProps) {
       {/* Status */}
       <div className="space-y-4">
         <div className="flex items-center justify-center space-x-2">
-          <StatusIcon />
+          {statusIcon}
           <span className={`text-xs font-mono tracking-widest uppercase ${getStatusColor()}`}>
             {getStatusText()}
           </span>
