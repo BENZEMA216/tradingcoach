@@ -4,7 +4,7 @@ Dashboard API endpoints
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from typing import Optional
 from datetime import date, timedelta
 
@@ -190,6 +190,7 @@ async def get_recent_trades(
             net_pnl_pct=float(p.net_pnl_pct) if p.net_pnl_pct else None,
             grade=p.score_grade,
             direction=p.direction,
+            currency=p.currency,
         )
         for p in positions
     ]
@@ -223,7 +224,12 @@ async def get_needs_review(
     low_scores = (
         db.query(Position)
         .filter(Position.status == PositionStatus.CLOSED)
-        .filter(Position.score_grade.in_(["D", "F"]))
+        .filter(
+            or_(
+                func.upper(Position.score_grade).like("D%"),
+                func.upper(Position.score_grade).like("F%"),
+            )
+        )
         .filter(Position.reviewed_at.is_(None))
         .order_by(Position.overall_score)
         .limit(limit // 2)
@@ -245,6 +251,7 @@ async def get_needs_review(
                     net_pnl=float(p.net_pnl) if p.net_pnl else 0.0,
                     grade=p.score_grade,
                     reason="Large loss",
+                    currency=p.currency,
                 )
             )
 
@@ -259,6 +266,7 @@ async def get_needs_review(
                     net_pnl=float(p.net_pnl) if p.net_pnl else 0.0,
                     grade=p.score_grade,
                     reason=f"Low score ({p.score_grade})",
+                    currency=p.currency,
                 )
             )
 

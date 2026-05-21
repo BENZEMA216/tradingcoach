@@ -8,6 +8,46 @@ pos: 集成测试 - 测试统计 API 端点的实际行为
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 import pytest
+from datetime import date, datetime
+
+from src.models import Position
+from src.models.position import PositionStatus
+
+
+def _add_closed_position(
+    test_db,
+    *,
+    symbol: str,
+    close_day: date,
+    net_pnl: float,
+    realized_pnl: float | None = None,
+    total_fees: float = 0.0,
+    score_grade: str | None = "C",
+    currency: str = "USD",
+) -> Position:
+    position = Position(
+        symbol=symbol,
+        symbol_name=f"{symbol} Inc.",
+        direction="long",
+        status=PositionStatus.CLOSED,
+        open_time=datetime(close_day.year, close_day.month, close_day.day, 9, 30),
+        close_time=datetime(close_day.year, close_day.month, close_day.day, 16, 0),
+        open_date=close_day,
+        close_date=close_day,
+        holding_period_days=0,
+        open_price=100,
+        close_price=110,
+        quantity=10,
+        realized_pnl=realized_pnl if realized_pnl is not None else net_pnl + total_fees,
+        net_pnl=net_pnl,
+        total_fees=total_fees,
+        overall_score=70,
+        score_grade=score_grade,
+        market="美股",
+        currency=currency,
+    )
+    test_db.add(position)
+    return position
 
 
 class TestStatisticsAPI:
@@ -62,6 +102,80 @@ class TestStatisticsAPI:
             assert "grade" in item
             assert "count" in item
             assert "total_pnl" in item
+
+    def test_get_grade_breakdown_includes_incomplete_grade_suffixes(self, client, test_db):
+        """真实数据中的 C? 等降级评分不应被 by-grade 静默丢弃"""
+        _add_closed_position(
+            test_db,
+            symbol="AAPL",
+            close_day=date(2026, 1, 2),
+            net_pnl=100,
+            score_grade="C+?",
+        )
+        _add_closed_position(
+            test_db,
+            symbol="MSFT",
+            close_day=date(2026, 1, 3),
+            net_pnl=-40,
+            score_grade="C?",
+        )
+        _add_closed_position(
+            test_db,
+            symbol="NVDA",
+            close_day=date(2026, 1, 4),
+            net_pnl=25,
+            score_grade="C-?",
+        )
+        _add_closed_position(
+            test_db,
+            symbol="TSLA",
+            close_day=date(2026, 1, 5),
+            net_pnl=10,
+            score_grade=None,
+        )
+        test_db.commit()
+
+        response = client.get("/api/v1/statistics/by-grade")
+
+        assert response.status_code == 200
+        grades = {item["grade"] for item in response.json()}
+        assert {"C+?", "C?", "C-?", "N/A"}.issubset(grades)
+
+    def test_performance_and_risk_metrics_use_same_sharpe_ratio(self, client, test_db):
+        """同一份数据下 performance 和 risk-metrics 的 Sharpe 必须一致"""
+        for index, pnl in enumerate([100, -30, 80, -20, 60], start=1):
+            _add_closed_position(
+                test_db,
+                symbol=f"T{index}",
+                close_day=date(2026, 2, index),
+                net_pnl=pnl,
+                score_grade="B",
+            )
+        test_db.commit()
+
+        performance = client.get("/api/v1/statistics/performance").json()
+        risk = client.get("/api/v1/statistics/risk-metrics").json()
+
+        assert performance["sharpe_ratio"] is not None
+        assert performance["sharpe_ratio"] == risk["sharpe_ratio"]
+
+    def test_fee_percentage_uses_realized_pnl_when_net_pnl_is_small(self, client, test_db):
+        """手续费占比应使用更稳定的未扣费盈亏，避免净盈亏接近 0 时夸大"""
+        _add_closed_position(
+            test_db,
+            symbol="FEE",
+            close_day=date(2026, 3, 1),
+            realized_pnl=1000,
+            net_pnl=100,
+            total_fees=900,
+            score_grade="C",
+        )
+        test_db.commit()
+
+        response = client.get("/api/v1/statistics/performance")
+
+        assert response.status_code == 200
+        assert response.json()["fees_pct_of_pnl"] == 90.0
 
     def test_get_direction_breakdown(self, client_with_data):
         """测试方向分解"""

@@ -759,7 +759,7 @@ async def get_related_positions(
             "net_pnl_pct": float(p.net_pnl_pct) if p.net_pnl_pct else None,
             "overall_score": float(p.overall_score) if p.overall_score else None,
             "score_grade": p.score_grade,
-            "currency": p.currency or "USD",
+            "currency": p.currency,
         }
         for p in unique_positions[:20]  # Limit to 20 related positions
     ]

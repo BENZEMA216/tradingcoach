@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from datetime import date
 from collections import defaultdict
+import math
 
 from ....database import get_db, Position, PositionStatus
 from ....schemas import (
@@ -44,6 +45,75 @@ from ....utils.currency import (  # noqa: E402
     convert_to_usd,
     get_pnl_in_usd,
 )
+
+
+def _daily_pnl_from_positions(positions: list[Position]) -> dict[date, float]:
+    daily_pnl = defaultdict(float)
+    for p in positions:
+        if p.close_date and p.net_pnl is not None:
+            daily_pnl[p.close_date] += get_pnl_in_usd(p)
+    return dict(daily_pnl)
+
+
+def _calculate_sharpe_ratio(
+    positions: list[Position],
+    risk_free_rate: float = 0.05,
+) -> Optional[float]:
+    daily_pnl = _daily_pnl_from_positions(positions)
+    returns = list(daily_pnl.values())
+    if len(returns) <= 1:
+        return None
+
+    avg_return = sum(returns) / len(returns)
+    variance = sum((r - avg_return) ** 2 for r in returns) / (len(returns) - 1)
+    daily_volatility = math.sqrt(variance)
+    if daily_volatility <= 0:
+        return None
+
+    daily_risk_free = risk_free_rate / 252
+    return ((avg_return - daily_risk_free) / daily_volatility) * math.sqrt(252)
+
+
+def _calculate_drawdown_stats(positions: list[Position]) -> tuple[float, Optional[float]]:
+    daily_pnl = _daily_pnl_from_positions(positions)
+    cumulative = 0.0
+    peak = 0.0
+    max_drawdown = 0.0
+
+    for close_date in sorted(daily_pnl.keys()):
+        cumulative += daily_pnl[close_date]
+        peak = max(peak, cumulative)
+        max_drawdown = max(max_drawdown, peak - cumulative)
+
+    if peak > 0 and peak >= max_drawdown:
+        return max_drawdown, min(max_drawdown / peak * 100, 100.0)
+
+    return max_drawdown, None
+
+
+def _get_realized_pnl_before_fees_usd(position: Position) -> float:
+    currency = position.currency or "USD"
+    if position.realized_pnl is not None:
+        return convert_to_usd(float(position.realized_pnl), currency)
+    return get_pnl_in_usd(position) + convert_to_usd(float(position.total_fees or 0), currency)
+
+
+def _grade_sort_key(grade: str) -> tuple[int, int, int, str]:
+    if grade == "N/A":
+        return (99, 99, 99, grade)
+
+    clean_grade = grade.rstrip("?")
+    base = clean_grade[:1]
+    modifier = clean_grade[1:]
+    base_order = {"A": 0, "B": 1, "C": 2, "D": 3, "F": 4}
+    modifier_order = {"+": 0, "": 1, "-": 2}
+    incomplete_order = 1 if grade.endswith("?") else 0
+    return (
+        base_order.get(base, 98),
+        modifier_order.get(modifier, 98),
+        incomplete_order,
+        grade,
+    )
 
 
 @router.get("/date-range")
@@ -122,26 +192,8 @@ async def get_performance_metrics(
     gross_loss = abs(sum(get_pnl_in_usd(p) for p in losers))
     profit_factor = gross_profit / gross_loss if gross_loss > 0 else None
 
-    # Max drawdown (using USD-converted PnL)
-    cumulative = 0.0
-    peak = 0.0
-    max_drawdown = 0.0
-
-    for p in positions:
-        cumulative += get_pnl_in_usd(p)
-        if cumulative > peak:
-            peak = cumulative
-        drawdown = peak - cumulative
-        if drawdown > max_drawdown:
-            max_drawdown = drawdown
-
-    # 一个 P&L 曲线可以从 +5000 下穿到 -7000，绝对回撤 12000 但 peak 才 5000
-    # → 旧公式给出 240% 这种没意义的数。clamp 到 100%，并要求 peak 至少
-    # 等于回撤量级才报百分比，否则用户应当看绝对金额。
-    if peak > 0 and peak >= max_drawdown:
-        max_drawdown_pct = min(max_drawdown / peak * 100, 100.0)
-    else:
-        max_drawdown_pct = None
+    max_drawdown, max_drawdown_pct = _calculate_drawdown_stats(positions)
+    sharpe_ratio = _calculate_sharpe_ratio(positions)
 
     # Consecutive wins/losses
     max_consecutive_wins = 0
@@ -181,8 +233,12 @@ async def get_performance_metrics(
         else None
     )
 
-    # Fees percentage
-    fees_pct = (total_fees / abs(total_pnl) * 100) if total_pnl != 0 else None
+    realized_pnl_before_fees = sum(_get_realized_pnl_before_fees_usd(p) for p in positions)
+    fees_pct = (
+        total_fees / abs(realized_pnl_before_fees) * 100
+        if realized_pnl_before_fees != 0
+        else None
+    )
 
     return PerformanceMetrics(
         total_pnl=round(total_pnl, 2),
@@ -196,6 +252,7 @@ async def get_performance_metrics(
         profit_factor=round(profit_factor, 2) if profit_factor else None,
         max_drawdown=round(max_drawdown, 2) if max_drawdown > 0 else None,
         max_drawdown_pct=round(max_drawdown_pct, 2) if max_drawdown_pct else None,
+        sharpe_ratio=round(sharpe_ratio, 2) if sharpe_ratio else None,
         max_consecutive_wins=max_consecutive_wins,
         max_consecutive_losses=max_consecutive_losses,
         total_fees=round(total_fees, 2),
@@ -303,25 +360,22 @@ async def get_grade_breakdown(
         if p.net_pnl and float(p.net_pnl) > 0:
             grade_stats[grade]["winners"] += 1
 
-    # Convert to response items with proper grade order
-    grade_order = ["A", "B", "C", "D", "F", "N/A"]
     items = []
 
-    for grade in grade_order:
-        if grade in grade_stats:
-            stats = grade_stats[grade]
-            win_rate = stats["winners"] / stats["count"] * 100 if stats["count"] > 0 else 0.0
-            avg_pnl = stats["total_pnl"] / stats["count"] if stats["count"] > 0 else 0.0
+    for grade in sorted(grade_stats.keys(), key=_grade_sort_key):
+        stats = grade_stats[grade]
+        win_rate = stats["winners"] / stats["count"] * 100 if stats["count"] > 0 else 0.0
+        avg_pnl = stats["total_pnl"] / stats["count"] if stats["count"] > 0 else 0.0
 
-            items.append(
-                GradeBreakdownItem(
-                    grade=grade,
-                    count=stats["count"],
-                    total_pnl=round(stats["total_pnl"], 2),
-                    win_rate=round(win_rate, 2),
-                    avg_pnl=round(avg_pnl, 2),
-                )
+        items.append(
+            GradeBreakdownItem(
+                grade=grade,
+                count=stats["count"],
+                total_pnl=round(stats["total_pnl"], 2),
+                win_rate=round(win_rate, 2),
+                avg_pnl=round(avg_pnl, 2),
             )
+        )
 
     return items
 
@@ -536,8 +590,6 @@ async def get_risk_metrics(
     """
     Get comprehensive risk metrics including Sharpe ratio, Sortino ratio, and drawdown analysis.
     """
-    import math
-
     query = db.query(Position).filter(Position.status == PositionStatus.CLOSED)
 
     if date_start:
@@ -555,11 +607,7 @@ async def get_risk_metrics(
             sortino_ratio=None,
         )
 
-    # Calculate daily returns (converted to USD)
-    daily_pnl = defaultdict(float)
-    for p in positions:
-        if p.close_date and p.net_pnl:
-            daily_pnl[p.close_date] += get_pnl_in_usd(p)
+    daily_pnl = _daily_pnl_from_positions(positions)
 
     returns = list(daily_pnl.values())
     dates = sorted(daily_pnl.keys())
@@ -598,12 +646,8 @@ async def get_risk_metrics(
         daily_volatility = None
         annualized_volatility = None
 
-    # Sharpe Ratio (annualized)
+    sharpe_ratio = _calculate_sharpe_ratio(positions, risk_free_rate)
     daily_risk_free = risk_free_rate / 252
-    if daily_volatility and daily_volatility > 0:
-        sharpe_ratio = ((avg_return - daily_risk_free) / daily_volatility) * math.sqrt(252)
-    else:
-        sharpe_ratio = None
 
     # Sortino Ratio (only considers downside volatility)
     negative_returns = [r for r in returns if r < 0]
@@ -642,14 +686,7 @@ async def get_risk_metrics(
     # Current drawdown
     current_drawdown = current_dd if cumulative < peak else 0.0
 
-    # Max drawdown percentage
-    # 一个 P&L 曲线可以从 +5000 下穿到 -7000，绝对回撤 12000 但 peak 才 5000
-    # → 旧公式给出 240% 这种没意义的数。clamp 到 100%，并要求 peak 至少
-    # 等于回撤量级才报百分比，否则用户应当看绝对金额。
-    if peak > 0 and peak >= max_drawdown:
-        max_drawdown_pct = min(max_drawdown / peak * 100, 100.0)
-    else:
-        max_drawdown_pct = None
+    _, max_drawdown_pct = _calculate_drawdown_stats(positions)
 
     # Average drawdown
     all_drawdowns = drawdowns + [current_dd] if current_dd > 0 else drawdowns
@@ -749,7 +786,7 @@ async def get_drawdown_periods(
                     peak_value=peak,
                     trough_value=peak - dd_trough,
                     drawdown=round(dd_trough, 2),
-                    drawdown_pct=round(dd_trough / peak * 100, 2) if peak > 0 else 0,
+                    drawdown_pct=round(min(dd_trough / peak * 100, 100.0), 2) if peak > 0 else 0,
                     recovery_date=d,
                     duration_days=duration,
                 ))
@@ -776,7 +813,7 @@ async def get_drawdown_periods(
             peak_value=peak,
             trough_value=peak - dd_trough,
             drawdown=round(dd_trough, 2),
-            drawdown_pct=round(dd_trough / peak * 100, 2) if peak > 0 else 0,
+            drawdown_pct=round(min(dd_trough / peak * 100, 100.0), 2) if peak > 0 else 0,
             recovery_date=None,
             duration_days=duration,
         ))

@@ -44,6 +44,7 @@ class RecentTradeItem(BaseModel):
     net_pnl_pct: Optional[float]
     grade: Optional[str]
     direction: str
+    currency: Optional[str] = None
 
 
 class NeedsReviewItem(BaseModel):
@@ -54,6 +55,7 @@ class NeedsReviewItem(BaseModel):
     net_pnl: float
     grade: Optional[str]
     reason: str
+    currency: Optional[str] = None
 
 
 class StrategyBreakdownItem(BaseModel):
