@@ -385,6 +385,21 @@ export interface UploadResponse {
   error_messages: string[];
 }
 
+export interface UploadPreflightResponse {
+  can_import: boolean;
+  file_name: string;
+  file_hash: string;
+  broker_id: string | null;
+  broker_name: string | null;
+  detection_confidence: number;
+  total_rows: number;
+  completed_trades: number;
+  skipped_rows: number;
+  detected_columns: string[];
+  error_messages: string[];
+  warning_messages: string[];
+}
+
 export interface UploadHistoryItem {
   id: number;
   import_time: string;
@@ -397,6 +412,26 @@ export interface UploadHistoryItem {
 }
 
 export const uploadApi = {
+  /**
+   * 上传前预检交易CSV文件，不写入数据库
+   */
+  previewTrades: async (file: File): Promise<UploadPreflightResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await api.post<UploadPreflightResponse>(
+      '/upload/trades/preview',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 60000,
+      }
+    );
+    return data;
+  },
+
   /**
    * 上传交易记录CSV文件
    * @param file CSV文件

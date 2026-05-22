@@ -35,6 +35,7 @@ importers/
 │   └── futu_adapter.py     # 富途专用适配器
 ├── transforms/             # 数据转换器
 │   └── __init__.py
+├── import_preflight.py     # 导入预检
 ├── csv_parser.py           # [兼容] 中文CSV解析器
 ├── english_csv_parser.py   # [兼容] 英文CSV解析器
 ├── data_cleaner.py         # [兼容] 数据清洗器
@@ -52,6 +53,7 @@ importers/
 | `configs/*.yaml` | 券商配置 | 字段映射、枚举映射、验证规则 |
 | `adapters/generic_adapter.py` | 通用适配器 | 纯 YAML 驱动的解析器 |
 | `adapters/futu_adapter.py` | 富途适配器 | 期权符号解析等专有逻辑 |
+| `import_preflight.py` | 导入预检 | 上传前只读识别券商格式、统计可导入行数、返回错误/警告 |
 | `incremental_importer.py` | 导入控制器 | 增量导入、去重、历史记录，批量插入优化（batch_size=500） |
 | `csv_parser.py` | [兼容] 中文解析 | 旧版富途中文 CSV 解析 |
 | `english_csv_parser.py` | [兼容] 英文解析 | 旧版富途英文 CSV 解析 |

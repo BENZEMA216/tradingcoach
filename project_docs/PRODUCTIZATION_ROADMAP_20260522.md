@@ -101,6 +101,8 @@ AI Coach 不应只是解释图表。更有价值的动作：
 - 支持重复检测和增量导入。
 - 给每次导入生成 data quality report。
 
+2026-05-22 进展：已先落地后端只读导入预检切片，`POST /api/v1/upload/trades/preview` 会识别券商格式、返回 broker、置信度、总行数、已成交行数、跳过行数、列名、错误和警告，不写数据库。下一步再把这个能力接到 Landing/Upload UI。
+
 ### P1：分析深度
 
 - 做 playbook/strategy tagging。
@@ -134,4 +136,3 @@ AI Coach 不应只是解释图表。更有价值的动作：
 - [Tradier Account API](https://docs.tradier.com/docs/account-details)
 - [Tradier Trading API](https://docs.tradier.com/docs/trading)
 - [Alpaca Activity SSE](https://docs.alpaca.markets/us/docs/activity-sse)
-
