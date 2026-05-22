@@ -31,6 +31,8 @@
 | REMAINING_TASKS_20260521.md | 剩余计划 | 稳定化开发完成后的发布前收口任务 |
 | REMAINING_ACCEPTANCE_20260521.md | 剩余验收 | 剩余收口任务的验收清单和当前状态 |
 | PR_NOTES_20260522.md | PR 草稿 | 当前收口分支的 PR 描述、验证记录和 deferred 列表 |
+| PRODUCTIZATION_QA_REVIEW_20260522.md | 产品化 QA 复盘 | 2026-05-22 自动化、浏览器回归、残留风险和下一轮验收建议 |
+| PRODUCTIZATION_ROADMAP_20260522.md | 产品化路线图 | 数据导入、券商直连、分析深度和 AI Coach 的近期产品路线 |
 
 ## reports/ 子目录
 
