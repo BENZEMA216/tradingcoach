@@ -12,11 +12,13 @@
 |------|-----------|------|------|
 | 前端类型检查 | `cd frontend && npm run typecheck` | PASS | 2026-05-22 本轮测试修复后复跑通过 |
 | 前端 lint | `cd frontend && npm run lint` | PASS | 2026-05-22 本轮测试修复后复跑通过 |
-| 前端单测 | `cd frontend && npm run test:unit` | PASS | 本轮前序验证：2 files / 9 tests passed |
-| 前端构建 | `cd frontend && npm run build` | PASS | 本轮前序验证通过；生产 JS 总量约 1.24MB，低于 2MB e2e 预算 |
+| 前端单测 | `cd frontend && npm run test:unit` | PASS | 2026-05-23：4 files / 15 tests passed，包含上传预检 UI |
+| 前端构建 | `cd frontend && npm run build` | PASS | 2026-05-23 复跑通过；生产 JS 总量仍低于 2MB e2e 预算 |
 | 后端全量测试 | `uv run --python /opt/homebrew/bin/python3.11 --with-requirements requirements.txt python -m pytest tests --tb=short` | PASS | 本轮前序验证：568 passed, 24 skipped |
 | Chromium 非视觉 e2e | accessibility / console-errors / performance / qa-walkthrough | PASS | 72 expected, 0 unexpected |
 | Mobile Chrome 非视觉 e2e | accessibility / console-errors / performance / qa-walkthrough | PASS | 72 expected, 0 unexpected |
+| 上传预检 e2e | `tests/e2e/upload-preflight.spec.ts` Chromium + Mobile Chrome | PASS | 2026-05-23：桌面 3 passed，移动端 3 passed |
+| 全站 QA e2e | `tests/e2e/qa-walkthrough.spec.ts --project=chromium` | PASS | 2026-05-23：31 passed |
 | 全量 e2e | `npm run test:e2e` | FAIL 已记录 | 前序运行 129 passed 后失败，主要是视觉基线、跨浏览器环境和旧测试选择器问题；本轮已修复核心选择器，视觉/全矩阵仍列为 deferred |
 
 ## 3. 本轮修复的 QA 基础设施问题
@@ -30,6 +32,8 @@
 | 桌面导航选择器选中隐藏元素 | sidebar/nav 中存在多份响应式元素 | 选择器增加可见性过滤，并在 README 记录移动端约束 |
 
 ## 4. 浏览器人工回归
+
+2026-05-23 增量：使用当前 worktree 的 Vite 服务 `http://127.0.0.1:5174` 扫过 Landing、`/upload`、Dashboard、Statistics、Positions、`/positions/472`、Events、Backtest、System、AI Coach。所有页面均有 `main`，无 `console.error`，无 `NaN` / `undefined`，无页面级横向溢出。移动端 390 x 844 已确认 Landing 与 `/upload` 无横向溢出，且上传输入和开始按钮存在。
 
 ### 桌面
 
@@ -77,4 +81,3 @@
 3. 每个评分或建议都能说明“依据是什么、缺什么数据、下一步怎么做”。
 4. AI Coach 不只是聊天，而是能生成 review queue、错因聚类、下周训练任务。
 5. 隐私模式默认安全：不上传原始券商文件，不在前端日志暴露账户、订单号、token。
-
