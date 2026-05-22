@@ -204,6 +204,24 @@ export default {
     scrollToBottom: 'Scroll to bottom',
   },
 
+  // Import Preflight
+  importPreflight: {
+    unsupportedTitle: 'Unsupported file format',
+    csvOnlyMessage: 'TradingCoach currently supports CSV imports only. Please export a CSV file from your broker.',
+    checkingTitle: 'Checking import compatibility',
+    checkingDesc: 'Detecting broker format without writing data.',
+    failedTitle: 'Preflight check failed',
+    retry: 'Retry',
+    readyTitle: 'Ready to import',
+    blockedTitle: 'File cannot be imported',
+    broker: 'Broker',
+    unknownBroker: 'Unknown',
+    confidence: 'Confidence',
+    totalRows: 'Rows',
+    completedTrades: 'Completed trades',
+    skippedRows: '{{count}} skipped rows',
+  },
+
   // Upload
   upload: {
     title: 'Upload Trades',

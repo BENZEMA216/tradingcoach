@@ -9,7 +9,7 @@
 
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost:5173';
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
 
 function isMobileViewport(page: { viewportSize: () => { width: number } | null }): boolean {
   return (page.viewportSize()?.width ?? 1280) < 768;
@@ -147,8 +147,8 @@ test.describe('Positions Page', () => {
   });
 
   test('Click row navigates to detail', async ({ page }) => {
-    await page.waitForSelector('tbody tr', { timeout: 5000 });
-    const firstRow = page.locator('tbody tr').first();
+    await page.waitForSelector('tbody tr[role="button"]', { timeout: 5000 });
+    const firstRow = page.locator('tbody tr[role="button"]').first();
     await firstRow.locator('td').first().click();
 
     await expect(page).toHaveURL(/\/positions\/\d+/);

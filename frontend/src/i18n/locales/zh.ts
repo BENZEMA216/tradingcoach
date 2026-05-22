@@ -204,6 +204,24 @@ export default {
     scrollToBottom: '滚动到底部',
   },
 
+  // Import Preflight
+  importPreflight: {
+    unsupportedTitle: '暂不支持该文件格式',
+    csvOnlyMessage: 'TradingCoach 目前仅支持 CSV 导入。请从交易工具导出 CSV 文件后再上传。',
+    checkingTitle: '正在检查导入兼容性',
+    checkingDesc: '正在识别券商格式，此步骤不会写入数据。',
+    failedTitle: '导入预检失败',
+    retry: '重试',
+    readyTitle: '可以开始导入',
+    blockedTitle: '该文件无法导入',
+    broker: '券商',
+    unknownBroker: '未知',
+    confidence: '置信度',
+    totalRows: '总行数',
+    completedTrades: '可导入交易',
+    skippedRows: '{{count}} 行将被跳过',
+  },
+
   // Upload
   upload: {
     title: '上传交易记录',

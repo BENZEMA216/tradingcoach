@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { uploadApi, taskApi, systemApi } from '@/api/client';
 import type { UploadHistoryItem } from '@/api/client';
+import { ImportPreflightPanel } from '@/components/upload/ImportPreflightPanel';
 import {
   Upload as UploadIcon,
   FileText,
@@ -20,6 +21,11 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { formatDate, formatNumber } from '@/utils/format';
+import {
+  isTradeImportReady,
+  validateTradeImportFile,
+} from '@/utils/importPreflight';
+import type { TradeImportFileValidation } from '@/utils/importPreflight';
 import { useNavigate } from 'react-router-dom';
 
 // 动态处理消息
@@ -52,6 +58,7 @@ export function Upload() {
 
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileValidation, setFileValidation] = useState<TradeImportFileValidation | null>(null);
   const [email, setEmail] = useState('');
   const [replaceMode, setReplaceMode] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -108,11 +115,20 @@ export function Upload() {
     return 0;
   };
 
+  const preflightMutation = useMutation({
+    mutationFn: (file: File) => uploadApi.previewTrades(file),
+  });
+
   // 重置上传状态
   const resetUpload = () => {
     setTaskId(null);
     setIsProcessing(false);
     setSelectedFile(null);
+    setFileValidation(null);
+    preflightMutation.reset();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     setShowLogs(false);
   };
 
@@ -154,6 +170,41 @@ export function Upload() {
     },
   });
 
+  const clearSelectedFile = useCallback(() => {
+    setSelectedFile(null);
+    setFileValidation(null);
+    preflightMutation.reset();
+    createTaskMutation.reset();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [createTaskMutation, preflightMutation]);
+
+  const selectTradeFile = useCallback((file: File) => {
+    const validation = validateTradeImportFile(file);
+    setFileValidation(validation);
+    preflightMutation.reset();
+    createTaskMutation.reset();
+
+    if (!validation.valid) {
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    setSelectedFile(file);
+    preflightMutation.mutate(file);
+  }, [createTaskMutation, preflightMutation]);
+
+  const retryPreflight = useCallback(() => {
+    if (selectedFile) {
+      preflightMutation.reset();
+      preflightMutation.mutate(selectedFile);
+    }
+  }, [preflightMutation, selectedFile]);
+
   // Handle drag events
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -172,23 +223,20 @@ export function Upload() {
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.name.endsWith('.csv')) {
-        setSelectedFile(file);
-      }
+      selectTradeFile(e.dataTransfer.files[0]);
     }
-  }, []);
+  }, [selectTradeFile]);
 
   // Handle file input change
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      selectTradeFile(e.target.files[0]);
     }
   };
 
   // Handle upload
   const handleUpload = () => {
-    if (selectedFile) {
+    if (selectedFile && canStartAnalysis) {
       createTaskMutation.mutate({
         file: selectedFile,
         email: email.trim() || undefined,
@@ -201,6 +249,15 @@ export function Upload() {
     if (!email) return true; // Empty is valid (optional field)
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
+
+  const canStartAnalysis = isTradeImportReady({
+    selectedFile,
+    validation: fileValidation,
+    preflight: preflightMutation.data ?? null,
+    isChecking: preflightMutation.isPending,
+    isSubmitting: createTaskMutation.isPending,
+    isEmailValid: isValidEmail(email),
+  });
 
   return (
     <div className="space-y-6">
@@ -583,6 +640,7 @@ export function Upload() {
           accept=".csv"
           onChange={handleFileChange}
           className="hidden"
+          data-testid="trade-file-input"
         />
 
         <div
@@ -618,6 +676,16 @@ export function Upload() {
           </div>
         </div>
 
+        <ImportPreflightPanel
+          className="mt-4"
+          selectedFileName={selectedFile?.name ?? null}
+          validation={fileValidation}
+          isChecking={preflightMutation.isPending}
+          result={preflightMutation.data ?? null}
+          error={preflightMutation.error}
+          onRetry={retryPreflight}
+        />
+
         {/* Selected File and Options */}
         {selectedFile && (
           <div className="mt-6 space-y-4">
@@ -635,7 +703,7 @@ export function Upload() {
                 </div>
               </div>
               <button
-                onClick={() => setSelectedFile(null)}
+                onClick={clearSelectedFile}
                 className="text-gray-400 hover:text-gray-600"
               >
                 &times;
@@ -677,26 +745,28 @@ export function Upload() {
               </label>
             </div>
 
-            {/* Upload Button */}
-            <button
-              onClick={handleUpload}
-              disabled={createTaskMutation.isPending || !isValidEmail(email)}
-              className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center space-x-2 font-semibold text-lg transition-all duration-200 active:scale-[0.98]"
-            >
-              {createTaskMutation.isPending ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>{t('upload.creating', 'Creating task...')}</span>
-                </>
-              ) : (
-                <>
-                  <UploadIcon className="w-5 h-5" />
-                  <span>{t('upload.startAnalysis', 'Start Analysis')}</span>
-                </>
-              )}
-            </button>
           </div>
         )}
+
+        {/* Upload Button */}
+        <button
+          onClick={handleUpload}
+          disabled={!canStartAnalysis}
+          className="mt-6 w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center space-x-2 font-semibold text-lg transition-all duration-200 active:scale-[0.98]"
+          data-testid="start-analysis-button"
+        >
+          {createTaskMutation.isPending ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>{t('upload.creating', 'Creating task...')}</span>
+            </>
+          ) : (
+            <>
+              <UploadIcon className="w-5 h-5" />
+              <span>{t('upload.startAnalysis', 'Start Analysis')}</span>
+            </>
+          )}
+        </button>
 
         {/* Error */}
         {createTaskMutation.isError && (
