@@ -96,6 +96,9 @@ npm run test:e2e:console
 | 首次绘制 | < 2s |
 | 图表渲染 | < 3s |
 | 表格渲染 | < 2s |
+| 生产 JS 总量 | < 2MB |
+
+Bundle size 用例优先读取 `dist/assets/*.js` 的生产构建产物；如果本地还没有 `dist`，才回退到 dev server 网络响应，并使用更宽松的开发态预算。
 
 **运行：**
 ```bash
@@ -236,6 +239,10 @@ npx playwright test --slow-mo 1000
 ---
 
 ## 常见问题
+
+### 移动端 Sidebar 选择器
+
+移动端关闭状态下的 sidebar 使用 `transform` 移出屏幕，Playwright 仍可能把其中的链接判定为 visible。测试移动端导航时应优先点击汉堡菜单，或对非导航目标使用直接路由；不要直接点击关闭状态 sidebar 内的第一个可见链接。
 
 ### 服务未运行
 
