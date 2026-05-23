@@ -2,7 +2,7 @@ import type { UploadPreflightResponse } from '@/api/client';
 import type { TradeImportFileValidation } from '@/utils/importPreflight';
 import {
   formatPreflightConfidence,
-  getImportPreflightErrorMessage,
+  getImportPreflightErrorDisplay,
 } from '@/utils/importPreflight';
 import {
   AlertCircle,
@@ -37,8 +37,8 @@ export function ImportPreflightPanel({
   className = '',
 }: ImportPreflightPanelProps) {
   const { t } = useTranslation();
-  const errorMessage = getImportPreflightErrorMessage(error);
-  const hasContent = Boolean(selectedFileName || validation?.valid === false || isChecking || result || errorMessage);
+  const errorDisplay = getImportPreflightErrorDisplay(error);
+  const hasContent = Boolean(selectedFileName || validation?.valid === false || isChecking || result || errorDisplay);
 
   if (!hasContent) {
     return null;
@@ -101,7 +101,7 @@ export function ImportPreflightPanel({
     );
   }
 
-  if (errorMessage) {
+  if (errorDisplay) {
     return (
       <div
         data-testid="import-preflight-panel"
@@ -111,9 +111,16 @@ export function ImportPreflightPanel({
           <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
           <div className="min-w-0 flex-1">
             <p className="font-semibold">
-              {t('importPreflight.failedTitle', 'Preflight check failed')}
+              {t(errorDisplay.titleKey, errorDisplay.titleFallback)}
             </p>
-            <p className={`mt-1 break-words text-sm ${mutedClass}`}>{errorMessage}</p>
+            <p className={`mt-1 break-words text-sm ${mutedClass}`}>
+              {t(errorDisplay.messageKey, errorDisplay.messageFallback)}
+            </p>
+            {errorDisplay.detail && (
+              <p className={`mt-2 break-words text-xs ${mutedClass}`}>
+                {errorDisplay.detail}
+              </p>
+            )}
             {onRetry && (
               <button
                 type="button"

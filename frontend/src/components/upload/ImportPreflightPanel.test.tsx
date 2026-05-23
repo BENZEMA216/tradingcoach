@@ -60,4 +60,27 @@ describe('ImportPreflightPanel', () => {
     expect(screen.getByText(/CSV/)).toBeInTheDocument();
     expect(screen.getByTestId('import-preflight-panel')).toHaveTextContent('orders.xlsx');
   });
+
+  it('shows actionable copy when the preview service cannot be reached', () => {
+    render(
+      <ImportPreflightPanel
+        selectedFileName="orders.csv"
+        validation={{ valid: true }}
+        isChecking={false}
+        result={null}
+        error={{
+          isAxiosError: true,
+          code: 'ERR_NETWORK',
+          message: 'Network Error',
+        }}
+      />
+    );
+
+    expect(screen.getByTestId('import-preflight-panel')).toHaveTextContent(
+      'Cannot reach import preview service'
+    );
+    expect(screen.getByTestId('import-preflight-panel')).toHaveTextContent(
+      'backend service is running'
+    );
+  });
 });

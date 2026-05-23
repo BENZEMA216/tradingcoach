@@ -18,6 +18,24 @@ export interface TradeImportReadyInput {
   isEmailValid: boolean;
 }
 
+export interface ImportPreflightErrorDisplay {
+  titleKey: string;
+  titleFallback: string;
+  messageKey: string;
+  messageFallback: string;
+  detail?: string;
+}
+
+interface AxiosLikeError {
+  isAxiosError?: boolean;
+  code?: string;
+  message?: string;
+  response?: {
+    status?: number;
+    data?: unknown;
+  };
+}
+
 function getFileExtension(fileName: string): string {
   const match = /\.[^./\\]+$/.exec(fileName);
   return match ? match[0].toLowerCase() : '';
@@ -58,8 +76,87 @@ export function formatPreflightConfidence(confidence: number | null | undefined)
   return `${Math.round(clamped * 100)}%`;
 }
 
-export function getImportPreflightErrorMessage(error: unknown): string | null {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function getResponseDetail(data: unknown): string | null {
+  if (typeof data === 'string') return data;
+  if (!isRecord(data)) return null;
+
+  const detail = data.detail;
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) return detail.map((item) => String(item)).join(', ');
+
+  return null;
+}
+
+function asAxiosLikeError(error: unknown): AxiosLikeError | null {
+  return isRecord(error) ? error : null;
+}
+
+export function getImportPreflightErrorDisplay(error: unknown): ImportPreflightErrorDisplay | null {
   if (!error) return null;
-  if (error instanceof Error) return error.message;
-  return String(error);
+
+  const axiosError = asAxiosLikeError(error);
+  const message = axiosError?.message || (error instanceof Error ? error.message : String(error));
+  const status = axiosError?.response?.status;
+  const detail = getResponseDetail(axiosError?.response?.data);
+  const isNetworkFailure =
+    axiosError?.code === 'ERR_NETWORK' ||
+    message === 'Network Error' ||
+    (axiosError?.isAxiosError && !axiosError.response);
+
+  if (isNetworkFailure) {
+    return {
+      titleKey: 'importPreflight.networkTitle',
+      titleFallback: 'Cannot reach import preview service',
+      messageKey: 'importPreflight.networkMessage',
+      messageFallback:
+        'Please confirm the backend service is running, then retry. No trade data was imported.',
+      detail: message,
+    };
+  }
+
+  if (status === 404) {
+    return {
+      titleKey: 'importPreflight.missingEndpointTitle',
+      titleFallback: 'Import preview service is not available',
+      messageKey: 'importPreflight.missingEndpointMessage',
+      messageFallback:
+        'The current backend does not include the import preview endpoint. Restart the backend with the latest code, then retry.',
+      detail: detail || message,
+    };
+  }
+
+  if (status && status >= 500) {
+    return {
+      titleKey: 'importPreflight.serverTitle',
+      titleFallback: 'Import preview service failed',
+      messageKey: 'importPreflight.serverMessage',
+      messageFallback:
+        'The backend returned an error while checking this file. Please retry after the service recovers.',
+      detail: detail || message,
+    };
+  }
+
+  if (detail) {
+    return {
+      titleKey: 'importPreflight.failedTitle',
+      titleFallback: 'Preflight check failed',
+      messageKey: 'importPreflight.fileMessage',
+      messageFallback: detail,
+    };
+  }
+
+  return {
+    titleKey: 'importPreflight.failedTitle',
+    titleFallback: 'Preflight check failed',
+    messageKey: 'importPreflight.unknownMessage',
+    messageFallback: message || 'Unknown error',
+  };
+}
+
+export function getImportPreflightErrorMessage(error: unknown): string | null {
+  return getImportPreflightErrorDisplay(error)?.messageFallback ?? null;
 }

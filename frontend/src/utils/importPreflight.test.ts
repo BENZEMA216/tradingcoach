@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   formatPreflightConfidence,
+  getImportPreflightErrorDisplay,
   isTradeImportReady,
   validateTradeImportFile,
 } from './importPreflight';
@@ -70,5 +71,30 @@ describe('trade import preflight utilities', () => {
   it('formats broker detection confidence as a percentage', () => {
     expect(formatPreflightConfidence(0.923)).toBe('92%');
     expect(formatPreflightConfidence(1)).toBe('100%');
+  });
+
+  it('turns network failures into actionable preflight guidance', () => {
+    const display = getImportPreflightErrorDisplay({
+      isAxiosError: true,
+      code: 'ERR_NETWORK',
+      message: 'Network Error',
+    });
+
+    expect(display.titleFallback).toBe('Cannot reach import preview service');
+    expect(display.messageFallback).toContain('backend service is running');
+  });
+
+  it('explains stale backends that do not expose the preflight endpoint', () => {
+    const display = getImportPreflightErrorDisplay({
+      isAxiosError: true,
+      message: 'Request failed with status code 404',
+      response: {
+        status: 404,
+        data: { detail: 'Not Found' },
+      },
+    });
+
+    expect(display.titleFallback).toBe('Import preview service is not available');
+    expect(display.messageFallback).toContain('current backend does not include');
   });
 });
