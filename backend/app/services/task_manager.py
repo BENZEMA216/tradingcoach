@@ -9,6 +9,7 @@ pos: 后端服务层 - 管理异步分析任务的执行
 - 异步任务执行 (ThreadPoolExecutor)
 - 详细处理日志 (每条交易/持仓/评分/事件)
 - 进度追踪 (0-100%)
+- 市场数据源不可用时降级继续分析
 - 事件检测 (财报/价格异常/成交量异常)
 - 完成通知 (邮件)
 
@@ -786,12 +787,11 @@ class TaskManager:
         Returns:
             dict with fetch statistics
         """
-        from src.data_sources.batch_fetcher import BatchFetcher
-        from src.data_sources.cache_manager import CacheManager
-        from src.models.trade import Trade
-        from sqlalchemy import func
-
         try:
+            from src.data_sources.batch_fetcher import BatchFetcher
+            from src.data_sources.cache_manager import CacheManager
+            from src.models.trade import Trade
+
             self._add_log(task_id, "初始化数据获取引擎...", "info", "data")
             time.sleep(0.05)
 
@@ -914,6 +914,21 @@ class TaskManager:
 
             return stats
 
+        except ModuleNotFoundError as e:
+            logger.warning(f"[{task_id}] Market data dependency missing: {e}")
+            self._add_log(
+                task_id,
+                f"⚠ 市场数据获取不可用: 缺少依赖 {e.name or str(e)}，将使用有限数据继续评分",
+                "warning",
+                "data",
+            )
+            return {
+                'symbols_fetched': 0,
+                'records_fetched': 0,
+                'symbols_analyzed': 0,
+                'failed_symbols': [],
+                'error': str(e),
+            }
         except Exception as e:
             logger.error(f"[{task_id}] Market data fetch error: {e}", exc_info=True)
             self._add_log(task_id, f"⚠ 市场数据获取异常: {str(e)}", "error", "data")
