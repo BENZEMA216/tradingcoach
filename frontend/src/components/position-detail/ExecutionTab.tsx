@@ -93,7 +93,80 @@ export function ExecutionTab({ trades, loading, currency }: ExecutionTabProps) {
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-300 border-t-blue-600"></div>
           </div>
         ) : trades && trades.length > 0 ? (
-          <div className="overflow-x-auto">
+          <>
+          <div className="sm:hidden divide-y divide-neutral-100 dark:divide-neutral-800">
+            {trades.map((trade) => (
+              <div key={trade.id} className="px-4 py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-xs font-mono text-neutral-600 dark:text-neutral-300">
+                      {formatDateTime(trade.filled_time)}
+                    </div>
+                    <div className="mt-2">
+                      <span
+                        className={clsx(
+                          'px-2 py-1 text-xs font-medium rounded',
+                          trade.direction === 'buy'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                        )}
+                      >
+                        {t(`direction.${trade.direction}`)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+                      {t('positionDetail.amount')}
+                    </div>
+                    <div className="mt-1 text-sm font-semibold">
+                      {formatCurrency(trade.filled_amount, displayCurrency)}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
+                  <div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+                      {t('positionDetail.price')}
+                    </div>
+                    <div className="mt-1 text-sm font-medium">
+                      {formatCurrency(trade.filled_price, displayCurrency)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+                      {t('positionDetail.quantity')}
+                    </div>
+                    <div className="mt-1 text-sm font-medium">
+                      {trade.filled_quantity}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+                      {t('positionDetail.fees')}
+                    </div>
+                    <div className="mt-1 text-sm font-medium text-red-600">
+                      -{formatCurrency(trade.total_fees, displayCurrency)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+                      {t('positionDetail.slippage')}
+                    </div>
+                    <div
+                      className={clsx(
+                        'mt-1 text-sm font-medium',
+                        trade.slippage !== null ? getPnLColorClass(-trade.slippage) : 'text-neutral-400'
+                      )}
+                    >
+                      {trade.slippage !== null ? formatCurrency(trade.slippage, displayCurrency) : '-'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-neutral-50 dark:bg-neutral-800/50">
                 <tr>
@@ -161,6 +234,7 @@ export function ExecutionTab({ trades, loading, currency }: ExecutionTabProps) {
               </tbody>
             </table>
           </div>
+          </>
         ) : (
           <div className="h-48 flex items-center justify-center text-neutral-500">
             {t('positionDetail.noLinkedTrades')}

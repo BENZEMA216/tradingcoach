@@ -7,7 +7,7 @@ import { positionsApi } from '@/api/client';
 import { GradeBadge } from '@/components/common';
 import { formatCurrency, formatPercent, formatDate, formatHoldingDays } from '@/utils/format';
 import clsx from 'clsx';
-import type { PositionFilters, PositionSummary } from '@/types';
+import type { PositionFilters, PositionListItem, PositionSummary } from '@/types';
 
 type SortField = 'symbol' | 'direction' | 'open_date' | 'close_date' | 'quantity' | 'net_pnl' | 'net_pnl_pct' | 'score_grade' | 'holding_period_days';
 type SortOrder = 'asc' | 'desc';
@@ -97,6 +97,19 @@ export function Positions() {
       openPosition(positionId);
     }
   };
+
+  const renderDirectionBadge = (direction: PositionListItem['direction']) => (
+    <span
+      className={clsx(
+        'px-1 py-0.5 text-[10px] font-bold rounded-sm uppercase tracking-wider',
+        direction === 'long'
+          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
+          : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20'
+      )}
+    >
+      {direction === 'long' ? t('direction.long') : t('direction.short')}
+    </span>
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ['positions', page, pageSize, queryParams],
@@ -373,7 +386,103 @@ export function Positions() {
 
       {/* Positions Table */}
       <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 overflow-hidden transition-colors">
-        <div className="overflow-x-auto">
+        <div className="sm:hidden divide-y divide-white/5">
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="px-4 py-4">
+                <div className="h-4 bg-neutral-100 dark:bg-white/5 rounded animate-pulse mb-3"></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="h-10 bg-neutral-100 dark:bg-white/5 rounded animate-pulse"></div>
+                  <div className="h-10 bg-neutral-100 dark:bg-white/5 rounded animate-pulse"></div>
+                </div>
+              </div>
+            ))
+          ) : data?.items.length === 0 ? (
+            <div className="px-4 py-12 text-center text-slate-400 dark:text-white/40 font-mono">
+              // {isZh ? '没有找到匹配的记录' : 'NO_DATA_FOUND'}
+            </div>
+          ) : (
+            data?.items.map((position) => (
+              <div
+                key={position.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => openPosition(position.id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openPosition(position.id);
+                  }
+                }}
+                className="block w-full px-4 py-4 text-left hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center min-w-0 gap-2">
+                      <span className="truncate font-mono font-bold text-slate-900 dark:text-white">
+                        {position.symbol}
+                      </span>
+                      {renderDirectionBadge(position.direction)}
+                    </div>
+                    {position.symbol_name && (
+                      <span className="mt-1 block truncate text-[10px] text-neutral-400 dark:text-white/30">
+                        {position.symbol_name}
+                      </span>
+                    )}
+                  </div>
+                  <GradeBadge grade={position.score_grade} showIncompleteInfo />
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
+                  <div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">
+                      {t('positions.openDate')}
+                    </div>
+                    <div className="mt-1 text-xs font-mono text-slate-500 dark:text-white/50">
+                      {formatDate(position.open_date)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">
+                      {t('positions.closeDate')}
+                    </div>
+                    <div className="mt-1 text-xs font-mono text-slate-500 dark:text-white/50">
+                      {formatDate(position.close_date)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">
+                      {t('positions.pnl')}
+                    </div>
+                    <div
+                      className={clsx(
+                        'mt-1 text-sm font-mono font-bold',
+                        (position.net_pnl || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
+                      )}
+                    >
+                      {formatCurrency(position.net_pnl, position.currency || 'USD')}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">
+                      {t('positions.pnlPct')}
+                    </div>
+                    <div
+                      className={clsx(
+                        'mt-1 text-sm font-mono font-bold',
+                        (position.net_pnl_pct || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
+                      )}
+                    >
+                      {formatPercent(position.net_pnl_pct)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-neutral-50 dark:bg-black border-b border-neutral-200 dark:border-white/10">
               <tr>
@@ -427,16 +536,7 @@ export function Positions() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={clsx(
-                          'px-1 py-0.5 text-[10px] font-bold rounded-sm uppercase tracking-wider',
-                          position.direction === 'long'
-                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
-                            : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20'
-                        )}
-                      >
-                        {position.direction === 'long' ? t('direction.long') : t('direction.short')}
-                      </span>
+                      {renderDirectionBadge(position.direction)}
                     </td>
                     <td className="px-4 py-3 text-xs font-mono text-slate-500 dark:text-white/50">
                       {formatDate(position.open_date)}

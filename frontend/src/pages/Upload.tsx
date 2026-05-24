@@ -802,7 +802,56 @@ export function Upload() {
             <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
           </div>
         ) : history && history.length > 0 ? (
-          <div className="overflow-x-auto">
+          <>
+          <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700">
+            {history.map((item: UploadHistoryItem) => (
+              <div key={item.id} className="py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+                      <Clock className="w-4 h-4 shrink-0" />
+                      <span className="text-xs">{formatDate(item.import_time)}</span>
+                    </div>
+                    <div className="mt-2 truncate text-sm font-medium text-gray-900 dark:text-white">
+                      {item.file_name}
+                    </div>
+                  </div>
+                  <span className={`shrink-0 px-2 py-1 text-xs rounded-full ${item.status === 'success'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
+                    }`}>
+                    {item.status}
+                  </span>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      {t('upload.historyType', 'Type')}
+                    </div>
+                    <span className={`mt-1 inline-flex px-2 py-1 text-xs rounded-full ${item.file_type === 'english'
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                        : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                      }`}>
+                      {item.file_type === 'english' ? 'EN' : 'CN'}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      {t('upload.historyNew', 'New')}
+                    </div>
+                    <div className="mt-1 font-medium text-green-600">+{item.new_trades}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      {t('upload.historySkipped', 'Skipped')}
+                    </div>
+                    <div className="mt-1 text-gray-500">{item.duplicates_skipped}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="text-left text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -853,6 +902,7 @@ export function Upload() {
               </tbody>
             </table>
           </div>
+          </>
         ) : (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
