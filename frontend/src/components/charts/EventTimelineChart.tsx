@@ -6,9 +6,9 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { EventListItem } from '@/types';
 import { useChartColors } from '@/hooks/useChartColors';
 import { ChartSkeleton } from '@/components/common/ChartSkeleton';

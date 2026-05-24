@@ -6,10 +6,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
   Cell,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { MonthlyPnLItem } from '@/types';
 import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';

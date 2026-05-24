@@ -7,10 +7,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
   ZAxis,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { DurationPnLItem } from '@/types';
 import { getPrivacyAwareFormatters } from '@/utils/format';
 import { usePrivacyStore } from '@/store/usePrivacyStore';

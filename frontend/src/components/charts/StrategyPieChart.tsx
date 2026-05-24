@@ -3,9 +3,9 @@ import {
   Pie,
   Cell,
   Tooltip,
-  ResponsiveContainer,
   Legend,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import { useTranslation } from 'react-i18next';
 import type { StrategyBreakdownItem } from '@/types';
 import { formatCurrency } from '@/utils/format';

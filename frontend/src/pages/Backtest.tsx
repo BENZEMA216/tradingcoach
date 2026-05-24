@@ -17,8 +17,8 @@ import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import { backtestApi, type BacktestResult } from '@/api/client';
 import { formatCurrency } from '@/utils/format';
 
