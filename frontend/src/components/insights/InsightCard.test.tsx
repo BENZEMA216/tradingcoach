@@ -32,7 +32,7 @@ describe('InsightCard', () => {
   it('formats consecutive loss counts as counts instead of money', () => {
     const insight: TradingInsight = {
       id: 'S04-TSLL',
-      type: 'problem',
+      type: 'reminder',
       category: 'symbol',
       priority: 80,
       title: 'TSLL连续亏损',
@@ -54,7 +54,7 @@ describe('InsightCard', () => {
   it('uses exact rule translation before stripping symbol-like suffixes', () => {
     const insight: TradingInsight = {
       id: 'P02-weekly',
-      type: 'problem',
+      type: 'reminder',
       category: 'trend',
       priority: 85,
       title: '连续3周亏损',

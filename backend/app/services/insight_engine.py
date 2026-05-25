@@ -135,7 +135,7 @@ class InsightEngine:
                 if wd_win_rate < self._win_rate - 20:
                     self._add_insight(TradingInsight(
                         id=f"T01-{weekday_names[wd]}",
-                        type=InsightType.PROBLEM,
+                        type=InsightType.REMINDER,
                         category=InsightCategory.TIME,
                         priority=85,
                         title=f"{weekday_names_zh[wd]}胜率偏低",
@@ -433,7 +433,7 @@ class InsightEngine:
                 elif symbol_wr < 35:
                     self._add_insight(TradingInsight(
                         id=f"S02-{symbol}",
-                        type=InsightType.PROBLEM,
+                        type=InsightType.REMINDER,
                         category=InsightCategory.SYMBOL,
                         priority=75,
                         title=f"{symbol}表现不佳",
@@ -488,7 +488,7 @@ class InsightEngine:
                 candidate = repeated_loss_candidates[0]
                 self._add_insight(TradingInsight(
                     id=f"S04-{candidate['symbol']}",
-                    type=InsightType.PROBLEM,
+                    type=InsightType.REMINDER,
                     category=InsightCategory.SYMBOL,
                     priority=80,
                     title=f"{candidate['symbol']}连续亏损",
@@ -509,7 +509,7 @@ class InsightEngine:
                 max_streak = max(item["max_consecutive_losses"] for item in repeated_loss_candidates)
                 self._add_insight(TradingInsight(
                     id="S04A",
-                    type=InsightType.PROBLEM,
+                    type=InsightType.REMINDER,
                     category=InsightCategory.SYMBOL,
                     priority=80,
                     title="多个标的连续亏损",
@@ -1239,7 +1239,7 @@ class InsightEngine:
         elif wr_change < -10:
             self._add_insight(TradingInsight(
                 id="P02",
-                type=InsightType.PROBLEM,
+                type=InsightType.REMINDER,
                 category=InsightCategory.TREND,
                 priority=78,
                 title="近期表现下滑",
@@ -1270,7 +1270,7 @@ class InsightEngine:
                 total_loss = sum(weekly_pnl[w] for w in recent_3_weeks)
                 self._add_insight(TradingInsight(
                     id="P02-weekly",
-                    type=InsightType.PROBLEM,
+                    type=InsightType.REMINDER,
                     category=InsightCategory.TREND,
                     priority=85,
                     title="连续3周亏损",

@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from backend.app.schemas.insights import InsightType
 from backend.app.services.insight_engine import InsightEngine
 from src.models.base import Base
 from src.models.position import Position, PositionStatus
@@ -75,6 +76,7 @@ def test_repeated_symbol_loss_insights_are_aggregated():
 
         insight = repeated_loss_insights[0]
         assert insight.id == "S04A"
+        assert insight.type == InsightType.REMINDER
         assert insight.data_points["affected_symbols"] == 3
         assert insight.data_points["max_consecutive_losses"] == 5
         assert "CCC" in insight.data_points["symbols"]
@@ -105,6 +107,7 @@ def test_weekly_loss_insight_uses_unique_rule_id():
 
         insight = weekly_loss_insights[0]
         assert insight.id == "P02-weekly"
+        assert insight.type == InsightType.REMINDER
         assert insight.title == "连续3周亏损"
         assert insight.data_points["total_loss"] == -1000
         assert insight.data_points["total_loss_display"] == "1,000"
@@ -112,6 +115,28 @@ def test_weekly_loss_insight_uses_unique_rule_id():
             item.id == "P02" and item.data_points.get("weeks_negative") == 3
             for item in insights
         )
+    finally:
+        session.close()
+
+
+def test_performance_decline_insight_is_a_reminder_not_a_problem():
+    session = _make_session()
+    start = date(2025, 3, 3)
+
+    try:
+        for index in range(5):
+            _add_closed_position(session, "AAA", start + timedelta(days=index), 100)
+        for index in range(5):
+            _add_closed_position(session, "BBB", start + timedelta(days=7 + index), -100)
+        session.commit()
+
+        insights = InsightEngine(session).generate_insights(limit=30)
+
+        insight = next(item for item in insights if item.id == "P02")
+        assert insight.type == InsightType.REMINDER
+        assert insight.title == "近期表现下滑"
+        assert insight.data_points["early_win_rate"] == 100.0
+        assert insight.data_points["recent_win_rate"] == 0.0
     finally:
         session.close()
 
