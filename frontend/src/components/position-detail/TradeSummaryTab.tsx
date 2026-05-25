@@ -100,6 +100,29 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
           </div>
         </div>
 
+        {position.is_option && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+            <div>
+              <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.optionType')}</div>
+              <div className="text-sm font-semibold uppercase">{position.option_type || '-'}</div>
+            </div>
+            <div>
+              <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.strikePrice')}</div>
+              <div className="text-sm font-semibold">
+                {position.strike_price != null ? position.strike_price.toFixed(2) : '-'}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.expiryDate')}</div>
+              <div className="text-sm font-semibold">{position.expiry_date || '-'}</div>
+            </div>
+            <div>
+              <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.underlying')}</div>
+              <div className="text-sm font-semibold">{position.underlying_symbol || '-'}</div>
+            </div>
+          </div>
+        )}
+
         {/* Time & Fees */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800">
           <div>

@@ -130,6 +130,9 @@ export interface PositionDetail extends PositionListItem {
   currency: string | null;
   is_option: boolean;
   underlying_symbol: string | null;
+  option_type: string | null;
+  strike_price: number | null;
+  expiry_date: string | null;
   scores: PositionScoreDetail;
   risk_metrics: PositionRiskMetrics;
   strategy_confidence: number | null;

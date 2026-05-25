@@ -311,6 +311,9 @@ async def get_position_detail(
         currency=position.currency,
         is_option=bool(position.is_option),
         underlying_symbol=position.underlying_symbol,
+        option_type=position.option_type,
+        strike_price=float(position.strike_price) if position.strike_price else None,
+        expiry_date=position.expiry_date,
         scores=PositionScoreDetail(
             entry_quality_score=float(position.entry_quality_score) if position.entry_quality_score else None,
             exit_quality_score=float(position.exit_quality_score) if position.exit_quality_score else None,

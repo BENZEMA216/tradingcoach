@@ -901,7 +901,7 @@ async def get_equity_drawdown(
             date=d,
             cumulative_pnl=round(cumulative, 2),
             drawdown=round(drawdown, 2),
-            drawdown_pct=round(drawdown_pct, 2) if drawdown_pct else None,
+            drawdown_pct=round(drawdown_pct, 2) if drawdown_pct is not None else None,
             peak=round(peak, 2),
         ))
 

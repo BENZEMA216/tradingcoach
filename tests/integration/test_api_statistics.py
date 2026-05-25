@@ -224,6 +224,23 @@ class TestStatisticsAPIAdvanced:
             assert "cumulative_pnl" in item
             assert "drawdown" in item
 
+    def test_get_equity_drawdown_returns_zero_pct_at_peak(self, client, test_db):
+        """权益新高点的回撤百分比应返回 0，而不是 null"""
+        _add_closed_position(
+            test_db,
+            symbol="AAPL",
+            close_day=date(2026, 1, 2),
+            net_pnl=100,
+        )
+        test_db.commit()
+
+        response = client.get("/api/v1/statistics/equity-drawdown")
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data[0]["drawdown"] == 0.0
+        assert data[0]["drawdown_pct"] == 0.0
+
     def test_get_pnl_distribution(self, client_with_data):
         """测试盈亏分布"""
         response = client_with_data.get("/api/v1/statistics/pnl-distribution")

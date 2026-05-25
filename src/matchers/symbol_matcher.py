@@ -412,7 +412,10 @@ class SymbolMatcher:
             market=opening_trade.market.value if hasattr(opening_trade.market, 'value') else opening_trade.market,
             currency=opening_trade.currency,
             is_option=opening_trade.is_option,
-            underlying_symbol=opening_trade.underlying_symbol
+            underlying_symbol=opening_trade.underlying_symbol,
+            option_type=opening_trade.option_type,
+            strike_price=opening_trade.strike_price,
+            expiry_date=opening_trade.expiration_date,
         )
 
         # 开仓信息
