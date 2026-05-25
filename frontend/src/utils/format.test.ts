@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isIncompleteGrade } from './format';
+import { getDisplayGrade, isIncompleteGrade } from './format';
 
 describe('grade formatting helpers', () => {
   it('detects downgraded incomplete grades by question-mark suffix', () => {
@@ -13,5 +13,13 @@ describe('grade formatting helpers', () => {
     expect(isIncompleteGrade('F')).toBe(false);
     expect(isIncompleteGrade(null)).toBe(false);
     expect(isIncompleteGrade(undefined)).toBe(false);
+  });
+
+  it('removes incomplete suffix from display grade', () => {
+    expect(getDisplayGrade('C+?')).toBe('C+');
+    expect(getDisplayGrade('C?')).toBe('C');
+    expect(getDisplayGrade('C-?')).toBe('C-');
+    expect(getDisplayGrade('B')).toBe('B');
+    expect(getDisplayGrade(null)).toBe('-');
   });
 });

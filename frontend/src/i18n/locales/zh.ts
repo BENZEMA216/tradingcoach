@@ -698,7 +698,7 @@ export default {
     scoreGradeIncomplete: {
       term: '不完整评分',
       fullName: 'Incomplete Grade',
-      description: '评分旁的 ? 表示市场数据、新闻上下文或环境数据不足，系统已降级评分，请不要把它当作完整评分。',
+      description: '虚线边框和信息图标表示该评分使用的数据不完整，例如市场数据、新闻上下文或环境数据不足。系统保留基础等级，但应把它视为低置信度评分。',
     },
     newsAlignmentScore: {
       term: '新闻契合度',

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { getGradeBadgeClass, isIncompleteGrade } from '@/utils/format';
+import { getDisplayGrade, getGradeBadgeClass, isIncompleteGrade } from '@/utils/format';
 import { InfoTooltip } from './InfoTooltip';
 
 interface GradeBadgeProps {
@@ -22,6 +22,7 @@ export function GradeBadge({
   className,
 }: GradeBadgeProps) {
   const incomplete = isIncompleteGrade(grade);
+  const displayGrade = getDisplayGrade(grade);
 
   return (
     <span className="inline-flex items-center justify-center gap-1">
@@ -34,7 +35,7 @@ export function GradeBadge({
           className
         )}
       >
-        {grade || '-'}
+        {displayGrade}
       </span>
       {showIncompleteInfo && incomplete && (
         <InfoTooltip termKey="scoreGradeIncomplete" size="xs" />

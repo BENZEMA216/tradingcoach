@@ -698,7 +698,7 @@ export default {
     scoreGradeIncomplete: {
       term: 'Incomplete Grade',
       fullName: 'Incomplete Grade',
-      description: 'The ? means this grade was computed with incomplete market, news, or environment data. Treat it as a downgraded confidence score.',
+      description: 'A dashed border and info icon mean this grade was computed with incomplete market, news, or environment data. Keep the base grade, but treat it as a low-confidence score.',
     },
     newsAlignmentScore: {
       term: 'News Alignment',
