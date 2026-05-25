@@ -249,6 +249,8 @@ class InsightEngine:
             if abs(intraday_wr - swing_wr) > 15:
                 better = "日内" if intraday_wr > swing_wr else "波段"
                 worse = "波段" if intraday_wr > swing_wr else "日内"
+                better_style = "intraday" if intraday_wr > swing_wr else "swing"
+                worse_style = "swing" if intraday_wr > swing_wr else "intraday"
                 better_wr = max(intraday_wr, swing_wr)
                 worse_wr = min(intraday_wr, swing_wr)
 
@@ -265,6 +267,12 @@ class InsightEngine:
                         "intraday_win_rate": round(intraday_wr, 1),
                         "swing_count": len(swing),
                         "swing_win_rate": round(swing_wr, 1),
+                        "better": better,
+                        "worse": worse,
+                        "better_style": better_style,
+                        "worse_style": worse_style,
+                        "better_wr": round(better_wr, 1),
+                        "worse_wr": round(worse_wr, 1),
                     }
                 ))
 
@@ -1190,6 +1198,7 @@ class InsightEngine:
         """
         P01: Win rate improvement
         P02: Performance deterioration
+        P02-weekly: Consecutive weekly losses
         """
         if len(self.positions) < 10:
             return
@@ -1245,7 +1254,7 @@ class InsightEngine:
                 }
             ))
 
-        # Check for consecutive weekly losses (P02 variant)
+        # Check for consecutive weekly losses
         weekly_pnl = defaultdict(float)
         for p in self.positions:
             if p.close_date:
@@ -1260,7 +1269,7 @@ class InsightEngine:
             if consecutive_negative:
                 total_loss = sum(weekly_pnl[w] for w in recent_3_weeks)
                 self._add_insight(TradingInsight(
-                    id="P02",
+                    id="P02-weekly",
                     type=InsightType.PROBLEM,
                     category=InsightCategory.TREND,
                     priority=85,
@@ -1270,5 +1279,6 @@ class InsightEngine:
                     data_points={
                         "weeks_negative": 3,
                         "total_loss": round(total_loss, 2),
+                        "total_loss_display": f"{abs(total_loss):,.0f}",
                     }
                 ))

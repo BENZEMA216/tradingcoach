@@ -1067,7 +1067,7 @@ export default {
     },
     'P02-weekly': {
       title: '3 consecutive losing weeks',
-      description: 'Lost ${{total_loss}} over the past 3 weeks',
+      description: 'Lost ${{total_loss_display}} over the past 3 weeks',
       suggestion: 'Strongly recommend pausing trading; deeply analyze causes before resuming',
     },
   },

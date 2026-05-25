@@ -1057,7 +1057,7 @@ export default {
     },
     'P02-weekly': {
       title: '连续3周亏损',
-      description: '最近3周连续亏损，共亏损${{total_loss}}',
+      description: '最近3周连续亏损，共亏损${{total_loss_display}}',
       suggestion: '建议暂停交易，深入分析原因后再恢复',
     },
   },

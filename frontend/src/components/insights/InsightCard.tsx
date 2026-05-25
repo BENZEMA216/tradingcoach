@@ -41,18 +41,21 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
   const config = TYPE_CONFIG[insight.type];
   const isZh = i18n.language === 'zh';
 
-  // Extract base rule ID (e.g., "B01-AAPL" -> "B01", "S04A" -> "S04A")
-  const getBaseRuleId = (id: string): string => {
+  // Resolve translation rule ID (e.g., "P02-weekly" stays exact, "S01-AAPL" -> "S01")
+  const getTranslationRuleId = (id: string): string => {
+    if (i18n.exists?.(`insightRules.${id}.title`)) {
+      return id;
+    }
     // Match pattern like "T01", "B01", "H04", "S01-AAPL", "S04A", etc.
     const match = id.match(/^([A-Z]\d+[A-Z]?)(?=-|$)/);
     return match ? match[1] : id;
   };
 
-  const baseRuleId = getBaseRuleId(insight.id);
+  const ruleId = getTranslationRuleId(insight.id);
 
   // Get translated content with fallback to original
   const getTranslatedTitle = (): string => {
-    const translationKey = `insightRules.${baseRuleId}.title`;
+    const translationKey = `insightRules.${ruleId}.title`;
     const translated = t(translationKey, {
       defaultValue: '',
       ...insight.data_points
@@ -61,7 +64,7 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
   };
 
   const getTranslatedDescription = (): string => {
-    const translationKey = `insightRules.${baseRuleId}.description`;
+    const translationKey = `insightRules.${ruleId}.description`;
     const translated = t(translationKey, {
       defaultValue: '',
       ...insight.data_points
@@ -70,7 +73,7 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
   };
 
   const getTranslatedSuggestion = (): string => {
-    const translationKey = `insightRules.${baseRuleId}.suggestion`;
+    const translationKey = `insightRules.${ruleId}.suggestion`;
     const translated = t(translationKey, {
       defaultValue: '',
       ...insight.data_points
