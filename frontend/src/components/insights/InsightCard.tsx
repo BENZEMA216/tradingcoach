@@ -41,10 +41,10 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
   const config = TYPE_CONFIG[insight.type];
   const isZh = i18n.language === 'zh';
 
-  // Extract base rule ID (e.g., "B01-AAPL" → "B01", "T01-Monday" → "T01")
+  // Extract base rule ID (e.g., "B01-AAPL" -> "B01", "S04A" -> "S04A")
   const getBaseRuleId = (id: string): string => {
-    // Match pattern like "T01", "B01", "H04", "S01-AAPL", "T01-Monday", etc.
-    const match = id.match(/^([A-Z]\d+)/);
+    // Match pattern like "T01", "B01", "H04", "S01-AAPL", "S04A", etc.
+    const match = id.match(/^([A-Z]\d+[A-Z]?)(?=-|$)/);
     return match ? match[1] : id;
   };
 
@@ -84,14 +84,35 @@ export function InsightCard({ insight, compact = false }: InsightCardProps) {
 
   const formatDataPoint = (key: string, value: unknown): string => {
     if (typeof value === 'number') {
-      if (key.includes('rate') || key.includes('pct') || key.includes('percentage')) {
+      const metricKey = key.toLowerCase();
+
+      if (metricKey.includes('rate') || metricKey.includes('pct') || metricKey.includes('percentage')) {
         return `${value.toFixed(1)}%`;
       }
-      if (key.includes('pnl') || key.includes('loss') || key.includes('win') || key.includes('fees')) {
-        return `$${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-      }
-      if (key.includes('days') || key.includes('holding')) {
+      if (metricKey.includes('days') || metricKey.includes('holding')) {
         return `${value.toFixed(1)}d`;
+      }
+      if (
+        metricKey.includes('consecutive') ||
+        metricKey.includes('streak') ||
+        metricKey.includes('count') ||
+        metricKey.includes('trade') ||
+        metricKey.includes('symbol') ||
+        metricKey.includes('winner') ||
+        metricKey.includes('loser')
+      ) {
+        return value.toLocaleString('en-US', { maximumFractionDigits: 0 });
+      }
+      if (
+        metricKey.includes('pnl') ||
+        metricKey.includes('fee') ||
+        metricKey.includes('amount') ||
+        metricKey.includes('profit') ||
+        metricKey.includes('loss') ||
+        metricKey.includes('avg_win') ||
+        metricKey.includes('avg_loss')
+      ) {
+        return `$${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
       }
       if (Number.isInteger(value)) {
         return String(value);

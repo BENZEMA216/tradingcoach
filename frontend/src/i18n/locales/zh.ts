@@ -929,6 +929,11 @@ export default {
       description: '{{symbol}}曾出现连续{{max_consecutive_losses}}笔亏损',
       suggestion: '在{{symbol}}连亏后应暂停交易，冷静分析后再考虑入场',
     },
+    'S04A': {
+      title: '多个标的连续亏损',
+      description: '{{affected_symbols}}个标的出现过连续亏损，最长{{max_consecutive_losses}}笔；重点标的：{{symbols}}',
+      suggestion: '优先暂停这些重复连亏标的，复盘共同原因后再恢复交易',
+    },
     'S05': {
       title: '新标的首次交易风险',
       description: '首次交易新标的的胜率仅{{first_trade_win_rate}}%，低于平均{{average_win_rate}}%',

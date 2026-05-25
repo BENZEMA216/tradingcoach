@@ -939,6 +939,11 @@ export default {
       description: '{{symbol}} had {{max_consecutive_losses}} consecutive losing trades',
       suggestion: 'Pause trading {{symbol}} after consecutive losses; analyze before re-entering',
     },
+    'S04A': {
+      title: 'Consecutive losses across symbols',
+      description: '{{affected_symbols}} symbols had repeated losing streaks; worst streak was {{max_consecutive_losses}} trades. Top symbols: {{symbols}}',
+      suggestion: 'Pause the repeated-loss symbols first and review the common causes before trading them again',
+    },
     'S05': {
       title: 'Risk with first trades on new symbols',
       description: 'First trade win rate on new symbols is only {{first_trade_win_rate}}%, below average {{average_win_rate}}%',

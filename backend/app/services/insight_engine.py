@@ -373,7 +373,7 @@ class InsightEngine:
         S01: Strong symbol - high win rate
         S02: Problem symbol - low win rate
         S03: Over-concentration
-        S04: Repeated losses on same symbol
+        S04: Repeated losses on same symbol(s)
         """
         symbol_stats = defaultdict(lambda: {
             "count": 0, "winners": 0, "pnl": 0.0, "consecutive_losses": 0, "max_consec_losses": 0
@@ -394,6 +394,7 @@ class InsightEngine:
                 stats["max_consec_losses"] = max(stats["max_consec_losses"], stats["consecutive_losses"])
 
         total_trades = len(self.positions)
+        repeated_loss_candidates = []
 
         for symbol, stats in symbol_stats.items():
             if stats["count"] >= 5:
@@ -458,20 +459,63 @@ class InsightEngine:
 
                 # S04: Repeated losses
                 if stats["max_consec_losses"] >= 3:
-                    self._add_insight(TradingInsight(
-                        id=f"S04-{symbol}",
-                        type=InsightType.PROBLEM,
-                        category=InsightCategory.SYMBOL,
-                        priority=80,
-                        title=f"{symbol}连续亏损",
-                        description=f"{symbol}曾出现连续{stats['max_consec_losses']}笔亏损",
-                        suggestion=f"在{symbol}连亏后应暂停交易，冷静分析后再考虑入场",
-                        data_points={
-                            "symbol": symbol,
-                            "max_consecutive_losses": stats["max_consec_losses"],
-                            "trade_count": stats["count"],
-                        }
-                    ))
+                    repeated_loss_candidates.append({
+                        "symbol": symbol,
+                        "max_consecutive_losses": stats["max_consec_losses"],
+                        "trade_count": stats["count"],
+                        "total_pnl": round(stats["pnl"], 2),
+                    })
+
+        if repeated_loss_candidates:
+            repeated_loss_candidates.sort(
+                key=lambda item: (
+                    item["max_consecutive_losses"],
+                    item["trade_count"],
+                    -item["total_pnl"],
+                ),
+                reverse=True,
+            )
+
+            if len(repeated_loss_candidates) == 1:
+                candidate = repeated_loss_candidates[0]
+                self._add_insight(TradingInsight(
+                    id=f"S04-{candidate['symbol']}",
+                    type=InsightType.PROBLEM,
+                    category=InsightCategory.SYMBOL,
+                    priority=80,
+                    title=f"{candidate['symbol']}连续亏损",
+                    description=(
+                        f"{candidate['symbol']}曾出现连续"
+                        f"{candidate['max_consecutive_losses']}笔亏损"
+                    ),
+                    suggestion=f"在{candidate['symbol']}连亏后应暂停交易，冷静分析后再考虑入场",
+                    data_points={
+                        "symbol": candidate["symbol"],
+                        "max_consecutive_losses": candidate["max_consecutive_losses"],
+                        "trade_count": candidate["trade_count"],
+                    }
+                ))
+            else:
+                top_candidates = repeated_loss_candidates[:5]
+                top_symbols = ", ".join(item["symbol"] for item in top_candidates)
+                max_streak = max(item["max_consecutive_losses"] for item in repeated_loss_candidates)
+                self._add_insight(TradingInsight(
+                    id="S04A",
+                    type=InsightType.PROBLEM,
+                    category=InsightCategory.SYMBOL,
+                    priority=80,
+                    title="多个标的连续亏损",
+                    description=(
+                        f"{top_symbols}等{len(repeated_loss_candidates)}个标的曾出现连续亏损，"
+                        f"最长{max_streak}笔"
+                    ),
+                    suggestion="优先暂停这些重复连亏标的，复盘共同原因后再恢复交易",
+                    data_points={
+                        "affected_symbols": len(repeated_loss_candidates),
+                        "max_consecutive_losses": max_streak,
+                        "symbols": top_symbols,
+                    }
+                ))
 
         # S05: First trade on new symbol performance
         symbol_first_trade = {}
