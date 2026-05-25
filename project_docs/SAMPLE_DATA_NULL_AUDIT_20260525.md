@@ -86,4 +86,4 @@
 - 当前数据库 dry-run 配对：627 trades，483 positions，61 open positions，14 个单腿 OPEN 期权字段缺失为 0
 - Live API：`/api/v1/positions/431` 返回 `option_type=CALL`、`strike_price=120.0`、`expiry_date=2025-02-07`
 - Browser QA：`http://127.0.0.1:5174/positions/431` 正常展示期权元数据，截图保存在 `.gstack/data-audit/position-431-option-metadata.png`
-- 大范围 `tests/integration/test_api_positions.py tests/integration/test_api_statistics.py` 旧用例未完整跑通：环境缺少 `factory_boy`，所有失败都卡在 `tests.factories` 导入 `factory`，不是本轮业务断言失败。
+- 安装缺失测试依赖 `factory-boy==3.3.3` 后，大范围 `tests/integration/test_api_positions.py tests/integration/test_api_statistics.py`：42 passed
