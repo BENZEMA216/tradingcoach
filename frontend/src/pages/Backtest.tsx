@@ -29,6 +29,44 @@ function formatSavingsPct(value: BacktestResult['savings_pct'], isZh: boolean) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(0)}%`;
 }
 
+function buildBacktestSummary(results: BacktestResult[], isZh: boolean) {
+  if (results.length === 0) return null;
+
+  const positiveRules = results.filter((rule) => rule.savings > 0);
+  const negativeRules = results.filter((rule) => rule.savings < 0);
+  const bestRule = positiveRules[0];
+  const secondRule = positiveRules[1];
+  const worstRule = [...results].sort((a, b) => a.savings - b.savings)[0];
+
+  if (!bestRule) {
+    return {
+      tone: 'negative' as const,
+      title: isZh ? '当前规则没有改善历史结果' : 'These rules did not improve the historical result',
+      body: isZh
+        ? '这组机械规则在历史数据上没有带来正收益，说明它们不适合直接套用。更合理的下一步是缩小条件或重新设计规则，再做参数测试。'
+        : 'None of these mechanical rules improved the historical result. They should not be applied directly; narrow the conditions or redesign the rules before parameter testing.',
+      callout: isZh ? '先不要把这些规则当作交易纪律。' : 'Do not treat these as trading rules yet.',
+    };
+  }
+
+  const bestName = isZh ? bestRule.name_cn : bestRule.name_en;
+  const secondName = secondRule ? (isZh ? secondRule.name_cn : secondRule.name_en) : null;
+  const worstName = worstRule && worstRule.savings < 0 ? (isZh ? worstRule.name_cn : worstRule.name_en) : null;
+
+  return {
+    tone: 'positive' as const,
+    title: isZh ? '核心结论：优先处理大亏和长期亏损标的' : 'Key takeaway: cap large losses and avoid persistent losers first',
+    body: isZh
+      ? `${bestName} 是历史模拟里最有效的规则，少做/更早处理 ${bestRule.skipped_count} 笔交易，理论上可改善 ${formatCurrency(bestRule.savings)}。${secondName ? `${secondName} 也有效，说明亏损主要集中在少数持续拖累的标的。` : ''}`
+      : `${bestName} was the strongest historical rule: changing ${bestRule.skipped_count} trades would have improved the result by ${formatCurrency(bestRule.savings)}. ${secondName ? `${secondName} also helped, suggesting losses were concentrated in a few persistent-loser symbols.` : ''}`,
+    callout: isZh
+      ? `${worstName ? `${worstName} 在当前参数下反而变差，` : ''}所以这页不是让你一次启用所有规则，而是提示优先测试“硬止损”和“亏损标的过滤”，再单独调参验证。`
+      : `${worstName ? `${worstName} got worse with the current parameters, ` : ''}so this page is not telling you to enable every rule. Prioritize hard stops and persistent-loser filters, then tune each rule separately.`,
+    positiveCount: positiveRules.length,
+    negativeCount: negativeRules.length,
+  };
+}
+
 export function Backtest() {
   const { i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
@@ -56,6 +94,8 @@ export function Backtest() {
     );
   }
 
+  const summary = buildBacktestSummary(results, isZh);
+
   return (
     <div className="space-y-6 pb-16">
       {/* Header */}
@@ -69,6 +109,61 @@ export function Backtest() {
             : 'What if you had followed these rules at the time? Cumulative-P&L counterfactuals.'}
         </p>
       </div>
+
+      {summary && (
+        <div
+          className={clsx(
+            'rounded-sm border px-6 py-5',
+            summary.tone === 'positive'
+              ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-500/20'
+              : 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-500/20'
+          )}
+        >
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0">
+              <div
+                className={clsx(
+                  'text-[10px] font-mono uppercase tracking-widest',
+                  summary.tone === 'positive'
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : 'text-amber-700 dark:text-amber-400'
+                )}
+              >
+                {isZh ? '整体解读' : 'Summary'}
+              </div>
+              <h2 className="mt-2 text-base font-mono font-bold text-slate-900 dark:text-white">
+                {summary.title}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/60">
+                {summary.body}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-700 dark:text-white/70">
+                {summary.callout}
+              </p>
+            </div>
+            {'positiveCount' in summary && (
+              <div className="hidden sm:grid grid-cols-2 gap-3 shrink-0 text-center font-mono">
+                <div className="rounded-sm bg-white/70 dark:bg-black/30 border border-emerald-200/70 dark:border-emerald-500/20 px-4 py-3">
+                  <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                    {summary.positiveCount}
+                  </div>
+                  <div className="mt-1 text-[10px] uppercase tracking-widest text-slate-400">
+                    {isZh ? '有效规则' : 'helped'}
+                  </div>
+                </div>
+                <div className="rounded-sm bg-white/70 dark:bg-black/30 border border-red-200/70 dark:border-red-500/20 px-4 py-3">
+                  <div className="text-xl font-bold text-red-600 dark:text-red-400">
+                    {summary.negativeCount}
+                  </div>
+                  <div className="mt-1 text-[10px] uppercase tracking-widest text-slate-400">
+                    {isZh ? '需调参' : 'needs tuning'}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Rule cards, sorted by savings desc */}
       <div className="space-y-4">
