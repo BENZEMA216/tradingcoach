@@ -103,13 +103,17 @@ export function AICoachPanel({ dateStart, dateEnd, limit = 20 }: AICoachPanelPro
   const isZh = i18n.language === 'zh';
 
   const { data: insights, isLoading, error } = useQuery({
-    queryKey: ['insights', dateStart, dateEnd, limit],
+    queryKey: ['statistics', 'insights', dateStart, dateEnd, limit],
     queryFn: () =>
       statisticsApi.getInsights({
         date_start: dateStart,
         date_end: dateEnd,
         limit,
       }),
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 
   // Group insights by type
