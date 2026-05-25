@@ -9,21 +9,36 @@ import { useNavigate } from 'react-router-dom';
 
 interface TradingCalendarProps {
     className?: string;
+    anchorDate?: string | null;
 }
 
 interface DailyData {
     date: string;
     pnl: number;
     trade_count: number;
-    win_rate: number;
 }
 
-export function TradingCalendar({ className }: TradingCalendarProps) {
+function parseAnchorMonth(anchorDate?: string | null): Date {
+    if (!anchorDate) return new Date();
+
+    const parsed = new Date(`${anchorDate}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return new Date();
+
+    return new Date(parsed.getFullYear(), parsed.getMonth(), 1);
+}
+
+export function TradingCalendar({ className, anchorDate }: TradingCalendarProps) {
     const { i18n } = useTranslation();
     const navigate = useNavigate();
     const isZh = i18n.language === 'zh';
 
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const anchorMonth = useMemo(() => parseAnchorMonth(anchorDate), [anchorDate]);
+    const [currentDate, setCurrentDate] = useState(anchorMonth);
+    const [lastAnchorDate, setLastAnchorDate] = useState(anchorDate);
+    if (lastAnchorDate !== anchorDate) {
+        setLastAnchorDate(anchorDate);
+        setCurrentDate(anchorMonth);
+    }
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
 
@@ -38,13 +53,10 @@ export function TradingCalendar({ className }: TradingCalendarProps) {
         const map = new Map<string, DailyData>();
         if (Array.isArray(yearData)) {
             yearData.forEach((item) => {
-                // Assuming item has { date: string, value: number, count: number } structure matches backend
-                // We might need to adjust based on actual API response, but strictly typing for now
                 map.set(item.date, {
                     date: item.date,
-                    pnl: item.value, // value usually maps to pnl in heatmaps
-                    trade_count: item.count || 0,
-                    win_rate: 0 // Heatmap might not return win_rate, check types later
+                    pnl: item.pnl,
+                    trade_count: item.trade_count || 0,
                 });
             });
         }

@@ -192,7 +192,7 @@ export const statisticsApi = {
   },
 
   getCalendarHeatmap: async (year: number) => {
-    const { data } = await api.get<{ date: string; value: number; count?: number }[]>('/statistics/calendar-heatmap', { params: { year } });
+    const { data } = await api.get<{ date: string; pnl: number; trade_count: number; is_winner: boolean }[]>('/statistics/calendar-heatmap', { params: { year } });
     return data;
   },
 

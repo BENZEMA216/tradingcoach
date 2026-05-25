@@ -456,7 +456,7 @@ export function Statistics() {
           <AICoachPanel dateStart={dateParams.date_start} dateEnd={dateParams.date_end} limit={20} />
 
           {/* Visual Trading Calendar */}
-          <TradingCalendar className="shadow-sm" />
+          <TradingCalendar className="shadow-sm" anchorDate={dateRange?.max_date} />
 
           {/* Section 01: Performance */}
           <ReportSection number="01" title="PERFORMANCE" subtitle={isZh ? '业绩表现' : 'Performance Overview'}>
