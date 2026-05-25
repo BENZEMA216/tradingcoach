@@ -64,9 +64,25 @@ def preview_import_file(file_path: str | Path, file_name: Optional[str] = None) 
     completed_df = adapter.filter_completed_trades()
     stats = adapter.get_statistics()
     completed_trades = len(completed_df)
+    importable_completed_trades = _count_importable_completed_trades(completed_df)
+    warning_messages = list(stats["warning_messages"])
+    error_messages = list(stats["error_messages"])
+
+    # Adapter validation runs before completed-trade filtering, so cancelled or
+    # queued rows with empty fill fields can produce validation errors even when
+    # completed rows are importable. Treat those as warnings for preflight.
+    if importable_completed_trades > 0 and error_messages:
+        warning_messages.extend(error_messages)
+        error_messages = []
+
+    if completed_trades > importable_completed_trades:
+        warning_messages.append(
+            f"{completed_trades - importable_completed_trades} completed rows are "
+            "missing required fill data and will be skipped."
+        )
 
     return ImportPreflightResult(
-        can_import=completed_trades > 0 and len(adapter.errors) == 0,
+        can_import=importable_completed_trades > 0,
         file_name=display_name,
         file_hash=file_hash[:16],
         broker_id=adapter.config.broker_id,
@@ -76,8 +92,8 @@ def preview_import_file(file_path: str | Path, file_name: Optional[str] = None) 
         completed_trades=completed_trades,
         skipped_rows=max(len(df) - completed_trades, 0),
         detected_columns=list(adapter.raw_df.columns) if adapter.raw_df is not None else [],
-        error_messages=stats["error_messages"],
-        warning_messages=stats["warning_messages"],
+        error_messages=error_messages,
+        warning_messages=warning_messages[:10],
     )
 
 
@@ -96,3 +112,34 @@ def _read_sample(path: Path) -> Optional[pd.DataFrame]:
         except (UnicodeDecodeError, pd.errors.ParserError):
             continue
     return None
+
+
+def _count_importable_completed_trades(completed_df: pd.DataFrame) -> int:
+    """Count completed rows that have the minimum fields the importer persists."""
+    if completed_df.empty:
+        return 0
+
+    required_columns = [
+        "symbol",
+        "direction",
+        "filled_time",
+        "filled_quantity",
+        "filled_price",
+    ]
+    missing_columns = [
+        column for column in required_columns if column not in completed_df.columns
+    ]
+    if missing_columns:
+        return 0
+
+    def has_text(column: pd.Series) -> pd.Series:
+        return column.notna() & column.astype(str).str.strip().ne("")
+
+    mask = (
+        has_text(completed_df["symbol"])
+        & has_text(completed_df["direction"])
+        & completed_df["filled_time"].notna()
+        & pd.to_numeric(completed_df["filled_quantity"], errors="coerce").fillna(0).gt(0)
+        & pd.to_numeric(completed_df["filled_price"], errors="coerce").fillna(0).gt(0)
+    )
+    return int(mask.sum())

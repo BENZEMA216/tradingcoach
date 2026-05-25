@@ -9,6 +9,7 @@ pos: 单元测试 - 验证上传前格式识别、行数统计和错误反馈
 """
 
 from pathlib import Path
+from textwrap import dedent
 
 from src.importers.import_preflight import preview_import_file
 
@@ -43,3 +44,28 @@ def test_preview_returns_actionable_error_for_unsupported_csv(tmp_path):
         "Unsupported CSV format. No broker adapter matched this file."
     ]
     assert result.detected_columns == ["foo", "bar"]
+
+
+def test_preview_allows_import_when_cancelled_rows_have_empty_fills(tmp_path):
+    csv_path = tmp_path / "futu_en_with_cancelled_rows.csv"
+    csv_path.write_text(
+        dedent(
+            """\
+            Side,Symbol,Name,Order Price,Order Qty,Order Amount,Status,Filled@Avg Price,Order Time,Order Type,Markets,Currency,Fill Qty,Fill Price,Fill Amount,Fill Time,Platform Fees,Counterparty,SFC Levy
+            Buy,AAPL,Apple,100,1,100,Filled,1@100,2025/01/01 09:30:00 (ET),Limit,US,USD,1,100,100,2025/01/01 09:30:01 (ET),1,,
+            Buy,MSFT,Microsoft,100,1,100,Cancelled,,2025/01/02 09:30:00 (ET),Limit,US,USD,0,0,,2025/01/02 09:30:01 (ET),1,,
+            """
+        ),
+        encoding="utf-8",
+    )
+
+    result = preview_import_file(csv_path, file_name=csv_path.name)
+
+    assert result.can_import is True
+    assert result.broker_id == "futu_en"
+    assert result.total_rows == 2
+    assert result.completed_trades == 1
+    assert result.skipped_rows == 1
+    assert result.error_messages == []
+    assert "Fill quantity must be greater than 0" in result.warning_messages
+    assert "Fill price must be greater than 0" in result.warning_messages
