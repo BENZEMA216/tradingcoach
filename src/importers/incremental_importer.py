@@ -805,7 +805,7 @@ class IncrementalImporter:
                 'import_time': datetime.now(),
                 'file_name': self.csv_path.name,
                 'file_hash': self.file_hash,
-                'file_type': self.file_language,
+                'file_type': self._get_history_file_type(),
                 'total_rows': self.result.total_rows,
                 'new_trades': self.result.new_trades,
                 'duplicates_skipped': self.result.duplicates_skipped,
@@ -820,6 +820,12 @@ class IncrementalImporter:
 
         except Exception as e:
             logger.warning(f"Failed to record import history: {e}")
+
+    def _get_history_file_type(self) -> str:
+        """Return a user-facing import history type."""
+        if self.file_language == 'adapter' and self.result.broker_id:
+            return self.result.broker_id
+        return self.file_language or ''
 
     def _print_summary(self):
         """打印导入摘要"""

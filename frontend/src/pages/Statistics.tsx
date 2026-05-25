@@ -387,8 +387,8 @@ export function Statistics() {
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-16">
       {/* Period Selector - Floating & Industrial */}
-      <div className="sticky top-0 z-10 bg-white/90 dark:bg-black/90 backdrop-blur-md -mx-8 px-8 py-3 border-b border-neutral-200 dark:border-white/10 transition-colors">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+      <div className="sticky top-0 z-10 bg-white/90 dark:bg-black/90 backdrop-blur-md -mx-4 px-4 py-3 border-b border-neutral-200 dark:border-white/10 transition-colors sm:-mx-8 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 max-w-7xl mx-auto">
           {/* Period Navigation */}
           {periodType !== 'all' && (
             <div className="flex items-center gap-2">
@@ -413,9 +413,9 @@ export function Statistics() {
           {periodType === 'all' && <div />}
 
           {/* Right side: Privacy Toggle + Period Tabs */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <PrivacyModeToggle />
-            <div className="flex gap-px bg-neutral-200 dark:bg-white/10 p-0.5 rounded-sm">
+            <div className="flex flex-wrap gap-px bg-neutral-200 dark:bg-white/10 p-0.5 rounded-sm">
               {periodTabs.map((tab) => (
                 <button
                   key={tab.type}

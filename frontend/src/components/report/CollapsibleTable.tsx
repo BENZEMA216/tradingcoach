@@ -63,7 +63,7 @@ export function CollapsibleTable({
           isCollapsed ? 'max-h-0' : 'max-h-[2000px]'
         )}
       >
-        <div className="border-t border-neutral-200 dark:border-white/10">
+        <div className="border-t border-neutral-200 dark:border-white/10 overflow-x-auto">
           {children}
         </div>
       </div>

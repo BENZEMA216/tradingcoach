@@ -51,6 +51,31 @@ const STEPS = [
   { key: 'complete', label: '完成', labelEn: 'Done', progress: 100 },
 ];
 
+function getHistoryTypeBadge(fileType: string) {
+  const normalized = fileType.toLowerCase();
+  const isEnglish = normalized === 'english' || normalized.endsWith('_en');
+  const isChinese = normalized === 'chinese' || normalized.endsWith('_cn');
+
+  if (isEnglish) {
+    return {
+      label: 'EN',
+      className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    };
+  }
+
+  if (isChinese) {
+    return {
+      label: 'CN',
+      className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+    };
+  }
+
+  return {
+    label: fileType ? fileType.toUpperCase() : 'CSV',
+    className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+  };
+}
+
 export function Upload() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -804,7 +829,10 @@ export function Upload() {
         ) : history && history.length > 0 ? (
           <>
           <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700">
-            {history.map((item: UploadHistoryItem) => (
+            {history.map((item: UploadHistoryItem) => {
+              const typeBadge = getHistoryTypeBadge(item.file_type);
+
+              return (
               <div key={item.id} className="py-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -828,11 +856,8 @@ export function Upload() {
                     <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       {t('upload.historyType', 'Type')}
                     </div>
-                    <span className={`mt-1 inline-flex px-2 py-1 text-xs rounded-full ${item.file_type === 'english'
-                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                        : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                      }`}>
-                      {item.file_type === 'english' ? 'EN' : 'CN'}
+                    <span className={`mt-1 inline-flex px-2 py-1 text-xs rounded-full ${typeBadge.className}`}>
+                      {typeBadge.label}
                     </span>
                   </div>
                   <div>
@@ -849,7 +874,8 @@ export function Upload() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           <div className="hidden sm:block overflow-x-auto">
             <table className="w-full">
@@ -864,7 +890,10 @@ export function Upload() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                {history.map((item: UploadHistoryItem) => (
+                {history.map((item: UploadHistoryItem) => {
+                  const typeBadge = getHistoryTypeBadge(item.file_type);
+
+                  return (
                   <tr key={item.id} className="text-sm">
                     <td className="py-3 pr-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
@@ -876,11 +905,8 @@ export function Upload() {
                       {item.file_name}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${item.file_type === 'english'
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                          : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                        }`}>
-                        {item.file_type === 'english' ? 'EN' : 'CN'}
+                      <span className={`px-2 py-1 text-xs rounded-full ${typeBadge.className}`}>
+                        {typeBadge.label}
                       </span>
                     </td>
                     <td className="py-3 pr-4 text-right font-medium text-green-600">
@@ -898,7 +924,8 @@ export function Upload() {
                       </span>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
