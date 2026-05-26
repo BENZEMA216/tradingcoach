@@ -29,6 +29,28 @@ function formatSavingsPct(value: BacktestResult['savings_pct'], isZh: boolean) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(0)}%`;
 }
 
+function formatBacktestDeltaLabel(result: BacktestResult, isZh: boolean) {
+  if (result.savings > 0) {
+    return isZh ? '模拟改善' : 'simulated improvement';
+  }
+
+  if (result.savings < 0) {
+    return isZh ? '模拟变差' : 'simulated drag';
+  }
+
+  return isZh ? '模拟持平' : 'simulated flat';
+}
+
+function formatBacktestDeltaRatio(result: BacktestResult, isZh: boolean) {
+  if (typeof result.savings_pct !== 'number' || !Number.isFinite(result.savings_pct)) {
+    return isZh ? '实际盈亏接近 0，比例不稳定' : 'unstable: actual P&L near 0';
+  }
+
+  return isZh
+    ? `${formatSavingsPct(result.savings_pct, isZh)} / |实际盈亏| ${formatCurrency(Math.abs(result.actual_total_pnl))}`
+    : `${formatSavingsPct(result.savings_pct, isZh)} / |actual P&L| ${formatCurrency(Math.abs(result.actual_total_pnl))}`;
+}
+
 function buildBacktestSummary(results: BacktestResult[], isZh: boolean) {
   if (results.length === 0) return null;
 
@@ -182,9 +204,9 @@ export function Backtest() {
               {/* Card header */}
               <button
                 onClick={() => setExpanded(isExpanded ? null : r.rule_id)}
-                className="w-full flex items-center justify-between px-6 py-4 hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors text-left"
+                className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors text-left"
               >
-                <div className="flex items-center gap-4 min-w-0">
+                <div className="flex items-center gap-4 min-w-0 w-full sm:w-auto sm:flex-1">
                   <div className="flex items-center justify-center w-8 h-8 rounded-sm bg-neutral-100 dark:bg-white/10 text-xs font-mono font-bold text-slate-700 dark:text-white/80">
                     {idx + 1}
                   </div>
@@ -202,7 +224,7 @@ export function Backtest() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-6 shrink-0">
+                <div className="flex items-center gap-6 shrink-0 self-end sm:self-auto">
                   <div className="text-right">
                     <div
                       className={clsx(
@@ -214,10 +236,10 @@ export function Backtest() {
                       {formatCurrency(r.savings)}
                     </div>
                     <div className="text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-white/40 mt-1">
-                      {isZh ? '可省 / 多赚' : 'savings'}
+                      {formatBacktestDeltaLabel(r, isZh)}
                     </div>
-                    <div className="text-xs font-mono text-slate-500 dark:text-white/50 mt-0.5">
-                      {formatSavingsPct(r.savings_pct, isZh)}
+                    <div className="text-xs font-mono text-slate-500 dark:text-white/50 mt-0.5 leading-tight">
+                      {formatBacktestDeltaRatio(r, isZh)}
                     </div>
                   </div>
                 </div>
@@ -325,8 +347,8 @@ export function Backtest() {
       {/* Footnote */}
       <p className="text-xs text-slate-400 dark:text-white/30 font-mono leading-relaxed">
         {isZh
-          ? '* 每条规则用"当时已知的信息"机械应用于历史交易，避免 look-ahead bias。所有金额按近似汇率换算成 USD 等价。'
-          : '* Each rule is applied mechanically to past trades using only info available at the time (no look-ahead bias). Amounts are USD-equivalent.'}
+          ? '* 每条规则用"当时已知的信息"机械应用于历史交易，避免 look-ahead bias。改善金额 = 反事实盈亏 - 实际盈亏；百分比 = 改善金额 / |实际盈亏|。所有金额按近似汇率换算成 USD 等价。'
+          : '* Each rule is applied mechanically to past trades using only info available at the time (no look-ahead bias). Improvement = counterfactual P&L - actual P&L; percentage = improvement / |actual P&L|. Amounts are USD-equivalent.'}
       </p>
     </div>
   );
