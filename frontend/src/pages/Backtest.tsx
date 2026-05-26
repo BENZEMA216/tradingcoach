@@ -22,33 +22,50 @@ import { StableResponsiveContainer as ResponsiveContainer } from '@/components/c
 import { backtestApi, type BacktestResult } from '@/api/client';
 import { formatCurrency } from '@/utils/format';
 
-function formatSavingsPct(value: BacktestResult['savings_pct'], isZh: boolean) {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
-    return isZh ? '百分比不稳定' : 'unstable %';
+function formatSignedCurrency(value: number) {
+  if (value > 0) {
+    return `+${formatCurrency(value)}`;
   }
-  return `${value >= 0 ? '+' : ''}${value.toFixed(0)}%`;
+  return formatCurrency(value);
 }
 
 function formatBacktestDeltaLabel(result: BacktestResult, isZh: boolean) {
   if (result.savings > 0) {
-    return isZh ? '模拟改善' : 'simulated improvement';
+    return isZh ? '历史模拟多赚/少亏' : 'historical simulated lift';
   }
 
   if (result.savings < 0) {
-    return isZh ? '模拟变差' : 'simulated drag';
+    return isZh ? '历史模拟少赚/多亏' : 'historical simulated drag';
   }
 
-  return isZh ? '模拟持平' : 'simulated flat';
+  return isZh ? '历史模拟持平' : 'historical simulated flat';
 }
 
-function formatBacktestDeltaRatio(result: BacktestResult, isZh: boolean) {
+function formatBacktestDeltaPath(result: BacktestResult, isZh: boolean) {
+  return isZh
+    ? `实际 ${formatCurrency(result.actual_total_pnl)} → 模拟 ${formatCurrency(result.counterfactual_total_pnl)}`
+    : `actual ${formatCurrency(result.actual_total_pnl)} → simulated ${formatCurrency(result.counterfactual_total_pnl)}`;
+}
+
+function formatBacktestRatioExplanation(result: BacktestResult, isZh: boolean) {
+  const actual = formatCurrency(result.actual_total_pnl);
+  const simulated = formatCurrency(result.counterfactual_total_pnl);
+  const delta = formatSignedCurrency(result.savings);
+
   if (typeof result.savings_pct !== 'number' || !Number.isFinite(result.savings_pct)) {
-    return isZh ? '实际盈亏接近 0，比例不稳定' : 'unstable: actual P&L near 0';
+    return isZh
+      ? `这不是收益率。它表示：如果历史上按这条规则执行，总盈亏会从 ${actual} 变成 ${simulated}，差额 ${delta}。实际盈亏接近 0，所以相对比例不稳定，不适合参考。`
+      : `This is not a return rate. It means this rule would have changed historical total P&L from ${actual} to ${simulated}, a ${delta} difference. Because actual P&L is near 0, the relative ratio is unstable and should not be used.`;
   }
 
+  const multiple = Math.abs(result.savings_pct) / 100;
+  const multipleText = multiple >= 10 ? multiple.toFixed(0) : multiple.toFixed(1);
+  const absoluteDelta = Math.abs(result.savings).toFixed(2);
+  const absoluteActual = formatCurrency(Math.abs(result.actual_total_pnl));
+
   return isZh
-    ? `${formatSavingsPct(result.savings_pct, isZh)} / |实际盈亏| ${formatCurrency(Math.abs(result.actual_total_pnl))}`
-    : `${formatSavingsPct(result.savings_pct, isZh)} / |actual P&L| ${formatCurrency(Math.abs(result.actual_total_pnl))}`;
+    ? `这不是收益率。它表示：如果历史上按这条规则执行，总盈亏会从 ${actual} 变成 ${simulated}，差额 ${delta}。${absoluteDelta} ÷ |${absoluteActual}| ≈ ${multipleText} 倍，只是说明这个差额相对实际结果有多大。`
+    : `This is not a return rate. It means this rule would have changed historical total P&L from ${actual} to ${simulated}, a ${delta} difference. ${absoluteDelta} ÷ |${absoluteActual}| ≈ ${multipleText}x; that only shows how large the difference is relative to the actual result.`;
 }
 
 function buildBacktestSummary(results: BacktestResult[], isZh: boolean) {
@@ -239,7 +256,7 @@ export function Backtest() {
                       {formatBacktestDeltaLabel(r, isZh)}
                     </div>
                     <div className="text-xs font-mono text-slate-500 dark:text-white/50 mt-0.5 leading-tight">
-                      {formatBacktestDeltaRatio(r, isZh)}
+                      {formatBacktestDeltaPath(r, isZh)}
                     </div>
                   </div>
                 </div>
@@ -275,6 +292,10 @@ export function Backtest() {
                       </div>
                     </div>
                   </div>
+
+                  <p className="rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-black/60 px-4 py-3 text-sm leading-6 text-slate-600 dark:text-white/60">
+                    {formatBacktestRatioExplanation(r, isZh)}
+                  </p>
 
                   {/* Cumulative chart */}
                   <div className="h-64 bg-white dark:bg-black/60 rounded-sm border border-neutral-200 dark:border-white/10 p-3">
@@ -347,8 +368,8 @@ export function Backtest() {
       {/* Footnote */}
       <p className="text-xs text-slate-400 dark:text-white/30 font-mono leading-relaxed">
         {isZh
-          ? '* 每条规则用"当时已知的信息"机械应用于历史交易，避免 look-ahead bias。改善金额 = 反事实盈亏 - 实际盈亏；百分比 = 改善金额 / |实际盈亏|。所有金额按近似汇率换算成 USD 等价。'
-          : '* Each rule is applied mechanically to past trades using only info available at the time (no look-ahead bias). Improvement = counterfactual P&L - actual P&L; percentage = improvement / |actual P&L|. Amounts are USD-equivalent.'}
+          ? '* 每条规则用"当时已知的信息"机械应用于历史交易，避免 look-ahead bias。改善金额 = 模拟盈亏 - 实际盈亏；相对比例只用于说明改善幅度大小，不是收益率。所有金额按近似汇率换算成 USD 等价。'
+          : '* Each rule is applied mechanically to past trades using only info available at the time (no look-ahead bias). Improvement = simulated P&L - actual P&L; the relative ratio only sizes the difference, not a return rate. Amounts are USD-equivalent.'}
       </p>
     </div>
   );

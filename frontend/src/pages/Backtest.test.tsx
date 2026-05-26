@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { Backtest } from './Backtest';
 import { backtestApi, type BacktestResult } from '@/api/client';
@@ -15,6 +17,22 @@ vi.mock('@/api/client', () => ({
     summary: vi.fn(),
   },
 }));
+
+vi.mock('recharts', () => {
+  const Container = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
+  const Empty = () => null;
+
+  return {
+    CartesianGrid: Empty,
+    Legend: Empty,
+    Line: Empty,
+    LineChart: Container,
+    ResponsiveContainer: Container,
+    Tooltip: Empty,
+    XAxis: Empty,
+    YAxis: Empty,
+  };
+});
 
 function renderBacktest(results: BacktestResult[]) {
   vi.mocked(backtestApi.summary).mockResolvedValue(results);
@@ -33,7 +51,9 @@ function renderBacktest(results: BacktestResult[]) {
 }
 
 describe('Backtest', () => {
-  it('explains that the backtest percentage is relative to actual P&L', async () => {
+  it('prioritizes historical simulated delta over percentage shorthand', async () => {
+    const user = userEvent.setup();
+
     renderBacktest([
       {
         rule_id: 'stop_loss',
@@ -51,8 +71,14 @@ describe('Backtest', () => {
       },
     ]);
 
-    expect(await screen.findByText('模拟改善')).toBeInTheDocument();
-    expect(screen.getByText('+267% / |实际盈亏| $4,590.21')).toBeInTheDocument();
+    expect(await screen.findByText('历史模拟多赚/少亏')).toBeInTheDocument();
+    expect(screen.getByText('实际 $4,590.21 → 模拟 $16,857.26')).toBeInTheDocument();
+    expect(screen.queryByText(/\+267%/)).not.toBeInTheDocument();
     expect(screen.queryByText('可省 / 多赚')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /严格止损 -X%/ }));
+
+    expect(screen.getByText(/这不是收益率/)).toBeInTheDocument();
+    expect(screen.getByText(/12267\.05 ÷ \|\$4,590\.21\| ≈ 2\.7 倍/)).toBeInTheDocument();
   });
 });
