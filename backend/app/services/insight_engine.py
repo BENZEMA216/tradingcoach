@@ -379,7 +379,6 @@ class InsightEngine:
     def _analyze_symbols(self):
         """
         S01: Strong symbol - high win rate
-        S02: Problem symbol - low win rate
         S03: Over-concentration
         S04: Repeated losses on same symbol(s)
         """
@@ -426,24 +425,6 @@ class InsightEngine:
                             "total_pnl": round(stats["pnl"], 2),
                             "winners": stats["winners"],
                             "losers": stats["count"] - stats["winners"],
-                        }
-                    ))
-
-                # S02: Problem symbol
-                elif symbol_wr < 35:
-                    self._add_insight(TradingInsight(
-                        id=f"S02-{symbol}",
-                        type=InsightType.REMINDER,
-                        category=InsightCategory.SYMBOL,
-                        priority=75,
-                        title=f"{symbol}表现不佳",
-                        description=f"{symbol}胜率仅{symbol_wr:.0f}%（{stats['count']}笔），总亏损${abs(stats['pnl']):,.0f}",
-                        suggestion=f"建议暂停交易{symbol}，或深入分析为何在此标的上表现不佳",
-                        data_points={
-                            "symbol": symbol,
-                            "trade_count": stats["count"],
-                            "win_rate": round(symbol_wr, 1),
-                            "total_pnl": round(stats["pnl"], 2),
                         }
                     ))
 

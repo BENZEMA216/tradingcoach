@@ -84,6 +84,22 @@ def test_repeated_symbol_loss_insights_are_aggregated():
         session.close()
 
 
+def test_poor_symbol_performance_is_not_a_global_insight():
+    session = _make_session()
+    start = date(2025, 1, 1)
+
+    try:
+        for index in range(6):
+            _add_closed_position(session, "WEAK", start + timedelta(days=index), -100)
+        session.commit()
+
+        insights = InsightEngine(session).generate_insights(limit=30)
+
+        assert not any(insight.id == "S02-WEAK" for insight in insights)
+    finally:
+        session.close()
+
+
 def test_weekly_loss_insight_uses_unique_rule_id():
     session = _make_session()
     start = date(2025, 1, 6)

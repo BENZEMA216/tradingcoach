@@ -76,6 +76,7 @@
 | A-503 | 空表格有空状态 | 浏览器检查 | by-grade、drawdowns 等表格不会只有表头、没有内容 | |
 | A-504 | 可点击行支持键盘操作 | 键盘 QA | Tab 可到达，Enter/Space 可触发 | |
 | A-505 | 暗色模式可读 | 切换主题检查 | Dashboard、Statistics、Positions、Position detail、Backtest 对比度足够 | |
+| A-506 | 标的表现不佳不进入全局问题流 | 单测、API、浏览器检查 | `S02` 不再作为全局 AI 教练洞察展示；标的表现保留在按标的统计上下文 | PASS - 2026-05-26 |
 
 ## 8. P1：处理取消流程
 
