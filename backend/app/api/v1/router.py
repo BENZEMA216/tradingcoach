@@ -4,11 +4,17 @@ API v1 Router - Aggregates all endpoint routers
 
 from fastapi import APIRouter
 
-from .endpoints import dashboard, positions, trades, market_data, statistics, system, ai_coach, upload, tasks, events, feedback, backtest
+from .endpoints import dashboard, positions, trades, market_data, statistics, system, ai_coach, upload, tasks, events, feedback, backtest, workspaces
 
 api_router = APIRouter()
 
 # Include all endpoint routers
+api_router.include_router(
+    workspaces.router,
+    prefix="/workspaces",
+    tags=["Workspaces"]
+)
+
 api_router.include_router(
     dashboard.router,
     prefix="/dashboard",

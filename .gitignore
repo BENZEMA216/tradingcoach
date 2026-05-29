@@ -224,6 +224,7 @@ secrets.json
 data/*.db
 data/*.sqlite
 data/*.sqlite3
+data/workspaces/
 *.db
 *.sqlite
 *.sqlite3

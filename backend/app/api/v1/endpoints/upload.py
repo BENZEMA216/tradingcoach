@@ -1,9 +1,9 @@
 """
 CSV上传API
 
-input: UploadFile (CSV文件)
+input: UploadFile (CSV文件), optional X-Workspace-Token
 output: 预检结果或导入结果JSON (成功/新增数/跳过数/配对数/评分数)
-pos: 后端上传端点 - 接收CSV、预检格式、调用增量导入器、触发后续处理
+pos: 后端上传端点 - 接收CSV、预检格式、调用增量导入器、触发 workspace 隔离处理
 
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
@@ -18,7 +18,7 @@ from typing import Optional
 import logging
 
 import pandas as pd
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, Header, HTTPException, BackgroundTasks, status
 from pydantic import BaseModel, Field
 
 # Add project root to path
@@ -37,6 +37,19 @@ from src.analyzers.quality_scorer import QualityScorer
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+from backend.app.services.workspace_service import workspace_service
+
+
+def _workspace_database_url(token: Optional[str]) -> str:
+    workspace = workspace_service.resolve_token(token)
+    if workspace is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired workspace token.",
+        )
+    return workspace.database_url
 
 
 class UploadResponse(BaseModel):
@@ -168,6 +181,7 @@ async def preview_trades_upload(file: UploadFile = File(...)):
 async def upload_trades(
     file: UploadFile = File(...),
     replace_mode: bool = False,  # 默认增量去重；replace=True 才会清空旧数据
+    x_workspace_token: Optional[str] = Header(None, alias="X-Workspace-Token"),
 ):
     """
     上传交易记录CSV文件
@@ -181,6 +195,8 @@ async def upload_trades(
     现在改为默认增量，避免重复上传同一文件时数据被反复清空、
     "duplicates_skipped" 字段始终为 0 的误导性表现。
     """
+    database_url = _workspace_database_url(x_workspace_token)
+
     start_time = datetime.now()
 
     # 验证文件类型
@@ -215,7 +231,7 @@ async def upload_trades(
         # 替换模式：先清除所有旧数据
         if replace_mode:
             logger.info("Replace mode enabled - clearing all existing data")
-            engine = init_database(config.DATABASE_URL, echo=False)
+            engine = init_database(database_url, echo=False)
             session = get_session()
             try:
                 clear_all_trading_data(session)
@@ -223,7 +239,11 @@ async def upload_trades(
                 session.close()
 
         # 导入（替换模式下相当于全新导入）
-        importer = IncrementalImporter(tmp_path, dry_run=False)
+        importer = IncrementalImporter(
+            tmp_path,
+            dry_run=False,
+            database_url=database_url,
+        )
         result = importer.run()
 
         # 如果有新交易，执行配对和评分
@@ -231,7 +251,7 @@ async def upload_trades(
         positions_scored = 0
 
         if result.new_trades > 0:
-            engine = init_database(config.DATABASE_URL, echo=False)
+            engine = init_database(database_url, echo=False)
             session = get_session()
 
             try:
@@ -326,9 +346,12 @@ async def upload_trades(
 
 
 @router.get("/history", response_model=list[UploadHistoryItem])
-async def get_upload_history(limit: int = 20):
+async def get_upload_history(
+    limit: int = 20,
+    x_workspace_token: Optional[str] = Header(None, alias="X-Workspace-Token"),
+):
     """获取导入历史"""
-    engine = init_database(config.DATABASE_URL, echo=False)
+    engine = init_database(_workspace_database_url(x_workspace_token), echo=False)
     session = get_session()
 
     try:

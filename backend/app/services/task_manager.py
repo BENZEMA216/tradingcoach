@@ -1,9 +1,9 @@
 """
 任务管理器
 
-input: Task 模型, 配置, EventDetector
+input: Task 模型, 配置, EventDetector, optional workspace database URL
 output: 任务创建、执行、状态追踪
-pos: 后端服务层 - 管理异步分析任务的执行
+pos: 后端服务层 - 管理异步分析任务的执行，支持匿名 workspace 隔离
 
 功能:
 - 异步任务执行 (ThreadPoolExecutor)
@@ -70,6 +70,7 @@ class TaskManager:
 
         self._executor = ThreadPoolExecutor(max_workers=max_workers)
         self._tasks = {}  # task_id -> Future
+        self._task_database_urls = {}  # task_id -> database_url
         self._initialized = True
 
         logger.info(f"TaskManager initialized with {max_workers} workers")
@@ -81,7 +82,8 @@ class TaskManager:
         file_size: int,
         file_path: str,
         email: Optional[str] = None,
-        replace_mode: bool = True
+        replace_mode: bool = True,
+        database_url: Optional[str] = None,
     ) -> str:
         """
         创建新任务
@@ -93,14 +95,17 @@ class TaskManager:
             file_path: 临时文件路径
             email: 通知邮箱（可选）
             replace_mode: 是否替换现有数据
+            database_url: 目标数据库 URL（默认使用全局数据库）
 
         Returns:
             task_id: 任务ID
         """
         task_id = str(uuid.uuid4())[:8]  # 使用短UUID
+        db_url = database_url or config.DATABASE_URL
+        self._task_database_urls[task_id] = db_url
 
         # 初始化数据库
-        init_database(config.DATABASE_URL, echo=False)
+        init_database(db_url, echo=False)
         create_all_tables()
 
         session = get_session()
@@ -132,13 +137,14 @@ class TaskManager:
             self._run_csv_analysis,
             task_id,
             file_path,
-            replace_mode
+            replace_mode,
+            db_url,
         )
         self._tasks[task_id] = future
 
         return task_id
 
-    def get_task(self, task_id: str) -> Optional[dict]:
+    def get_task(self, task_id: str, database_url: Optional[str] = None) -> Optional[dict]:
         """
         获取任务状态
 
@@ -148,7 +154,7 @@ class TaskManager:
         Returns:
             任务信息字典，不存在返回 None
         """
-        init_database(config.DATABASE_URL, echo=False)
+        init_database(self._database_url_for_task(task_id, database_url), echo=False)
         session = get_session()
 
         try:
@@ -159,7 +165,7 @@ class TaskManager:
         finally:
             session.close()
 
-    def cancel_task(self, task_id: str) -> bool:
+    def cancel_task(self, task_id: str, database_url: Optional[str] = None) -> bool:
         """
         取消任务
 
@@ -172,7 +178,11 @@ class TaskManager:
         if task_id in self._tasks:
             future = self._tasks[task_id]
             if future.cancel():
-                self._update_task_status(task_id, TaskStatus.CANCELLED)
+                self._update_task_status(
+                    task_id,
+                    TaskStatus.CANCELLED,
+                    database_url=database_url,
+                )
                 logger.info(f"Task cancelled: {task_id}")
                 return True
 
@@ -185,10 +195,11 @@ class TaskManager:
         progress: float = None,
         step: str = None,
         result: dict = None,
-        error: str = None
+        error: str = None,
+        database_url: Optional[str] = None,
     ):
         """更新任务状态"""
-        init_database(config.DATABASE_URL, echo=False)
+        init_database(self._database_url_for_task(task_id, database_url), echo=False)
         session = get_session()
 
         try:
@@ -235,7 +246,8 @@ class TaskManager:
         task_id: str,
         message: str,
         level: str = "info",
-        category: str = None
+        category: str = None,
+        database_url: Optional[str] = None,
     ):
         """
         添加日志条目（不更新进度）
@@ -247,7 +259,7 @@ class TaskManager:
             category: 日志分类 (import/match/score/system)
         """
         with self._log_lock:  # 串行化数据库写入
-            init_database(config.DATABASE_URL, echo=False)
+            init_database(self._database_url_for_task(task_id, database_url), echo=False)
             session = get_session()
 
             try:
@@ -279,7 +291,20 @@ class TaskManager:
             finally:
                 session.close()
 
-    def _run_csv_analysis(self, task_id: str, file_path: str, replace_mode: bool):
+    def _database_url_for_task(
+        self,
+        task_id: str,
+        database_url: Optional[str] = None,
+    ) -> str:
+        return database_url or self._task_database_urls.get(task_id) or config.DATABASE_URL
+
+    def _run_csv_analysis(
+        self,
+        task_id: str,
+        file_path: str,
+        replace_mode: bool,
+        database_url: str,
+    ):
         """
         执行 CSV 分析任务（带详细日志）
 
@@ -349,7 +374,7 @@ class TaskManager:
                 time.sleep(0.05)
                 self._add_log(task_id, "清除持仓记录表...", "info", "import")
                 time.sleep(0.05)
-                self._clear_all_trading_data()
+                self._clear_all_trading_data(database_url)
                 self._add_log(task_id, "清除导入历史表...", "info", "import")
                 time.sleep(0.05)
                 self._add_log(task_id, "✓ 旧数据已清除", "success", "import")
@@ -367,7 +392,11 @@ class TaskManager:
             self._add_log(task_id, "读取文件内容...", "info", "import")
             time.sleep(0.05)
 
-            importer = IncrementalImporter(file_path, dry_run=False)
+            importer = IncrementalImporter(
+                file_path,
+                dry_run=False,
+                database_url=database_url,
+            )
 
             self._add_log(task_id, "解析 CSV 列结构...", "info", "import")
             time.sleep(0.05)
@@ -392,7 +421,7 @@ class TaskManager:
                     time.sleep(0.02)
 
             # 添加导入的每条交易详情 - 全部记录！
-            self._log_all_imported_trades(task_id)
+            self._log_all_imported_trades(task_id, database_url)
 
             self._update_task_status(
                 task_id,
@@ -425,7 +454,7 @@ class TaskManager:
                 self._add_log(task_id, "按标的分组交易记录...", "info", "match")
                 time.sleep(0.05)
 
-                init_database(config.DATABASE_URL, echo=False)
+                init_database(database_url, echo=False)
                 session = get_session()
 
                 try:
@@ -610,7 +639,7 @@ class TaskManager:
             logger.info(f"[{task_id}] Task completed successfully")
 
             # 发送邮件通知
-            self._send_completion_email(task_id, result)
+            self._send_completion_email(task_id, result, database_url)
 
         except Exception as e:
             logger.error(f"[{task_id}] Task failed: {e}", exc_info=True)
@@ -628,11 +657,11 @@ class TaskManager:
             except Exception:
                 pass
 
-    def _log_all_imported_trades(self, task_id: str):
+    def _log_all_imported_trades(self, task_id: str, database_url: str):
         """记录所有导入的交易 - 每条都记录！"""
         from src.models.trade import Trade
 
-        init_database(config.DATABASE_URL, echo=False)
+        init_database(database_url, echo=False)
         session = get_session()
 
         try:
@@ -941,11 +970,11 @@ class TaskManager:
                 'error': str(e)
             }
 
-    def _clear_all_trading_data(self):
+    def _clear_all_trading_data(self, database_url: str):
         """清除所有交易数据"""
         from sqlalchemy import text
 
-        init_database(config.DATABASE_URL, echo=False)
+        init_database(database_url, echo=False)
         session = get_session()
 
         tables_to_clear = ['positions', 'trades', 'import_history']
@@ -1050,9 +1079,14 @@ class TaskManager:
             # 不抛出异常，事件检测失败不影响整体流程
             return 0
 
-    def _send_completion_email(self, task_id: str, result: dict):
+    def _send_completion_email(
+        self,
+        task_id: str,
+        result: dict,
+        database_url: Optional[str] = None,
+    ):
         """发送完成通知邮件"""
-        init_database(config.DATABASE_URL, echo=False)
+        init_database(self._database_url_for_task(task_id, database_url), echo=False)
         session = get_session()
 
         try:
