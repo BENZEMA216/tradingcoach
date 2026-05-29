@@ -22,6 +22,12 @@
 
 Trading Coach is a comprehensive trading analytics platform that helps traders analyze their performance, identify patterns, and improve their trading decisions. It combines institutional-grade metrics with behavioral analysis to provide actionable insights.
 
+For the Product Hunt beta, TradingCoach is a sample-first trade review tool:
+try an anonymous sample workspace, or upload a supported CSV export. It does
+not connect to brokers, does not place trades, and does not provide investment
+advice. Anonymous beta workspaces are isolated and expire after 72 hours by
+default.
+
 ### Key Highlights
 
 - **Multi-Broker Support**: Import trades from Futu, Tiger, CITIC, Huatai and more
