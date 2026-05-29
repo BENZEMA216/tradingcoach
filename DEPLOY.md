@@ -108,6 +108,39 @@ npx vercel --prod
 
 ## 生产环境配置
 
+### Product Hunt Beta 推荐拓扑
+
+推荐发布形态：
+
+- 前端：`https://beta.<domain>`
+- 后端：`https://api-beta.<domain>` 或 Railway 自定义域名
+- 前端构建变量：`VITE_API_BASE_URL=https://api-beta.<domain>/api/v1`
+- 后端 CORS：`CORS_ORIGINS=https://beta.<domain>`
+- 数据目录：持久卷挂载到 `/app/data`，workspace 默认在 `/app/data/workspaces`
+
+Beta 是匿名临时工作区模型，不需要用户注册：
+
+```bash
+WORKSPACE_TTL_HOURS=72
+WORKSPACE_DATA_DIR=/app/data/workspaces
+```
+
+发布前请验证：
+
+```bash
+# 1) sample workspace 可以创建并返回 workspace_token
+curl -s -X POST https://api-beta.<domain>/api/v1/workspaces/sample | jq .
+
+# 2) 无 token 不应读取全局旧数据
+curl -s https://api-beta.<domain>/api/v1/system/stats | jq .
+
+# 3) 非法 token 应返回 401
+curl -i -H "X-Workspace-Token: invalid" https://api-beta.<domain>/api/v1/system/stats
+
+# 4) 生产交互式 docs 应关闭
+curl -o /dev/null -w "/docs %{http_code}\n" https://api-beta.<domain>/api/v1/docs
+```
+
 ### ⚠️ 必须配置的安全环境变量
 
 部署到 Railway / Fly / VPS 等任何对外服务前，**这些环境变量必须设置**，否则会暴露严重安全风险：
@@ -119,11 +152,15 @@ DEBUG=false
 # 2) 锁定 CORS：必须显式列出你的前端真实域名（逗号分隔多个）
 #    切勿包含 "*"，与 allow_credentials=True 同用会让任意网站
 #    代用户调用 DELETE /system/data/reset 等敏感端点
-CORS_ORIGINS=https://tradingcoach.vercel.app
+CORS_ORIGINS=https://beta.<domain>
 
 # 3) 设置 ADMIN_TOKEN：保护 DELETE /api/v1/system/data/reset
 #    配置后该端点除 X-Confirm-Reset header 外还要求匹配的 X-Admin-Token
 ADMIN_TOKEN=<openssl rand -hex 32>
+
+# 4) 匿名 workspace TTL 与持久化目录
+WORKSPACE_TTL_HOURS=72
+WORKSPACE_DATA_DIR=/app/data/workspaces
 ```
 
 **验证生产配置是否正确**：

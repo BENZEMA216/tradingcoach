@@ -33,6 +33,8 @@
 | PR_NOTES_20260522.md | PR 草稿 | 当前收口分支的 PR 描述、验证记录和 deferred 列表 |
 | PRODUCTIZATION_QA_REVIEW_20260522.md | 产品化 QA 复盘 | 2026-05-22 自动化、浏览器回归、残留风险和下一轮验收建议 |
 | PRODUCTIZATION_ROADMAP_20260522.md | 产品化路线图 | 数据导入、券商直连、分析深度和 AI Coach 的近期产品路线 |
+| SAMPLE_DATA_NULL_AUDIT_20260525.md | 数据审计 | 基于用户 sample 数据检查空值、缺失指标和潜在数据处理 bug |
+| PRODUCT_HUNT_BETA_RELEASE_20260529.md | PH Beta 发布记录 | sample-first beta、匿名 workspace、隐私说明、验证结果和待发布事项 |
 
 ## reports/ 子目录
 
