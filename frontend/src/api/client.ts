@@ -1,4 +1,9 @@
 import axios from 'axios';
+import {
+  clearWorkspaceToken,
+  getWorkspaceToken,
+  setWorkspaceToken,
+} from './workspaceToken';
 import type {
   DashboardKPIs,
   EquityCurveResponse,
@@ -49,6 +54,73 @@ const api = axios.create({
   baseURL: API_BASE,
   timeout: 60000, // 60秒默认超时
 });
+
+api.interceptors.request.use((config) => {
+  const token = getWorkspaceToken();
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers['X-Workspace-Token'] = token;
+  }
+  return config;
+});
+
+export interface WorkspaceResponse {
+  workspace_id: string;
+  workspace_token: string;
+  created_at: string;
+  expires_at: string;
+  ttl_hours: number;
+}
+
+export interface SampleWorkspaceResponse extends WorkspaceResponse {
+  sample: {
+    total_rows: number;
+    completed_trades: number;
+    new_trades: number;
+    duplicates_skipped: number;
+    positions_matched: number;
+    positions_scored: number;
+    broker_id?: string | null;
+    broker_name?: string | null;
+  };
+}
+
+export interface WorkspaceDeleteResponse {
+  deleted: boolean;
+  workspace_id: string | null;
+  deleted_counts: Record<string, number>;
+}
+
+export const workspaceApi = {
+  create: async (): Promise<WorkspaceResponse> => {
+    const { data } = await api.post<WorkspaceResponse>('/workspaces');
+    setWorkspaceToken(data.workspace_token);
+    return data;
+  },
+
+  ensure: async (): Promise<string> => {
+    const existing = getWorkspaceToken();
+    if (existing) return existing;
+    const workspace = await workspaceApi.create();
+    return workspace.workspace_token;
+  },
+
+  createSample: async (): Promise<SampleWorkspaceResponse> => {
+    const { data } = await api.post<SampleWorkspaceResponse>('/workspaces/sample');
+    setWorkspaceToken(data.workspace_token);
+    return data;
+  },
+
+  deleteCurrent: async (): Promise<WorkspaceDeleteResponse> => {
+    const { data } = await api.delete<WorkspaceDeleteResponse>('/workspaces/current');
+    clearWorkspaceToken();
+    return data;
+  },
+
+  clearLocalToken: () => {
+    clearWorkspaceToken();
+  },
+};
 
 // Dashboard API
 export const dashboardApi = {

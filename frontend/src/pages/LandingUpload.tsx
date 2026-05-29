@@ -6,10 +6,10 @@
  * pos: 页面组件 - 应用入口，支持异步分析和多渠道通知
  */
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { taskApi, systemApi, uploadApi } from '@/api/client';
+import { taskApi, systemApi, uploadApi, workspaceApi } from '@/api/client';
 import {
   Upload as UploadIcon,
   FileSpreadsheet,
@@ -43,6 +43,7 @@ type PageState = 'upload' | 'error';
 export function LandingUpload() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const notification = useNotification();
   const taskStorage = useTaskStorage();
 
@@ -109,10 +110,21 @@ export function LandingUpload() {
     mutationFn: (file: File) => uploadApi.previewTrades(file),
   });
 
+  const sampleMutation = useMutation({
+    mutationFn: () => workspaceApi.createSample(),
+    onSuccess: () => {
+      clearTask();
+      queryClient.clear();
+      navigate('/statistics');
+    },
+  });
+
   // Create task mutation
   const createTaskMutation = useMutation({
-    mutationFn: ({ file, userEmail }: { file: File; userEmail?: string }) =>
-      taskApi.create(file, userEmail || undefined, true),
+    mutationFn: async ({ file, userEmail }: { file: File; userEmail?: string }) => {
+      await workspaceApi.ensure();
+      return taskApi.create(file, userEmail || undefined, true);
+    },
     onSuccess: (data) => {
       // Save to localStorage
       saveTask({
@@ -353,6 +365,38 @@ export function LandingUpload() {
             <p className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
               {t('landing.heroSubtitle')}
             </p>
+
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => sampleMutation.mutate()}
+                disabled={sampleMutation.isPending}
+                className="w-full sm:w-auto px-6 py-3 bg-white text-black hover:bg-gray-200 disabled:bg-gray-700 disabled:text-gray-400 rounded-sm font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 transition-colors"
+                data-testid="try-sample-data-button"
+              >
+                {sampleMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <BarChart3 className="w-4 h-4" />
+                )}
+                <span>{t('landing.trySampleData')}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full sm:w-auto px-6 py-3 border border-white/25 text-white hover:bg-white/10 rounded-sm font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 transition-colors"
+                data-testid="upload-csv-secondary-button"
+              >
+                <UploadIcon className="w-4 h-4" />
+                <span>{t('landing.uploadYourCsv')}</span>
+              </button>
+            </div>
+
+            {sampleMutation.isError && (
+              <p className="mt-4 text-sm text-red-300">
+                {t('landing.sampleLoadFailed')}
+              </p>
+            )}
           </div>
 
           <div className="max-w-4xl mx-auto w-full relative z-10 px-6 pb-24">
@@ -501,6 +545,18 @@ export function LandingUpload() {
                     </>
                   )}
                 </button>
+
+                <div className="mt-6 text-left border border-white/10 bg-white/[0.03] rounded-sm p-4">
+                  <p className="text-xs font-mono text-white/40 uppercase tracking-widest mb-3">
+                    {t('landing.betaPrivacyTitle')}
+                  </p>
+                  <ul className="space-y-2 text-sm text-white/55">
+                    <li>{t('landing.betaPrivacyCsvOnly')}</li>
+                    <li>{t('landing.betaPrivacyNoBroker')}</li>
+                    <li>{t('landing.betaPrivacyNotAdvice')}</li>
+                    <li>{t('landing.betaPrivacyTtl')}</li>
+                  </ul>
+                </div>
 
                 {/* Has Data Link */}
                 {hasData && (

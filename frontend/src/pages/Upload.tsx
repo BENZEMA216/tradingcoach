@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { uploadApi, taskApi, systemApi } from '@/api/client';
+import { uploadApi, taskApi, systemApi, workspaceApi } from '@/api/client';
 import type { UploadHistoryItem } from '@/api/client';
 import { ImportPreflightPanel } from '@/components/upload/ImportPreflightPanel';
 import {
@@ -170,11 +170,12 @@ export function Upload() {
 
   // Reset all data mutation
   const resetMutation = useMutation({
-    mutationFn: () => systemApi.resetAllData(),
+    mutationFn: () => workspaceApi.deleteCurrent(),
     onSuccess: () => {
       setShowResetModal(false);
-      // Invalidate all queries to refresh data
-      queryClient.invalidateQueries();
+      queryClient.clear();
+      resetUpload();
+      navigate('/');
     },
   });
 
@@ -186,8 +187,10 @@ export function Upload() {
 
   // Create task mutation (async)
   const createTaskMutation = useMutation({
-    mutationFn: ({ file, email }: { file: File; email?: string }) =>
-      taskApi.create(file, email, replaceMode),
+    mutationFn: async ({ file, email }: { file: File; email?: string }) => {
+      await workspaceApi.ensure();
+      return taskApi.create(file, email, replaceMode);
+    },
     onSuccess: (data) => {
       // 不再跳转，在当前页面显示进度
       setTaskId(data.task_id);
