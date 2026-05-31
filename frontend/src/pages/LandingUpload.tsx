@@ -297,7 +297,7 @@ export function LandingUpload() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-6 py-12">
+      <main className="flex-1 flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-2xl">
           {/* Task Recovery Banner */}
           {taskStorage.isLoaded && storedTask && showRecoveryBanner && pageState === 'upload' && (
@@ -353,20 +353,20 @@ export function LandingUpload() {
           )}
 
           {/* Hero - The "Monolith" */}
-          <div className="text-center mb-24 relative z-10 pt-10">
-            <div className="inline-block border border-white/20 px-4 py-1.5 rounded-full mb-10 bg-black/50 backdrop-blur">
+          <div className="text-center mb-12 relative z-10 pt-2">
+            <div className="inline-block border border-white/20 px-4 py-1.5 rounded-full mb-6 bg-black/50 backdrop-blur">
               <span className="text-xs font-mono text-white/70 uppercase tracking-widest">{t('landing.systemStatus')} • {t('landing.version')} 1.0.0</span>
             </div>
 
-            <h1 className="text-7xl md:text-9xl font-bold text-white mb-8 tracking-tighter leading-[0.9] whitespace-pre-line">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-5 tracking-tighter leading-[0.9] whitespace-pre-line">
               {t('landing.heroTitle')}
             </h1>
 
-            <p className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
+            <p className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
               {t('landing.heroSubtitle')}
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => sampleMutation.mutate()}
