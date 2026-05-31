@@ -20,16 +20,25 @@ from visualization.utils.data_loader import DataLoader, get_data_loader
 
 @pytest.fixture
 def test_db():
-    """Create a temporary in-memory database for testing"""
-    # Use in-memory SQLite database
+    """Create an isolated in-memory database for each test.
+
+    init_database caches one engine per URL, so every call with
+    'sqlite:///:memory:' returns the same shared in-memory database. Without
+    resetting, rows committed by earlier tests leak into later ones (e.g. an
+    "empty database" test seeing accumulated trades). Drop and recreate all
+    tables on setup to guarantee a clean slate.
+    """
     init_database('sqlite:///:memory:', echo=False)
     session = get_session()
 
-    # Create all tables
+    # Guarantee a clean schema even if the cached engine was reused.
+    Base.metadata.drop_all(session.bind)
     Base.metadata.create_all(session.bind)
 
     yield session
 
+    session.rollback()
+    Base.metadata.drop_all(session.bind)
     session.close()
 
 
@@ -226,8 +235,7 @@ class TestDataLoader:
 
     def test_get_overview_stats(self, test_db, sample_trades, sample_positions):
         """Test getting overview statistics"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         stats = loader.get_overview_stats()
 
@@ -241,8 +249,7 @@ class TestDataLoader:
 
     def test_get_data_coverage(self, test_db, sample_trades, sample_market_data):
         """Test getting data coverage"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         coverage_df = loader.get_data_coverage()
 
@@ -266,8 +273,7 @@ class TestDataLoader:
 
     def test_get_quality_scores(self, test_db, sample_positions):
         """Test getting quality scores"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         scores_df = loader.get_quality_scores()
 
@@ -289,8 +295,7 @@ class TestDataLoader:
 
     def test_get_symbol_trades(self, test_db, sample_trades):
         """Test getting trades for a specific symbol"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         aapl_trades = loader.get_symbol_trades('AAPL')
 
@@ -301,8 +306,7 @@ class TestDataLoader:
 
     def test_get_symbol_positions(self, test_db, sample_positions):
         """Test getting positions for a specific symbol"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         aapl_positions = loader.get_symbol_positions('AAPL')
 
@@ -311,8 +315,7 @@ class TestDataLoader:
 
     def test_get_market_data(self, test_db, sample_market_data):
         """Test getting market data"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         # Get all AAPL data
         df = loader.get_market_data('AAPL')
@@ -330,8 +333,7 @@ class TestDataLoader:
 
     def test_get_market_data_with_date_range(self, test_db, sample_market_data):
         """Test getting market data with date range filter"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         # Get data for specific date range
         df = loader.get_market_data(
@@ -345,8 +347,7 @@ class TestDataLoader:
 
     def test_get_all_symbols(self, test_db, sample_trades):
         """Test getting all symbols"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         symbols = loader.get_all_symbols()
 
@@ -357,8 +358,7 @@ class TestDataLoader:
 
     def test_get_symbols_with_scores(self, test_db, sample_positions):
         """Test getting symbols with scores"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         symbols = loader.get_symbols_with_scores()
 
@@ -367,8 +367,7 @@ class TestDataLoader:
 
     def test_get_symbols_with_market_data(self, test_db, sample_market_data):
         """Test getting symbols with market data"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         symbols = loader.get_symbols_with_market_data()
 
@@ -378,8 +377,7 @@ class TestDataLoader:
 
     def test_get_position_by_id(self, test_db, sample_positions):
         """Test getting position by ID"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         # Get first position
         pos = loader.get_position_by_id(sample_positions[0].id)
@@ -390,8 +388,7 @@ class TestDataLoader:
 
     def test_get_position_by_id_not_found(self, test_db):
         """Test getting non-existent position"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         pos = loader.get_position_by_id(99999)
 
@@ -399,8 +396,7 @@ class TestDataLoader:
 
     def test_empty_database(self, test_db):
         """Test with empty database"""
-        loader = DataLoader()
-        loader.session = test_db
+        loader = DataLoader(session=test_db)
 
         stats = loader.get_overview_stats()
 
