@@ -9,6 +9,7 @@ from typing import Optional
 from datetime import date, datetime
 
 from ....database import get_db, Position, PositionStatus, Trade, MarketData
+from ....utils.currency import get_pnl_in_usd, get_fees_in_usd, convert_to_usd
 from ....schemas import (
     PaginatedResponse,
     PositionListItem,
@@ -51,6 +52,7 @@ def position_to_list_item(p: Position) -> PositionListItem:
         score_grade=p.score_grade,
         strategy_type=p.strategy_type,
         reviewed_at=p.reviewed_at,
+        currency=p.currency or "USD",
     )
 
 
@@ -209,10 +211,13 @@ async def get_position_summary(
     closed_positions = [p for p in positions if p.status == PositionStatus.CLOSED]
     open_positions = [p for p in positions if p.status == PositionStatus.OPEN]
 
-    # Calculate metrics
-    total_pnl = sum(float(p.net_pnl or 0) for p in closed_positions)
-    total_realized_pnl = sum(float(p.realized_pnl or 0) for p in closed_positions)
-    total_fees = sum(float(p.total_fees or 0) for p in closed_positions)
+    # Calculate metrics — USD-equivalent so HKD positions don't poison the
+    # total. (sign-of-pnl is still currency-agnostic for win/loss counting.)
+    total_pnl = sum(get_pnl_in_usd(p) for p in closed_positions)
+    total_realized_pnl = sum(
+        convert_to_usd(p.realized_pnl, p.currency) for p in closed_positions
+    )
+    total_fees = sum(get_fees_in_usd(p) for p in closed_positions)
 
     winners = [p for p in closed_positions if p.net_pnl and float(p.net_pnl) > 0]
     losers = [p for p in closed_positions if p.net_pnl and float(p.net_pnl) <= 0]
@@ -220,15 +225,15 @@ async def get_position_summary(
     win_rate = len(winners) / len(closed_positions) * 100 if closed_positions else 0.0
     avg_pnl = total_pnl / len(closed_positions) if closed_positions else 0.0
     avg_winner = (
-        sum(float(p.net_pnl) for p in winners) / len(winners) if winners else 0.0
+        sum(get_pnl_in_usd(p) for p in winners) / len(winners) if winners else 0.0
     )
     avg_loser = (
-        sum(float(p.net_pnl) for p in losers) / len(losers) if losers else 0.0
+        sum(get_pnl_in_usd(p) for p in losers) / len(losers) if losers else 0.0
     )
 
-    # Profit factor
-    gross_profit = sum(float(p.net_pnl) for p in winners)
-    gross_loss = abs(sum(float(p.net_pnl) for p in losers))
+    # Profit factor (USD-equivalent)
+    gross_profit = sum(get_pnl_in_usd(p) for p in winners)
+    gross_loss = abs(sum(get_pnl_in_usd(p) for p in losers))
     profit_factor = gross_profit / gross_loss if gross_loss > 0 else None
 
     # Average score
@@ -306,6 +311,9 @@ async def get_position_detail(
         currency=position.currency,
         is_option=bool(position.is_option),
         underlying_symbol=position.underlying_symbol,
+        option_type=position.option_type,
+        strike_price=float(position.strike_price) if position.strike_price else None,
+        expiry_date=position.expiry_date,
         scores=PositionScoreDetail(
             entry_quality_score=float(position.entry_quality_score) if position.entry_quality_score else None,
             exit_quality_score=float(position.exit_quality_score) if position.exit_quality_score else None,
@@ -754,6 +762,7 @@ async def get_related_positions(
             "net_pnl_pct": float(p.net_pnl_pct) if p.net_pnl_pct else None,
             "overall_score": float(p.overall_score) if p.overall_score else None,
             "score_grade": p.score_grade,
+            "currency": p.currency,
         }
         for p in unique_positions[:20]  # Limit to 20 related positions
     ]

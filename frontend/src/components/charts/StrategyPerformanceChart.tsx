@@ -7,10 +7,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   Cell,
   LabelList,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { StrategyBreakdownItem } from '@/types';
 import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
@@ -33,8 +33,8 @@ export function StrategyPerformanceChart({ data, isLoading, onBarClick, bare = f
   const chartConfig = useResponsiveChart(containerRef, { layout: 'horizontal' });
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
-  const { formatCurrency: _formatCurrency, formatPnL, formatAxis } = getPrivacyAwareFormatters();
+  usePrivacyStore((state) => state.isPrivacyMode);
+  const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
     if (bare) return <ChartSkeleton height="h-64" showTitle={false} />;
@@ -71,7 +71,7 @@ export function StrategyPerformanceChart({ data, isLoading, onBarClick, bare = f
 
   const chartContent = (
     <div ref={containerRef} className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <BarChart
             data={chartData}
             layout="vertical"

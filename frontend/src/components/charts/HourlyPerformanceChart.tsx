@@ -6,10 +6,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
   Cell,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { HourlyPerformanceItem } from '@/types';
 import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
@@ -29,7 +29,7 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
   const colors = useChartColors();
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
@@ -69,7 +69,7 @@ export function HourlyPerformanceChart({ data, isLoading, onBarClick, bare = fal
 
   const chartContent = (
     <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis

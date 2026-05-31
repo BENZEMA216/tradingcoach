@@ -7,10 +7,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
   ZAxis,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { DurationPnLItem } from '@/types';
 import { getPrivacyAwareFormatters } from '@/utils/format';
 import { usePrivacyStore } from '@/store/usePrivacyStore';
@@ -31,7 +31,7 @@ export function DurationPnLChart({ data, isLoading, bare = false }: DurationPnLC
   const { t } = useTranslation();
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   // Calculate optimal visualization settings based on data density
@@ -117,7 +117,7 @@ export function DurationPnLChart({ data, isLoading, bare = false }: DurationPnLC
 
   const chartContent = (
     <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
             <XAxis

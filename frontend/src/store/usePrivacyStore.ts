@@ -24,7 +24,7 @@ interface PrivacyState {
 
 export const usePrivacyStore = create<PrivacyState>()(
   persist(
-    (set, _get) => ({
+    (set) => ({
       // Initial state
       isPrivacyMode: false,
       initialCapital: null,

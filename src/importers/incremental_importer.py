@@ -1,9 +1,9 @@
 """
 增量导入器
 
-input: CSV文件路径
+input: CSV文件路径, optional database_url
 output: 导入结果(新增数/跳过数/错误), 导入历史记录
-pos: 数据导入层控制器 - 自动检测券商格式、指纹去重、增量导入
+pos: 数据导入层控制器 - 自动检测券商格式、指纹去重、增量导入，支持 workspace DB
 
 支持两种模式:
 1. 适配器模式（推荐）: 使用 AdapterRegistry 自动检测券商格式
@@ -108,7 +108,8 @@ class IncrementalImporter:
         csv_path: str,
         dry_run: bool = False,
         use_adapter: bool = True,
-        broker_id: Optional[str] = None
+        broker_id: Optional[str] = None,
+        database_url: Optional[str] = None,
     ):
         """
         初始化导入器
@@ -118,11 +119,13 @@ class IncrementalImporter:
             dry_run: 是否为测试运行（不写入数据库）
             use_adapter: 是否使用新适配器系统（默认True）
             broker_id: 强制指定券商ID（可选，默认自动检测）
+            database_url: 目标数据库 URL（默认使用 config.DATABASE_URL）
         """
         self.csv_path = Path(csv_path)
         self.dry_run = dry_run
         self.use_adapter = use_adapter and ADAPTER_SYSTEM_AVAILABLE
         self.forced_broker_id = broker_id
+        self.database_url = database_url or config.DATABASE_URL
         self.session = None
         self.result = ImportResult()
 
@@ -329,7 +332,7 @@ class IncrementalImporter:
 
         # 初始化数据库
         if not self.dry_run:
-            engine = init_database(config.DATABASE_URL, echo=False)
+            engine = init_database(self.database_url, echo=False)
             create_all_tables()
             self.session = get_session()
 
@@ -805,7 +808,7 @@ class IncrementalImporter:
                 'import_time': datetime.now(),
                 'file_name': self.csv_path.name,
                 'file_hash': self.file_hash,
-                'file_type': self.file_language,
+                'file_type': self._get_history_file_type(),
                 'total_rows': self.result.total_rows,
                 'new_trades': self.result.new_trades,
                 'duplicates_skipped': self.result.duplicates_skipped,
@@ -820,6 +823,12 @@ class IncrementalImporter:
 
         except Exception as e:
             logger.warning(f"Failed to record import history: {e}")
+
+    def _get_history_file_type(self) -> str:
+        """Return a user-facing import history type."""
+        if self.file_language == 'adapter' and self.result.broker_id:
+            return self.result.broker_id
+        return self.file_language or ''
 
     def _print_summary(self):
         """打印导入摘要"""

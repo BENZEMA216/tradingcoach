@@ -134,6 +134,9 @@ direction_mapping:
   Buy: buy
   Sell: sell
   Sell Short: sell_short
+  # 富途英文 CSV 实际导出用的是 "Short Sell"（不同词序）。
+  # 不加这条会让 short 单全部静默丢弃。
+  Short Sell: sell_short
   Buy to Cover: buy_to_cover
 
 # 市场映射

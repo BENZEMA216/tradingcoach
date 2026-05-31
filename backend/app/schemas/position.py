@@ -61,6 +61,10 @@ class PositionListItem(BaseModel):
     # Review status
     reviewed_at: Optional[datetime] = None
 
+    # Currency code (USD/HKD/CNY) — frontend needs this to render the right
+    # symbol ($ vs HK$) and to know whether to currency-convert in aggregates.
+    currency: Optional[str] = None
+
     class Config:
         from_attributes = True
 
@@ -168,6 +172,9 @@ class PositionDetail(BaseModel):
     currency: Optional[str] = None
     is_option: bool = False
     underlying_symbol: Optional[str] = None
+    option_type: Optional[str] = None
+    strike_price: Optional[float] = None
+    expiry_date: Optional[date] = None
 
     # Quality scores
     scores: PositionScoreDetail

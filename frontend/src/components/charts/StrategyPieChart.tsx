@@ -3,9 +3,9 @@ import {
   Pie,
   Cell,
   Tooltip,
-  ResponsiveContainer,
   Legend,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import { useTranslation } from 'react-i18next';
 import type { StrategyBreakdownItem } from '@/types';
 import { formatCurrency } from '@/utils/format';
@@ -86,7 +86,7 @@ export function StrategyPieChart({ data, title, onDrillDown, bare = false, isLoa
 
   const chartContent = (
     <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minHeight={200}>
         <PieChart>
           <Pie
             data={chartData}

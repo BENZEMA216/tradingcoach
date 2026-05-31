@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronUp, ChevronDown, Filter, X, Search } from 'lucide-react';
 import { positionsApi } from '@/api/client';
-import { formatCurrency, formatPercent, formatDate, getPnLColorClass, getGradeBadgeClass, formatHoldingDays } from '@/utils/format';
+import { GradeBadge } from '@/components/common';
+import { formatCurrency, formatPercent, formatDate, formatHoldingDays } from '@/utils/format';
 import clsx from 'clsx';
-import type { PositionSummary } from '@/types';
+import type { PositionFilters, PositionListItem, PositionSummary } from '@/types';
 
 type SortField = 'symbol' | 'direction' | 'open_date' | 'close_date' | 'quantity' | 'net_pnl' | 'net_pnl_pct' | 'score_grade' | 'holding_period_days';
 type SortOrder = 'asc' | 'desc';
@@ -19,6 +20,7 @@ interface Filters {
   date_end: string;
   is_winner: string;
   score_grade: string;
+  is_reviewed: string;
 }
 
 const defaultFilters: Filters = {
@@ -29,7 +31,10 @@ const defaultFilters: Filters = {
   date_end: '',
   is_winner: '',
   score_grade: '',
+  is_reviewed: '',
 };
+
+const GRADE_FILTERS = ['A', 'B', 'C', 'D', 'F', 'C+?', 'C?', 'C-?'];
 
 export function Positions() {
   const { t, i18n } = useTranslation();
@@ -49,8 +54,13 @@ export function Positions() {
     const params = new URLSearchParams(window.location.search);
     return {
       ...defaultFilters,
+      symbol: params.get('symbol') || '',
+      direction: params.get('direction') || '',
+      status: params.get('status') || '',
       date_start: params.get('date_start') || '',
       date_end: params.get('date_end') || '',
+      score_grade: params.get('score_grade') || '',
+      is_reviewed: params.get('is_reviewed') || '',
     };
   });
   const [showFilters, setShowFilters] = useState(() => {
@@ -60,21 +70,46 @@ export function Positions() {
 
   // Build query params
   const queryParams = useMemo(() => {
-    const params: Record<string, any> = {
+    const params: PositionFilters = {
       sort_by: sortBy,
       sort_order: sortOrder,
     };
 
     if (filters.symbol) params.symbol = filters.symbol;
-    if (filters.direction) params.direction = filters.direction;
-    if (filters.status) params.status = filters.status;
+    if (filters.direction === 'long' || filters.direction === 'short') params.direction = filters.direction;
+    if (filters.status === 'open' || filters.status === 'closed') params.status = filters.status;
     if (filters.date_start) params.date_start = filters.date_start;
     if (filters.date_end) params.date_end = filters.date_end;
     if (filters.is_winner) params.is_winner = filters.is_winner === 'true';
     if (filters.score_grade) params.score_grade = filters.score_grade;
+    if (filters.is_reviewed) params.is_reviewed = filters.is_reviewed === 'true';
 
     return params;
   }, [sortBy, sortOrder, filters]);
+
+  const openPosition = (positionId: number) => {
+    navigate(`/positions/${positionId}`);
+  };
+
+  const handlePositionRowKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>, positionId: number) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openPosition(positionId);
+    }
+  };
+
+  const renderDirectionBadge = (direction: PositionListItem['direction']) => (
+    <span
+      className={clsx(
+        'px-1 py-0.5 text-[10px] font-bold rounded-sm uppercase tracking-wider',
+        direction === 'long'
+          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
+          : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20'
+      )}
+    >
+      {direction === 'long' ? t('direction.long') : t('direction.short')}
+    </span>
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ['positions', page, pageSize, queryParams],
@@ -312,11 +347,9 @@ export function Positions() {
                   className="w-full px-4 py-2 pr-10 border border-neutral-200 dark:border-white/10 rounded-sm bg-neutral-50 dark:bg-black text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-neutral-400 dark:focus:border-white/40 appearance-none transition-colors cursor-pointer"
                 >
                   <option value="">{isZh ? '全部' : 'ALL_GRADES'}</option>
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                  <option value="C">C</option>
-                  <option value="D">D</option>
-                  <option value="F">F</option>
+                  {GRADE_FILTERS.map((grade) => (
+                    <option key={grade} value={grade}>{grade}</option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-white/30 pointer-events-none" />
               </div>
@@ -353,7 +386,103 @@ export function Positions() {
 
       {/* Positions Table */}
       <div className="bg-white dark:bg-black rounded-sm border border-neutral-200 dark:border-white/10 overflow-hidden transition-colors">
-        <div className="overflow-x-auto">
+        <div className="sm:hidden divide-y divide-white/5">
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="px-4 py-4">
+                <div className="h-4 bg-neutral-100 dark:bg-white/5 rounded animate-pulse mb-3"></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="h-10 bg-neutral-100 dark:bg-white/5 rounded animate-pulse"></div>
+                  <div className="h-10 bg-neutral-100 dark:bg-white/5 rounded animate-pulse"></div>
+                </div>
+              </div>
+            ))
+          ) : data?.items.length === 0 ? (
+            <div className="px-4 py-12 text-center text-slate-400 dark:text-white/40 font-mono">
+              // {isZh ? '没有找到匹配的记录' : 'NO_DATA_FOUND'}
+            </div>
+          ) : (
+            data?.items.map((position) => (
+              <div
+                key={position.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => openPosition(position.id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openPosition(position.id);
+                  }
+                }}
+                className="block w-full px-4 py-4 text-left hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center min-w-0 gap-2">
+                      <span className="truncate font-mono font-bold text-slate-900 dark:text-white">
+                        {position.symbol}
+                      </span>
+                      {renderDirectionBadge(position.direction)}
+                    </div>
+                    {position.symbol_name && (
+                      <span className="mt-1 block truncate text-[10px] text-neutral-400 dark:text-white/30">
+                        {position.symbol_name}
+                      </span>
+                    )}
+                  </div>
+                  <GradeBadge grade={position.score_grade} showIncompleteInfo />
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
+                  <div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">
+                      {t('positions.openDate')}
+                    </div>
+                    <div className="mt-1 text-xs font-mono text-slate-500 dark:text-white/50">
+                      {formatDate(position.open_date)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">
+                      {t('positions.closeDate')}
+                    </div>
+                    <div className="mt-1 text-xs font-mono text-slate-500 dark:text-white/50">
+                      {formatDate(position.close_date)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">
+                      {t('positions.pnl')}
+                    </div>
+                    <div
+                      className={clsx(
+                        'mt-1 text-sm font-mono font-bold',
+                        (position.net_pnl || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
+                      )}
+                    >
+                      {formatCurrency(position.net_pnl, position.currency || 'USD')}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">
+                      {t('positions.pnlPct')}
+                    </div>
+                    <div
+                      className={clsx(
+                        'mt-1 text-sm font-mono font-bold',
+                        (position.net_pnl_pct || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
+                      )}
+                    >
+                      {formatPercent(position.net_pnl_pct)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-neutral-50 dark:bg-black border-b border-neutral-200 dark:border-white/10">
               <tr>
@@ -366,7 +495,7 @@ export function Positions() {
                 {renderSortableHeader('net_pnl_pct', t('positions.pnlPct'), 'right')}
                 {renderSortableHeader('score_grade', t('positions.grade'), 'center')}
                 {renderSortableHeader('holding_period_days', t('positions.holdingDays'), 'right')}
-                <th className="px-4 py-3 text-left w-24"></th> {/* Visual Bar */}
+                <th className="px-4 py-3 text-left w-24" aria-hidden="true"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -388,7 +517,10 @@ export function Positions() {
                 data?.items.map((position) => (
                   <tr
                     key={position.id}
-                    onClick={() => navigate(`/positions/${position.id}`)}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openPosition(position.id)}
+                    onKeyDown={(event) => handlePositionRowKeyDown(event, position.id)}
                     className="hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
                   >
                     <td className="px-4 py-3">
@@ -404,16 +536,7 @@ export function Positions() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={clsx(
-                          'px-1 py-0.5 text-[10px] font-bold rounded-sm uppercase tracking-wider',
-                          position.direction === 'long'
-                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
-                            : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20'
-                        )}
-                      >
-                        {position.direction === 'long' ? t('direction.long') : t('direction.short')}
-                      </span>
+                      {renderDirectionBadge(position.direction)}
                     </td>
                     <td className="px-4 py-3 text-xs font-mono text-slate-500 dark:text-white/50">
                       {formatDate(position.open_date)}
@@ -430,7 +553,7 @@ export function Positions() {
                         (position.net_pnl || 0) >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
                       )}
                     >
-                      {formatCurrency(position.net_pnl)}
+                      {formatCurrency(position.net_pnl, position.currency || 'USD')}
                     </td>
                     <td
                       className={clsx(
@@ -441,22 +564,12 @@ export function Positions() {
                       {formatPercent(position.net_pnl_pct)}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span
-                        className={clsx(
-                          'px-2 py-0.5 text-[10px] font-bold rounded-sm border',
-                          position.score_grade === 'A' || position.score_grade === 'A+' ? 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-500/30' :
-                            position.score_grade === 'B' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30' :
-                              position.score_grade === 'C' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/30' :
-                                'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30'
-                        )}
-                      >
-                        {position.score_grade || '-'}
-                      </span>
+                      <GradeBadge grade={position.score_grade} showIncompleteInfo />
                     </td>
                     <td className="px-4 py-3 text-xs font-mono text-right text-slate-500 dark:text-white/50">
-                      {position.holding_period_days}D
+                      {formatHoldingDays(position.holding_period_days, isZh)}
                     </td>
-                    <td className="px-4 py-3 align-middle">
+                    <td className="px-4 py-3 align-middle" aria-hidden="true">
                       {/* Visual PnL Bar - Industrial */}
                       <div className="flex items-center justify-start h-full w-24 opacity-30 group-hover:opacity-100 transition-opacity">
                         <div

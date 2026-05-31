@@ -70,6 +70,16 @@ export const getGradeBadgeClass = (grade: string | null | undefined): string => 
   }
 };
 
+export const isIncompleteGrade = (grade: string | null | undefined): boolean => {
+  return Boolean(grade?.trim().endsWith('?'));
+};
+
+export const getDisplayGrade = (grade: string | null | undefined): string => {
+  const normalized = grade?.trim();
+  if (!normalized) return '-';
+  return isIncompleteGrade(normalized) ? normalized.slice(0, -1) : normalized;
+};
+
 // Format holding days
 export const formatHoldingDays = (days: number | null | undefined, isZh: boolean = false): string => {
   if (days === null || days === undefined) return '-';

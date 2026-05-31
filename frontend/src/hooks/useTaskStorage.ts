@@ -5,7 +5,7 @@
  * output: 本地存储的任务和操作方法
  * pos: Hook 层 - 使用 localStorage 持久化最近的分析任务
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface StoredTask {
   taskId: string;
@@ -18,37 +18,32 @@ export interface StoredTask {
 
 const STORAGE_KEY = 'tradingcoach-current-task';
 
-export function useTaskStorage() {
-  const [currentTask, setCurrentTask] = useState<StoredTask | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+function loadStoredTask(): StoredTask | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return null;
 
-  // Load task from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const task = JSON.parse(stored) as StoredTask;
-        // Only restore if task is still active (pending or running)
-        if (task.status === 'pending' || task.status === 'running') {
-          setCurrentTask(task);
-        } else {
-          // Clear completed/failed tasks older than 24 hours
-          const createdAt = new Date(task.createdAt).getTime();
-          const now = Date.now();
-          const hoursSinceCreated = (now - createdAt) / (1000 * 60 * 60);
-          if (hoursSinceCreated > 24) {
-            localStorage.removeItem(STORAGE_KEY);
-          } else {
-            setCurrentTask(task);
-          }
-        }
-      }
-    } catch {
-      // Ignore parse errors
-      localStorage.removeItem(STORAGE_KEY);
+    const task = JSON.parse(stored) as StoredTask;
+    if (task.status === 'pending' || task.status === 'running') {
+      return task;
     }
-    setIsLoaded(true);
-  }, []);
+
+    const createdAt = new Date(task.createdAt).getTime();
+    const hoursSinceCreated = (Date.now() - createdAt) / (1000 * 60 * 60);
+    if (hoursSinceCreated > 24) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+
+    return task;
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    return null;
+  }
+}
+
+export function useTaskStorage() {
+  const [currentTask, setCurrentTask] = useState<StoredTask | null>(() => loadStoredTask());
 
   // Save task to localStorage
   const saveTask = useCallback((task: StoredTask) => {
@@ -65,6 +60,13 @@ export function useTaskStorage() {
     (status: StoredTask['status'], progress?: number, currentStep?: string) => {
       setCurrentTask((prev) => {
         if (!prev) return null;
+        if (
+          prev.status === status &&
+          prev.progress === progress &&
+          prev.currentStep === currentStep
+        ) {
+          return prev;
+        }
         const updated = { ...prev, status, progress, currentStep };
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -94,7 +96,7 @@ export function useTaskStorage() {
 
   return {
     currentTask,
-    isLoaded,
+    isLoaded: true,
     hasActiveTask,
     saveTask,
     updateTaskStatus,

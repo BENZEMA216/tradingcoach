@@ -2,8 +2,8 @@
  * Accessibility Tests - 可访问性测试
  *
  * input: All frontend pages
- * output: Accessibility validation results
- * pos: E2E 测试 - 确保页面可访问性达标
+ * output: Accessibility validation results with desktop/mobile-safe interactive selectors
+ * pos: E2E 测试 - 确保页面可访问性达标，并避免聚焦移动端离屏导航元素
  *
  * Run: npx playwright test tests/e2e/accessibility.spec.ts --project=chromium
  *
@@ -70,7 +70,7 @@ test.describe('Keyboard Navigation', () => {
     await waitForNetworkIdle(page);
 
     // Find nav links (NavLink in sidebar) or buttons
-    const navElements = page.locator('nav a, aside a, aside button');
+    const navElements = page.locator('nav a, aside a, aside button').filter({ visible: true });
     const count = await navElements.count();
 
     expect(count).toBeGreaterThan(0);

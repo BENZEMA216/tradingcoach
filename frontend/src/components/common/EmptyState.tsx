@@ -117,35 +117,23 @@ export function EmptyState({
 
   const sizes = sizeClasses[size];
 
-  const ActionButton = () => {
-    if (!actionText) return null;
+  const buttonClasses = clsx(
+    sizes.button,
+    'font-medium rounded-lg transition-all duration-200',
+    'bg-blue-600 hover:bg-blue-700 text-white',
+    'hover:shadow-lg hover:shadow-blue-500/25',
+    'active:scale-[0.98]'
+  );
 
-    const buttonClasses = clsx(
-      sizes.button,
-      'font-medium rounded-lg transition-all duration-200',
-      'bg-blue-600 hover:bg-blue-700 text-white',
-      'hover:shadow-lg hover:shadow-blue-500/25',
-      'active:scale-[0.98]'
-    );
-
-    if (actionLink) {
-      return (
-        <Link to={actionLink} className={buttonClasses}>
-          {actionText}
-        </Link>
-      );
-    }
-
-    if (onAction) {
-      return (
-        <button onClick={onAction} className={buttonClasses}>
-          {actionText}
-        </button>
-      );
-    }
-
-    return null;
-  };
+  const actionElement = actionText && actionLink ? (
+    <Link to={actionLink} className={buttonClasses}>
+      {actionText}
+    </Link>
+  ) : actionText && onAction ? (
+    <button onClick={onAction} className={buttonClasses}>
+      {actionText}
+    </button>
+  ) : null;
 
   return (
     <div
@@ -191,68 +179,9 @@ export function EmptyState({
       )}
 
       {/* Action */}
-      <ActionButton />
+      {actionElement}
     </div>
   );
 }
-
-/**
- * Preset empty states for common scenarios
- */
-export const EmptyStatePresets = {
-  /** No trades data - guide to upload */
-  noTrades: (props?: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="upload"
-      title="暂无交易数据"
-      description="上传您的交易记录开始分析"
-      actionText="上传数据"
-      actionLink="/upload"
-      {...props}
-    />
-  ),
-
-  /** No results from filter */
-  noResults: (props?: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="filter"
-      title="没有找到结果"
-      description="尝试调整筛选条件"
-      {...props}
-    />
-  ),
-
-  /** No events detected */
-  noEvents: (props?: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="event"
-      title="暂无事件"
-      description="持仓期间未检测到重大市场事件"
-      {...props}
-    />
-  ),
-
-  /** No insights available */
-  noInsights: (props?: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="insight"
-      title="暂无洞察"
-      description="需要更多交易数据才能生成分析"
-      {...props}
-    />
-  ),
-
-  /** Chart has no data */
-  noChartData: (props?: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="chart"
-      title="暂无图表数据"
-      description="该时间段内没有足够的数据"
-      height="h-48"
-      size="sm"
-      {...props}
-    />
-  ),
-};
 
 export default EmptyState;

@@ -1,9 +1,9 @@
 """
 CSV上传API
 
-input: UploadFile (CSV文件)
-output: 导入结果JSON (成功/新增数/跳过数/配对数/评分数)
-pos: 后端上传端点 - 接收CSV、调用增量导入器、触发后续处理
+input: UploadFile (CSV文件), optional X-Workspace-Token
+output: 预检结果或导入结果JSON (成功/新增数/跳过数/配对数/评分数)
+pos: 后端上传端点 - 接收CSV、预检格式、调用增量导入器、触发 workspace 隔离处理
 
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
@@ -18,8 +18,8 @@ from typing import Optional
 import logging
 
 import pandas as pd
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
-from pydantic import BaseModel
+from fastapi import APIRouter, UploadFile, File, Header, HTTPException, BackgroundTasks, status
+from pydantic import BaseModel, Field
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
@@ -30,12 +30,26 @@ from src.models.base import init_database, get_session, create_all_tables
 from src.importers.english_csv_parser import detect_csv_language, EnglishCSVParser
 from src.importers.csv_parser import CSVParser
 from src.importers.incremental_importer import IncrementalImporter
+from src.importers.import_preflight import preview_import_file
 from src.matchers.fifo_matcher import FIFOMatcher
 from src.analyzers.quality_scorer import QualityScorer
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+from backend.app.services.workspace_service import workspace_service
+
+
+def _workspace_database_url(token: Optional[str]) -> str:
+    workspace = workspace_service.resolve_token(token)
+    if workspace is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired workspace token.",
+        )
+    return workspace.database_url
 
 
 class UploadResponse(BaseModel):
@@ -78,6 +92,22 @@ class UploadHistoryItem(BaseModel):
     status: str
 
 
+class UploadPreflightResponse(BaseModel):
+    """上传前预检响应"""
+    can_import: bool
+    file_name: str
+    file_hash: str
+    broker_id: Optional[str] = None
+    broker_name: Optional[str] = None
+    detection_confidence: float = 0.0
+    total_rows: int = 0
+    completed_trades: int = 0
+    skipped_rows: int = 0
+    detected_columns: list[str] = Field(default_factory=list)
+    error_messages: list[str] = Field(default_factory=list)
+    warning_messages: list[str] = Field(default_factory=list)
+
+
 def clear_all_trading_data(session):
     """清除所有交易数据，为新一批数据导入做准备"""
     from sqlalchemy import text
@@ -100,10 +130,58 @@ def clear_all_trading_data(session):
     logger.info("All trading data cleared for fresh import")
 
 
+@router.post("/trades/preview", response_model=UploadPreflightResponse)
+async def preview_trades_upload(file: UploadFile = File(...)):
+    """上传前只读预检交易 CSV，不写入数据库。"""
+    if not file.filename or not file.filename.lower().endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Only CSV files are supported")
+
+    tmp_path = None
+    try:
+        content = await file.read()
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        result = preview_import_file(tmp_path, file_name=file.filename)
+        return UploadPreflightResponse(**result.to_dict())
+
+    except UnicodeDecodeError as e:
+        logger.warning(f"Upload preview not UTF-8 decodable: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="File is not a valid text CSV. Please export from your broker as CSV.",
+        )
+    except pd.errors.EmptyDataError:
+        raise HTTPException(
+            status_code=400,
+            detail="CSV file is empty or has no parseable columns.",
+        )
+    except pd.errors.ParserError as e:
+        logger.warning(f"CSV preview parse error: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="CSV file is malformed and could not be parsed.",
+        )
+    except Exception as e:
+        logger.error(f"Upload preview failed: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail="Upload preview failed. Check server logs for details.",
+        )
+    finally:
+        if tmp_path:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+
+
 @router.post("/trades", response_model=UploadResponse)
 async def upload_trades(
     file: UploadFile = File(...),
     replace_mode: bool = False,  # 默认增量去重；replace=True 才会清空旧数据
+    x_workspace_token: Optional[str] = Header(None, alias="X-Workspace-Token"),
 ):
     """
     上传交易记录CSV文件
@@ -117,6 +195,8 @@ async def upload_trades(
     现在改为默认增量，避免重复上传同一文件时数据被反复清空、
     "duplicates_skipped" 字段始终为 0 的误导性表现。
     """
+    database_url = _workspace_database_url(x_workspace_token)
+
     start_time = datetime.now()
 
     # 验证文件类型
@@ -151,7 +231,7 @@ async def upload_trades(
         # 替换模式：先清除所有旧数据
         if replace_mode:
             logger.info("Replace mode enabled - clearing all existing data")
-            engine = init_database(config.DATABASE_URL, echo=False)
+            engine = init_database(database_url, echo=False)
             session = get_session()
             try:
                 clear_all_trading_data(session)
@@ -159,7 +239,11 @@ async def upload_trades(
                 session.close()
 
         # 导入（替换模式下相当于全新导入）
-        importer = IncrementalImporter(tmp_path, dry_run=False)
+        importer = IncrementalImporter(
+            tmp_path,
+            dry_run=False,
+            database_url=database_url,
+        )
         result = importer.run()
 
         # 如果有新交易，执行配对和评分
@@ -167,7 +251,7 @@ async def upload_trades(
         positions_scored = 0
 
         if result.new_trades > 0:
-            engine = init_database(config.DATABASE_URL, echo=False)
+            engine = init_database(database_url, echo=False)
             session = get_session()
 
             try:
@@ -262,9 +346,12 @@ async def upload_trades(
 
 
 @router.get("/history", response_model=list[UploadHistoryItem])
-async def get_upload_history(limit: int = 20):
+async def get_upload_history(
+    limit: int = 20,
+    x_workspace_token: Optional[str] = Header(None, alias="X-Workspace-Token"),
+):
     """获取导入历史"""
-    engine = init_database(config.DATABASE_URL, echo=False)
+    engine = init_database(_workspace_database_url(x_workspace_token), echo=False)
     session = get_session()
 
     try:

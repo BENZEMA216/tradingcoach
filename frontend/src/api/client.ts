@@ -1,8 +1,14 @@
 import axios from 'axios';
+import {
+  clearWorkspaceToken,
+  getWorkspaceToken,
+  setWorkspaceToken,
+} from './workspaceToken';
 import type {
   DashboardKPIs,
   EquityCurveResponse,
   RecentTradeItem,
+  NeedsReviewItem,
   StrategyBreakdownItem,
   DailyPnLItem,
   PositionListItem,
@@ -49,6 +55,73 @@ const api = axios.create({
   timeout: 60000, // 60秒默认超时
 });
 
+api.interceptors.request.use((config) => {
+  const token = getWorkspaceToken();
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers['X-Workspace-Token'] = token;
+  }
+  return config;
+});
+
+export interface WorkspaceResponse {
+  workspace_id: string;
+  workspace_token: string;
+  created_at: string;
+  expires_at: string;
+  ttl_hours: number;
+}
+
+export interface SampleWorkspaceResponse extends WorkspaceResponse {
+  sample: {
+    total_rows: number;
+    completed_trades: number;
+    new_trades: number;
+    duplicates_skipped: number;
+    positions_matched: number;
+    positions_scored: number;
+    broker_id?: string | null;
+    broker_name?: string | null;
+  };
+}
+
+export interface WorkspaceDeleteResponse {
+  deleted: boolean;
+  workspace_id: string | null;
+  deleted_counts: Record<string, number>;
+}
+
+export const workspaceApi = {
+  create: async (): Promise<WorkspaceResponse> => {
+    const { data } = await api.post<WorkspaceResponse>('/workspaces');
+    setWorkspaceToken(data.workspace_token);
+    return data;
+  },
+
+  ensure: async (): Promise<string> => {
+    const existing = getWorkspaceToken();
+    if (existing) return existing;
+    const workspace = await workspaceApi.create();
+    return workspace.workspace_token;
+  },
+
+  createSample: async (): Promise<SampleWorkspaceResponse> => {
+    const { data } = await api.post<SampleWorkspaceResponse>('/workspaces/sample');
+    setWorkspaceToken(data.workspace_token);
+    return data;
+  },
+
+  deleteCurrent: async (): Promise<WorkspaceDeleteResponse> => {
+    const { data } = await api.delete<WorkspaceDeleteResponse>('/workspaces/current');
+    clearWorkspaceToken();
+    return data;
+  },
+
+  clearLocalToken: () => {
+    clearWorkspaceToken();
+  },
+};
+
 // Dashboard API
 export const dashboardApi = {
   getKPIs: async (params?: { date_start?: string; date_end?: string }) => {
@@ -63,6 +136,13 @@ export const dashboardApi = {
 
   getRecentTrades: async (limit = 10) => {
     const { data } = await api.get<RecentTradeItem[]>('/dashboard/recent-trades', {
+      params: { limit },
+    });
+    return data;
+  },
+
+  getNeedsReview: async (limit = 5) => {
+    const { data } = await api.get<NeedsReviewItem[]>('/dashboard/needs-review', {
       params: { limit },
     });
     return data;
@@ -184,7 +264,7 @@ export const statisticsApi = {
   },
 
   getCalendarHeatmap: async (year: number) => {
-    const { data } = await api.get('/statistics/calendar-heatmap', { params: { year } });
+    const { data } = await api.get<{ date: string; pnl: number; trade_count: number; is_winner: boolean }[]>('/statistics/calendar-heatmap', { params: { year } });
     return data;
   },
 
@@ -377,6 +457,21 @@ export interface UploadResponse {
   error_messages: string[];
 }
 
+export interface UploadPreflightResponse {
+  can_import: boolean;
+  file_name: string;
+  file_hash: string;
+  broker_id: string | null;
+  broker_name: string | null;
+  detection_confidence: number;
+  total_rows: number;
+  completed_trades: number;
+  skipped_rows: number;
+  detected_columns: string[];
+  error_messages: string[];
+  warning_messages: string[];
+}
+
 export interface UploadHistoryItem {
   id: number;
   import_time: string;
@@ -389,6 +484,26 @@ export interface UploadHistoryItem {
 }
 
 export const uploadApi = {
+  /**
+   * 上传前预检交易CSV文件，不写入数据库
+   */
+  previewTrades: async (file: File): Promise<UploadPreflightResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await api.post<UploadPreflightResponse>(
+      '/upload/trades/preview',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 60000,
+      }
+    );
+    return data;
+  },
+
   /**
    * 上传交易记录CSV文件
    * @param file CSV文件
@@ -457,7 +572,7 @@ export interface TaskStatus {
     error_messages?: string[];
   } | null;
   error_message: string | null;
-  logs: { time: string; level: string; message: string }[];
+  logs: { time: string; level?: string; message: string; category?: string }[];
   created_at: string | null;
   started_at: string | null;
   completed_at: string | null;
@@ -624,6 +739,50 @@ export const eventsApi = {
   updateNotes: async (eventId: number, notes: string): Promise<EventDetail> => {
     const { data } = await api.put<EventDetail>(`/events/${eventId}/notes`, null, {
       params: { notes },
+    });
+    return data;
+  },
+};
+
+// ==================== Counterfactual Backtest API ====================
+
+export interface BacktestMonthlyPoint {
+  month: string;
+  actual_pnl: number;
+  cf_pnl: number;
+  savings: number;
+  actual_cumulative: number;
+  cf_cumulative: number;
+}
+
+export interface BacktestResult {
+  rule_id: string;
+  name_cn: string;
+  name_en: string;
+  notes: string;
+  params: Record<string, number>;
+  skipped_count: number;
+  actual_total_pnl: number;
+  counterfactual_total_pnl: number;
+  savings: number;
+  savings_pct: number | null;
+  monthly: BacktestMonthlyPoint[];
+  skipped_by_symbol: Record<string, number>;
+}
+
+export const backtestApi = {
+  /** Run every rule with default params, sorted by savings desc */
+  summary: async (): Promise<BacktestResult[]> => {
+    const { data } = await api.get<BacktestResult[]>('/backtest/summary');
+    return data;
+  },
+  /** Run a specific rule with optional param overrides */
+  run: async (
+    ruleId: string,
+    params?: Record<string, number>,
+  ): Promise<BacktestResult> => {
+    const { data } = await api.get<BacktestResult>(`/backtest/run/${ruleId}`, {
+      params,
     });
     return data;
   },

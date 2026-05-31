@@ -5,7 +5,7 @@
  * output: 通知权限状态和发送方法
  * pos: Hook 层 - 封装 Web Notifications API
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 interface UseNotificationOptions {
   onPermissionChange?: (permission: NotificationPermission) => void;
@@ -20,18 +20,11 @@ interface NotificationOptions {
 }
 
 export function useNotification(options: UseNotificationOptions = {}) {
-  const [permission, setPermission] = useState<NotificationPermission>('default');
-  const [isSupported, setIsSupported] = useState(false);
-
-  // Check support and current permission on mount
-  useEffect(() => {
-    const supported = 'Notification' in window;
-    setIsSupported(supported);
-
-    if (supported) {
-      setPermission(Notification.permission);
-    }
-  }, []);
+  const onPermissionChange = options.onPermissionChange;
+  const [isSupported] = useState(() => typeof window !== 'undefined' && 'Notification' in window);
+  const [permission, setPermission] = useState<NotificationPermission>(() => (
+    typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default'
+  ));
 
   // Request permission
   const requestPermission = useCallback(async (): Promise<boolean> => {
@@ -52,13 +45,13 @@ export function useNotification(options: UseNotificationOptions = {}) {
     try {
       const result = await Notification.requestPermission();
       setPermission(result);
-      options.onPermissionChange?.(result);
+      onPermissionChange?.(result);
       return result === 'granted';
     } catch (error) {
       console.error('Error requesting notification permission:', error);
       return false;
     }
-  }, [isSupported, permission, options]);
+  }, [isSupported, onPermissionChange, permission]);
 
   // Send notification
   const sendNotification = useCallback(

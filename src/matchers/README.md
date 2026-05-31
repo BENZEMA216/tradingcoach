@@ -210,7 +210,7 @@ print(f"已配对: {tq.matched_quantity}")
 
 ### 3. 期权配对
 
-期权交易正常参与配对，标的代码保持完整期权代码。
+期权交易正常参与配对，标的代码保持完整期权代码；生成已平仓和未平仓 Position 时都会保留 underlying、CALL/PUT、strike、expiry 等期权元数据。
 
 ### 4. 做空配对
 

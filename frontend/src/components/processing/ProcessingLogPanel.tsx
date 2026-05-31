@@ -8,11 +8,11 @@
  * 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { X, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { X, FileText, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 import { taskApi, type TaskStatus } from '@/api/client';
 import { useNotification } from '@/hooks/useNotification';
@@ -31,6 +31,17 @@ interface ProcessingLogPanelProps {
   onCancel?: () => void;
 }
 
+const LOG_LEVELS: LogEntryData['level'][] = ['info', 'success', 'warning', 'error', 'debug'];
+const LOG_CATEGORIES: NonNullable<LogEntryData['category']>[] = ['import', 'match', 'score', 'system'];
+
+function isLogLevel(level: string | undefined): level is LogEntryData['level'] {
+  return LOG_LEVELS.includes(level as LogEntryData['level']);
+}
+
+function isLogCategory(category: string | undefined): category is NonNullable<LogEntryData['category']> {
+  return LOG_CATEGORIES.includes(category as NonNullable<LogEntryData['category']>);
+}
+
 export function ProcessingLogPanel({
   taskId,
   fileName,
@@ -40,11 +51,12 @@ export function ProcessingLogPanel({
 }: ProcessingLogPanelProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { sendNotification, isGranted } = useNotification();
   const toast = useToast();
 
   const [showLogs, setShowLogs] = useState(true);
-  const [hasNotified, setHasNotified] = useState(false);
+  const hasNotifiedRef = useRef(false);
 
   // 轮询任务状态
   const { data: task } = useQuery({
@@ -62,12 +74,37 @@ export function ProcessingLogPanel({
     retry: 3,
   });
 
+  const cancelMutation = useMutation({
+    mutationFn: () => taskApi.cancel(taskId),
+    onSuccess: async (response) => {
+      if (response.success) {
+        toast.success(
+          t('notification.cancelSuccess', '任务已取消'),
+          response.message
+        );
+        await queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+        return;
+      }
+
+      toast.error(
+        t('notification.cancelFailed', '取消失败'),
+        response.message
+      );
+    },
+    onError: (error: Error) => {
+      toast.error(
+        t('notification.cancelFailed', '取消失败'),
+        error.message || t('notification.unknownError', '未知错误')
+      );
+    },
+  });
+
   // 任务完成/失败时触发通知
   useEffect(() => {
-    if (!task || hasNotified) return;
+    if (!task || hasNotifiedRef.current) return;
 
     if (task.status === 'completed') {
-      setHasNotified(true);
+      hasNotifiedRef.current = true;
 
       // 浏览器通知
       if (isGranted) {
@@ -95,7 +132,7 @@ export function ProcessingLogPanel({
     }
 
     if (task.status === 'failed') {
-      setHasNotified(true);
+      hasNotifiedRef.current = true;
 
       // 浏览器通知
       if (isGranted) {
@@ -113,12 +150,12 @@ export function ProcessingLogPanel({
 
       onError?.(task.error_message || 'Unknown error');
     }
-  }, [task?.status, hasNotified]);
+  }, [isGranted, onComplete, onError, sendNotification, t, task, toast]);
 
   // 处理取消
   const handleCancel = () => {
-    // TODO: 调用取消 API
-    onCancel?.();
+    if (!isProcessing || cancelMutation.isPending) return;
+    cancelMutation.mutate();
   };
 
   // 导航到统计页
@@ -137,15 +174,16 @@ export function ProcessingLogPanel({
   };
 
   // 转换日志格式
-  const logs: LogEntryData[] = (task?.logs || []).map((log: any) => ({
+  const logs: LogEntryData[] = (task?.logs || []).map((log) => ({
     time: log.time,
-    level: log.level || 'info',
+    level: isLogLevel(log.level) ? log.level : 'info',
     message: log.message,
-    category: log.category,
+    category: isLogCategory(log.category) ? log.category : undefined,
   }));
 
   const isProcessing = task?.status === 'running' || task?.status === 'pending';
   const isComplete = task?.status === 'completed' || task?.status === 'failed';
+  const isCancelled = task?.status === 'cancelled';
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -172,10 +210,15 @@ export function ProcessingLogPanel({
             {isProcessing && (
               <button
                 onClick={handleCancel}
+                disabled={cancelMutation.isPending}
                 className="p-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
                 title={t('common.cancel', '取消')}
               >
-                <X className="w-5 h-5" />
+                {cancelMutation.isPending ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <X className="w-5 h-5" />
+                )}
               </button>
             )}
           </div>
@@ -186,7 +229,7 @@ export function ProcessingLogPanel({
           <ProgressHeader
             progress={task?.progress ?? 0}
             currentStep={task?.current_step ?? t('processingLog.preparing', '准备中...')}
-            status={(task?.status as any) ?? 'pending'}
+            status={task?.status ?? 'pending'}
           />
         </div>
 
@@ -246,6 +289,26 @@ export function ProcessingLogPanel({
                 {showLogs && <LogStream logs={logs} isProcessing={false} className="mt-2 rounded-lg overflow-hidden" />}
               </div>
             )}
+          </div>
+        )}
+
+        {isCancelled && (
+          <div className="p-6 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <X className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
+              {t('processingLog.cancelled', '已取消')}
+            </h3>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              {t('processingLog.cancelledDescription', '该导入任务已停止，不会继续写入新数据。')}
+            </p>
+            <button
+              onClick={handleUploadAnother}
+              className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              {t('processingLog.uploadAnother', '上传另一个文件')}
+            </button>
           </div>
         )}
 

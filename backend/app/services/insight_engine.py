@@ -89,13 +89,19 @@ class InsightEngine:
 
     def _compute_basic_stats(self):
         """Compute commonly used statistics"""
+        from ..utils.currency import get_pnl_in_usd
+
         self._winners = [p for p in self.positions if p.net_pnl and float(p.net_pnl) > 0]
         self._losers = [p for p in self.positions if p.net_pnl and float(p.net_pnl) <= 0]
 
         total = len(self.positions)
         self._win_rate = len(self._winners) / total * 100 if total > 0 else 0
-        self._total_pnl = sum(float(p.net_pnl or 0) for p in self.positions)
+        # USD-equivalent — 不能直接 sum HKD+USD（之前会让 "最大亏损占总盈利 X%"
+        # 这种指标的分母虚高几倍，得出 21.9% 的假数字）。
+        self._total_pnl = sum(get_pnl_in_usd(p) for p in self.positions)
         self._avg_pnl = self._total_pnl / total if total > 0 else 0
+        # 保留一份 USD-equivalent 的单笔列表，给 R03 等用
+        self._pnls_usd = [get_pnl_in_usd(p) for p in self.positions]
 
     def _add_insight(self, insight: TradingInsight):
         """Add an insight to the list"""
@@ -129,7 +135,7 @@ class InsightEngine:
                 if wd_win_rate < self._win_rate - 20:
                     self._add_insight(TradingInsight(
                         id=f"T01-{weekday_names[wd]}",
-                        type=InsightType.PROBLEM,
+                        type=InsightType.REMINDER,
                         category=InsightCategory.TIME,
                         priority=85,
                         title=f"{weekday_names_zh[wd]}胜率偏低",
@@ -243,6 +249,8 @@ class InsightEngine:
             if abs(intraday_wr - swing_wr) > 15:
                 better = "日内" if intraday_wr > swing_wr else "波段"
                 worse = "波段" if intraday_wr > swing_wr else "日内"
+                better_style = "intraday" if intraday_wr > swing_wr else "swing"
+                worse_style = "swing" if intraday_wr > swing_wr else "intraday"
                 better_wr = max(intraday_wr, swing_wr)
                 worse_wr = min(intraday_wr, swing_wr)
 
@@ -259,6 +267,12 @@ class InsightEngine:
                         "intraday_win_rate": round(intraday_wr, 1),
                         "swing_count": len(swing),
                         "swing_win_rate": round(swing_wr, 1),
+                        "better": better,
+                        "worse": worse,
+                        "better_style": better_style,
+                        "worse_style": worse_style,
+                        "better_wr": round(better_wr, 1),
+                        "worse_wr": round(worse_wr, 1),
                     }
                 ))
 
@@ -365,9 +379,8 @@ class InsightEngine:
     def _analyze_symbols(self):
         """
         S01: Strong symbol - high win rate
-        S02: Problem symbol - low win rate
         S03: Over-concentration
-        S04: Repeated losses on same symbol
+        S04: Repeated losses on same symbol(s)
         """
         symbol_stats = defaultdict(lambda: {
             "count": 0, "winners": 0, "pnl": 0.0, "consecutive_losses": 0, "max_consec_losses": 0
@@ -388,6 +401,7 @@ class InsightEngine:
                 stats["max_consec_losses"] = max(stats["max_consec_losses"], stats["consecutive_losses"])
 
         total_trades = len(self.positions)
+        repeated_loss_candidates = []
 
         for symbol, stats in symbol_stats.items():
             if stats["count"] >= 5:
@@ -414,24 +428,6 @@ class InsightEngine:
                         }
                     ))
 
-                # S02: Problem symbol
-                elif symbol_wr < 35:
-                    self._add_insight(TradingInsight(
-                        id=f"S02-{symbol}",
-                        type=InsightType.PROBLEM,
-                        category=InsightCategory.SYMBOL,
-                        priority=75,
-                        title=f"{symbol}表现不佳",
-                        description=f"{symbol}胜率仅{symbol_wr:.0f}%（{stats['count']}笔），总亏损${abs(stats['pnl']):,.0f}",
-                        suggestion=f"建议暂停交易{symbol}，或深入分析为何在此标的上表现不佳",
-                        data_points={
-                            "symbol": symbol,
-                            "trade_count": stats["count"],
-                            "win_rate": round(symbol_wr, 1),
-                            "total_pnl": round(stats["pnl"], 2),
-                        }
-                    ))
-
                 # S03: Over-concentration
                 if concentration > 30:
                     self._add_insight(TradingInsight(
@@ -452,20 +448,63 @@ class InsightEngine:
 
                 # S04: Repeated losses
                 if stats["max_consec_losses"] >= 3:
-                    self._add_insight(TradingInsight(
-                        id=f"S04-{symbol}",
-                        type=InsightType.PROBLEM,
-                        category=InsightCategory.SYMBOL,
-                        priority=80,
-                        title=f"{symbol}连续亏损",
-                        description=f"{symbol}曾出现连续{stats['max_consec_losses']}笔亏损",
-                        suggestion=f"在{symbol}连亏后应暂停交易，冷静分析后再考虑入场",
-                        data_points={
-                            "symbol": symbol,
-                            "max_consecutive_losses": stats["max_consec_losses"],
-                            "trade_count": stats["count"],
-                        }
-                    ))
+                    repeated_loss_candidates.append({
+                        "symbol": symbol,
+                        "max_consecutive_losses": stats["max_consec_losses"],
+                        "trade_count": stats["count"],
+                        "total_pnl": round(stats["pnl"], 2),
+                    })
+
+        if repeated_loss_candidates:
+            repeated_loss_candidates.sort(
+                key=lambda item: (
+                    item["max_consecutive_losses"],
+                    item["trade_count"],
+                    -item["total_pnl"],
+                ),
+                reverse=True,
+            )
+
+            if len(repeated_loss_candidates) == 1:
+                candidate = repeated_loss_candidates[0]
+                self._add_insight(TradingInsight(
+                    id=f"S04-{candidate['symbol']}",
+                    type=InsightType.REMINDER,
+                    category=InsightCategory.SYMBOL,
+                    priority=80,
+                    title=f"{candidate['symbol']}连续亏损",
+                    description=(
+                        f"{candidate['symbol']}曾出现连续"
+                        f"{candidate['max_consecutive_losses']}笔亏损"
+                    ),
+                    suggestion=f"在{candidate['symbol']}连亏后应暂停交易，冷静分析后再考虑入场",
+                    data_points={
+                        "symbol": candidate["symbol"],
+                        "max_consecutive_losses": candidate["max_consecutive_losses"],
+                        "trade_count": candidate["trade_count"],
+                    }
+                ))
+            else:
+                top_candidates = repeated_loss_candidates[:5]
+                top_symbols = ", ".join(item["symbol"] for item in top_candidates)
+                max_streak = max(item["max_consecutive_losses"] for item in repeated_loss_candidates)
+                self._add_insight(TradingInsight(
+                    id="S04A",
+                    type=InsightType.REMINDER,
+                    category=InsightCategory.SYMBOL,
+                    priority=80,
+                    title="多个标的连续亏损",
+                    description=(
+                        f"{top_symbols}等{len(repeated_loss_candidates)}个标的曾出现连续亏损，"
+                        f"最长{max_streak}笔"
+                    ),
+                    suggestion="优先暂停这些重复连亏标的，复盘共同原因后再恢复交易",
+                    data_points={
+                        "affected_symbols": len(repeated_loss_candidates),
+                        "max_consecutive_losses": max_streak,
+                        "symbols": top_symbols,
+                    }
+                ))
 
         # S05: First trade on new symbol performance
         symbol_first_trade = {}
@@ -675,21 +714,27 @@ class InsightEngine:
                 ))
 
         # R03: Single trade risk too high
-        if self._total_pnl > 0:
-            max_loss = min(float(p.net_pnl or 0) for p in self.positions)
-            if abs(max_loss) > self._total_pnl * 0.2:  # Single loss > 20% of total profit
+        # 用 USD-equivalent 的最大亏损 vs USD-equivalent 总盈利。之前直接对
+        # HKD+USD 求和，分母虚高 ~8 倍，把"亏 191% 总盈利"误报成"21.9%"。
+        if self._total_pnl > 0 and self._pnls_usd:
+            max_loss_usd = min(self._pnls_usd)
+            if abs(max_loss_usd) > self._total_pnl * 0.2:
                 self._add_insight(TradingInsight(
                     id="R03",
                     type=InsightType.PROBLEM,
                     category=InsightCategory.RISK,
                     priority=82,
                     title="单笔风险过大",
-                    description=f"最大单笔亏损${abs(max_loss):.0f}，占总盈利的{abs(max_loss)/self._total_pnl*100:.0f}%",
+                    description=(
+                        f"最大单笔亏损 ${abs(max_loss_usd):.0f}（USD等价），"
+                        f"占总盈利 ${self._total_pnl:.0f} 的 "
+                        f"{abs(max_loss_usd)/self._total_pnl*100:.0f}%"
+                    ),
                     suggestion="建议控制单笔交易的风险敞口，设置止损以限制最大亏损",
                     data_points={
-                        "max_single_loss": round(max_loss, 2),
+                        "max_single_loss": round(max_loss_usd, 2),
                         "total_pnl": round(self._total_pnl, 2),
-                        "pct_of_total": round(abs(max_loss) / self._total_pnl * 100, 1),
+                        "pct_of_total": round(abs(max_loss_usd) / self._total_pnl * 100, 1),
                     }
                 ))
 
@@ -1134,6 +1179,7 @@ class InsightEngine:
         """
         P01: Win rate improvement
         P02: Performance deterioration
+        P02-weekly: Consecutive weekly losses
         """
         if len(self.positions) < 10:
             return
@@ -1174,7 +1220,7 @@ class InsightEngine:
         elif wr_change < -10:
             self._add_insight(TradingInsight(
                 id="P02",
-                type=InsightType.PROBLEM,
+                type=InsightType.REMINDER,
                 category=InsightCategory.TREND,
                 priority=78,
                 title="近期表现下滑",
@@ -1189,7 +1235,7 @@ class InsightEngine:
                 }
             ))
 
-        # Check for consecutive weekly losses (P02 variant)
+        # Check for consecutive weekly losses
         weekly_pnl = defaultdict(float)
         for p in self.positions:
             if p.close_date:
@@ -1204,8 +1250,8 @@ class InsightEngine:
             if consecutive_negative:
                 total_loss = sum(weekly_pnl[w] for w in recent_3_weeks)
                 self._add_insight(TradingInsight(
-                    id="P02",
-                    type=InsightType.PROBLEM,
+                    id="P02-weekly",
+                    type=InsightType.REMINDER,
                     category=InsightCategory.TREND,
                     priority=85,
                     title="连续3周亏损",
@@ -1214,5 +1260,6 @@ class InsightEngine:
                     data_points={
                         "weeks_negative": 3,
                         "total_loss": round(total_loss, 2),
+                        "total_loss_display": f"{abs(total_loss):,.0f}",
                     }
                 ))

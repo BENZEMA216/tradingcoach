@@ -5,7 +5,7 @@
  * output: 均匀节奏展示的日志列表
  * pos: 组件 - 通过队列消费实现均匀的日志展示动画
  */
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CheckCircle, AlertCircle, Info, Loader2, Terminal } from 'lucide-react';
 
 interface LogEntry {
@@ -22,6 +22,7 @@ interface TickingLogStreamProps {
 
 export function TickingLogStream({ logs, maxVisible = 12 }: TickingLogStreamProps) {
   const [displayedLogs, setDisplayedLogs] = useState<LogEntry[]>([]);
+  const [queueLength, setQueueLength] = useState(0);
   const queueRef = useRef<LogEntry[]>([]);
   const lastProcessedIndex = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,6 +32,7 @@ export function TickingLogStream({ logs, maxVisible = 12 }: TickingLogStreamProp
     if (logs.length > lastProcessedIndex.current) {
       const newLogs = logs.slice(lastProcessedIndex.current);
       queueRef.current.push(...newLogs);
+      setQueueLength(queueRef.current.length);
       lastProcessedIndex.current = logs.length;
     }
   }, [logs]);
@@ -40,6 +42,7 @@ export function TickingLogStream({ logs, maxVisible = 12 }: TickingLogStreamProp
     const consume = () => {
       if (queueRef.current.length > 0) {
         const nextLog = queueRef.current.shift()!;
+        setQueueLength(queueRef.current.length);
         setDisplayedLogs((prev) => {
           const updated = [...prev, nextLog];
           // Keep only maxVisible logs
@@ -108,9 +111,6 @@ export function TickingLogStream({ logs, maxVisible = 12 }: TickingLogStreamProp
       return '--:--:--';
     }
   };
-
-  // Queue indicator
-  const queueLength = queueRef.current.length;
 
   return (
     <div className="relative">

@@ -190,11 +190,11 @@ export function AICoach() {
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-4">
               {/* Type Filter */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   {t('insights.type', 'Type')}:
                 </span>
-                <div className="flex gap-1">
+                <div className="flex flex-wrap gap-1">
                   {TYPE_FILTERS.map((filter) => (
                     <button
                       key={filter.value}
@@ -218,7 +218,7 @@ export function AICoach() {
               </div>
 
               {/* Category Filter */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   {t('insights.category', 'Category')}:
                 </span>

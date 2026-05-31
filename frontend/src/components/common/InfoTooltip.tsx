@@ -47,7 +47,11 @@ export function InfoTooltip({ termKey, size = 'sm' }: InfoTooltipProps) {
     <span className="relative inline-flex items-center ml-1">
       <button
         ref={buttonRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
         className={`inline-flex items-center justify-center
                    text-gray-400 hover:text-blue-500
                    dark:text-gray-500 dark:hover:text-blue-400
@@ -64,12 +68,17 @@ export function InfoTooltip({ termKey, size = 'sm' }: InfoTooltipProps) {
           {/* Backdrop for mobile */}
           <div
             className="fixed inset-0 bg-black/20 z-40 md:hidden"
-            onClick={() => setIsOpen(false)}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setIsOpen(false);
+            }}
           />
 
           {/* Tooltip content */}
           <div
             ref={tooltipRef}
+            onClick={(event) => event.stopPropagation()}
             className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2
                        w-72 md:w-80
                        bg-white dark:bg-gray-800
@@ -87,7 +96,11 @@ export function InfoTooltip({ termKey, size = 'sm' }: InfoTooltipProps) {
             <div className="relative p-4">
               {/* Close button */}
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setIsOpen(false);
+                }}
                 className="absolute top-2 right-2 p-1
                          text-gray-400 hover:text-gray-600
                          dark:text-gray-500 dark:hover:text-gray-300"

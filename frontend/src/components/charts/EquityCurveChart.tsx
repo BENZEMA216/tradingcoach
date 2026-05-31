@@ -6,9 +6,9 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { EquityCurvePoint } from '@/types';
 import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
@@ -32,7 +32,7 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
   const locale = i18n.language === 'zh' ? 'zh-CN' : 'en-US';
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
@@ -99,7 +99,7 @@ export function EquityCurveChart({ data, totalPnL, maxDrawdown, title, bare, isL
         </div>
       )}
       <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
             <defs>
               <linearGradient id="equityCurveGradient" x1="0" y1="0" x2="0" y2="1">

@@ -24,6 +24,17 @@
 | frontend_audit_report.md | 审计报告 | 前端代码审计报告 |
 | session_summary_*.md | 会话记录 | 开发会话总结 |
 | 复盘想法.md | 业务文档 | 复盘功能设计想法 |
+| 复盘研究与Feature路线图.md | 研究报告 | 25 篇文章+12 KOL+39 大师+14 产品 landscape+15 个 Feature 路线图 (2026-05-20) |
+| QA_REPORT_20260520_v2.md | QA 报告 | API + 静态审计混合 QA，记录数据可信度、评分、UX 和流程问题 |
+| NEXT_ACTIONS_20260521.md | 近期计划 | 当前 dogfood/QA 分支的近期稳定化执行计划 |
+| ACCEPTANCE_CHECKLIST_20260521.md | 验收文档 | 近期稳定化工作的验收清单和发布门禁 |
+| REMAINING_TASKS_20260521.md | 剩余计划 | 稳定化开发完成后的发布前收口任务 |
+| REMAINING_ACCEPTANCE_20260521.md | 剩余验收 | 剩余收口任务的验收清单和当前状态 |
+| PR_NOTES_20260522.md | PR 草稿 | 当前收口分支的 PR 描述、验证记录和 deferred 列表 |
+| PRODUCTIZATION_QA_REVIEW_20260522.md | 产品化 QA 复盘 | 2026-05-22 自动化、浏览器回归、残留风险和下一轮验收建议 |
+| PRODUCTIZATION_ROADMAP_20260522.md | 产品化路线图 | 数据导入、券商直连、分析深度和 AI Coach 的近期产品路线 |
+| SAMPLE_DATA_NULL_AUDIT_20260525.md | 数据审计 | 基于用户 sample 数据检查空值、缺失指标和潜在数据处理 bug |
+| PRODUCT_HUNT_BETA_RELEASE_20260529.md | PH Beta 发布记录 | sample-first beta、匿名 workspace、隐私说明、验证结果和待发布事项 |
 
 ## reports/ 子目录
 

@@ -5,7 +5,6 @@ import { positionsApi, eventsApi } from '@/api/client';
 import {
   formatCurrency,
   formatPercent,
-  getPnLColorClass,
 } from '@/utils/format';
 import clsx from 'clsx';
 import { ChevronLeft } from 'lucide-react';
@@ -137,7 +136,7 @@ export function PositionDetail() {
                 (position.net_pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'
               )}
             >
-              {formatCurrency(position.net_pnl)}
+              {formatCurrency(position.net_pnl, position.currency || 'USD')}
             </div>
             <div
               className={clsx(
@@ -169,7 +168,7 @@ export function PositionDetail() {
 
         {/* Section 3: Trade Executions */}
         <section>
-          <ExecutionTab trades={trades} loading={loadingTrades} />
+          <ExecutionTab trades={trades} loading={loadingTrades} currency={position.currency} />
         </section>
 
         {/* Section 4: News Context */}

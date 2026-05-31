@@ -26,7 +26,7 @@ FastAPI RESTful API 服务，为前端 React 应用提供数据接口。
 | `trades.py` | 交易 API | 交易记录查询 |
 | `statistics.py` | 统计 API | 多维度统计分析 |
 | `market_data.py` | 市场数据 API | OHLCV、技术指标 |
-| `upload.py` | 上传 API | CSV 文件上传、增量导入 |
+| `upload.py` | 上传 API | CSV 文件上传前预检、增量导入 |
 | `ai_coach.py` | AI 教练 API | LLM 交易分析和建议 |
 | `system.py` | 系统 API | 健康检查、数据库统计 |
 
@@ -99,6 +99,14 @@ FastAPI RESTful API 服务，为前端 React 应用提供数据接口。
 |------|------|------|
 | GET | `/{symbol}` | 获取股票市场数据 |
 | GET | `/{symbol}/indicators` | 获取技术指标 |
+
+### Upload `/api/v1/upload`
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/trades/preview` | 上传前只读预检 CSV，返回券商识别、行数、错误和警告 |
+| POST | `/trades` | 上传并导入交易 CSV |
+| GET | `/history` | 获取导入历史 |
+| POST | `/snapshot` | 上传持仓快照并对账 |
 
 ### System `/api/v1/system`
 | 方法 | 路径 | 说明 |

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
@@ -14,7 +14,7 @@ import {
   getSymbolRiskInsight,
   getRollingWinRateInsight,
 } from '@/utils/insights';
-import { PrivacyModeToggle } from '@/components/common';
+import { GradeBadge, PrivacyModeToggle } from '@/components/common';
 import { AICoachPanel } from '@/components/insights';
 import {
   ReportSection,
@@ -59,6 +59,15 @@ function translateHoldingPeriodLabel(label: string, isZh: boolean): string {
   return HOLDING_PERIOD_LABELS_ZH[label] ?? label;
 }
 
+function EmptyTableRow({ colSpan, label }: { colSpan: number; label: string }) {
+  return (
+    <tr>
+      <td colSpan={colSpan} className="px-4 py-8 text-center text-sm font-mono text-white/40">
+        {label}
+      </td>
+    </tr>
+  );
+}
 
 function getDateRange(type: PeriodType, offset: number = 0): { start: Date | null; end: Date | null } {
   if (type === 'all') return { start: null, end: null };
@@ -238,21 +247,38 @@ export function Statistics() {
   );
 
   const handleDrillDown = (title: string, filters: PositionFilters) => {
+    void title;
     const params = new URLSearchParams();
     if (filters.symbol) params.set('symbol', filters.symbol);
     if (filters.direction) params.set('direction', filters.direction);
-    if (filters.score_grade) params.set('grade', filters.score_grade);
-    if (filters.strategy_type) params.set('strategy', filters.strategy_type);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.score_grade) params.set('score_grade', filters.score_grade);
+    if (filters.strategy_type) params.set('strategy_type', filters.strategy_type);
+    if (filters.is_reviewed !== undefined) params.set('is_reviewed', String(filters.is_reviewed));
+    if (filters.date_start) params.set('date_start', filters.date_start);
+    if (filters.date_end) params.set('date_end', filters.date_end);
 
     // Add date range if currently filtering by specific period
-    if (periodType !== 'all') {
-      if (dateParams.date_start) params.set('from', dateParams.date_start);
-      if (dateParams.date_end) params.set('to', dateParams.date_end);
+    if (periodType !== 'all' && !filters.date_start && !filters.date_end) {
+      if (dateParams.date_start) params.set('date_start', dateParams.date_start);
+      if (dateParams.date_end) params.set('date_end', dateParams.date_end);
     }
 
     // Direct navigation to Positions Terminal
     window.location.href = `/positions?${params.toString()}`;
   };
+
+  const getRowActionProps = (action: () => void) => ({
+    role: 'button' as const,
+    tabIndex: 0,
+    onClick: action,
+    onKeyDown: (event: React.KeyboardEvent<HTMLTableRowElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        action();
+      }
+    },
+  });
 
   // API Queries
   const { data: performance, isLoading } = useQuery({
@@ -361,8 +387,8 @@ export function Statistics() {
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-16">
       {/* Period Selector - Floating & Industrial */}
-      <div className="sticky top-0 z-10 bg-white/90 dark:bg-black/90 backdrop-blur-md -mx-8 px-8 py-3 border-b border-neutral-200 dark:border-white/10 transition-colors">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+      <div className="sticky top-0 z-10 bg-white/90 dark:bg-black/90 backdrop-blur-md -mx-4 px-4 py-3 border-b border-neutral-200 dark:border-white/10 transition-colors sm:-mx-8 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 max-w-7xl mx-auto">
           {/* Period Navigation */}
           {periodType !== 'all' && (
             <div className="flex items-center gap-2">
@@ -387,9 +413,9 @@ export function Statistics() {
           {periodType === 'all' && <div />}
 
           {/* Right side: Privacy Toggle + Period Tabs */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <PrivacyModeToggle />
-            <div className="flex gap-px bg-neutral-200 dark:bg-white/10 p-0.5 rounded-sm">
+            <div className="flex flex-wrap gap-px bg-neutral-200 dark:bg-white/10 p-0.5 rounded-sm">
               {periodTabs.map((tab) => (
                 <button
                   key={tab.type}
@@ -430,7 +456,7 @@ export function Statistics() {
           <AICoachPanel dateStart={dateParams.date_start} dateEnd={dateParams.date_end} limit={20} />
 
           {/* Visual Trading Calendar */}
-          <TradingCalendar className="shadow-sm" />
+          <TradingCalendar className="shadow-sm" anchorDate={dateRange?.max_date} />
 
           {/* Section 01: Performance */}
           <ReportSection number="01" title="PERFORMANCE" subtitle={isZh ? '业绩表现' : 'Performance Overview'}>
@@ -691,11 +717,11 @@ export function Statistics() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {bySymbol?.map((item) => (
+                  {bySymbol && bySymbol.length > 0 ? bySymbol.map((item) => (
                     <tr
                       key={item.symbol}
-                      onClick={() => handleDrillDown(item.symbol, { symbol: item.symbol }, item.symbol_name || undefined)}
-                      className="hover:bg-white/5 cursor-pointer transition-colors"
+                      {...getRowActionProps(() => handleDrillDown(item.symbol, { symbol: item.symbol }, item.symbol_name || undefined))}
+                      className="hover:bg-white/5 cursor-pointer transition-colors focus:outline-none focus:bg-white/10"
                     >
                       <td className="px-4 py-3 font-mono text-sm font-medium text-white">{item.symbol}</td>
                       <td className="px-4 py-3 text-right font-mono text-sm text-white/60">{item.count}</td>
@@ -704,7 +730,9 @@ export function Statistics() {
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm text-white/60">{formatPercent(item.win_rate, 1)}</td>
                     </tr>
-                  ))}
+                  )) : (
+                    <EmptyTableRow colSpan={4} label={isZh ? '暂无标的数据' : 'No symbol breakdown data'} />
+                  )}
                 </tbody>
               </table>
             </CollapsibleTable>
@@ -724,23 +752,27 @@ export function Statistics() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {byGrade?.map((item) => (
+                  {byGrade && byGrade.length > 0 ? byGrade.map((item) => (
                     <tr
                       key={item.grade}
-                      onClick={() => handleDrillDown(
+                      {...getRowActionProps(() => handleDrillDown(
                         isZh ? `${item.grade} 级交易` : `Grade ${item.grade} Trades`,
                         { score_grade: item.grade }
-                      )}
-                      className="hover:bg-white/5 cursor-pointer transition-colors"
+                      ))}
+                      className="hover:bg-white/5 cursor-pointer transition-colors focus:outline-none focus:bg-white/10"
                     >
-                      <td className="px-4 py-3 font-mono text-sm font-medium text-white">{item.grade}</td>
+                      <td className="px-4 py-3 font-mono text-sm font-medium text-white">
+                        <GradeBadge grade={item.grade} showIncompleteInfo />
+                      </td>
                       <td className="px-4 py-3 text-right font-mono text-sm text-white/60">{item.count}</td>
                       <td className={clsx('px-4 py-3 text-right font-mono text-sm font-medium', item.total_pnl > 0 ? 'text-green-500' : 'text-red-500')}>
                         {formatCurrency(item.total_pnl)}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm text-white/60">{formatPercent(item.win_rate, 1)}</td>
                     </tr>
-                  ))}
+                  )) : (
+                    <EmptyTableRow colSpan={4} label={isZh ? '暂无评分分布数据' : 'No grade distribution data'} />
+                  )}
                 </tbody>
               </table>
             </CollapsibleTable>
@@ -777,32 +809,31 @@ export function Statistics() {
             )}
 
             {/* Drawdowns - Collapsible */}
-            {drawdowns && drawdowns.length > 0 && (
-              <CollapsibleTable
-                title={isZh ? '回撤记录' : 'Drawdown History'}
-                className="mt-4"
-              >
-                <table className="w-full text-sm">
-                  <thead className="bg-white/5 border-b border-white/10">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '开始' : 'START'}</th>
-                      <th className="px-4 py-3 text-left text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '结束' : 'END'}</th>
-                      <th className="px-4 py-3 text-right text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '回撤' : 'DD'}</th>
-                      <th className="px-4 py-3 text-right text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '天数' : 'DAYS'}</th>
-                      <th className="px-4 py-3 text-center text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '状态' : 'STATUS'}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {drawdowns.slice(0, 5).map((dd, idx) => (
-                      <tr
-                        key={idx}
-                        onClick={() => handleDrillDown(
-                          isZh ? '回撤期间交易' : 'Trades During Drawdown',
-                          { date_start: dd.start_date, date_end: dd.end_date || undefined },
-                          `${formatDate(dd.start_date)} - ${dd.end_date ? formatDate(dd.end_date) : (isZh ? '至今' : 'Present')}`
-                        )}
-                        className="hover:bg-white/5 cursor-pointer transition-colors"
-                      >
+            <CollapsibleTable
+              title={isZh ? '回撤记录' : 'Drawdown History'}
+              className="mt-4"
+            >
+              <table className="w-full text-sm">
+                <thead className="bg-white/5 border-b border-white/10">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '开始' : 'START'}</th>
+                    <th className="px-4 py-3 text-left text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '结束' : 'END'}</th>
+                    <th className="px-4 py-3 text-right text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '回撤' : 'DD'}</th>
+                    <th className="px-4 py-3 text-right text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '天数' : 'DAYS'}</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-mono font-medium text-white/40 uppercase tracking-wider">{isZh ? '状态' : 'STATUS'}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {drawdowns && drawdowns.length > 0 ? drawdowns.slice(0, 5).map((dd, idx) => (
+                    <tr
+                      key={`${dd.start_date}-${idx}`}
+                      {...getRowActionProps(() => handleDrillDown(
+                        isZh ? '回撤期间交易' : 'Trades During Drawdown',
+                        { date_start: dd.start_date, date_end: dd.end_date || undefined },
+                        `${formatDate(dd.start_date)} - ${dd.end_date ? formatDate(dd.end_date) : (isZh ? '至今' : 'Present')}`
+                      ))}
+                      className="hover:bg-white/5 cursor-pointer transition-colors focus:outline-none focus:bg-white/10"
+                    >
                         <td className="px-4 py-3 font-mono text-sm text-white">{formatDate(dd.start_date)}</td>
                         <td className="px-4 py-3 font-mono text-sm text-white">{dd.end_date ? formatDate(dd.end_date) : '-'}</td>
                         <td className="px-4 py-3 text-right text-red-500 font-mono text-sm font-bold">
@@ -823,11 +854,12 @@ export function Statistics() {
                           )}
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </CollapsibleTable>
-            )}
+                    )) : (
+                      <EmptyTableRow colSpan={5} label={isZh ? '暂无回撤记录' : 'No drawdown periods'} />
+                    )}
+                </tbody>
+              </table>
+            </CollapsibleTable>
           </ReportSection>
 
           {/* No Data State */}

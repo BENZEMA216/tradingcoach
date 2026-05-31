@@ -6,10 +6,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
   Legend,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { EquityDrawdownItem } from '@/types';
 import { getPrivacyAwareFormatters } from '@/utils/format';
 import { useChartColors } from '@/hooks/useChartColors';
@@ -27,7 +27,7 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
   const locale = i18n.language === 'zh' ? 'zh-CN' : 'en-US';
 
   // Subscribe to privacy state for re-renders
-  const { isPrivacyMode: _isPrivacyMode } = usePrivacyStore();
+  usePrivacyStore((state) => state.isPrivacyMode);
   const { formatPnL, formatAxis } = getPrivacyAwareFormatters();
 
   if (isLoading) {
@@ -102,7 +102,7 @@ export function EquityDrawdownChart({ data, isLoading, bare = false }: EquityDra
   // The actual chart content
   const chartContent = (
     <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
             <defs>
               {/* Equity gradient - green with fade */}

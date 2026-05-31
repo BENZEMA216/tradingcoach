@@ -1,9 +1,9 @@
 """
 任务管理 API
 
-input: 任务创建请求、文件上传
+input: 任务创建请求、文件上传、X-Workspace-Token
 output: 任务状态、进度、结果
-pos: 后端 API 层 - 提供异步任务管理接口
+pos: 后端 API 层 - 提供 workspace 隔离的异步任务管理接口
 
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Optional, List
 import logging
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Query
+from fastapi import APIRouter, UploadFile, File, Header, HTTPException, Query, status
 from pydantic import BaseModel, EmailStr
 
 # Add project root to path
@@ -24,10 +24,21 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from backend.app.services.task_manager import task_manager
+from backend.app.services.workspace_service import workspace_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+def _workspace_database_url(token: Optional[str]) -> str:
+    workspace = workspace_service.resolve_token(token)
+    if workspace is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired workspace token.",
+        )
+    return workspace.database_url
 
 
 # ==================== 请求/响应模型 ====================
@@ -73,7 +84,8 @@ class TaskListResponse(BaseModel):
 async def create_analysis_task(
     file: UploadFile = File(...),
     email: Optional[str] = Query(None, description="通知邮箱（可选）"),
-    replace_mode: bool = Query(True, description="替换模式（默认清除旧数据）")
+    replace_mode: bool = Query(True, description="替换模式（默认清除旧数据）"),
+    x_workspace_token: Optional[str] = Header(None, alias="X-Workspace-Token"),
 ):
     """
     创建 CSV 分析任务
@@ -85,6 +97,8 @@ async def create_analysis_task(
     - **email**: 完成后通知邮箱（可选）
     - **replace_mode**: 是否清除现有数据后再导入（默认 True）
     """
+    database_url = _workspace_database_url(x_workspace_token)
+
     # 验证文件类型
     if not file.filename.endswith('.csv'):
         raise HTTPException(
@@ -112,7 +126,8 @@ async def create_analysis_task(
             file_size=file_size,
             file_path=tmp_path,
             email=email,
-            replace_mode=replace_mode
+            replace_mode=replace_mode,
+            database_url=database_url,
         )
 
         return TaskCreateResponse(
@@ -127,13 +142,16 @@ async def create_analysis_task(
 
 
 @router.get("/{task_id}", response_model=TaskStatusResponse)
-async def get_task_status(task_id: str):
+async def get_task_status(
+    task_id: str,
+    x_workspace_token: Optional[str] = Header(None, alias="X-Workspace-Token"),
+):
     """
     获取任务状态
 
     查询任务的当前状态、进度和结果
     """
-    task = task_manager.get_task(task_id)
+    task = task_manager.get_task(task_id, database_url=_workspace_database_url(x_workspace_token))
 
     if not task:
         raise HTTPException(
@@ -145,13 +163,17 @@ async def get_task_status(task_id: str):
 
 
 @router.delete("/{task_id}")
-async def cancel_task(task_id: str):
+async def cancel_task(
+    task_id: str,
+    x_workspace_token: Optional[str] = Header(None, alias="X-Workspace-Token"),
+):
     """
     取消任务
 
     取消正在等待或执行中的任务
     """
-    task = task_manager.get_task(task_id)
+    database_url = _workspace_database_url(x_workspace_token)
+    task = task_manager.get_task(task_id, database_url=database_url)
 
     if not task:
         raise HTTPException(
@@ -165,7 +187,7 @@ async def cancel_task(task_id: str):
             detail=f"任务已结束，无法取消"
         )
 
-    success = task_manager.cancel_task(task_id)
+    success = task_manager.cancel_task(task_id, database_url=database_url)
 
     if success:
         return {"success": True, "message": "任务已取消"}
@@ -176,7 +198,8 @@ async def cancel_task(task_id: str):
 @router.get("/", response_model=TaskListResponse)
 async def list_tasks(
     limit: int = Query(10, ge=1, le=100),
-    status: Optional[str] = Query(None, description="按状态筛选")
+    status: Optional[str] = Query(None, description="按状态筛选"),
+    x_workspace_token: Optional[str] = Header(None, alias="X-Workspace-Token"),
 ):
     """
     获取任务列表
@@ -187,7 +210,7 @@ async def list_tasks(
     from src.models.base import init_database, get_session
     from src.models.task import Task
 
-    init_database(config.DATABASE_URL, echo=False)
+    init_database(_workspace_database_url(x_workspace_token), echo=False)
     session = get_session()
 
     try:

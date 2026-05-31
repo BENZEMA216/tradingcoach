@@ -15,7 +15,6 @@ import {
   XCircle,
 } from 'lucide-react';
 import { formatNumber } from '@/utils/format';
-import clsx from 'clsx';
 
 // Dynamic processing messages
 const LOADING_MESSAGES = [

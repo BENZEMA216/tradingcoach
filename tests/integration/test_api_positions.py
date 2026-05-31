@@ -8,6 +8,10 @@ pos: 集成测试 - 测试 API 端点的实际行为
 一旦我被更新，务必更新我的开头注释，以及所属文件夹的README.md
 """
 import pytest
+from datetime import date, datetime
+
+from src.models import Position
+from src.models.position import PositionStatus
 
 
 class TestPositionsAPI:
@@ -76,6 +80,38 @@ class TestPositionsAPI:
         """测试获取不存在的持仓返回 404"""
         response = client.get("/api/v1/positions/99999")
         assert response.status_code == 404
+
+    def test_get_position_detail_includes_option_metadata(self, client, test_db):
+        """测试期权详情返回完整期权字段"""
+        position = Position(
+            symbol="NVDA250207C120000",
+            symbol_name="NVIDIA Call Option",
+            direction="long",
+            status=PositionStatus.OPEN,
+            open_time=datetime(2025, 2, 3, 9, 30, 33),
+            open_date=date(2025, 2, 3),
+            open_price=2.26,
+            quantity=1,
+            market="美股",
+            currency="USD",
+            is_option=1,
+            underlying_symbol="NVDA",
+            option_type="CALL",
+            strike_price=120,
+            expiry_date=date(2025, 2, 7),
+        )
+        test_db.add(position)
+        test_db.commit()
+
+        response = client.get(f"/api/v1/positions/{position.id}")
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["is_option"] is True
+        assert data["underlying_symbol"] == "NVDA"
+        assert data["option_type"] == "CALL"
+        assert data["strike_price"] == 120.0
+        assert data["expiry_date"] == "2025-02-07"
 
     def test_get_position_summary_empty(self, client):
         """测试空数据库的统计摘要"""

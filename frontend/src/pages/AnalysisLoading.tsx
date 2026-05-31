@@ -2,22 +2,24 @@
  * AnalysisLoading - 独立分析加载页面
  *
  * input: taskId URL参数
- * output: 展示分析进度，完成后跳转
+ * output: 展示分析进度，支持取消任务，完成后跳转
  * pos: 页面组件 - 全屏两栏布局的loading体验
  */
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { taskApi } from '@/api/client';
 import { BrandSection } from '@/components/loading/BrandSection';
 import { ProgressPanel } from '@/components/loading/ProgressPanel';
 import { BackgroundEffects } from '@/components/landing/BackgroundEffects';
+import { useToast } from '@/store/useToastStore';
 
 export function AnalysisLoading() {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const toast = useToast();
 
   // Task status polling
   const { data: task, isLoading, error } = useQuery({
@@ -54,6 +56,35 @@ export function AnalysisLoading() {
     navigate('/');
   };
 
+  const cancelMutation = useMutation({
+    mutationFn: () => taskApi.cancel(taskId!),
+    onSuccess: async (response) => {
+      if (response.success) {
+        toast.success(
+          t('notification.cancelSuccess', 'Task cancelled'),
+          response.message
+        );
+      } else {
+        toast.error(
+          t('notification.cancelFailed', 'Cancel failed'),
+          response.message
+        );
+      }
+      await queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+    },
+    onError: (cancelError: Error) => {
+      toast.error(
+        t('notification.cancelFailed', 'Cancel failed'),
+        cancelError.message || t('notification.unknownError', 'Unknown error')
+      );
+    },
+  });
+
+  const handleCancel = () => {
+    if (!taskId || cancelMutation.isPending) return;
+    cancelMutation.mutate();
+  };
+
   if (!taskId) {
     navigate('/');
     return null;
@@ -79,6 +110,8 @@ export function AnalysisLoading() {
           onViewPositions={handleViewPositions}
           onViewDashboard={handleViewDashboard}
           onRetry={handleRetry}
+          onCancel={handleCancel}
+          isCancelling={cancelMutation.isPending}
         />
       </div>
     </div>

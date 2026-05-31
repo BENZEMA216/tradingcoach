@@ -6,11 +6,9 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
-  Cell,
   ReferenceLine,
-  Area,
 } from 'recharts';
+import { StableResponsiveContainer as ResponsiveContainer } from '@/components/charts/StableResponsiveContainer';
 import type { EventListItem } from '@/types';
 import { useChartColors } from '@/hooks/useChartColors';
 import { ChartSkeleton } from '@/components/common/ChartSkeleton';
@@ -46,6 +44,65 @@ const IMPACT_COLORS = {
   mixed: '#F59E0B',
   neutral: '#64748B',
 };
+
+interface TimelineTooltipPayload {
+  dateLabel: string;
+  positive: number;
+  negative: number;
+  neutral: number;
+  mixed: number;
+  total: number;
+}
+
+function TimelineTooltip({
+  active,
+  payload,
+  isZh,
+}: {
+  active?: boolean;
+  payload?: unknown[];
+  isZh: boolean;
+}) {
+  if (!active || !payload || payload.length === 0) return null;
+
+  const data = (payload[0] as { payload: TimelineTooltipPayload }).payload;
+
+  return (
+    <div className="bg-white dark:bg-neutral-900 px-3 py-2 rounded-sm shadow-lg border border-neutral-200 dark:border-white/10 text-xs font-mono">
+      <div className="font-bold text-slate-900 dark:text-white mb-1.5">{data.dateLabel}</div>
+      <div className="space-y-0.5">
+        {data.positive > 0 && (
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-green-600 dark:text-green-500">▲ {isZh ? '利好' : 'Bullish'}</span>
+            <span className="text-slate-900 dark:text-white">{data.positive}</span>
+          </div>
+        )}
+        {data.negative > 0 && (
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-red-600 dark:text-red-500">▼ {isZh ? '利空' : 'Bearish'}</span>
+            <span className="text-slate-900 dark:text-white">{data.negative}</span>
+          </div>
+        )}
+        {data.mixed > 0 && (
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-amber-600 dark:text-amber-500">◆ {isZh ? '混合' : 'Mixed'}</span>
+            <span className="text-slate-900 dark:text-white">{data.mixed}</span>
+          </div>
+        )}
+        {data.neutral > 0 && (
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-slate-500 dark:text-slate-400">○ {isZh ? '中性' : 'Neutral'}</span>
+            <span className="text-slate-900 dark:text-white">{data.neutral}</span>
+          </div>
+        )}
+        <div className="border-t border-neutral-200 dark:border-white/10 pt-1 mt-1 flex items-center justify-between">
+          <span className="text-slate-500 dark:text-white/40">{isZh ? '合计' : 'Total'}</span>
+          <span className="font-bold text-slate-900 dark:text-white">{data.total}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function EventTimelineChart({
   events,
@@ -169,49 +226,6 @@ export function EventTimelineChart({
     );
   }
 
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: unknown[]; label?: string }) => {
-    if (!active || !payload || payload.length === 0) return null;
-
-    const data = (payload[0] as { payload: typeof timelineData[0] }).payload;
-
-    return (
-      <div className="bg-white dark:bg-neutral-900 px-3 py-2 rounded-sm shadow-lg border border-neutral-200 dark:border-white/10 text-xs font-mono">
-        <div className="font-bold text-slate-900 dark:text-white mb-1.5">{data.dateLabel}</div>
-        <div className="space-y-0.5">
-          {data.positive > 0 && (
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-green-600 dark:text-green-500">▲ {isZh ? '利好' : 'Bullish'}</span>
-              <span className="text-slate-900 dark:text-white">{data.positive}</span>
-            </div>
-          )}
-          {data.negative > 0 && (
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-red-600 dark:text-red-500">▼ {isZh ? '利空' : 'Bearish'}</span>
-              <span className="text-slate-900 dark:text-white">{data.negative}</span>
-            </div>
-          )}
-          {data.mixed > 0 && (
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-amber-600 dark:text-amber-500">◆ {isZh ? '混合' : 'Mixed'}</span>
-              <span className="text-slate-900 dark:text-white">{data.mixed}</span>
-            </div>
-          )}
-          {data.neutral > 0 && (
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-500 dark:text-slate-400">○ {isZh ? '中性' : 'Neutral'}</span>
-              <span className="text-slate-900 dark:text-white">{data.neutral}</span>
-            </div>
-          )}
-          <div className="border-t border-neutral-200 dark:border-white/10 pt-1 mt-1 flex items-center justify-between">
-            <span className="text-slate-500 dark:text-white/40">{isZh ? '合计' : 'Total'}</span>
-            <span className="font-bold text-slate-900 dark:text-white">{data.total}</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const totalPositive = impactSummary.positive;
   const totalNegative = impactSummary.negative;
   const totalNeutralMixed = impactSummary.neutral + impactSummary.mixed;
@@ -277,7 +291,7 @@ export function EventTimelineChart({
         </div>
 
         <div className="h-56">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minHeight={200}>
             <ComposedChart
               data={timelineData}
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
@@ -298,7 +312,7 @@ export function EventTimelineChart({
                 width={25}
                 tickFormatter={(v) => Math.abs(v).toString()}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<TimelineTooltip isZh={isZh} />} />
               <ReferenceLine y={0} stroke={colors.grid} strokeOpacity={0.5} />
 
               {/* Positive events - above axis */}

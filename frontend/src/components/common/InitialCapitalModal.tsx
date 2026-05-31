@@ -6,7 +6,7 @@
  *
  * Once updated, update this header
  */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, DollarSign, Info, Percent } from 'lucide-react';
 import { usePrivacyStore } from '@/store/usePrivacyStore';
@@ -18,26 +18,21 @@ interface InitialCapitalModalProps {
 
 const PRESET_AMOUNTS = [10000, 25000, 50000, 100000, 250000, 500000, 1000000];
 
+function getInitialPreset(initialCapital: number | null) {
+  return initialCapital && PRESET_AMOUNTS.includes(initialCapital) ? initialCapital : null;
+}
+
+function getInitialCustomAmount(initialCapital: number | null) {
+  return initialCapital && !PRESET_AMOUNTS.includes(initialCapital) ? initialCapital.toString() : '';
+}
+
 export function InitialCapitalModal({ isOpen, onClose }: InitialCapitalModalProps) {
   const { i18n } = useTranslation();
   const isZh = i18n.language === 'zh';
   const { setInitialCapital, initialCapital, resetPrivacySettings } = usePrivacyStore();
 
-  const [customAmount, setCustomAmount] = useState('');
-  const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
-
-  // Initialize with current capital if editing
-  useEffect(() => {
-    if (isOpen && initialCapital) {
-      if (PRESET_AMOUNTS.includes(initialCapital)) {
-        setSelectedPreset(initialCapital);
-        setCustomAmount('');
-      } else {
-        setSelectedPreset(null);
-        setCustomAmount(initialCapital.toString());
-      }
-    }
-  }, [isOpen, initialCapital]);
+  const [customAmount, setCustomAmount] = useState(() => getInitialCustomAmount(initialCapital));
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(() => getInitialPreset(initialCapital));
 
   if (!isOpen) return null;
 

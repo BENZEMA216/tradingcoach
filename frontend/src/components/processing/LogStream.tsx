@@ -33,7 +33,6 @@ export function LogStream({ logs, className, isProcessing = false }: LogStreamPr
   const containerRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [filter, setFilter] = useState<FilterType>('all');
-  const [prevLogCount, setPrevLogCount] = useState(0);
 
   // 筛选日志
   const filteredLogs = useMemo(() => {
@@ -41,19 +40,6 @@ export function LogStream({ logs, className, isProcessing = false }: LogStreamPr
     if (filter === 'error') return logs.filter((l) => l.level === 'error');
     return logs.filter((l) => l.category === filter);
   }, [logs, filter]);
-
-  // 检测新增的日志索引
-  const newLogStartIndex = useMemo(() => {
-    if (filteredLogs.length > prevLogCount) {
-      return prevLogCount;
-    }
-    return -1;
-  }, [filteredLogs.length, prevLogCount]);
-
-  // 更新日志计数
-  useEffect(() => {
-    setPrevLogCount(filteredLogs.length);
-  }, [filteredLogs.length]);
 
   // 自动滚动到底部
   useEffect(() => {
@@ -141,7 +127,7 @@ export function LogStream({ logs, className, isProcessing = false }: LogStreamPr
               <LogEntry
                 key={`${log.time}-${index}`}
                 log={log}
-                isNew={index >= newLogStartIndex && newLogStartIndex >= 0}
+                isNew={false}
               />
             ))}
             {/* 处理中时显示等待指示器 */}

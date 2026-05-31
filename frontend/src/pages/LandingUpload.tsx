@@ -9,7 +9,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { taskApi, systemApi } from '@/api/client';
+import { taskApi, systemApi, uploadApi, workspaceApi } from '@/api/client';
 import {
   Upload as UploadIcon,
   FileSpreadsheet,
@@ -28,9 +28,15 @@ import {
   BrainCircuit,
 } from 'lucide-react';
 import { BackgroundEffects } from '@/components/landing/BackgroundEffects';
+import { ImportPreflightPanel } from '@/components/upload/ImportPreflightPanel';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { useNotification, getNotificationPreference, setNotificationPreference } from '@/hooks/useNotification';
 import { useTaskStorage } from '@/hooks/useTaskStorage';
+import {
+  isTradeImportReady,
+  validateTradeImportFile,
+} from '@/utils/importPreflight';
+import type { TradeImportFileValidation } from '@/utils/importPreflight';
 
 type PageState = 'upload' | 'error';
 
@@ -45,6 +51,7 @@ export function LandingUpload() {
   const [pageState, setPageState] = useState<PageState>('upload');
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileValidation, setFileValidation] = useState<TradeImportFileValidation | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [enableNotification, setEnableNotification] = useState(() => getNotificationPreference());
@@ -84,12 +91,12 @@ export function LandingUpload() {
   useEffect(() => {
     if (recoveredTask && storedTask) {
       updateTaskStatus(
-        recoveredTask.status as 'pending' | 'running' | 'completed' | 'failed',
+        recoveredTask.status as 'pending' | 'running' | 'completed' | 'failed' | 'cancelled',
         recoveredTask.progress,
         recoveredTask.current_step || undefined
       );
     }
-  }, [recoveredTask?.status, recoveredTask?.progress]);
+  }, [recoveredTask, storedTask, updateTaskStatus]);
 
   // Task status polling for error state display
   const { data: task } = useQuery({
@@ -99,10 +106,25 @@ export function LandingUpload() {
     staleTime: Infinity,
   });
 
+  const preflightMutation = useMutation({
+    mutationFn: (file: File) => uploadApi.previewTrades(file),
+  });
+
+  const sampleMutation = useMutation({
+    mutationFn: () => workspaceApi.createSample(),
+    onSuccess: () => {
+      clearTask();
+      queryClient.clear();
+      navigate('/statistics');
+    },
+  });
+
   // Create task mutation
   const createTaskMutation = useMutation({
-    mutationFn: ({ file, userEmail }: { file: File; userEmail?: string }) =>
-      taskApi.create(file, userEmail || undefined, true),
+    mutationFn: async ({ file, userEmail }: { file: File; userEmail?: string }) => {
+      await workspaceApi.ensure();
+      return taskApi.create(file, userEmail || undefined, true);
+    },
     onSuccess: (data) => {
       // Save to localStorage
       saveTask({
@@ -119,6 +141,42 @@ export function LandingUpload() {
       setPageState('error');
     },
   });
+
+  const clearSelectedFile = useCallback(() => {
+    setSelectedFile(null);
+    setFileValidation(null);
+    preflightMutation.reset();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [preflightMutation]);
+
+  const selectTradeFile = useCallback((file: File) => {
+    const validation = validateTradeImportFile(file);
+    setFileValidation(validation);
+    preflightMutation.reset();
+    createTaskMutation.reset();
+    setPageState('upload');
+    setTaskId(null);
+
+    if (!validation.valid) {
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    setSelectedFile(file);
+    preflightMutation.mutate(file);
+  }, [createTaskMutation, preflightMutation]);
+
+  const retryPreflight = useCallback(() => {
+    if (selectedFile) {
+      preflightMutation.reset();
+      preflightMutation.mutate(selectedFile);
+    }
+  }, [preflightMutation, selectedFile]);
 
   // Request notification permission when checkbox is toggled
   const handleNotificationToggle = async () => {
@@ -151,21 +209,18 @@ export function LandingUpload() {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.name.endsWith('.csv') || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
-        setSelectedFile(file);
-      }
+      selectTradeFile(e.dataTransfer.files[0]);
     }
-  }, []);
+  }, [selectTradeFile]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      selectTradeFile(e.target.files[0]);
     }
   };
 
   const handleUpload = () => {
-    if (selectedFile) {
+    if (selectedFile && canStartAnalysis) {
       createTaskMutation.mutate({
         file: selectedFile,
         userEmail: email.trim() || undefined,
@@ -200,6 +255,15 @@ export function LandingUpload() {
     if (!value) return true; // Empty is valid (optional)
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   };
+
+  const canStartAnalysis = isTradeImportReady({
+    selectedFile,
+    validation: fileValidation,
+    preflight: preflightMutation.data ?? null,
+    isChecking: preflightMutation.isPending,
+    isSubmitting: createTaskMutation.isPending,
+    isEmailValid: isValidEmail(email),
+  });
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative overflow-hidden font-sans selection:bg-white selection:text-black">
@@ -291,7 +355,7 @@ export function LandingUpload() {
           {/* Hero - The "Monolith" */}
           <div className="text-center mb-24 relative z-10 pt-10">
             <div className="inline-block border border-white/20 px-4 py-1.5 rounded-full mb-10 bg-black/50 backdrop-blur">
-              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">{t('landing.systemStatus')} • {t('landing.version')} 0.9.2</span>
+              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">{t('landing.systemStatus')} • {t('landing.version')} 1.0.0</span>
             </div>
 
             <h1 className="text-7xl md:text-9xl font-bold text-white mb-8 tracking-tighter leading-[0.9] whitespace-pre-line">
@@ -301,6 +365,38 @@ export function LandingUpload() {
             <p className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
               {t('landing.heroSubtitle')}
             </p>
+
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => sampleMutation.mutate()}
+                disabled={sampleMutation.isPending}
+                className="w-full sm:w-auto px-6 py-3 bg-white text-black hover:bg-gray-200 disabled:bg-gray-700 disabled:text-gray-400 rounded-sm font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 transition-colors"
+                data-testid="try-sample-data-button"
+              >
+                {sampleMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <BarChart3 className="w-4 h-4" />
+                )}
+                <span>{t('landing.trySampleData')}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full sm:w-auto px-6 py-3 border border-white/25 text-white hover:bg-white/10 rounded-sm font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 transition-colors"
+                data-testid="upload-csv-secondary-button"
+              >
+                <UploadIcon className="w-4 h-4" />
+                <span>{t('landing.uploadYourCsv')}</span>
+              </button>
+            </div>
+
+            {sampleMutation.isError && (
+              <p className="mt-4 text-sm text-red-300">
+                {t('landing.sampleLoadFailed')}
+              </p>
+            )}
           </div>
 
           <div className="max-w-4xl mx-auto w-full relative z-10 px-6 pb-24">
@@ -314,9 +410,10 @@ export function LandingUpload() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".csv,.xls,.xlsx"
+                  accept=".csv"
                   onChange={handleFileChange}
                   className="hidden"
+                  data-testid="trade-file-input"
                 />
 
                 {/* Dropzone - Industrial */}
@@ -335,7 +432,7 @@ export function LandingUpload() {
                           <FileSpreadsheet className="w-10 h-10 text-green-600" />
                         </div>
                         <div>
-                          <p className="text-lg font-medium text-neutral-900 dark:text-white">
+                          <p className="text-lg font-medium text-white">
                             {selectedFile.name}
                           </p>
                           <p className="text-sm text-neutral-500 mt-1">
@@ -368,6 +465,17 @@ export function LandingUpload() {
                     )}
                   </div>
                 </div>
+
+                <ImportPreflightPanel
+                  className="mt-6 text-left"
+                  selectedFileName={selectedFile?.name ?? null}
+                  validation={fileValidation}
+                  isChecking={preflightMutation.isPending}
+                  result={preflightMutation.data ?? null}
+                  error={preflightMutation.error}
+                  onRetry={retryPreflight}
+                  variant="landing"
+                />
 
                 {/* Notification Options (shown when file is selected) */}
                 {selectedFile && (
@@ -421,8 +529,9 @@ export function LandingUpload() {
                 {/* Upload Button */}
                 <button
                   onClick={handleUpload}
-                  disabled={!selectedFile || createTaskMutation.isPending || (email !== '' && !isValidEmail(email))}
+                  disabled={!canStartAnalysis}
                   className="w-full mt-8 py-4 bg-white text-black hover:bg-gray-200 disabled:bg-gray-800 disabled:text-gray-500 rounded-sm font-bold text-sm uppercase tracking-widest flex items-center justify-center space-x-3 transition-colors"
+                  data-testid="start-analysis-button"
                 >
   {createTaskMutation.isPending ? (
                     <>
@@ -436,6 +545,18 @@ export function LandingUpload() {
                     </>
                   )}
                 </button>
+
+                <div className="mt-6 text-left border border-white/10 bg-white/[0.03] rounded-sm p-4">
+                  <p className="text-xs font-mono text-white/40 uppercase tracking-widest mb-3">
+                    {t('landing.betaPrivacyTitle')}
+                  </p>
+                  <ul className="space-y-2 text-sm text-white/55">
+                    <li>{t('landing.betaPrivacyCsvOnly')}</li>
+                    <li>{t('landing.betaPrivacyNoBroker')}</li>
+                    <li>{t('landing.betaPrivacyNotAdvice')}</li>
+                    <li>{t('landing.betaPrivacyTtl')}</li>
+                  </ul>
+                </div>
 
                 {/* Has Data Link */}
                 {hasData && (
@@ -500,7 +621,7 @@ export function LandingUpload() {
                   <button
                     onClick={() => {
                       setPageState('upload');
-                      setSelectedFile(null);
+                      clearSelectedFile();
                       setTaskId(null);
                       hasNotified.current = false;
                     }}

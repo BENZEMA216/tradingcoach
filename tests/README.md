@@ -95,6 +95,7 @@ python -m pytest tests/unit/ -v
 | `test_option_analyzer.py` | 期权分析 (24个用例) |
 | `test_indicator_calculator.py` | RSI/MACD/BB/ATR |
 | `test_csv_parser.py` | CSV 解析和编码 |
+| `test_import_preflight.py` | 上传前 CSV 预检、券商识别、错误反馈 |
 
 ### 2. 集成测试 (`tests/integration/`)
 
@@ -107,6 +108,7 @@ python -m pytest tests/integration/ -v
 **测试覆盖：**
 - Positions API: 列表、筛选、分页、详情、错误处理
 - Statistics API: 性能指标、分解统计、风险指标
+- Upload API: CSV 预检、非 CSV 拒绝
 
 ### 3. 契约测试 (`tests/contract/`)
 

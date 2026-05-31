@@ -67,6 +67,11 @@ class FutuAdapter(BaseCSVAdapter):
         - 中文版: 包含 "方向", "代码", "成交时间", "市场" 列
         - 英文版: 包含 "Side", "Symbol", "Fill Time", "Markets" 列
         - 费用列包含 "平台使用费"/"Platform Fees"
+
+        重要：因为 FutuAdapter 同时被注册给 futu_cn 和 futu_en，必须根据
+        config.broker_id 只对相应语言版本打高分，否则 detect_and_get_adapter
+        会因为字典遍历顺序而把中文配置套到英文 CSV 上（导致 _map_fields
+        全部找不到字段、所有 trade 静默丢失）。
         """
         columns = set(sample_df.columns)
 
@@ -82,11 +87,20 @@ class FutuAdapter(BaseCSVAdapter):
         unique_matched = cls.FUTU_UNIQUE_COLUMNS & columns
         bonus = 0.15 if unique_matched else 0
 
-        confidence = max(cn_score, en_score) + bonus
+        # 根据 config 限制只看相应语言
+        if config.broker_id == "futu_cn":
+            score = cn_score
+        elif config.broker_id == "futu_en":
+            score = en_score
+        else:
+            # 历史兼容：未指定语言的 futu 配置取较高者
+            score = max(cn_score, en_score)
+
+        confidence = score + bonus
         can_parse = confidence >= 0.7
 
-        logger.debug(f"Futu detection: cn={cn_score:.2f}, en={en_score:.2f}, "
-                     f"bonus={bonus:.2f}, total={confidence:.2f}")
+        logger.debug(f"Futu detection ({config.broker_id}): cn={cn_score:.2f}, "
+                     f"en={en_score:.2f}, bonus={bonus:.2f}, total={confidence:.2f}")
 
         return can_parse, min(confidence, 1.0)
 
@@ -105,6 +119,12 @@ class FutuAdapter(BaseCSVAdapter):
         """富途特有的字段转换"""
         df = super()._transform_fields(df)
 
+        # 期权价差单 (spread orders) 的填充信息补全 — 富途对 spread 单
+        # 的 Fill Qty/Fill Price/Fill Time 列是空的，只在 "Filled@Avg Price"
+        # 里塞了 "2unit(s)@3.39" 这种汇总。如果不还原，spread 行会被
+        # _row_to_trade_adapter 当成 "missing required field" 静默丢掉。
+        df = self._fill_spread_orders(df)
+
         # 解析期权符号
         if 'symbol' in df.columns:
             df = self._parse_option_symbols(df)
@@ -115,6 +135,67 @@ class FutuAdapter(BaseCSVAdapter):
 
         return df
 
+    # ------------------------------------------------------------------ #
+    # 价差单 (spread) 填充补全
+    # ------------------------------------------------------------------ #
+    _SPREAD_FILL_RE = re.compile(
+        r'^\s*(\d+(?:\.\d+)?)\s*unit\(s\)\s*@\s*([\-\d\.]+)\s*$'
+    )
+
+    def _fill_spread_orders(self, df: pd.DataFrame) -> pd.DataFrame:
+        """从 raw CSV 的 "Filled@Avg Price" 列推算 spread 单的填充。"""
+        if self.raw_df is None:
+            return df
+
+        raw_col = 'Filled@Avg Price' if not self.is_chinese else '已成交@均价'
+        if raw_col not in self.raw_df.columns:
+            return df
+
+        # symbol contains "/" → spread
+        is_spread = df['symbol'].astype(str).str.contains('/', na=False)
+        if not is_spread.any():
+            return df
+
+        # filled_quantity 仍是 NaN 的 spread 行才需要补
+        needs_fill = is_spread & df['filled_quantity'].isna()
+        n_targets = int(needs_fill.sum())
+        if n_targets == 0:
+            return df
+
+        filled_count = 0
+        for idx in df.index[needs_fill]:
+            raw_val = self.raw_df.loc[idx, raw_col] if idx in self.raw_df.index else None
+            if pd.isna(raw_val) or not raw_val:
+                continue
+            m = self._SPREAD_FILL_RE.match(str(raw_val))
+            if not m:
+                continue
+            qty = float(m.group(1))
+            price = float(m.group(2))
+            df.at[idx, 'filled_quantity'] = qty
+            df.at[idx, 'filled_price'] = price
+            # spread 用 Order Time 作 Fill Time（合理近似 — 全部成交时刻 ≈ 下单时刻）
+            if 'order_time' in df.columns and pd.notna(df.at[idx, 'order_time']):
+                df.at[idx, 'filled_time'] = df.at[idx, 'order_time']
+            # filled_amount: 期权乘数 100/张
+            df.at[idx, 'filled_amount'] = qty * price * 100
+            filled_count += 1
+
+        if filled_count:
+            logger.info(
+                f"Synthesized fill info for {filled_count}/{n_targets} spread orders "
+                f"(from '{raw_col}' field)"
+            )
+        return df
+
+    # 富途垂直价差代码 — 两个 strike 在同一行
+    #   NVDA260717C195/200             单月双 strike
+    #   BIDU260320P105/260618P105      双月同 strike
+    #   HIMS260618C45/50               不带千位
+    _SPREAD_PATTERN = re.compile(
+        r'^([A-Z]+)\d{4,6}[CP][\d.]+/(\d{4,6}[CP])?[\d.]+$'
+    )
+
     def _parse_option_symbols(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         解析期权符号
@@ -124,37 +205,52 @@ class FutuAdapter(BaseCSVAdapter):
         - 260618: 到期日 (YYMMDD)
         - C/P: Call/Put
         - 205000: 行权价 (需除以1000)
+
+        Vertical spread:
+        - NVDA260717C195/200 等 — 标记为期权（is_option=True）
+        - underlying 从前缀提取
+        - strike / expiry 不可单值表示，留空
         """
+        spread_re = self._SPREAD_PATTERN
+
         def parse_option(symbol):
             if pd.isna(symbol):
                 return {}
 
             symbol = str(symbol).strip()
 
-            # 匹配期权格式
+            # 1) 单 leg OCC 格式
             pattern = r'^([A-Z]+)(\d{6})([CP])(\d+)$'
             match = re.match(pattern, symbol)
+            if match:
+                underlying, date_str, option_type, strike_raw = match.groups()
+                try:
+                    expiry = datetime.strptime(date_str, '%y%m%d').date()
+                    strike = int(strike_raw) / 1000.0
+                    return {
+                        'is_option': True,
+                        'underlying_symbol': underlying,
+                        'option_type': 'CALL' if option_type == 'C' else 'PUT',
+                        'strike_price': strike,
+                        'expiration_date': expiry,
+                    }
+                except Exception:
+                    pass
 
-            if not match:
-                return {'is_option': False}
+            # 2) Vertical spread —— 用 / 隔开两条 leg
+            if '/' in symbol:
+                sp = spread_re.match(symbol)
+                if sp:
+                    return {
+                        'is_option': True,
+                        'underlying_symbol': sp.group(1),
+                        # 价差不能用单一 strike / expiry / type 表示
+                        'option_type': None,
+                        'strike_price': None,
+                        'expiration_date': None,
+                    }
 
-            underlying, date_str, option_type, strike_raw = match.groups()
-
-            try:
-                # 解析到期日
-                expiry = datetime.strptime(date_str, '%y%m%d').date()
-                # 解析行权价
-                strike = int(strike_raw) / 1000.0
-
-                return {
-                    'is_option': True,
-                    'underlying_symbol': underlying,
-                    'option_type': 'CALL' if option_type == 'C' else 'PUT',
-                    'strike_price': strike,
-                    'expiration_date': expiry,
-                }
-            except Exception:
-                return {'is_option': False}
+            return {'is_option': False}
 
         # 应用解析
         option_info = df['symbol'].apply(parse_option)

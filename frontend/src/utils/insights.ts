@@ -30,12 +30,21 @@ export function getEquityCurveInsight(
   if (!data || data.length === 0) return '';
 
   const last = data[data.length - 1];
-  const maxDrawdown = Math.min(...data.map(d => d.drawdown_pct ?? 0));
+  // drawdown_pct 在 API 里是正值（"回撤了 92%"），用 Math.max 才对。
+  // 之前写的 Math.min 会被首日的 0 拉到 0.0%，导致 caption "0.0%" 与
+  // 卡片标签的 -$9,489.61 自相矛盾。
+  // 进一步：如果交易组合曾经从正穿到负，drawdown / peak 会大于 100%
+  // （peak 不是初始资金而是历史最高 P&L）。clamp 到 100% 给用户一个
+  // 物理上有意义的"最深回撤比例"。
+  const rawMax = Math.max(...data.map(d => d.drawdown_pct ?? 0));
+  const maxDrawdown = Math.min(rawMax, 100);
+  const wasClamped = rawMax > 100;
+  const suffix = wasClamped ? (isZh ? '+' : '+') : '';
 
   if (isZh) {
-    return `累计收益 ${formatUSD(last.cumulative_pnl)}，期间最大回撤 ${Math.abs(maxDrawdown).toFixed(1)}%。`;
+    return `累计收益 ${formatUSD(last.cumulative_pnl)}，期间最大回撤 ${maxDrawdown.toFixed(1)}%${suffix}。`;
   }
-  return `Cumulative P&L of ${formatUSD(last.cumulative_pnl)} with maximum drawdown of ${Math.abs(maxDrawdown).toFixed(1)}%.`;
+  return `Cumulative P&L of ${formatUSD(last.cumulative_pnl)} with maximum drawdown of ${maxDrawdown.toFixed(1)}%${suffix}.`;
 }
 
 /**

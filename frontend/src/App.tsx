@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { ToastContainer } from '@/components/common/Toast';
 import { FeedbackButton } from '@/components/feedback/FeedbackButton';
 import { LandingUpload } from '@/pages/LandingUpload';
+import { Upload } from '@/pages/Upload';
 import { AnalysisLoading } from '@/pages/AnalysisLoading';
 import { Dashboard } from '@/pages/Dashboard';
 import { Positions } from '@/pages/Positions';
@@ -12,6 +13,7 @@ import { System } from '@/pages/System';
 import { AICoach } from '@/pages/AICoach';
 import { TaskStatus } from '@/pages/TaskStatus';
 import { EventAnalysis } from '@/pages/EventAnalysis';
+import { Backtest } from '@/pages/Backtest';
 
 function App() {
   return (
@@ -31,12 +33,13 @@ function App() {
           <Route path="positions" element={<Positions />} />
           <Route path="positions/:id" element={<PositionDetail />} />
           <Route path="events" element={<EventAnalysis />} />
+          <Route path="backtest" element={<Backtest />} />
           <Route path="tasks/:taskId" element={<TaskStatus />} />
 
           {/* Hidden routes (accessible via URL but not in nav) */}
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="ai-coach" element={<AICoach />} />
-          <Route path="upload" element={<Navigate to="/" replace />} />
+          <Route path="upload" element={<Upload />} />
           <Route path="system" element={<System />} />
         </Route>
       </Routes>

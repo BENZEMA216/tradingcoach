@@ -2,8 +2,8 @@
  * Console Error Monitoring Tests - 控制台错误监控测试
  *
  * input: All frontend pages
- * output: Console error detection and reporting
- * pos: E2E 测试 - 确保页面无 JavaScript 错误
+ * output: Console error detection and reporting with mobile-safe navigation checks
+ * pos: E2E 测试 - 确保页面无 JavaScript 错误，并避免点击移动端离屏 sidebar
  *
  * Run: npx playwright test tests/e2e/console-errors.spec.ts --project=chromium
  *
@@ -46,6 +46,10 @@ function isIgnoredError(errorText: string): boolean {
   return IGNORED_ERRORS.some(pattern => errorText.includes(pattern));
 }
 
+function isMobileViewport(page: { viewportSize: () => { width: number } | null }): boolean {
+  return (page.viewportSize()?.width ?? 1280) < 768;
+}
+
 test.describe('Console Error Monitoring', () => {
   for (const pageInfo of PAGES) {
     test(`${pageInfo.name} page has no console errors`, async ({ page }) => {
@@ -80,14 +84,19 @@ test.describe('Console Error Monitoring - User Interactions', () => {
     await page.goto(`${BASE_URL}/dashboard`);
     await waitForNetworkIdle(page);
 
-    // Interact with the page
-    // Click on navigation items
-    const navLinks = page.locator('nav a, aside a');
-    const navCount = await navLinks.count();
-
-    if (navCount > 0) {
-      await navLinks.first().click();
+    if (isMobileViewport(page)) {
+      await page.goto(`${BASE_URL}/statistics`);
       await waitForNetworkIdle(page);
+    } else {
+      // Interact with the page
+      // Click on navigation items
+      const navLinks = page.locator('nav a, aside a').filter({ visible: true });
+      const navCount = await navLinks.count();
+
+      if (navCount > 0) {
+        await navLinks.first().click();
+        await waitForNetworkIdle(page);
+      }
     }
 
     const errors = consoleCollector.getErrors().filter(e => !isIgnoredError(e.text));
@@ -125,12 +134,12 @@ test.describe('Console Error Monitoring - User Interactions', () => {
     const rowCount = await rows.count();
 
     if (rowCount > 0) {
-      await rows.first().click();
+      await rows.first().locator('td').first().click();
       await waitForNetworkIdle(page, EXTENDED_TIMEOUT);
 
       // Go back
-      const backButton = page.getByText(/Back|返回/);
-      if (await backButton.isVisible()) {
+      const backButton = page.getByRole('button', { name: /Back|返回/ });
+      if (await backButton.count() > 0 && await backButton.first().isVisible()) {
         await backButton.click();
         await waitForNetworkIdle(page, EXTENDED_TIMEOUT);
       }

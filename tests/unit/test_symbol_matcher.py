@@ -50,6 +50,30 @@ def create_trade(
     )
 
 
+def create_option_trade(
+    direction: TradeDirection,
+    quantity: int,
+    price: float,
+    filled_time: datetime,
+    symbol: str = 'NVDA250207C120000',
+) -> Trade:
+    """辅助函数：创建单腿期权交易记录"""
+    trade = create_trade(
+        direction=direction,
+        quantity=quantity,
+        price=price,
+        filled_time=filled_time,
+        symbol=symbol,
+    )
+    trade.symbol_name = 'NVIDIA Call Option'
+    trade.is_option = 1
+    trade.underlying_symbol = 'NVDA'
+    trade.option_type = 'CALL'
+    trade.strike_price = Decimal('120')
+    trade.expiration_date = filled_time.date().replace(month=2, day=7)
+    return trade
+
+
 class TestSymbolMatcherInit:
     """测试 SymbolMatcher 初始化"""
 
@@ -338,6 +362,28 @@ class TestSymbolMatcherOpenPositions:
         assert position.open_price == Decimal('150.00')
         assert position.close_price is None
         assert position.close_time is None
+
+    def test_finalize_open_option_preserves_option_fields(self):
+        """测试未平仓单腿期权保留期权字段"""
+        matcher = SymbolMatcher('NVDA250207C120000')
+        buy = create_option_trade(
+            TradeDirection.BUY,
+            1,
+            2.26,
+            datetime(2025, 2, 3, 9, 30, 33),
+        )
+
+        matcher.process_trade(buy)
+        open_positions = matcher.finalize_open_positions()
+
+        assert len(open_positions) == 1
+        position = open_positions[0]
+        assert position.status == PositionStatus.OPEN
+        assert position.is_option == 1
+        assert position.underlying_symbol == 'NVDA'
+        assert position.option_type == 'CALL'
+        assert position.strike_price == Decimal('120')
+        assert position.expiry_date == datetime(2025, 2, 7).date()
 
     def test_finalize_open_short(self, symbol_matcher):
         """测试创建未平仓做空持仓"""

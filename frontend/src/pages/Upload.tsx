@@ -1,8 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { uploadApi, taskApi, systemApi } from '@/api/client';
-import type { UploadHistoryItem, TaskStatus } from '@/api/client';
+import { uploadApi, taskApi, systemApi, workspaceApi } from '@/api/client';
+import type { UploadHistoryItem } from '@/api/client';
+import { ImportPreflightPanel } from '@/components/upload/ImportPreflightPanel';
 import {
   Upload as UploadIcon,
   FileText,
@@ -20,6 +21,11 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { formatDate, formatNumber } from '@/utils/format';
+import {
+  isTradeImportReady,
+  validateTradeImportFile,
+} from '@/utils/importPreflight';
+import type { TradeImportFileValidation } from '@/utils/importPreflight';
 import { useNavigate } from 'react-router-dom';
 
 // 动态处理消息
@@ -45,6 +51,31 @@ const STEPS = [
   { key: 'complete', label: '完成', labelEn: 'Done', progress: 100 },
 ];
 
+function getHistoryTypeBadge(fileType: string) {
+  const normalized = fileType.toLowerCase();
+  const isEnglish = normalized === 'english' || normalized.endsWith('_en');
+  const isChinese = normalized === 'chinese' || normalized.endsWith('_cn');
+
+  if (isEnglish) {
+    return {
+      label: 'EN',
+      className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    };
+  }
+
+  if (isChinese) {
+    return {
+      label: 'CN',
+      className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+    };
+  }
+
+  return {
+    label: fileType ? fileType.toUpperCase() : 'CSV',
+    className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+  };
+}
+
 export function Upload() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -52,6 +83,7 @@ export function Upload() {
 
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileValidation, setFileValidation] = useState<TradeImportFileValidation | null>(null);
   const [email, setEmail] = useState('');
   const [replaceMode, setReplaceMode] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -108,11 +140,20 @@ export function Upload() {
     return 0;
   };
 
+  const preflightMutation = useMutation({
+    mutationFn: (file: File) => uploadApi.previewTrades(file),
+  });
+
   // 重置上传状态
   const resetUpload = () => {
     setTaskId(null);
     setIsProcessing(false);
     setSelectedFile(null);
+    setFileValidation(null);
+    preflightMutation.reset();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     setShowLogs(false);
   };
 
@@ -129,11 +170,12 @@ export function Upload() {
 
   // Reset all data mutation
   const resetMutation = useMutation({
-    mutationFn: () => systemApi.resetAllData(),
+    mutationFn: () => workspaceApi.deleteCurrent(),
     onSuccess: () => {
       setShowResetModal(false);
-      // Invalidate all queries to refresh data
-      queryClient.invalidateQueries();
+      queryClient.clear();
+      resetUpload();
+      navigate('/');
     },
   });
 
@@ -145,14 +187,51 @@ export function Upload() {
 
   // Create task mutation (async)
   const createTaskMutation = useMutation({
-    mutationFn: ({ file, email }: { file: File; email?: string }) =>
-      taskApi.create(file, email, replaceMode),
+    mutationFn: async ({ file, email }: { file: File; email?: string }) => {
+      await workspaceApi.ensure();
+      return taskApi.create(file, email, replaceMode);
+    },
     onSuccess: (data) => {
       // 不再跳转，在当前页面显示进度
       setTaskId(data.task_id);
       setIsProcessing(true);
     },
   });
+
+  const clearSelectedFile = useCallback(() => {
+    setSelectedFile(null);
+    setFileValidation(null);
+    preflightMutation.reset();
+    createTaskMutation.reset();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [createTaskMutation, preflightMutation]);
+
+  const selectTradeFile = useCallback((file: File) => {
+    const validation = validateTradeImportFile(file);
+    setFileValidation(validation);
+    preflightMutation.reset();
+    createTaskMutation.reset();
+
+    if (!validation.valid) {
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    setSelectedFile(file);
+    preflightMutation.mutate(file);
+  }, [createTaskMutation, preflightMutation]);
+
+  const retryPreflight = useCallback(() => {
+    if (selectedFile) {
+      preflightMutation.reset();
+      preflightMutation.mutate(selectedFile);
+    }
+  }, [preflightMutation, selectedFile]);
 
   // Handle drag events
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -172,23 +251,20 @@ export function Upload() {
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.name.endsWith('.csv')) {
-        setSelectedFile(file);
-      }
+      selectTradeFile(e.dataTransfer.files[0]);
     }
-  }, []);
+  }, [selectTradeFile]);
 
   // Handle file input change
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      selectTradeFile(e.target.files[0]);
     }
   };
 
   // Handle upload
   const handleUpload = () => {
-    if (selectedFile) {
+    if (selectedFile && canStartAnalysis) {
       createTaskMutation.mutate({
         file: selectedFile,
         email: email.trim() || undefined,
@@ -201,6 +277,15 @@ export function Upload() {
     if (!email) return true; // Empty is valid (optional field)
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
+
+  const canStartAnalysis = isTradeImportReady({
+    selectedFile,
+    validation: fileValidation,
+    preflight: preflightMutation.data ?? null,
+    isChecking: preflightMutation.isPending,
+    isSubmitting: createTaskMutation.isPending,
+    isEmailValid: isValidEmail(email),
+  });
 
   return (
     <div className="space-y-6">
@@ -583,6 +668,7 @@ export function Upload() {
           accept=".csv"
           onChange={handleFileChange}
           className="hidden"
+          data-testid="trade-file-input"
         />
 
         <div
@@ -618,6 +704,16 @@ export function Upload() {
           </div>
         </div>
 
+        <ImportPreflightPanel
+          className="mt-4"
+          selectedFileName={selectedFile?.name ?? null}
+          validation={fileValidation}
+          isChecking={preflightMutation.isPending}
+          result={preflightMutation.data ?? null}
+          error={preflightMutation.error}
+          onRetry={retryPreflight}
+        />
+
         {/* Selected File and Options */}
         {selectedFile && (
           <div className="mt-6 space-y-4">
@@ -635,7 +731,7 @@ export function Upload() {
                 </div>
               </div>
               <button
-                onClick={() => setSelectedFile(null)}
+                onClick={clearSelectedFile}
                 className="text-gray-400 hover:text-gray-600"
               >
                 &times;
@@ -677,26 +773,28 @@ export function Upload() {
               </label>
             </div>
 
-            {/* Upload Button */}
-            <button
-              onClick={handleUpload}
-              disabled={createTaskMutation.isPending || !isValidEmail(email)}
-              className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center space-x-2 font-semibold text-lg transition-all duration-200 active:scale-[0.98]"
-            >
-              {createTaskMutation.isPending ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>{t('upload.creating', 'Creating task...')}</span>
-                </>
-              ) : (
-                <>
-                  <UploadIcon className="w-5 h-5" />
-                  <span>{t('upload.startAnalysis', 'Start Analysis')}</span>
-                </>
-              )}
-            </button>
           </div>
         )}
+
+        {/* Upload Button */}
+        <button
+          onClick={handleUpload}
+          disabled={!canStartAnalysis}
+          className="mt-6 w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center space-x-2 font-semibold text-lg transition-all duration-200 active:scale-[0.98]"
+          data-testid="start-analysis-button"
+        >
+          {createTaskMutation.isPending ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>{t('upload.creating', 'Creating task...')}</span>
+            </>
+          ) : (
+            <>
+              <UploadIcon className="w-5 h-5" />
+              <span>{t('upload.startAnalysis', 'Start Analysis')}</span>
+            </>
+          )}
+        </button>
 
         {/* Error */}
         {createTaskMutation.isError && (
@@ -732,7 +830,57 @@ export function Upload() {
             <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
           </div>
         ) : history && history.length > 0 ? (
-          <div className="overflow-x-auto">
+          <>
+          <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700">
+            {history.map((item: UploadHistoryItem) => {
+              const typeBadge = getHistoryTypeBadge(item.file_type);
+
+              return (
+              <div key={item.id} className="py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+                      <Clock className="w-4 h-4 shrink-0" />
+                      <span className="text-xs">{formatDate(item.import_time)}</span>
+                    </div>
+                    <div className="mt-2 truncate text-sm font-medium text-gray-900 dark:text-white">
+                      {item.file_name}
+                    </div>
+                  </div>
+                  <span className={`shrink-0 px-2 py-1 text-xs rounded-full ${item.status === 'success'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
+                    }`}>
+                    {item.status}
+                  </span>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      {t('upload.historyType', 'Type')}
+                    </div>
+                    <span className={`mt-1 inline-flex px-2 py-1 text-xs rounded-full ${typeBadge.className}`}>
+                      {typeBadge.label}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      {t('upload.historyNew', 'New')}
+                    </div>
+                    <div className="mt-1 font-medium text-green-600">+{item.new_trades}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      {t('upload.historySkipped', 'Skipped')}
+                    </div>
+                    <div className="mt-1 text-gray-500">{item.duplicates_skipped}</div>
+                  </div>
+                </div>
+              </div>
+              );
+            })}
+          </div>
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="text-left text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -745,7 +893,10 @@ export function Upload() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                {history.map((item: UploadHistoryItem) => (
+                {history.map((item: UploadHistoryItem) => {
+                  const typeBadge = getHistoryTypeBadge(item.file_type);
+
+                  return (
                   <tr key={item.id} className="text-sm">
                     <td className="py-3 pr-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
@@ -757,11 +908,8 @@ export function Upload() {
                       {item.file_name}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${item.file_type === 'english'
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                          : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                        }`}>
-                        {item.file_type === 'english' ? 'EN' : 'CN'}
+                      <span className={`px-2 py-1 text-xs rounded-full ${typeBadge.className}`}>
+                        {typeBadge.label}
                       </span>
                     </td>
                     <td className="py-3 pr-4 text-right font-medium text-green-600">
@@ -779,10 +927,12 @@ export function Upload() {
                       </span>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
+          </>
         ) : (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />

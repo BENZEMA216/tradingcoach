@@ -62,7 +62,12 @@ class FIFOMatcher:
             'open_positions': 0,
             'closed_positions': 0,
             'warnings': [],
-            'symbols_processed': 0
+            'symbols_processed': 0,
+            # 卖单找不到对应买单的明细 — 通常是 CSV 起点前已有的持仓被卖出。
+            # 这部分卖单的 P&L 不会进入"closed positions" 总盈亏，必须给用户看到。
+            'orphaned_closes': [],
+            'orphaned_close_count': 0,
+            'orphaned_close_total_qty': 0,
         }
 
         logger.info(f"Initialized FIFOMatcher (dry_run={dry_run})")
@@ -198,6 +203,23 @@ class FIFOMatcher:
                           f"(sell_short without buy_to_cover)")
                 self.stats['warnings'].append(warning)
                 logger.warning(warning)
+
+            # 汇总孤儿卖单
+            if matcher.orphaned_closes:
+                self.stats['orphaned_closes'].extend(matcher.orphaned_closes)
+
+        # 总计
+        self.stats['orphaned_close_count'] = len(self.stats['orphaned_closes'])
+        self.stats['orphaned_close_total_qty'] = sum(
+            oc.get('quantity', 0) for oc in self.stats['orphaned_closes']
+        )
+        if self.stats['orphaned_close_count']:
+            logger.warning(
+                f"⚠ {self.stats['orphaned_close_count']} orphaned closing trades "
+                f"({self.stats['orphaned_close_total_qty']} total shares) — these are "
+                f"sells whose corresponding buys aren't in this CSV (likely positions "
+                f"opened BEFORE the CSV start date). Their P&L is NOT included in totals."
+            )
 
         logger.info(f"Created {len(open_positions)} open positions")
 

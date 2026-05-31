@@ -27,9 +27,14 @@ DB_PATH = Path(__file__).parent.parent.parent / 'data' / 'tradingcoach.db'
 class DataLoader:
     """数据加载器"""
 
-    def __init__(self):
+    def __init__(self, session=None):
         self.session = None
-        self._connect_db()
+        if session is not None:
+            # Allow injecting an existing session (e.g. tests) so we do not
+            # re-point the global engine at the on-disk database.
+            self.session = session
+        else:
+            self._connect_db()
 
     def _connect_db(self):
         """连接数据库"""

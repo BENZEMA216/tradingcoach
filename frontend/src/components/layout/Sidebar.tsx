@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import {
@@ -8,9 +8,9 @@ import {
   Calendar,
   Upload,
   Home,
-  Monitor,
   Menu,
   X,
+  Rewind,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { LanguageSwitcher, ThemeToggle } from '@/components/common';
@@ -20,18 +20,13 @@ const navItems = [
   { to: '/statistics', icon: BarChart3, labelKey: 'nav.statistics' },
   { to: '/positions', icon: List, labelKey: 'nav.positions' },
   { to: '/events', icon: Calendar, labelKey: 'nav.events' },
+  { to: '/backtest', icon: Rewind, labelKey: 'nav.backtest' },
 ];
 
 export function Sidebar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location.pathname]);
 
   // Close mobile menu when clicking outside or pressing escape
   useEffect(() => {
@@ -113,7 +108,10 @@ export function Sidebar() {
         {/* Home Button */}
         <div className="px-3 pt-6">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              navigate('/');
+            }}
             className="w-full flex items-center px-4 py-3 rounded-sm text-sm font-mono text-slate-500 dark:text-white/60 hover:text-slate-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-neutral-200 dark:hover:border-white/10"
           >
             <Home className="w-4 h-4 mr-3" />
@@ -132,6 +130,7 @@ export function Sidebar() {
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className={({ isActive }) =>
                       clsx(
                         'flex items-center px-4 py-3 rounded-none text-sm font-medium transition-all duration-200 border-l-2',
@@ -155,7 +154,10 @@ export function Sidebar() {
               DATA_LINK
             </p>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate('/');
+              }}
               className="w-full flex items-center px-4 py-3 rounded-sm text-sm font-medium text-slate-500 dark:text-white/50 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-all duration-200"
             >
               <Upload className="w-5 h-5 mr-3 text-slate-400 dark:text-white/50" />

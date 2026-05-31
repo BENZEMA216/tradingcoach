@@ -4,10 +4,9 @@ import {
   formatPercent,
   formatDateTime,
   getPnLColorClass,
-  getGradeBadgeClass,
   formatHoldingDays,
 } from '@/utils/format';
-import { InfoTooltip } from '@/components/common/InfoTooltip';
+import { GradeBadge, InfoTooltip } from '@/components/common';
 import type { PositionDetail } from '@/types';
 import clsx from 'clsx';
 
@@ -55,14 +54,7 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
           <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
             {t('positionDetail.tradeSummary')}
           </h3>
-          <span
-            className={clsx(
-              'px-3 py-1 text-lg font-bold rounded-lg',
-              getGradeBadgeClass(position.score_grade)
-            )}
-          >
-            {position.score_grade || '-'}
-          </span>
+          <GradeBadge grade={position.score_grade} size="md" showIncompleteInfo className="rounded-lg" />
         </div>
 
         {/* Hero P&L */}
@@ -73,7 +65,7 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
               getPnLColorClass(position.net_pnl)
             )}
           >
-            {formatCurrency(position.net_pnl)}
+            {formatCurrency(position.net_pnl, position?.currency || 'USD')}
           </div>
           <div
             className={clsx(
@@ -89,11 +81,11 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.openPrice')}</div>
-            <div className="text-lg font-semibold">{formatCurrency(position.open_price)}</div>
+            <div className="text-lg font-semibold">{formatCurrency(position.open_price, position?.currency || 'USD')}</div>
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.closePrice')}</div>
-            <div className="text-lg font-semibold">{formatCurrency(position.close_price)}</div>
+            <div className="text-lg font-semibold">{formatCurrency(position.close_price, position?.currency || 'USD')}</div>
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.quantity')}</div>
@@ -107,6 +99,29 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
             <div className="text-lg font-semibold">{formatHoldingDays(position.holding_period_days, isZh)}</div>
           </div>
         </div>
+
+        {position.is_option && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+            <div>
+              <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.optionType')}</div>
+              <div className="text-sm font-semibold uppercase">{position.option_type || '-'}</div>
+            </div>
+            <div>
+              <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.strikePrice')}</div>
+              <div className="text-sm font-semibold">
+                {position.strike_price != null ? position.strike_price.toFixed(2) : '-'}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.expiryDate')}</div>
+              <div className="text-sm font-semibold">{position.expiry_date || '-'}</div>
+            </div>
+            <div>
+              <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.underlying')}</div>
+              <div className="text-sm font-semibold">{position.underlying_symbol || '-'}</div>
+            </div>
+          </div>
+        )}
 
         {/* Time & Fees */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800">
@@ -124,13 +139,13 @@ export function TradeSummaryTab({ position }: TradeSummaryTabProps) {
               <InfoTooltip termKey="pnl" size="xs" />
             </div>
             <div className={clsx('text-sm font-medium', getPnLColorClass(position.realized_pnl))}>
-              {formatCurrency(position.realized_pnl)}
+              {formatCurrency(position.realized_pnl, position?.currency || 'USD')}
             </div>
           </div>
           <div>
             <div className="text-xs text-neutral-500 mb-1">{t('positionDetail.totalFees')}</div>
             <div className="text-sm font-medium text-red-600">
-              -{formatCurrency(position.total_fees)}
+              -{formatCurrency(position.total_fees, position?.currency || 'USD')}
             </div>
           </div>
         </div>

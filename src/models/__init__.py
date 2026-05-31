@@ -21,6 +21,8 @@ from .news_context import NewsContext, NewsSentiment, NewsImpactLevel, NewsCateg
 from .event_context import EventContext, EventType, EventImpact
 from .task import Task, TaskStatus, TaskType
 from .import_history import ImportHistory, PositionSnapshot
+from .market_snapshot import MarketSnapshot
+from .data_lineage import DataLineageEvent, DataLineageRecord
 
 # 导出所有模型和工具函数
 __all__ = [
@@ -44,6 +46,9 @@ __all__ = [
     'Task',
     'ImportHistory',
     'PositionSnapshot',
+    'MarketSnapshot',
+    'DataLineageEvent',
+    'DataLineageRecord',
 
     # 枚举类型
     'TradeDirection',
