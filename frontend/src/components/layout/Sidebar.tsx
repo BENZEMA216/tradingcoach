@@ -94,6 +94,9 @@ export function Sidebar() {
             <span className="text-sm font-mono font-bold tracking-widest text-slate-900 dark:text-white uppercase">
               TC_TERMINAL
             </span>
+            <span className="ml-2 px-1.5 py-0.5 rounded-sm border border-amber-400/60 bg-amber-400/10 text-amber-600 dark:text-amber-400 text-[9px] font-mono font-bold tracking-widest uppercase">
+              Beta
+            </span>
           </div>
           {/* Mobile Close Button */}
           <button

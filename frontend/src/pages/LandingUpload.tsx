@@ -354,8 +354,9 @@ export function LandingUpload() {
 
           {/* Hero - The "Monolith" */}
           <div className="text-center mb-12 relative z-10 pt-2">
-            <div className="inline-block border border-white/20 px-4 py-1.5 rounded-full mb-6 bg-black/50 backdrop-blur">
-              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">{t('landing.systemStatus')} • {t('landing.version')} 1.0.0</span>
+            <div className="inline-flex items-center gap-2 border border-white/20 px-4 py-1.5 rounded-full mb-6 bg-black/50 backdrop-blur">
+              <span className="px-1.5 py-0.5 rounded-sm bg-amber-400/15 border border-amber-400/50 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-widest">{t('landing.betaTag')}</span>
+              <span className="text-xs font-mono text-white/70 uppercase tracking-widest">{t('landing.systemStatus')}</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-5 tracking-tighter leading-[0.9] whitespace-pre-line">
@@ -397,6 +398,10 @@ export function LandingUpload() {
                 {t('landing.sampleLoadFailed')}
               </p>
             )}
+
+            <p className="mt-6 mx-auto max-w-xl text-xs text-white/40 leading-relaxed">
+              {t('landing.betaNotice')}
+            </p>
           </div>
 
           <div className="max-w-4xl mx-auto w-full relative z-10 px-6 pb-24">

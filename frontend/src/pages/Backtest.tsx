@@ -237,7 +237,7 @@ export function Backtest() {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-slate-500 dark:text-white/50 font-mono truncate">
-                      {r.notes}
+                      {isZh ? r.notes : (r.notes_en || r.notes)}
                     </p>
                   </div>
                 </div>

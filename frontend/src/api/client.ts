@@ -760,6 +760,7 @@ export interface BacktestResult {
   name_cn: string;
   name_en: string;
   notes: string;
+  notes_en: string;
   params: Record<string, number>;
   skipped_count: number;
   actual_total_pnl: number;

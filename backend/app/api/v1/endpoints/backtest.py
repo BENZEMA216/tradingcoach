@@ -50,6 +50,7 @@ class CounterfactualResult(BaseModel):
     name_cn: str
     name_en: str
     notes: str
+    notes_en: str
     params: Dict
     skipped_count: int
     actual_total_pnl: float
@@ -74,6 +75,7 @@ def _to_response(result, cfg) -> CounterfactualResult:
         name_cn=cfg.name_cn,
         name_en=cfg.name_en,
         notes=result.notes,
+        notes_en=result.notes_en,
         params=result.params,
         skipped_count=result.skipped_count,
         actual_total_pnl=result.actual_total_pnl,

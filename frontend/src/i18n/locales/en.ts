@@ -101,6 +101,8 @@ export default {
     heroSubtitle: 'Try the sample workspace first, then upload your own broker CSV when you are ready.',
     systemStatus: 'System Operational',
     version: 'v',
+    betaTag: 'Public Beta',
+    betaNotice: "You're using the public beta — found a bug or have an idea? Use the feedback button (bottom-right); it files a GitHub issue.",
     trySampleData: 'Try Sample Data',
     uploadYourCsv: 'Upload Your CSV',
     sampleLoadFailed: 'Sample workspace failed to load. Please try again.',
