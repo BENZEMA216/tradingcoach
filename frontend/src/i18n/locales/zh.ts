@@ -101,6 +101,8 @@ export default {
     heroSubtitle: '先用样本数据快速体验，再上传自己的券商 CSV 做真实复盘。',
     systemStatus: '系统运行中',
     version: '版本',
+    betaTag: '公开 Beta',
+    betaNotice: '当前为公开 Beta 测试版 —— 发现问题或有想法？点右下角反馈按钮，会直接提交到 GitHub Issue。',
     trySampleData: '试用样本数据',
     uploadYourCsv: '上传 CSV',
     sampleLoadFailed: '样本工作区加载失败，请重试。',

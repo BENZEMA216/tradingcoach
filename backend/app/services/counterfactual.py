@@ -52,6 +52,7 @@ class RuleResult:
     monthly: List[Dict]  # [{month: "2025-04", actual_pnl, cf_pnl, savings}, ...]
     skipped_by_symbol: Dict[str, int]
     notes: str = ""
+    notes_en: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -98,6 +99,7 @@ def _assemble_result(
     positions: List[Position],
     skipped_ids: List[int],
     notes: str = "",
+    notes_en: str = "",
 ) -> RuleResult:
     skip_set = set(skipped_ids)
     actual_by_m, counter_by_m = _build_monthly(positions, skip_set)
@@ -140,6 +142,7 @@ def _assemble_result(
         monthly=monthly_rows,
         skipped_by_symbol=dict(by_sym),
         notes=notes,
+        notes_en=notes_en,
     )
 
 
@@ -182,6 +185,10 @@ def cf1_consecutive_loss_cutoff(
         notes=(
             f"对每个标的，连续 {n} 笔亏损后跳过该标的所有后续交易。"
             f"触发熔断的标的：{len(cutoff_after_id)} 个。"
+        ),
+        notes_en=(
+            f"Per ticker, skip all later trades on it after {n} consecutive losses. "
+            f"Tickers that triggered the cutoff: {len(cutoff_after_id)}."
         ),
     )
 
@@ -228,6 +235,10 @@ def cf2_no_revenge_trading(
         notes=(
             f"任何亏损平仓后 {hours} 小时内开的新仓视为报复性交易，全部跳过。"
         ),
+        notes_en=(
+            f"Any position opened within {hours}h of a losing exit is treated as "
+            f"revenge trading and skipped."
+        ),
     )
 
 
@@ -267,6 +278,12 @@ def cf3_avoid_persistent_losers(
         notes=(
             f"完全避开胜率 < {max_win_rate*100:.0f}% 且总盈亏 < 0 的标的"
             f"（最少 {min_trades} 笔样本）。识别出 {len(bad_symbols)} 个标的："
+            f"{', '.join(sorted(bad_symbols)[:8])}{'...' if len(bad_symbols)>8 else ''}"
+        ),
+        notes_en=(
+            f"Fully avoid tickers with win rate < {max_win_rate*100:.0f}% and "
+            f"negative total P&L (min {min_trades} trades). "
+            f"Identified {len(bad_symbols)} tickers: "
             f"{', '.join(sorted(bad_symbols)[:8])}{'...' if len(bad_symbols)>8 else ''}"
         ),
     )
@@ -361,6 +378,11 @@ def cf4_position_size_cap(
             f"单笔仓位金额超过历史中位数的 {cap_multiple}× 时按比例缩小，"
             f"模拟仓位管理对总盈亏的影响。命中 {len(capped_positions)} 笔。"
         ),
+        notes_en=(
+            f"Scale down any position larger than {cap_multiple}× the historical "
+            f"median size, simulating position-size management. "
+            f"{len(capped_positions)} positions affected."
+        ),
     )
 
 
@@ -436,6 +458,10 @@ def cf5_hard_stop_loss(
         notes=(
             f"对任何亏损超过 {threshold_pct}% 的仓位，假设当时严格止损在 "
             f"{threshold_pct}%。命中 {len(capped)} 笔。"
+        ),
+        notes_en=(
+            f"For any position that lost more than {threshold_pct}%, assume a hard "
+            f"stop at {threshold_pct}%. {len(capped)} positions affected."
         ),
     )
 

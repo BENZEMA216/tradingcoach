@@ -31,6 +31,7 @@ export function FeedbackButton() {
   const [description, setDescription] = useState('');
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [issueUrl, setIssueUrl] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!title.trim()) return;
@@ -48,14 +49,16 @@ export function FeedbackButton() {
       });
 
       if (response.data.success) {
+        setIssueUrl(response.data.issue_url ?? null);
         setSubmitStatus('success');
-        // 3秒后关闭并重置
+        // 关闭并重置（留足时间让用户点击 issue 链接）
         setTimeout(() => {
           setTitle('');
           setDescription('');
           setIsOpen(false);
           setSubmitStatus('idle');
-        }, 2000);
+          setIssueUrl(null);
+        }, 6000);
       }
     } catch (error) {
       setSubmitStatus('error');
@@ -122,8 +125,18 @@ export function FeedbackButton() {
                   {isZh ? '感谢你的反馈！' : 'Thank you for your feedback!'}
                 </h4>
                 <p className="text-sm text-slate-500 dark:text-white/60">
-                  {isZh ? '我们已收到你的反馈，会尽快处理。' : 'We have received your feedback and will review it soon.'}
+                  {isZh ? '已自动提交为 GitHub Issue，会尽快处理。' : 'Filed as a GitHub issue — we will review it soon.'}
                 </p>
+                {issueUrl && (
+                  <a
+                    href={issueUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-4 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    {isZh ? '查看 Issue →' : 'View issue →'}
+                  </a>
+                )}
               </div>
             ) : (
               <>

@@ -60,6 +60,7 @@ describe('Backtest', () => {
         name_cn: '严格止损 -X%',
         name_en: 'Hard stop -X%',
         notes: '对任何亏损超过 -10.0% 的仓位，假设当时严格止损在 -10.0%。',
+        notes_en: 'For any position that lost more than -10.0%, assume a hard stop at -10.0%.',
         params: { stop_loss_pct: -10 },
         skipped_count: 112,
         actual_total_pnl: 4590.21,
