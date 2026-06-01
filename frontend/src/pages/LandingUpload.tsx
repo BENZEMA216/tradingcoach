@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { taskApi, systemApi, uploadApi, workspaceApi } from '@/api/client';
+import { track } from '@/api/analytics';
 import {
   Upload as UploadIcon,
   FileSpreadsheet,
@@ -112,7 +113,9 @@ export function LandingUpload() {
 
   const sampleMutation = useMutation({
     mutationFn: () => workspaceApi.createSample(),
+    onMutate: () => track('sample_click'),
     onSuccess: () => {
+      track('sample_loaded');
       clearTask();
       queryClient.clear();
       navigate('/statistics');
@@ -221,6 +224,7 @@ export function LandingUpload() {
 
   const handleUpload = () => {
     if (selectedFile && canStartAnalysis) {
+      track('upload_submit');
       createTaskMutation.mutate({
         file: selectedFile,
         userEmail: email.trim() || undefined,
