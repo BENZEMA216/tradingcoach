@@ -1,7 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { ToastContainer } from '@/components/common/Toast';
 import { FeedbackButton } from '@/components/feedback/FeedbackButton';
+import { track } from '@/api/analytics';
 import { LandingUpload } from '@/pages/LandingUpload';
 import { Upload } from '@/pages/Upload';
 import { AnalysisLoading } from '@/pages/AnalysisLoading';
@@ -15,9 +17,18 @@ import { TaskStatus } from '@/pages/TaskStatus';
 import { EventAnalysis } from '@/pages/EventAnalysis';
 import { Backtest } from '@/pages/Backtest';
 
+function RouteTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    track('page_view', { path: location.pathname });
+  }, [location.pathname]);
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <RouteTracker />
       <ToastContainer />
       <FeedbackButton />
       <Routes>
