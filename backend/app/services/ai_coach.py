@@ -235,10 +235,6 @@ class AICoach:
                 else "暂无足够数据生成分析报告。请确保有足够的交易记录。"
             )
 
-        # 未配置 LLM 时直接走规则引擎降级总结（双语）
-        if self.llm_client is None:
-            return self._generate_fallback_summary(insights, metrics, lang)
-
         # 将洞察转换为 JSON 格式
         insights_json = json.dumps(
             [
