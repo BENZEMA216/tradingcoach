@@ -5,7 +5,6 @@ import {
   SparklesIcon,
   ChartBarIcon,
   LightBulbIcon,
-  ChatBubbleLeftRightIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
   InformationCircleIcon,
@@ -58,16 +57,11 @@ export function AICoach() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ['ai-coach-proactive-insights'],
-    queryFn: () => aiCoachApi.getProactiveInsights({ limit: 20 }),
+    queryKey: ['ai-coach-proactive-insights', i18n.language],
+    queryFn: () => aiCoachApi.getProactiveInsights({ limit: 20, lang: i18n.language }),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch service status
-  const { data: status } = useQuery({
-    queryKey: ['ai-coach-status'],
-    queryFn: () => aiCoachApi.getStatus(),
-  });
 
   // Filter insights
   const filteredInsights = (proactiveData?.insights || []).filter((insight: TradingInsight) => {
@@ -96,25 +90,6 @@ export function AICoach() {
             {t('insights.aiCoach', 'Smart analysis of your trading performance with personalized suggestions')}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {/* Service Status Badge */}
-          <div
-            className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 ${
-              status?.available
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                status?.available ? 'bg-green-500' : 'bg-yellow-500'
-              }`}
-            />
-            {status?.available
-              ? `${status.provider} - ${status.model}`
-              : t('aiCoach.serviceUnavailable', 'AI Unavailable')}
-          </div>
-        </div>
       </div>
 
       {/* Tab Navigation */}
@@ -135,17 +110,6 @@ export function AICoach() {
                 {proactiveData.insights.length}
               </span>
             )}
-          </button>
-          <button
-            onClick={() => setActiveTab('chat')}
-            className={`flex items-center gap-2 py-3 px-1 border-b-2 text-sm font-medium transition-colors ${
-              activeTab === 'chat'
-                ? 'border-purple-600 text-purple-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-            }`}
-          >
-            <ChatBubbleLeftRightIcon className="w-5 h-5" />
-            {t('insights.chat', 'Chat')}
           </button>
         </nav>
       </div>

@@ -77,6 +77,7 @@ async def get_proactive_insights(
     date_start: Optional[date] = Query(default=None, description="开始日期"),
     date_end: Optional[date] = Query(default=None, description="结束日期"),
     limit: int = Query(default=10, ge=1, le=20, description="返回洞察数量上限"),
+    lang: str = Query(default="zh", description="摘要语言: zh 或 en"),
     db: Session = Depends(get_db)
 ):
     """
@@ -89,7 +90,8 @@ async def get_proactive_insights(
         response = await coach.get_proactive_insights(
             date_start=date_start,
             date_end=date_end,
-            limit=limit
+            limit=limit,
+            lang=lang
         )
         return response.to_dict()
     except ValueError as e:
@@ -100,9 +102,14 @@ async def get_proactive_insights(
             date_end=date_end,
             limit=limit
         )
+        unavailable = (
+            "Rule-engine insights below (AI summary service unavailable)."
+            if lang == "en"
+            else "以下是规则引擎生成的洞察（AI 摘要服务暂不可用）。"
+        )
         return {
             "insights": [i.dict() for i in insights],
-            "ai_summary": f"AI 服务暂不可用: {str(e)}。以下是规则引擎生成的洞察。",
+            "ai_summary": unavailable,
             "key_metrics": {},
             "date_range": {
                 "start": str(date_start) if date_start else "all",
