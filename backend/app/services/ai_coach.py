@@ -164,7 +164,8 @@ class AICoach:
         self,
         date_start: Optional[date] = None,
         date_end: Optional[date] = None,
-        limit: int = 10
+        limit: int = 10,
+        lang: str = "zh"
     ) -> ProactiveInsightResponse:
         """
         获取主动推送的洞察
@@ -204,7 +205,7 @@ class AICoach:
             date_range_str = "无数据"
 
         # 5. 生成 AI 总结
-        ai_summary = await self._generate_summary(insights, metrics, date_range_str)
+        ai_summary = await self._generate_summary(insights, metrics, date_range_str, lang)
 
         return ProactiveInsightResponse(
             insights=insights,
@@ -222,11 +223,21 @@ class AICoach:
         self,
         insights: List[TradingInsight],
         metrics: Dict[str, Any],
-        date_range: str
+        date_range: str,
+        lang: str = "zh"
     ) -> str:
         """使用 LLM 生成洞察总结"""
         if not insights:
-            return "暂无足够数据生成分析报告。请确保有足够的交易记录。"
+            return (
+                "Not enough data to generate an analysis report yet. "
+                "Please make sure there are enough trades."
+                if lang == "en"
+                else "暂无足够数据生成分析报告。请确保有足够的交易记录。"
+            )
+
+        # 未配置 LLM 时直接走规则引擎降级总结（双语）
+        if self.llm_client is None:
+            return self._generate_fallback_summary(insights, metrics, lang)
 
         # 将洞察转换为 JSON 格式
         insights_json = json.dumps(
@@ -266,41 +277,42 @@ class AICoach:
         except Exception as e:
             logger.error(f"Failed to generate AI summary: {e}")
             # 降级：返回简单总结
-            return self._generate_fallback_summary(insights, metrics)
+            return self._generate_fallback_summary(insights, metrics, lang)
 
     def _generate_fallback_summary(
         self,
         insights: List[TradingInsight],
-        metrics: Dict[str, Any]
+        metrics: Dict[str, Any],
+        lang: str = "zh"
     ) -> str:
-        """生成降级版本的总结（不使用 LLM）"""
+        """生成降级版本的总结（不使用 LLM）。
+
+        保持单一语种：只用指标和洞察计数组成一句话概览，不内嵌各洞察的
+        中文标题/描述（详细问题与优势在下方列表里已按当前语言展示）。
+        """
         problems = [i for i in insights if i.type.value == "problem"]
         strengths = [i for i in insights if i.type.value == "strength"]
-
-        summary_parts = []
-
-        # 整体表现
+        total = metrics.get("total_trades", 0)
         win_rate = metrics.get("win_rate", 0)
         total_pnl = metrics.get("total_pnl", 0)
+
+        if lang == "en":
+            pnl_word = "up" if total_pnl > 0 else "down"
+            n_p, n_s = len(problems), len(strengths)
+            issues = f"{n_p} issue" + ("" if n_p == 1 else "s")
+            strs = f"{n_s} strength" + ("" if n_s == 1 else "s")
+            return (
+                f"{total} trades, {win_rate:.1f}% win rate, "
+                f"{pnl_word} ${abs(total_pnl):,.0f}. "
+                f"{issues} and {strs} detected — see the breakdown below."
+            )
+
         pnl_status = "盈利" if total_pnl > 0 else "亏损"
-        summary_parts.append(
-            f"共{metrics.get('total_trades', 0)}笔交易，"
-            f"胜率{win_rate:.1f}%，{pnl_status}${abs(total_pnl):,.0f}。"
+        return (
+            f"共 {total} 笔交易，胜率 {win_rate:.1f}%，"
+            f"{pnl_status} ${abs(total_pnl):,.0f}。"
+            f"检测到 {len(problems)} 个问题、{len(strengths)} 个优势，详见下方。"
         )
-
-        # 问题
-        if problems:
-            summary_parts.append(f"\n\n主要问题：")
-            for p in problems[:2]:
-                summary_parts.append(f"- {p.title}: {p.description}")
-
-        # 优势
-        if strengths:
-            summary_parts.append(f"\n\n优势方面：")
-            for s in strengths[:2]:
-                summary_parts.append(f"- {s.title}: {s.description}")
-
-        return "\n".join(summary_parts)
 
     async def chat(
         self,

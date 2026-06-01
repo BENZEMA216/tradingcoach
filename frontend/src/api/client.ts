@@ -383,6 +383,7 @@ export const aiCoachApi = {
     date_start?: string;
     date_end?: string;
     limit?: number;
+    lang?: string;
   }) => {
     const { data } = await api.get<ProactiveInsightResponse>(
       '/ai-coach/proactive-insights',
