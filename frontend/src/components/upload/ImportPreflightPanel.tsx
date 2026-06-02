@@ -213,7 +213,7 @@ export function ImportPreflightPanel({
             })}
           </p>
 
-          {messages.length > 0 && (
+          {canImport && messages.length > 0 && (
             <ul className="mt-3 space-y-1 text-sm text-amber-600 dark:text-amber-400">
               {messages.map((message) => (
                 <li key={message}>• {message}</li>
