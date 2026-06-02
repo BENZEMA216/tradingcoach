@@ -232,6 +232,7 @@ export default {
     retry: '重试',
     readyTitle: '可以开始导入',
     blockedTitle: '该文件无法导入',
+    blockedHelp: '目前仅支持富途（Futu）导出的 CSV。可以换个文件重试，或点上方「试用样本数据」先体验完整功能；你的券商不在？点右下角反馈按钮告诉我们，会尽快支持。',
     broker: '券商',
     unknownBroker: '未知',
     confidence: '置信度',

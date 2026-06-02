@@ -165,6 +165,15 @@ export function ImportPreflightPanel({
             <span className={`break-all text-xs ${mutedClass}`}>{selectedFileName || result.file_name}</span>
           </div>
 
+          {!canImport && (
+            <p className={`mt-2 text-sm ${mutedClass}`}>
+              {t(
+                'importPreflight.blockedHelp',
+                "We currently support Futu Securities CSV exports. Try another file, or use “Try Sample Data” above to explore the full experience. Broker not supported? Tell us via the feedback button (bottom-right) and we’ll add it."
+              )}
+            </p>
+          )}
+
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
             <div className={`rounded-lg border p-3 ${statClass}`}>
               <div className={`flex items-center gap-2 text-xs ${mutedClass}`}>
