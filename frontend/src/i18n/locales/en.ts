@@ -232,6 +232,7 @@ export default {
     retry: 'Retry',
     readyTitle: 'Ready to import',
     blockedTitle: 'File cannot be imported',
+    blockedHelp: "We currently support Futu Securities CSV exports. Try another file, or use “Try Sample Data” above to explore the full experience. Broker not supported? Tell us via the feedback button (bottom-right) and we’ll add it.",
     broker: 'Broker',
     unknownBroker: 'Unknown',
     confidence: 'Confidence',
